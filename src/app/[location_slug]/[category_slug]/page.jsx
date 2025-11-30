@@ -1,3 +1,5 @@
+
+
 import Link from "next/link";
 import React from "react";
 import "../../styles/category.css";
@@ -16,9 +18,9 @@ export async function generateMetadata({ params }) {
 
 
 
-const Category = async ({ params }) => {
-  const { location_slug, category_slug } = params;
-  console.log('location_slug category page:',location_slug );
+const Category = async ( {params }) => {
+  console.log('location_slug category page:', params );
+  const { location_slug , category_slug } = params;
 const data = await fetchMenuData(location_slug);
 const pageData = await fetchPageData(location_slug,category_slug);
 const waiverLink = await getWaiverLink(location_slug);

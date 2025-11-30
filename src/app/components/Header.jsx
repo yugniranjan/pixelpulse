@@ -37,19 +37,10 @@ const Header = ({ location_slug, menudata, configdata }) => {
           </div>
         </div>
 
-        <div className="desktop-container">
-          <div className="aero-menu-location">
-            <Link href="/" className="aero-d-changelocation" prefetch>
-              <GrLocation />
-              {location_slug}
-            </Link>
-            <Link href={`/${location_slug}/about-us/faq`} prefetch>
-              <div className="aero-faq">FAQ&apos;s</div>
-            </Link>
-          </div>
-        </div>
+          
 
-        <div className="aero_main_logo_wrap">
+        <div className="desktop-container">
+           <div className="aero_main_logo_wrap">
           <Link href={`/${location_slug}`} className="aero_main_logo" prefetch>
             <Image
               src={logo}
@@ -61,6 +52,18 @@ const Header = ({ location_slug, menudata, configdata }) => {
             />
           </Link>
         </div>
+          <div className="aero-menu-location">
+            {/* <Link href="/" className="aero-d-changelocation" prefetch>
+              <GrLocation />
+              {location_slug}
+            </Link> */}
+            <Link href={`/${location_slug}/about-us/faq`} prefetch>
+              <div className="aero-faq">FAQ&apos;s</div>
+            </Link>
+          </div>
+        </div>
+
+     
 
         <div className="aero-btn-booknow app-container" style={{ textAlign: "right" }}>
           {estoreConfig?.value && (

@@ -2,7 +2,7 @@
 const axios = require('axios');
 const XLSX = require('xlsx');
 
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/1zpV1juNopYe4bnFP959w3ldwj0dC-3WF/export?format=xlsx`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/1PRq9W16-0HAVHb2zsexYCm8rD4XNb3cg/export?format=xlsx`;
 const sheetCache = new Map();
 const CACHE_TTL = 1000 * 60 * 15; // 15 min
 const waiverLinkCache = new Map();
@@ -129,7 +129,7 @@ async function fetchFaqData(location, page) {
 }
 
 async function getWaiverLink(location){
-  console.log(location);
+  console.log('yoyo',location);
   const cacheKey = `waiver:${location}`;
   const cached = waiverLinkCache.get(cacheKey);
   console.log(cacheKey, cached);

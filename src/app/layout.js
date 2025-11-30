@@ -1,9 +1,12 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
-const GoogleAnalytics = dynamic(()=> import('./components/GoogleAnalytics'));
+const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
 import { Suspense } from "react";
 import Loading from "./loading";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { fetchMenuData, fetchsheetdata, getReviewsData } from "./lib/sheets";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -35,14 +38,34 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
+  // const location_slug = params?.location_slug;
+  const location_slug = "st-catharines";
+
+  const [menudata, configdata, sheetdata] = await Promise.all([
+    fetchMenuData(location_slug),
+    fetchsheetdata('config', location_slug),
+    fetchsheetdata('locations', location_slug),
+
+  ]);
+
+  const locationid = sheetdata?.[0]?.locationid || null;
+  const reviewdata = await getReviewsData(locationid)
   return (
     <html lang="en">
       <body className={inter.className}>
         <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}
+        <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
         <Suspense fallback={<Loading />}>{children}</Suspense>
-        
+        <Footer
+          location_slug={location_slug}
+          configdata={configdata}
+          menudata={menudata}
+          reviewdata={reviewdata}
+        />
+        <div id="modal-root"></div>
       </body>
     </html>
   );

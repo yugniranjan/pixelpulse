@@ -10,7 +10,7 @@ import { fetchsheetdata,fetchMenuData, generateMetadataLib,getWaiverLink } from 
 import Link from "next/link";
 
 export async function generateMetadata({ params }) {
-  const { location_slug, subcategory_slug, category_slug } = params;
+  const { location_slug = "st-catharines", subcategory_slug, category_slug } = params;
   const metadata = await generateMetadataLib({
     location: location_slug,
     category: category_slug,
@@ -21,7 +21,8 @@ export async function generateMetadata({ params }) {
 
 
 const Subcategory = async ({ params }) => {
-  const { location_slug, subcategory_slug,category_slug } = params;
+  console.log('console', params)
+  const { location_slug = "st-catharines", subcategory_slug,category_slug } = params;
   const [data, dataconfig, menudata] = await Promise.all([
     fetchsheetdata('Data', location_slug),
     fetchsheetdata('config', location_slug),
