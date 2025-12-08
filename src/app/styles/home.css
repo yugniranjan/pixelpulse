@@ -4,6 +4,14 @@
 }
 
 
+.aero-col-3 .aero-header-logo{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 0;
+  mix-blend-mode: plus-lighter;
+}
+
 .aero-col-3 {
   background: linear-gradient(90deg,
       var(--black-color) 0% 30%,
@@ -12,6 +20,7 @@
   background-color: var(--black-color);
   border-bottom: 1px solid var(--white-color);
   padding: 0.75em;
+  height: 70px;
 }
 
 .aero-col-3>div {
@@ -60,12 +69,12 @@
   position: relative;
 }
 
-.aero_main_logo {
+/* .aero_main_logo {
   position: absolute;
   inset: 0;
   top: -26px;
   z-index: 99;
-}
+} */
 
 .aero_main_logo img {
   max-width: 78px;
@@ -717,7 +726,7 @@ ul.attractions-grid {
 
 /* Each LI: fixed width on desktop, full width on mobile */
 ul.attractions-grid li {
-  width: 330px;              /* Fixed width by default */
+  width: 330px;           
 }
 
 @media (max-width: 768px) {
@@ -756,6 +765,10 @@ ul.attractions-grid li {
 
   .aero-col-3 {
     padding: 1.25em;
+        height: 95px;
+  }
+  .aero-col-3 .aero-header-logo{
+    justify-content: flex-start;
   }
 
   .aero_home_video-container video {

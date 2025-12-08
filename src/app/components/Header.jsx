@@ -29,7 +29,7 @@ const Header = ({ location_slug, menudata, configdata }) => {
 
       <section className="d-flex aero-col-3">
         <div className="aero-menu-location app-container">
-          <div className="d-flex-center aero_menu_location_icon">
+          <div className="d-flex-center aero_menu_location_icon" style={{justifyContent:"flex-start"}}>
             <MenuButton navList={navList} location_slug={location_slug} />
             <Link href="/" className="d-flex-center" prefetch>
               <GrLocation fontSize={30} color="#fff" />
@@ -39,7 +39,7 @@ const Header = ({ location_slug, menudata, configdata }) => {
 
           
 
-        <div className="desktop-container">
+        <div className="desktop-container aero-header-logo">
            <div className="aero_main_logo_wrap">
           <Link href={`/${location_slug}`} className="aero_main_logo" prefetch>
             <Image
@@ -57,7 +57,7 @@ const Header = ({ location_slug, menudata, configdata }) => {
               <GrLocation />
               {location_slug}
             </Link> */}
-            <Link href={`/${location_slug}/about-us/faq`} prefetch>
+            <Link href={`/${location_slug}/about-us/faq`} className="desktop-container" prefetch>
               <div className="aero-faq">FAQ&apos;s</div>
             </Link>
           </div>

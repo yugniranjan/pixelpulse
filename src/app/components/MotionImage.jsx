@@ -4,9 +4,10 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-const MotionImage = async ({ pageData,waiverLink }) => {
+const MotionImage = async ({ pageData, waiverLink }) => {
   //console.log(header_image);
-  const item = Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : pageData;
+  const item =
+    Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : pageData;
   // Handle case when no item exists
   if (!item) return null;
 
@@ -40,6 +41,8 @@ const MotionImage = async ({ pageData,waiverLink }) => {
             )}
           </article>
           <h1 className="aero-home-h1heading">{item.title}</h1>
+          {/* <h1>{item.title}</h1> */}
+          <p style={{color:"#fff" , padding:"20px 10px 20px 10px" , textAlign:"center"}} dangerouslySetInnerHTML={{ __html: item.smalltext }} />
         </section>
       ) : (
         <motion.div
@@ -53,15 +56,18 @@ const MotionImage = async ({ pageData,waiverLink }) => {
           }}
           style={{ maxHeight: "600px", minHeight: "450px" }}
         >
-           <Image
-            src={item.headerimage || 'https://storage.googleapis.com/aerosports/aerosports-trampoline-park-redefine-fun.svg'} // Ensure `item.image` has valid URL
+          <Image
+            src={
+              item.headerimage ||
+              "https://storage.googleapis.com/aerosports/aerosports-trampoline-park-redefine-fun.svg"
+            } // Ensure `item.image` has valid URL
             alt={item.imagetitle || "Aerosports fun for everyone"}
             layout="fill"
             objectFit="cover"
             quality={85}
             priority
           />
-          
+
           <motion.article
             className="image-content"
             initial={{ opacity: 0 }}
@@ -74,7 +80,11 @@ const MotionImage = async ({ pageData,waiverLink }) => {
             <p dangerouslySetInnerHTML={{ __html: item.smalltext }} />
             {waiverLink && (
               <div className="aero-btn-booknow">
-                <Link href={waiverLink} target="_blank"  title="sign your waiver at aerosports trampoline park" >
+                <Link
+                  href={waiverLink}
+                  target="_blank"
+                  title="sign your waiver at aerosports trampoline park"
+                >
                   <motion.button
                     animate={{
                       scale: [1, 1.2, 1.5, 1.2, 1],
