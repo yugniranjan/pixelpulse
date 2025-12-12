@@ -9,7 +9,7 @@ import SubCategoryCard from "@/components/smallComponents/SubCategoryCard"
 import MotionImage from "@/components/MotionImage";
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug,
+    location: params.location_slug || 'st-catharines',
     category: '',
     page: "kids-birthday-parties"
   });
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
 }
 
 const Page = async ({ params }) => {
-  const location_slug = params.location_slug;
+  const location_slug = params.location_slug || 'st-catharines';
   const waiverLink = await getWaiverLink(location_slug);
   const [data, birthdaydata,  menudata] = await Promise.all([
      fetchPageData(location_slug,'kids-birthday-parties'),

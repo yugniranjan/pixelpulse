@@ -6,7 +6,7 @@ import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug,
+    location: params.location_slug || 'st-catharines',
     category: '',
     page: 'blogs'
   });
@@ -15,14 +15,14 @@ export async function generateMetadata({ params }) {
 
 
 const page = async({params}) => {
-  const location_slug = params?.location_slug;
+  const location_slug = params?.location_slug || 'st-catharines';
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const data = await fetchMenuData(location_slug);
  
   const blogsData = getDataByParentId(data, "blogs");
   const extractBlogData = blogsData[0]?.children
-  console.log('blogsData');
-   console.log(blogsData);
+  // console.log('blogsData');
+  //  console.log(blogsData);
   return (
     <main className="aero-blog-main-section">
       <section className='aero-max-container'>

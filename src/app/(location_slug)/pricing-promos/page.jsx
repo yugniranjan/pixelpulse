@@ -7,7 +7,7 @@ import { fetchsheetdata, getWaiverLink, fetchPageData,generateMetadataLib } from
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug,
+    location: params.location_slug || 'st-catharines',
     category: '',
     page: 'pricing-promos'
   });
@@ -17,7 +17,9 @@ export async function generateMetadata({ params }) {
 
 
 const page = async ({ params }) => {
-  const { location_slug } = params;
+  // const { location_slug = 'st-catharines' } = params;
+  const location_slug = 'st-catharines'
+  
   const [memberData, dataconfig] = await Promise.all([
     await fetchPageData(location_slug, 'pricing-promos'),
     await fetchsheetdata('config',location_slug),

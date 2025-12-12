@@ -3,7 +3,8 @@ import { getDataByBlogId,getDataByParentId } from "@/utils/customFunctions";
 import { fetchPageData,fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import Link from 'next/link';
 export async function generateMetadata({ params }) {
-  const { location_slug, slug } = params;
+   const location_slug = params?.location_slug || 'st-catharines';
+  const { slug } = params;
   const metadata = await generateMetadataLib({
     location: location_slug,
     category: 'blogs',
@@ -13,7 +14,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogDetail({ params }) {
-  const { location_slug, slug } = params;
+  const location_slug = params?.location_slug || 'st-catharines';
+  const {  slug } = params;
+
 
   const [blogData, menuData] = await Promise.all([
     fetchPageData(location_slug,slug),
@@ -25,9 +28,6 @@ const extractBlogData = (await getDataByParentId(menuData, "blogs"))[0]?.childre
 
 //const  blogData=  extractBlogData.find((item) => item.path === slug);
 
-    //console.log(blogsData);
-    console.log('blog setail');
-    console.log(blogData);
    let images = [];
 const imagesString=blogData?.headerimage;
 if (imagesString) {
