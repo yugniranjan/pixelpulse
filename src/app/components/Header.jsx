@@ -6,30 +6,31 @@ import Image from "next/image";
 import MenuButton from "./smallComponents/MenuButton";
 import TopHeader from "./smallComponents/TopHeader";
 import { MdOutlinePermContactCalendar } from "react-icons/md";
-import logo from '@public/assets/images/logo.jpg'
+import logo from "@public/assets/images/logo.jpg";
+import LogoutButton from "./LogoutButton";
 
-
-const Header = ({ location_slug, menudata, configdata }) => {
+const Header = ({ location_slug, menudata, configdata, token }) => {
   const navList = (Array.isArray(menudata) ? menudata : [])
     .filter((item) => item.isactive === 1)
     .map((item) => ({ navName: item.desc, navUrl: item.path.toLowerCase() }))
     .sort((a, b) => a.navName.localeCompare(b.navName));
 
-    console.log(configdata.length);
+  console.log(configdata.length);
   const estoreConfig = Array.isArray(configdata)
     ? configdata.find((item) => item.key === "estorebase")
     : null;
 
- // const topHeaderConfig = Array.isArray(configdata)
- //   ? configdata.find((item) => item.key === "top-header")
- //   : null;
+  // const topHeaderConfig = Array.isArray(configdata)
+  //   ? configdata.find((item) => item.key === "top-header")
+  //   : null;
   return (
     <header>
-      
-
       <section className="d-flex aero-col-3">
         <div className="aero-menu-location app-container">
-          <div className="d-flex-center aero_menu_location_icon" style={{justifyContent:"flex-start"}}>
+          <div
+            className="d-flex-center aero_menu_location_icon"
+            style={{ justifyContent: "flex-start" }}
+          >
             <MenuButton navList={navList} location_slug={location_slug} />
             <Link href="/" className="d-flex-center" prefetch>
               <GrLocation fontSize={30} color="#fff" />
@@ -37,35 +38,42 @@ const Header = ({ location_slug, menudata, configdata }) => {
           </div>
         </div>
 
-          
-
         <div className="desktop-container aero-header-logo">
-           <div className="aero_main_logo_wrap">
-          <Link href={`/${location_slug}`} className="aero_main_logo" prefetch>
-            <Image
-              src={logo}
-              height="71"
-              width="71"
-              alt="logo"
-              title="logo"
-              unoptimized
-            />
-          </Link>
-        </div>
+          <div className="aero_main_logo_wrap">
+            <Link
+              href={`/${location_slug}`}
+              className="aero_main_logo"
+              prefetch
+            >
+              <Image
+                src={logo}
+                height="71"
+                width="71"
+                alt="logo"
+                title="logo"
+                unoptimized
+              />
+            </Link>
+          </div>
           <div className="aero-menu-location">
             {/* <Link href="/" className="aero-d-changelocation" prefetch>
               <GrLocation />
               {location_slug}
             </Link> */}
-            <Link href={`/${location_slug}/about-us/faq`} className="desktop-container" prefetch>
+            <Link
+              href={`/${location_slug}/about-us/faq`}
+              className="desktop-container"
+              prefetch
+            >
               <div className="aero-faq">FAQ&apos;s</div>
             </Link>
           </div>
         </div>
 
-     
-
-        <div className="aero-btn-booknow app-container" style={{ textAlign: "right" }}>
+        <div
+          className="aero-btn-booknow app-container"
+          style={{ textAlign: "right" }}
+        >
           {estoreConfig?.value && (
             <Link href={estoreConfig.value} target="_blank" prefetch>
               <button>book</button>
@@ -73,7 +81,8 @@ const Header = ({ location_slug, menudata, configdata }) => {
           )}
         </div>
 
-        <div className="aero-btn-booknow desktop-container">
+        <div className="aero-btn-booknow-1 aero-btn-booknow desktop-container">
+          {token && <LogoutButton />}
           <Link
             href={`/${location_slug}/contactus`}
             prefetch
@@ -105,8 +114,15 @@ const Header = ({ location_slug, menudata, configdata }) => {
                 </Link>
               ))}
           </div>
-          <div style={{ position: "relative" }} className="aero-header-changelocation-wrap">
-            <Link href="/" prefetch className="aero-app-changelocation app-container">
+          <div
+            style={{ position: "relative" }}
+            className="aero-header-changelocation-wrap"
+          >
+            <Link
+              href="/"
+              prefetch
+              className="aero-app-changelocation app-container"
+            >
               {location_slug}
             </Link>
             <Link
@@ -118,6 +134,9 @@ const Header = ({ location_slug, menudata, configdata }) => {
               <MdOutlinePermContactCalendar />
               <span>Inquiry</span>
             </Link>
+            <div className="app-container">
+              {token && <LogoutButton />}
+            </div>
           </div>
         </nav>
       </section>

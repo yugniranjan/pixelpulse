@@ -7,6 +7,8 @@ import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { fetchMenuData, fetchsheetdata, getReviewsData } from "./lib/sheets";
+import { cookies } from "next/headers";
+import { Toaster } from "sonner";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -39,7 +41,8 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-
+const token = cookies().get("admin_token")?.value;
+console.log("Admin Token:", token);
   // const location_slug = params?.location_slug;
   const location_slug = "st-catharines";
 
@@ -55,9 +58,10 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Toaster position="top-right" />
         <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}
-        <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
+        <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
         <Suspense fallback={<Loading />}>{children}</Suspense>
         <Footer
           location_slug={location_slug}

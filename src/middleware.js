@@ -1,18 +1,36 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+
+const PUBLIC_FILES = ["/favicon.ico"];
 
 export function middleware(request) {
-  const hostname = request.headers.get('host');
-  const isLocalhost = hostname?.includes('localhost') || hostname?.includes('127.0.0.1');
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get("admin_token")?.value;
 
-  if (!isLocalhost && request.nextUrl.protocol === 'http:') {
-    const url = request.nextUrl.clone();
-    url.protocol = 'https:';
-    return NextResponse.redirect(url, 301);
+  // 🚫 Skip Next.js internals & public files
+  if (
+    pathname.startsWith("/_next") ||
+    PUBLIC_FILES.includes(pathname)
+  ) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next(); // ✅ Correct method
+  // 🔁 Logged-in user should not see login page
+  if (pathname === "/admin/login") {
+    return token
+      ? NextResponse.redirect(new URL("/admin/blogs", request.url))
+      : NextResponse.next();
+  }
+
+  // 🔐 Protect all admin routes
+  if (pathname.startsWith("/admin") && !token) {
+    return NextResponse.redirect(
+      new URL("/admin/login", request.url)
+    );
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/admin/:path*"],
 };

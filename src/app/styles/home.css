@@ -3,8 +3,7 @@
   gap: 0.5rem;
 }
 
-
-.aero-col-3 .aero-header-logo{
+.aero-col-3 .aero-header-logo {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,26 +12,28 @@
 }
 
 .aero-col-3 {
-  background: linear-gradient(90deg,
-      var(--black-color) 0% 30%,
-      #524c4ec4 45% 55%,
-      var(--black-color) 70% 100%);
+  background: linear-gradient(
+    90deg,
+    var(--black-color) 0% 30%,
+    #524c4ec4 45% 55%,
+    var(--black-color) 70% 100%
+  );
   background-color: var(--black-color);
   border-bottom: 1px solid var(--white-color);
   padding: 0.75em;
   height: 70px;
 }
 
-.aero-col-3>div {
+.aero-col-3 > div {
   flex-basis: 33.3%;
   text-align: center;
 }
 
-.aero-col-3>div:first-child {
+.aero-col-3 > div:first-child {
   text-align: left;
 }
 
-.aero-col-3>div:last-child {
+.aero-col-3 > div:last-child {
   text-align: right;
 }
 
@@ -208,7 +209,7 @@
   object-fit: cover;
 }
 
-.aero-home-h1heading{
+.aero-home-h1heading {
   text-align: center;
   margin-top: 50px;
   color: var(--white-color);
@@ -241,7 +242,7 @@
   opacity: 2;
 }
 
-.aero_home-headerimg-wrapper>img {
+.aero_home-headerimg-wrapper > img {
   height: 600px;
 }
 
@@ -257,7 +258,7 @@
   width: 90%;
 }
 
-.aero_home-headerimg-wrapper article{
+.aero_home-headerimg-wrapper article {
   top: 40%;
 }
 
@@ -359,7 +360,7 @@
   padding: 2em 0.5em;
 }
 
-.aero_home-actionbtn-wrap .aero-btn-booknow button{
+.aero_home-actionbtn-wrap .aero-btn-booknow button {
   width: 100%;
 }
 
@@ -386,7 +387,7 @@
   transition: 0.5s ease-in-out;
 }
 
-.aero_home-playsection-2 article:hover>img {
+.aero_home-playsection-2 article:hover > img {
   transform: scale(1.05);
 }
 
@@ -501,7 +502,7 @@
 
 /* Seo section  */
 .aero_home_seo_section {
-  color: var( --secondary-color);
+  color: var(--secondary-color);
   padding: 0 1em;
 }
 
@@ -696,7 +697,7 @@
 }
 .figcaption-bg {
   width: 100%; /* 👈 This makes it match the image's width */
-  background-image: url('/assets/images/home/line_pattern.svg'); /* or any path in /public */
+  background-image: url("/assets/images/home/line_pattern.svg"); /* or any path in /public */
   background-size: cover;
   background-position: center;
   color: white;
@@ -726,7 +727,7 @@ ul.attractions-grid {
 
 /* Each LI: fixed width on desktop, full width on mobile */
 ul.attractions-grid li {
-  width: 330px;           
+  width: 330px;
 }
 
 @media (max-width: 768px) {
@@ -754,6 +755,13 @@ ul.attractions-grid li {
     font-size: 1.2rem;
   }
 
+  .aero-btn-booknow-1.aero-btn-booknow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+  }
+
   .aero-btn-kidslearnmore {
     bottom: 3em;
   }
@@ -765,9 +773,9 @@ ul.attractions-grid li {
 
   .aero-col-3 {
     padding: 1.25em;
-        height: 95px;
+    height: 95px;
   }
-  .aero-col-3 .aero-header-logo{
+  .aero-col-3 .aero-header-logo {
     justify-content: flex-start;
   }
 
@@ -775,10 +783,9 @@ ul.attractions-grid li {
     height: unset;
     object-fit: contain;
   }
-  .aero-home-h1heading{
+  .aero-home-h1heading {
     font-size: 33px;
   }
-
 
   .aero-list-7,
   .aero-list-7-1 {
@@ -867,7 +874,7 @@ ul.attractions-grid li {
   }
 
   /* footer  */
-  .aero_home-headerimg-wrapper>img {
+  .aero_home-headerimg-wrapper > img {
     height: 400px;
   }
 
@@ -923,5 +930,4 @@ ul.attractions-grid li {
   .aero_footer_article-card div p {
     font-size: 1.2rem;
   }
-  
 }
