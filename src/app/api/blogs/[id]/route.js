@@ -25,3 +25,10 @@ export async function PUT(req, { params }) {
 
   return Response.json({ success: true });
 }
+
+
+export async function DELETE(_, { params }) {
+  await db.collection("blogs").doc(params.id).delete();
+
+  return Response.json({ success: true });
+}

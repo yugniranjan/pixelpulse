@@ -1,114 +1,128 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
-import Quote from "@editorjs/quote";
-import ImageTool from "@editorjs/image";
-import Embed from "@editorjs/embed";
-import Table from "@editorjs/table";
-import CodeTool from "@editorjs/code";
-import Marker from "@editorjs/marker";
-import LinkTool from "@editorjs/link";
 
-export default function BlogEditor({ onChange , value = null}) {
-  
+const getDraftKey = (blogId) =>
+  blogId ? `blog-draft-${blogId}` : "blog-draft-new";
+
+export default function BlogEditor({
+  blogId = null,
+  apiData = null,
+  onReady,
+  onChangeData,
+}) {
   const editorRef = useRef(null);
+  const dataRef = useRef(null);
+  const initialised = useRef(false);
+  const holderId = "editorjs";
 
+  // ================= INIT + LOAD DATA =================
   useEffect(() => {
-    if (editorRef.current) return;
+    let mounted = true;
 
-    const editor = new EditorJS({
-      data: value || undefined,
-      holder: "editorjs",
-      autofocus: true,
-      placeholder: "Start writing your blog here...",
-      tools: {
-        header: {
-          class: Header,
-          inlineToolbar: ["bold", "italic", "link", "marker"],
-        },
-        list: {
-          class: List,
-          inlineToolbar: ["bold", "italic", "link"],
-        },
-        quote: {
-          class: Quote,
-          inlineToolbar: ["bold", "italic", "link"],
-          config: {
-            quotePlaceholder: "Enter a quote",
-            captionPlaceholder: "Quote author",
-          },
-        },
-        image: {
-          class: ImageTool,
-          config: {
-            uploader: {
-              async uploadByFile(file) {
-                const formData = new FormData();
-                formData.append("file", file);
+    async function initEditor() {
+      if (editorRef.current) return;
 
-                const res = await fetch("/api/upload-image", {
-                  method: "POST",
-                  body: formData,
-                });
+      const EditorJS = (await import("@editorjs/editorjs")).default;
+      const Header = (await import("@editorjs/header")).default;
+      const List = (await import("@editorjs/list")).default;
+      const Quote = (await import("@editorjs/quote")).default;
+      const ImageTool = (await import("@editorjs/image")).default;
+      const Embed = (await import("@editorjs/embed")).default;
+      const Table = (await import("@editorjs/table")).default;
+      const CodeTool = (await import("@editorjs/code")).default;
+      const Marker = (await import("@editorjs/marker")).default;
+      const LinkTool = (await import("@editorjs/link")).default;
 
-                const data = await res.json();
-                return {
-                  success: 1,
-                  file: { url: data.url },
-                };
+      if (!mounted) return;
+
+      const editor = new EditorJS({
+        holder: holderId,
+        autofocus: true,
+        placeholder: "Start writing your blog...",
+
+        tools: {
+          header: Header,
+          list: List,
+          quote: Quote,
+          table: Table,
+          code: CodeTool,
+          marker: Marker,
+          linkTool: LinkTool,
+          embed: Embed,
+          image: {
+            class: ImageTool,
+            config: {
+              uploader: {
+                async uploadByFile(file) {
+                  const formData = new FormData();
+                  formData.append("file", file);
+
+                  const res = await fetch("/api/upload-image", {
+                    method: "POST",
+                    body: formData,
+                  });
+
+                  const data = await res.json();
+                  return { success: 1, file: { url: data.url } };
+                },
               },
             },
           },
         },
-        embed: {
-          class: Embed,
-          inlineToolbar: false,
-          config: {
-            services: {
-              youtube: true,
-              twitter: true,
-              instagram: true,
-            },
-          },
-        },
-        table: Table,
-        code: {
-          class: CodeTool,
-          inlineToolbar: true,
-        },
-        marker: {
-          class: Marker,
-          shortcut: "CMD+SHIFT+M",
-        },
-        linkTool: {
-          class: LinkTool,
-          inlineToolbar: true,
-        },
-      },
-      inlineToolbar: true,
-      onChange: async (api) => {
-        const content = await api.saver.save();
-        onChange(content);
-      },
-    });
 
-    editorRef.current = editor;
+        onChange: async (api) => {
+          const savedData = await api.saver.save();
+          dataRef.current = savedData;
+          onChangeData?.(savedData);
+        },
+      });
+
+      editorRef.current = editor;
+
+      // 🔥 LOAD DATA AFTER READY
+      editor.isReady.then(() => {
+        if (initialised.current) return;
+
+        const draftKey = getDraftKey(blogId);
+        const draft = localStorage.getItem(draftKey);
+
+        if (draft) {
+          editor.render(JSON.parse(draft));
+        } else if (apiData) {
+          editor.render(apiData);
+        }
+
+        initialised.current = true;
+        onReady?.();
+      });
+    }
+
+    initEditor();
 
     return () => {
-      if (editorRef.current?.destroy) {
-        editorRef.current.destroy();
-      }
+      mounted = false;
+      editorRef.current?.destroy?.();
       editorRef.current = null;
     };
-  }, [value]);
+  }, []); // 👈 IMPORTANT: EMPTY DEPENDENCY
+
+  // ================= AUTOSAVE =================
+  useEffect(() => {
+    const draftKey = getDraftKey(blogId);
+
+    const interval = setInterval(() => {
+      if (!dataRef.current) return;
+      localStorage.setItem(draftKey, JSON.stringify(dataRef.current));
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [blogId]);
 
   return (
     <div
-      id="editorjs"
-      className="border border-gray-300 p-4 rounded-md min-h-[500px] bg-white"
+      id={holderId}
+      className="border p-4 rounded-md min-h-[500px] bg-white"
     />
   );
 }

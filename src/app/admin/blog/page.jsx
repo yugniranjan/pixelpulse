@@ -1,30 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import BlogEditor from "@/components/Editor";
+import dynamic from "next/dynamic";
+import { toast } from "sonner";
+
+const BlogEditor = dynamic(() => import("@/components/Editor"), {
+  ssr: false,
+});
 
 export default function CreateBlog() {
-  const [content, setContent] = useState(null);
-  const [title, setTitle] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const editorDataRef = useRef(null);   // 🔥 editor content
+  const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const publishBlog = async () => {
+    if (!editorDataRef.current) {
+      toast.error("Please write some content");
+      return;
+    }
+
     setLoading(true);
 
     const res = await fetch("/api/create-blog", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({
+        title,
+        content: editorDataRef.current,
+      }),
     });
 
     const data = await res.json();
 
     if (data.success) {
-      // ✅ reset
-      setTitle("");
-      setContent(null);
+      // ✅ clear autosave draft
+      localStorage.removeItem("blog-draft-new");
 
       // ✅ redirect
       router.push("/admin/blogs");
@@ -41,40 +54,46 @@ export default function CreateBlog() {
         placeholder="Blog Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        style={{ width: "100%", padding: 10, marginBottom: 20 }}
+        style={{
+          width: "100%",
+          padding: 10,
+          marginBottom: 20,
+        }}
       />
 
-      <BlogEditor onChange={setContent} />
+      {/* 🔥 IMPORTANT */}
+      <BlogEditor
+        onChangeData={(data) => {
+          editorDataRef.current = data;
+        }}
+      />
 
-      <div style={{ display: "flex", gap: "16px", marginTop: "20px" }}>
+      <div style={{ display: "flex", gap: "16px", marginTop: 20 }}>
         <button
           onClick={publishBlog}
-          disabled={!content || loading}
+          disabled={loading}
           style={{
             padding: "10px 24px",
-            borderRadius: "8px",
-            fontWeight: "600",
-            backgroundColor: !content || loading ? "#ccc" : "#2563eb",
-            color: !content || loading ? "#555" : "#fff",
+            borderRadius: 8,
+            fontWeight: 600,
+            backgroundColor: loading ? "#ccc" : "#2563eb",
+            color: loading ? "#555" : "#fff",
             border: "none",
-            cursor: !content || loading ? "not-allowed" : "pointer",
-            transition: "background-color 0.2s",
+            cursor: loading ? "not-allowed" : "pointer",
           }}
         >
           {loading ? "Publishing..." : "Publish"}
         </button>
 
         <button
-          onClick={() => console.log("Preview clicked!")}
+          onClick={() => console.log("Preview clicked")}
           style={{
             padding: "10px 24px",
-            borderRadius: "8px",
-            fontWeight: "600",
+            borderRadius: 8,
+            fontWeight: 600,
             backgroundColor: "#f3f4f6",
-            color: "#111",
             border: "none",
             cursor: "pointer",
-            transition: "background-color 0.2s",
           }}
         >
           Preview

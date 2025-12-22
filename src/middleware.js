@@ -28,9 +28,18 @@ export function middleware(request) {
     );
   }
 
+
+  // 🔐 Protect APIs
+  if (pathname.startsWith("/api") && !token) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/:path*"],
 };
