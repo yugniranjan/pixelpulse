@@ -13,10 +13,11 @@ import {
   getWaiverLink,
 } from "@/lib/sheets";
 import Link from "next/link";
+import { LOCATION_NAME } from "@/lib/constant";
 
 export async function generateMetadata({ params }) {
   const {
-    location_slug = "st-catharines",
+    location_slug = LOCATION_NAME || 'st-catharines',
     subcategory_slug,
     category_slug,
   } = params;
@@ -29,9 +30,9 @@ export async function generateMetadata({ params }) {
 }
 
 const Subcategory = async ({ params }) => {
-  console.log("console", params);
+  // console.log("console", params);
   const {
-    location_slug = "st-catharines",
+    location_slug = LOCATION_NAME,
     subcategory_slug,
     category_slug,
   } = params;
@@ -53,13 +54,16 @@ const Subcategory = async ({ params }) => {
     ? getDataByParentId(data, subcategory_slug)
     : [];
 
+    const safePageData = JSON.parse(JSON.stringify(attractionsData));
+  const safeWaiverLink = JSON.parse(JSON.stringify(waiverLink));
+
   const pagedata = attractionsData?.[0];
   if (!pagedata) return;
 
   return (
     <main>
       <section>
-        <MotionImage pageData={attractionsData} waiverLink={waiverLink} />
+        <MotionImage pageData={safePageData} waiverLink={safeWaiverLink} />
       </section>
 
       <section className="subcategory_main_section-bg">

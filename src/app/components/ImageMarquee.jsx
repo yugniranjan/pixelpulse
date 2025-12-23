@@ -18,8 +18,8 @@ if (imagesString) {
   if(!images) return;
 }
 
-console.log(images);
-console.log('header image');
+// console.log(images);
+// console.log('header image');
   const isDefault = images.length === 0;
 
   return (
@@ -29,13 +29,13 @@ console.log('header image');
           <div className={styles.imageContainer}>
             <img 
               src={DEFAULT_IMAGE}
-              alt="AeroSports Fun"
-              title="AeroSports Trampoline Park"
+              alt="pixelpulseplay Fun"
+              title="pixelpulseplay Trampoline Park"
               width={400}
               height={267}
               loading='lazy'
             />
-            <p className={styles.title}>AeroSports Trampoline Fun</p>
+            <p className={styles.title}>pixelpulseplay Trampoline Fun</p>
           </div>
         ) : (
           images.map((image, index) => (

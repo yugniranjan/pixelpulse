@@ -1,47 +1,3 @@
-// import Image from "next/image";
-// import Link from "next/link";
-// import "./styles.css";
-// import logo from '@public/assets/images/logo.jpg'
-// import { fetchsheetdata } from "./lib/sheets";
-
-// export default async function Home() {
-//   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-//   const FetchLocation = await fetchsheetdata('locations');
-
-//   return (
-//     <main className="aero-bg">
-//       <section className="aero-max-container aero-bg-padding">
-//         <div className="aero-img-heading">
-//           <Image src={logo} alt="logo" />
-//           <h1 className="city-card-h1-heading">ONE PASS MORE FUN</h1>
-//         </div>
-
-//         <div className="city-card-wrapper">
-//           {FetchLocation.map((card, i) => {
-//             return (
-//               <div className="city-card-wrap" key={i}>
-//                 <img
-//                   src={card.smallimage}
-//                   alt="city image"
-//                   width={100}
-//                   height={100}
-//                   loading="lazy"
-//                 />
-//                 <h2>{card.desc}</h2>
-//                 <p>{card.address}</p>
-//                 <Link href={`/${card.locations}`} prefetch>
-//                   <button>
-//                     <span>SELECT THIS PARK</span>
-//                   </button>
-//                 </Link>
-//               </div>
-//             );
-//           })}
-//         </div>
-//       </section>
-//     </main>
-//   );
-// }
 
 import "./styles/home.css";
 import "./styles/promotions.css";
@@ -58,9 +14,10 @@ import {
   getWaiverLink,
   generateMetadataLib,
 } from "@/lib/sheets";
+import { LOCATION_NAME } from "./lib/constant";
 
 export async function generateMetadata() {
-  const location_slug = "st-catharines";
+  const location_slug = LOCATION_NAME || "st-catharines";
   const metadata = await generateMetadataLib({
     location: location_slug,
     category: "",
@@ -70,39 +27,29 @@ export async function generateMetadata() {
 }
 
 const Home = async () => {
-  // const location_slug = params?.location_slug;
-  const location_slug = "st-catharines";
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  const location_slug = LOCATION_NAME;
+
   const waiverLink = await getWaiverLink(location_slug);
+
   const [data, dataconfig, promotions] = await Promise.all([
     fetchMenuData(location_slug),
     fetchsheetdata("config", location_slug),
     fetchsheetdata("promotions", location_slug),
   ]);
 
-  const homepageSection1 = Array.isArray(dataconfig)
-    ? dataconfig.find((item) => item.key === "homepageSection1")?.value ?? ""
-    : "";
-
-  const promotionPopup = Array.isArray(dataconfig)
-    ? dataconfig.filter((item) => item.key === "promotion-popup")
-    : [];
-
-  const header_image = Array.isArray(data)
-    ? data.filter((item) => item.path === "home")
-    : [];
+  const homepageSection1 = Array.isArray(dataconfig) ? dataconfig.find((item) => item.key === "homepageSection1")?.value ?? "" : "";
+  const promotionPopup = Array.isArray(dataconfig) ? dataconfig.filter((item) => item.key === "promotion-popup") : [];
+  const header_image = Array.isArray(data) ? data.filter((item) => item.path === "home") : [];
+  const safeHeaderImage = header_image ? JSON.parse(JSON.stringify(header_image)) : {};
   const seosection = header_image?.[0]?.seosection || "";
-  const attractionsData = Array.isArray(data)
-    ? getDataByParentId(data, "attractions") || []
-    : [];
-  const blogsData = Array.isArray(data)
-    ? getDataByParentId(data, "blogs") || []
-    : [];
+  const attractionsData = Array.isArray(data) ? getDataByParentId(data, "attractions") || [] : [];
+  const blogsData = Array.isArray(data) ? getDataByParentId(data, "blogs") || [] : [];
 
   const stCatharinesSchema = {
     "@context": "https://schema.org",
     "@type": "AmusementPark",
-    name: "AeroSports Trampoline Park",
+    name: "pixelpulseplay Trampoline Park",
     description:
       "A fun-filled trampoline park offering amusement, activities, mini golf, and kids' party services, axe throw.",
     address: {
@@ -143,14 +90,15 @@ const Home = async () => {
         <PromotionModal promotionPopup={promotionPopup} />
       )}
 
-      <MotionImage pageData={header_image} waiverLink={waiverLink} />
+      <MotionImage pageData={safeHeaderImage} waiverLink={waiverLink} />
+
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home-actionbtn-bg">
           <section className="aero-max-container aero_home-actionbtn">
             <h2 className="d-flex-center">JUMP STRAIGHT TO</h2>
             <section className="aero_home-actionbtn-wrap">
               <Link
-                href={`/${location_slug}/programs`}
+                href={`/programs`}
                 className="aero-btn-booknow"
                 prefetch
               >
@@ -164,14 +112,14 @@ const Home = async () => {
                 <button>PROGRAMS</button>
               </Link> */}
               <Link
-                href={`/${location_slug}/kids-birthday-parties`}
+                href={`/kids-birthday-parties`}
                 className="aero-btn-booknow"
                 prefetch
               >
                 <button>BIRTHDAY PARTIES</button>
               </Link>
               <Link
-                href={`/${location_slug}/attractions`}
+                href={`/attractions`}
                 className="aero-btn-booknow"
                 prefetch
               >
@@ -186,7 +134,7 @@ const Home = async () => {
       <section className="aero_home-playsection">
         <section className="aero_home-playsection-bg">
           <section className="aero-max-container aero_home-playsection-1 d-flex-dir-col">
-            <h2>THERE IS SO MUCH TO DO AT AEROSPORTS!</h2>
+            <h2>THERE IS SO MUCH TO DO AT PIXELPULSEPLAY!</h2>
             <p>{homepageSection1}</p>
           </section>
         </section>
@@ -269,7 +217,7 @@ const Home = async () => {
               </svg>{" "}
               Celeberate your event
             </h2>
-            <p>Elevate your event to next level at Aerosports! </p>
+            <p>Elevate your event to next level at pixelpulseplay! </p>
             <div className="offer-section__inner container">
               {/* Card 1 */}
               <article className="offer-card">
@@ -286,13 +234,13 @@ const Home = async () => {
                 </div>
                 <div className="offer-card__body">
                   <p>
-                    Host your next team building day at Aerosports and turn work
+                    Host your next team building day at pixelpulseplay and turn work
                     into play! Our team-based attractions promote collaboration,
                     problem-solving, and laughter.Teamwork has never been this
                     much fun!
                   </p>
                   <Link
-                    href={`/${location_slug}/groups-events/corporate-parties-events-groups`}
+                    href={`/groups-events/corporate-parties-events-groups`}
                     className="sigma_btn-custom"
                   >
                     More Info →
@@ -319,7 +267,7 @@ const Home = async () => {
                     with private room, host, pizza, open-jump & more.
                   </p>
                   <a
-                    href={`/${location_slug}/kids-birthday-parties`}
+                    href={`/kids-birthday-parties`}
                     className="sigma_btn-custom"
                   >
                     COMPARE PACKAGES →
@@ -346,7 +294,7 @@ const Home = async () => {
                     jumpers. For 30+ or to book space and food, please call us!
                   </p>
                   <a
-                    href={`${location_slug}/groups-events/school-groups`}
+                    href={`/groups-events/school-groups`}
                     className="sigma_btn-custom"
                   >
                     More Info →
@@ -375,7 +323,7 @@ const Home = async () => {
             Explore attractions
           </h2>{" "}
           <Link
-            href={`/${location_slug}/attractions`}
+            href={`/attractions`}
             className="aero-btn-booknow"
             prefetch
           >
@@ -386,7 +334,7 @@ const Home = async () => {
               {attractionsData[0]?.children?.map((item, i) => (
                 <li key={i}>
                   <Link
-                    href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                    href={`/${item?.parentid}/${item?.path}`}
                     prefetch
                   >
                     <article className="d-flex-dir-col">
@@ -439,7 +387,7 @@ const Home = async () => {
             <h2>Every Updated Article</h2>
             <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
             <Link
-              href={`/${location_slug}/blogs`}
+              href={`/blogs`}
               className="aero-btn-booknow aero-btn-article-section"
               prefetch
             >
@@ -472,7 +420,7 @@ const Home = async () => {
           </section>
         </section>
       )}
-      {location_slug === "st-catharines" && (
+      {location_slug === LOCATION_NAME && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

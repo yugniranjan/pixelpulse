@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 export const fetchData = async (url) => {
   try {
-    console.log(url);
+    // console.log(url);
     const response = await fetch(url, {next: {revalidate: 3600}}); 
     if (!response.ok) notFound();
 

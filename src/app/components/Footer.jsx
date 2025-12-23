@@ -74,7 +74,7 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
           <Link href={`/${location_slug}`} prefetch>
             <Image
               src={logo}
-              alt="AeroSports Logo"
+              alt="pixelpulseplay Logo"
               width={100}
               height={93.42}
               unoptimized

@@ -16,7 +16,7 @@ const FaqCard = async ({ location_slug, page }) => {
      
         <div className="subcategory_main_section entry-content">
   <h2>FAQS</h2>
-    <div style={{color:'white'}}>Have questions? We’ve got answers! If you need more information, don’t hesitate to reach out to your local Aerosports park for further support.</div>   
+    <div style={{color:'white'}}>Have questions? We’ve got answers! If you need more information, don’t hesitate to reach out to your local pixelpulseplay park for further support.</div>   
           {data.map((item, i) => {
             const { question, answer } = item;
             return (

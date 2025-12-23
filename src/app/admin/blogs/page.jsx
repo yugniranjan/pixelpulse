@@ -99,7 +99,7 @@ export default function AllBlogs() {
 
           {filteredBlogs.map(
             (blog) => (
-              console.log(blog),
+              // console.log(blog),
               (
                 <tr key={blog.id}>
                   <td>

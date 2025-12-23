@@ -21,7 +21,7 @@ function ContactForm() {
   useEffect(() => {
     const currentUrl = window.location.href; 
     const pathSegments = new URL(currentUrl).pathname.split("/"); 
-    const locationSegment = pathSegments[1]; // "st-catharines" is the second segment
+    const locationSegment = pathSegments[1]; // LOCATION_NAME is the second segment
     setCurrentLocation(locationSegment); // Update state with extracted location
   }, []);
   const handleChange = (e) => {
@@ -30,7 +30,7 @@ function ContactForm() {
   };
 
  const handleSubmit = async (e) => {
-  // console.log('contact form'); 
+  // // console.log('contact form'); 
   formData.locationEmail='event@aerosportsparks.ca'
   formData.subject = currentLocation +' ' + formData.selectedEvent + ' from ' + formData.fullName + ' on ' + formData.date + ' at ' + formData.time;
    e.preventDefault();

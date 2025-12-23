@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import { fetchMenuData, fetchsheetdata, getReviewsData } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
+import { LOCATION_NAME } from "./lib/constant";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -30,7 +31,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: BASE_URL,
-    title: "AeroSports Trampoline Park Locations: St. Catharines, Niagara Falls, Windsor, London, Oakville,scarborough",
+    title: "pixelpulseplay Trampoline Park Locations: St. Catharines, Niagara Falls, Windsor, London, Oakville,scarborough",
     description: "The GTA's ultimate play destination: A huge trampoline park with climbing walls, towering slides, a jungle gym, obstacle courses, dodgeball, and more. Ideal for birthday parties!",
     images: [
       {
@@ -42,9 +43,9 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
 const token = cookies().get("admin_token")?.value;
-console.log("Admin Token:", token);
+// // console.log("Admin Token:", token);
   // const location_slug = params?.location_slug;
-  const location_slug = "st-catharines";
+  const location_slug = LOCATION_NAME;
 
   const [menudata, configdata, sheetdata] = await Promise.all([
     fetchMenuData(location_slug),

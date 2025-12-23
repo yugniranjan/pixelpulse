@@ -3,46 +3,53 @@ import "../../styles/kidsparty.css";
 import "../../styles/subcategory.css";
 
 import ImageMarquee from "@/components/ImageMarquee";
-import { fetchsheetdata,  fetchPageData,generateMetadataLib, fetchMenuData,getWaiverLink } from "@/lib/sheets";
-import FaqCard from "@/components/smallComponents/FaqCard"
-import SubCategoryCard from "@/components/smallComponents/SubCategoryCard"
+import {
+  fetchsheetdata,
+  fetchPageData,
+  generateMetadataLib,
+  fetchMenuData,
+  getWaiverLink,
+} from "@/lib/sheets";
+import FaqCard from "@/components/smallComponents/FaqCard";
+import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
 import MotionImage from "@/components/MotionImage";
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug || 'st-catharines',
-    category: '',
-    page: "kids-birthday-parties"
+    location: params.location_slug || "st-catharines",
+    category: "",
+    page: "kids-birthday-parties",
   });
   return metadata;
 }
 
 const Page = async ({ params }) => {
-  const location_slug = params.location_slug || 'st-catharines';
+  const location_slug = params.location_slug || "st-catharines";
   const waiverLink = await getWaiverLink(location_slug);
-  const [data, birthdaydata,  menudata] = await Promise.all([
-     fetchPageData(location_slug,'kids-birthday-parties'),
-     fetchsheetdata('birthday packages',location_slug),
-     
-     fetchMenuData(location_slug)
-  
+  const [data, birthdaydata, menudata] = await Promise.all([
+    fetchPageData(location_slug, "kids-birthday-parties"),
+    fetchsheetdata("birthday packages", location_slug),
+
+    fetchMenuData(location_slug),
   ]);
-  const attractions = menudata?.filter((item)=> item.path=="attractions")[0];
-  
+  const attractions = menudata?.filter((item) => item.path == "attractions")[0];
+
   return (
-    <main >
-     
-        <MotionImage pageData={data} waiverLink={waiverLink} />
-     
-    
+    <main>
+      <MotionImage pageData={data} waiverLink={waiverLink} />
+
       <section className="subcategory_main_section-bg">
-     
         <section className="aero-max-container">
-        <center><h2 style={{paddingTop: '60px'}}>Birthday Party Packages & Pricing</h2></center>
-        <p>
-         At AeroSports {location_slug}, we offer competitively priced birthday party packages in our private party rooms—perfectly located near you. Choose the package that fits your budget and guest list:
-      </p>
+          <center>
+            <h2 style={{ paddingTop: "60px" }}>
+              Birthday Party Packages & Pricing
+            </h2>
+          </center>
+          <p>
+            At pixelpulseplay {location_slug}, we offer competitively priced
+            birthday party packages in our private party rooms—perfectly located
+            near you. Choose the package that fits your budget and guest list:
+          </p>
           <article className="aero_bp_2_main_section">
-          
             {birthdaydata.map((item, i) => {
               const includedata = item.includes.split(";");
               return (
@@ -65,15 +72,14 @@ const Page = async ({ params }) => {
           </article>
         </section>
       </section>
-     
-      
+
       {/* <SubCategoryCard attractionsData={attractions.children} location_slug={location_slug} theme={'default'} title={`Activities & Attractions`} text={[attractions.metadescription]} />
 
         <FaqCard page={'kids-birthday-parties'} location_slug={location_slug} />
       
      */}
-     
-<section className="aero_home_article_section">
+
+      <section className="aero_home_article_section">
         {/* <section className="aero-max-container">
           <div
             className="subcategory_main_section"
@@ -83,12 +89,9 @@ const Page = async ({ params }) => {
       </section>
       <section className="aero_home_article_section">
         <section className="aero-max-container aero_home_seo_section">
-          <div
-            dangerouslySetInnerHTML={{ __html: data?.seosection || "" }}
-          />
+          <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
         </section>
       </section>
-      
     </main>
   );
 };

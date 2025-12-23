@@ -16,13 +16,11 @@ export async function generateMetadata({ params }) {
 
 const page = async({params}) => {
   const location_slug = params?.location_slug || 'st-catharines';
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const data = await fetchMenuData(location_slug);
+  const data = await fetchMenuData(location_slug);
  
   const blogsData = getDataByParentId(data, "blogs");
   const extractBlogData = blogsData[0]?.children
-  // console.log('blogsData');
-  //  console.log(blogsData);
+  // // console.log('blogsData');
   return (
     <main className="aero-blog-main-section">
       <section className='aero-max-container'>

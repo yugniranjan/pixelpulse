@@ -9,7 +9,7 @@ const globalTrackingId = "G-1TETQERPZN";
 const locationTrackingIds = {
   london: "G-L59BND7FS0",
   windsor: "G-KWJLE4VJRW",
-  "st-catharines": "G-CJJLRQ2Q2Y",
+  LOCATION_NAME: "G-CJJLRQ2Q2Y",
   oakville: "G-D5W5H2N64H",
   scarborough: "G-D5W5H2N64H",
 };

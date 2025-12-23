@@ -15,21 +15,21 @@ async function fetchsheetdata(sheetName, location) {
   const cached = sheetCache.get(cacheKey);
   if(cached)
   {
-    console.log('cache found');
+    // console.log('cache found');
     
    
   }
     if(location=='.well-known')
     {
-      console.log('unknown location', location);
+      // console.log('unknown location', location);
       return [];
     }
   if (cached && now - cached.timestamp < CACHE_TTL) {
-    console.log("✅ from cache " + cacheKey);
+    // console.log("✅ from cache " + cacheKey);
     return cached.data;
   }
 
-  console.log("🚀 fetching fresh sheet data " + cacheKey);
+  // console.log("🚀 fetching fresh sheet data " + cacheKey);
 
   try {
     const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
@@ -48,7 +48,7 @@ async function fetchsheetdata(sheetName, location) {
       }
     });
     const distinctLocations = Array.from(locationSet);
-    //console.log("Distinct Locations:", distinctLocations);
+    //// console.log("Distinct Locations:", distinctLocations);
     // Cache per sheet and location
     workbook.SheetNames.forEach((name) => {
       const worksheet = workbook.Sheets[name];
@@ -68,7 +68,7 @@ async function fetchsheetdata(sheetName, location) {
           m => m.location?.includes(loc) || m.location === ""
         );
         const cacheKeyLocal = `${name}:${loc}`;
-      //  console.log('setting cache for: ',cacheKeyLocal)
+      //  // console.log('setting cache for: ',cacheKeyLocal)
         sheetCache.set(cacheKeyLocal, {
           data: filteredData,
           timestamp: now,
@@ -129,10 +129,10 @@ async function fetchFaqData(location, page) {
 }
 
 async function getWaiverLink(location){
-  console.log('yoyo',location);
+  // console.log('yoyo',location);
   const cacheKey = `waiver:${location}`;
   const cached = waiverLinkCache.get(cacheKey);
-  console.log(cacheKey, cached);
+  // console.log(cacheKey, cached);
   if(cached)
   {
        return cached;
@@ -151,7 +151,7 @@ async function generateMetadataLib({ location, category, page }) {
   const data = await fetchPageData(location, pagefordata);
 
   const metadataItem = data;//?.find((item) => item.path === pagefordata);
-//console.log(pagefordata);
+//// console.log(pagefordata);
   // Construct canonical path
   let canonicalPath = location;
   if (category && page) {
@@ -168,23 +168,23 @@ async function generateMetadataLib({ location, category, page }) {
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
 
   return {
-    title: metadataItem?.metatitle || "AeroSports Trampoline Park",
-    description: metadataItem?.metadescription || "Fun for all ages at AeroSports!",
+    title: metadataItem?.metatitle || "pixelpulseplay Trampoline Park",
+    description: metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!",
     alternates: {
       canonical: fullUrl,
     },
     openGraph: {
-      title: metadataItem?.metatitle || "AeroSports Trampoline Park",
-      description: metadataItem?.metadescription || "Fun for all ages at AeroSports!",
+      title: metadataItem?.metatitle || "pixelpulseplay Trampoline Park",
+      description: metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!",
       url: fullUrl,
-      siteName: "AeroSports Trampoline Park",
+      siteName: "pixelpulseplay Trampoline Park",
       images: imageUrl
         ? [
             {
               url: imageUrl,
               width: 1200,
               height: 630,
-              alt: `AeroSports – ${location}`,
+              alt: `pixelpulseplay – ${location}`,
             },
           ]
         : [],
@@ -195,7 +195,7 @@ async function generateMetadataLib({ location, category, page }) {
 }
 
 async function getReviewsData(locationid){
-  console.log(locationid);
+  // console.log(locationid);
   const cacheKey = `reviews:${locationid}`;
   const cached = reviewesData.get(cacheKey);
   

@@ -15,6 +15,11 @@ export function middleware(request) {
   }
 
   // 🔁 Logged-in user should not see login page
+  if (pathname === "/api/auth/login") {
+    return NextResponse.next();
+  }
+
+  // 🔁 Logged-in user should not see login page
   if (pathname === "/admin/login") {
     return token
       ? NextResponse.redirect(new URL("/admin/blogs", request.url))

@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache  } from "@/lib/sheets";
 export async function GET() {
-  const siteUrl = 'https://www.aerosportsparks.ca';
+  const siteUrl = 'https://www.pixelpulseplayparks.ca';
   const dynamicPaths = new Set();
 
   try {
