@@ -15,6 +15,9 @@ import {
   generateMetadataLib,
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "./lib/constant";
+import PixelPulseSection from "./components/home/PixelPulseSection";
+import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
+import SectionHeading from "./components/home/SectionHeading";
 
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME || "st-catharines";
@@ -95,7 +98,9 @@ const Home = async () => {
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home-actionbtn-bg">
           <section className="aero-max-container aero_home-actionbtn">
-            <h2 className="d-flex-center">JUMP STRAIGHT TO</h2>
+
+            <SectionHeading> JUMP STRAIGHT <span>TO</span>  </SectionHeading>
+
             <section className="aero_home-actionbtn-wrap">
               <Link
                 href={`/programs`}
@@ -104,13 +109,6 @@ const Home = async () => {
               >
                 <button>BOOK NOW</button>
               </Link>
-              {/* <Link
-                href={`/${location_slug}/programs`}
-                className="aero-btn-booknow"
-                prefetch
-              >
-                <button>PROGRAMS</button>
-              </Link> */}
               <Link
                 href={`/kids-birthday-parties`}
                 className="aero-btn-booknow"
@@ -134,7 +132,9 @@ const Home = async () => {
       <section className="aero_home-playsection">
         <section className="aero_home-playsection-bg">
           <section className="aero-max-container aero_home-playsection-1 d-flex-dir-col">
-            <h2>THERE IS SO MUCH TO DO AT PIXELPULSEPLAY!</h2>
+
+            <SectionHeading>  <span>LEVEL UP YOUR PLAY</span> <br /> AT PIXEL PULSE VAUGHAN  </SectionHeading>
+
             <p>{homepageSection1}</p>
           </section>
         </section>
@@ -142,25 +142,11 @@ const Home = async () => {
         {attractionsData?.[0]?.children?.length > 0 && (
           <section className="aero_home_article_section">
             <section className="aero-max-container">
-              <h2 className="heading-with-icon">
-                {" "}
-                <svg
-                  className="promotions__icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="8" width="18" height="4" rx="1"></rect>
-                  <path d="M12 8v13"></path>
-                  <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
-                  <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path>
-                </svg>{" "}
-                Current Promotions
-              </h2>
+
+              <SectionHeading className="section-heading-white">
+                Current <span>Promotions</span>
+              </SectionHeading>
+
               <p>
                 Do not miss out on these amazing deals! Save big on your next
                 visit.
@@ -196,7 +182,7 @@ const Home = async () => {
           </section>
         )}
 
-        <section className="aero_home_article_section">
+        {/* <section className="aero_home_article_section">
           <section className="aero-max-container">
             <h2 className="heading-with-icon">
               {" "}
@@ -219,7 +205,7 @@ const Home = async () => {
             </h2>
             <p>Elevate your event to next level at pixelpulseplay! </p>
             <div className="offer-section__inner container">
-              {/* Card 1 */}
+     
               <article className="offer-card">
                 <div
                   className="offer-card__img"
@@ -230,14 +216,11 @@ const Home = async () => {
                   role="img"
                   aria-label="Memberships"
                 >
-                  <h3 className="offer-card__title">Team Building Events</h3>
+                  <h3 className="offer-card__title">CORPORATE EVENTS</h3>
                 </div>
                 <div className="offer-card__body">
                   <p>
-                    Host your next team building day at pixelpulseplay and turn work
-                    into play! Our team-based attractions promote collaboration,
-                    problem-solving, and laughter.Teamwork has never been this
-                    much fun!
+                    Elevate your corporate events at Pixel Pulse, where immersive challenges inspire teamwork, strategic thinking, and shared wins in a high-energy environment.
                   </p>
                   <Link
                     href={`/groups-events/corporate-parties-events-groups`}
@@ -248,7 +231,7 @@ const Home = async () => {
                 </div>
               </article>
 
-              {/* Card 2 */}
+      
               <article className="offer-card">
                 <div
                   className="offer-card__img"
@@ -263,8 +246,7 @@ const Home = async () => {
                 </div>
                 <div className="offer-card__body">
                   <p>
-                    Epic for them. Easy for you. All-inclusive party packages
-                    with private room, host, pizza, open-jump & more.
+                    The best kids birthday parties in Vaughan. All-inclusive Pixel & tile games, immersive fun, private room, party host, pizza, and excitement.
                   </p>
                   <a
                     href={`/kids-birthday-parties`}
@@ -275,7 +257,7 @@ const Home = async () => {
                 </div>
               </article>
 
-              {/* Card 3 */}
+      
               <article className="offer-card">
                 <div
                   className="offer-card__img"
@@ -290,8 +272,7 @@ const Home = async () => {
                 </div>
                 <div className="offer-card__body">
                   <p>
-                    We offer special Field Trip rates for groups of 10–29
-                    jumpers. For 30+ or to book space and food, please call us!
+                   We offer special field trip and team event rates for groups of 20-40 players. For groups of 20+ or to book space and food, please call us.
                   </p>
                   <a
                     href={`/groups-events/school-groups`}
@@ -303,25 +284,14 @@ const Home = async () => {
               </article>
             </div>
           </section>
-        </section>
+        </section> */}
+
+        <CelebrateEventsSection />
 
         <section className="aero_home_article_section">
-          <h2 className="heading-with-icon">
-            <svg
-              className="promotions__icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4l3 3" />
-            </svg>
-            Explore attractions
-          </h2>{" "}
+          <SectionHeading className="section-heading-white">
+            Explore <span>attractions</span>
+          </SectionHeading>
           <Link
             href={`/attractions`}
             className="aero-btn-booknow"
@@ -362,29 +332,11 @@ const Home = async () => {
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
           <section className="aero-max-container">
-            <h2 className="heading-with-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="promotions__icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                width="24"
-                height="24"
-                aria-hidden="true"
-              >
-                <path d="M4 4h16v16H4z" />{" "}
-                {/* Outer square – looks like a document */}
-                <line x1="8" y1="8" x2="16" y2="8" /> {/* Line 1 */}
-                <line x1="8" y1="12" x2="16" y2="12" /> {/* Line 2 */}
-                <line x1="8" y1="16" x2="12" y2="16" /> {/* Line 3 (shorter) */}
-              </svg>
-              Latest Articles & News
-            </h2>
-            <h2>Every Updated Article</h2>
+            <SectionHeading className="section-heading-white">
+              <span> Latest</span>  Articles & News
+            </SectionHeading>
+            <h3 style={{color:"white", textAlign:"center"}}>Every Updated Article</h3>
+
             <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
             <Link
               href={`/blogs`}
@@ -413,13 +365,14 @@ const Home = async () => {
           </section>
         </section>
       )}
-      {attractionsData?.[0]?.children?.length > 0 && (
+      {/* {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
           <section className="aero-max-container aero_home_seo_section">
             <div dangerouslySetInnerHTML={{ __html: seosection }} />
           </section>
         </section>
-      )}
+      )} */}
+      <PixelPulseSection />
       {location_slug === LOCATION_NAME && (
         <script
           type="application/ld+json"

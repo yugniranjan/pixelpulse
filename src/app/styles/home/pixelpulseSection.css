@@ -1,0 +1,192 @@
+.pixel-pulse {
+  background: #1B211A;
+  color: #e5e7eb;
+  padding: 100px 20px;
+  font-family: "Poppins", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.hero {
+  text-align: center;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #22d3ee, #a855f7, #ec4899);
+  background-size: 200%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p, .section p {
+  margin-top: 24px;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #c7d2fe;
+  text-align: left;
+}
+
+/* SECTIONS */
+.section {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.section h2 {
+  font-size: 2.2rem;
+  margin-bottom: 24px;
+  color: #f8fafc;
+  position: relative;
+}
+
+.section h2::after {
+  content: "";
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #22d3ee, #a855f7);
+  display: block;
+  margin: 14px auto 0;
+  border-radius: 999px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+  margin-top: 50px;
+}
+
+/* GAME CARDS */
+.card {
+  background: linear-gradient(180deg, #0f172a, #020617);
+  padding: 30px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 rgba(255, 255, 255, 0);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(34, 211, 238, 0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(168, 85, 247, 0.25);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 14px;
+  color: #f9fafb;
+}
+
+.card p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #cbd5f5;
+}
+
+/* CTA */
+.cta-box {
+  margin-top: 120px;
+  background: linear-gradient(135deg, var(--primary-color), #065213, var(--secondary-color));
+  padding: 50px 30px;
+  border-radius: 28px;
+  color: #020617;
+  text-align: center;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+}
+
+.cta-box p {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.cta-box button {
+  margin-top: 28px;
+  padding: 16px 44px;
+  border-radius: 999px;
+  border: none;
+  background: #020617;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta-box button:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 30px rgba(2, 6, 23, 0.7);
+}
+
+/* TAGLINES */
+.tagline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 50px;
+}
+
+.tag-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(14px);
+  padding: 30px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tag-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.tag-card span {
+  font-size: 0.9rem;
+  color: #c7d2fe;
+}
+
+/* HIGHLIGHTS */
+.highlights {
+  list-style: none;
+  margin-top: 50px;
+  display: grid;
+  gap: 18px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.highlights li {
+  padding: 16px 22px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.15), rgba(168, 85, 247, 0.15));
+  border-left: 4px solid #22d3ee;
+  text-align: left;
+}

@@ -91,6 +91,30 @@ header:first-child + * {
   color: var(--primary-color);
   /* white icon */
 }
+
+.section-heading{
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.5em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  user-select: none;
+}
+.section-heading span {
+  color: var(--primary-color);
+}
+.section-heading-white {
+  color: var(--white-color);
+}
+.section-heading-black {
+  color: var(--black-color);
+}
+.section-heading-orange {
+  color: var(--secondary-color);
+} 
+
 @media screen and (min-width: 992px) {
   header:first-child + * {
     padding-top: 142px;
@@ -102,4 +126,13 @@ header:first-child + * {
   .desktop-container {
     display: block;
   }
+
+  .section-heading{
+  font-size: 3.5rem;
+}
+  .section-heading-main{
+  font-size: 6.5rem;
+  filter: drop-shadow(3px 3px 0px white);
+  margin-bottom: 0.1em;
+}
 }

@@ -136,24 +136,16 @@
     text-transform: uppercase;
     text-shadow: 0 2px 6px rgba(0,0,0,0.6);
   }
-  
-  /* Body */
+
   .offer-card__body {
     padding: 1.5rem;
-  }
-  
-  .offer-card__body p {
-    margin: 0 0 1.5rem;
-    color: #4a5568;  /* tailwind-gray-700 */
-    line-height: 1.6;
-    font-size: 1rem;
   }
   
   /* Button */
   .offer-card__btn {
     display: inline-block;
     padding: 0.75rem 1.5rem;
-    border: 2px solid #f97316;   /* tailwind-orange-500 */
+    border: 2px solid #f97316;  
     border-radius: 0.375rem;
     color: #f97316;
     font-size: 0.95rem;
