@@ -1,5 +1,5 @@
-import "../../styles/home/pixelPulseSection.css";
 import React from "react";
+import "src/app/styles/home/pixelpulseSection.css";
 import SectionHeading from "./SectionHeading";
 
 const pixelPulseContent = {

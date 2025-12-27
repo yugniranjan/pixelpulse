@@ -1,5 +1,5 @@
 import Link from "next/link";
-import "../../styles/home/celebrateEventsSection.css";
+import "src/app/styles/home/celebrateEventsSection.css";
 import SectionHeading from "./SectionHeading";
 
 export default function CelebrateEventsSection() {
