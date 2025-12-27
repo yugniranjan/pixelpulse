@@ -1,9 +1,13 @@
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req) {
   const body = await req.json();
   if (!body.title || !body.content) {
-    return Response.json({ error: "Invalid data" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
   const doc = {
     title: body.title,
@@ -15,7 +19,7 @@ export async function POST(req) {
 
   const ref = await db.collection("blogs").add(doc);
 
-  return Response.json({
+  return NextResponse.json({
     success: true,
     id: ref.id,
   });

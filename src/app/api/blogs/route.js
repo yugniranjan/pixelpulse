@@ -1,5 +1,8 @@
-// src/app/api/blog/list/route.js
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   const snap = await db
@@ -12,5 +15,5 @@ export async function GET() {
     ...doc.data(),
   }));
 
-  return Response.json(blogs);
+  return NextResponse.json(blogs);
 }

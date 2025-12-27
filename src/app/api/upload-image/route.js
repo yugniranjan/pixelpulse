@@ -1,5 +1,9 @@
+import { NextResponse } from "next/server";
 import { bucket } from "@/lib/gcs";
 import { randomUUID } from "crypto";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req) {
   try {
@@ -7,12 +11,12 @@ export async function POST(req) {
     const file = formData.get("file");
 
     if (!file) {
-      return Response.json({ error: "File missing" }, { status: 400 });
+      return NextResponse.json({ error: "File missing" }, { status: 400 });
     }
 
     // optional: allow only images
     if (!file.type.startsWith("image/")) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Only image uploads allowed" },
         { status: 400 }
       );
@@ -34,13 +38,13 @@ export async function POST(req) {
 
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
       url: publicUrl,
     });
   } catch (err) {
     console.error("Upload error:", err);
-    return Response.json(
+    return NextResponse.json(
       { error: "Upload failed" },
       { status: 500 }
     );
