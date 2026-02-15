@@ -84,7 +84,7 @@
 }
 
 .aero_category_section_card_wrap:hover .aero_category_section_card_desc {
-  background-color: var(--primary-color-hover, #ff4081);
+  background-color: var(--secondary-color);
 }
 
 .aero_category_section_card_desc h2 {

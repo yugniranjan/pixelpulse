@@ -19,7 +19,7 @@
   background-color: var(--black-color);
   border-bottom: 1px solid var(--white-color);
   padding: 0.75em;
-  height: 70px;
+  height: 66px;
 }
 
 .aero-col-3>div {
@@ -83,7 +83,7 @@
 }
 
 .aero_changelocation_height {
-  /* height: 44px; */
+  height: 50px;
   box-shadow: 0 0 2px var(--primary-color);
 }
 
@@ -767,7 +767,7 @@ ul.attractions-grid li {
 
   .aero-col-3 {
     padding: 1.25em;
-    height: 95px;
+    height: 90px;
   }
 
   .aero-col-3 .aero-header-logo {

@@ -9,8 +9,7 @@ export async function POST(req) {
   if (!body.get("title") || !body.get("content") || !body.get("featuredImage")) {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
-  console.log(body.get("title"), body.get("content"), body.get("featuredImage"));
-  return
+  
   const doc = {
     title: body.get("title"),
     content: body.get("content"),
