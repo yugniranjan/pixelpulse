@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import ImageUploader from "@/components/ImageUploader";
 
 const BlogEditor = dynamic(() => import("@/components/Editor"), {
   ssr: false,
@@ -12,11 +13,37 @@ const BlogEditor = dynamic(() => import("@/components/Editor"), {
 export default function CreateBlog() {
   const router = useRouter();
 
-  const editorDataRef = useRef(null);   // 🔥 editor content
+  const editorDataRef = useRef(null);
   const [title, setTitle] = useState("");
+  const [featuredImage, setFeaturedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
+
+  //   ImageUploader(file).then((url) => {
+  //     setFeaturedImage(url);
+  //     setImagePreview(url);
+  //   });
+
+  //   // setFeaturedImage(file);
+
+
+  //   // const reader = new FileReader();
+  //   // reader.onloadend = () => {
+  //   //   setImagePreview(reader.result);
+  //   // };
+  //   // reader.readAsDataURL(file);
+  // };
+
   const publishBlog = async () => {
+    if (!title.trim()) {
+      toast.error("Please enter blog title");
+      return;
+    }
+
     if (!editorDataRef.current) {
       toast.error("Please write some content");
       return;
@@ -24,23 +51,30 @@ export default function CreateBlog() {
 
     setLoading(true);
 
-    const res = await fetch("/api/create-blog", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        content: editorDataRef.current,
-      }),
-    });
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", JSON.stringify(editorDataRef.current));
+    if (featuredImage) {
+      formData.append("featuredImage", featuredImage);
+    }
 
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/create-blog", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (data.success) {
-      // ✅ clear autosave draft
-      localStorage.removeItem("blog-draft-new");
+      const data = await res.json();
 
-      // ✅ redirect
-      router.push("/admin/blogs");
+      if (data.success) {
+        localStorage.removeItem("blog-draft-new");
+        toast.success("Blog published");
+        router.push("/admin/blogs");
+      } else {
+        toast.error("Failed to publish blog");
+      }
+    } catch (err) {
+      toast.error("Something went wrong");
     }
 
     setLoading(false);
@@ -50,6 +84,7 @@ export default function CreateBlog() {
     <div style={{ maxWidth: 800, margin: "40px auto" }}>
       <h1>Admin Blog Editor</h1>
 
+      {/* Title */}
       <input
         placeholder="Blog Title"
         value={title}
@@ -61,14 +96,42 @@ export default function CreateBlog() {
         }}
       />
 
-      {/* 🔥 IMPORTANT */}
+      {/* ⭐ Featured Image Section */}
+      <div style={{ marginBottom: 24 }}>
+        <h3>Featured Image</h3>
+
+        {/* <input type="file" accept="image/*" onChange={ImageUploader} /> */}
+        <ImageUploader
+          onUpload={(url) => {
+            setFeaturedImage(url);
+            setImagePreview(url);
+          }}
+        />
+
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            style={{
+              width: "100%",
+              maxHeight: 300,
+              objectFit: "cover",
+              marginTop: 12,
+              borderRadius: 8,
+            }}
+          />
+        )}
+      </div>
+
+      {/* Editor */}
       <BlogEditor
         onChangeData={(data) => {
           editorDataRef.current = data;
         }}
       />
 
-      <div style={{ display: "flex", gap: "16px", marginTop: 20 }}>
+      {/* Buttons */}
+      <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         <button
           onClick={publishBlog}
           disabled={loading}
@@ -93,7 +156,6 @@ export default function CreateBlog() {
             fontWeight: 600,
             backgroundColor: "#f3f4f6",
             border: "none",
-            cursor: "pointer",
           }}
         >
           Preview

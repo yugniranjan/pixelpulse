@@ -10,6 +10,7 @@ import {
 } from "@/lib/sheets";
 import MotionImage from "@/components/MotionImage";
 import { LOCATION_NAME } from "@/lib/constant";
+import { notFound } from "next/navigation";
 export async function generateMetadata({ params }) {
   const { location_slug = LOCATION_NAME, category_slug } = params;
 
@@ -24,24 +25,41 @@ export async function generateMetadata({ params }) {
 const Category = async ({ params }) => {
   const { location_slug = LOCATION_NAME, category_slug } = params;
 
+  // 1️⃣ Fetch data
   const data = await fetchMenuData(location_slug);
   const pageData = await fetchPageData(location_slug, category_slug);
   const waiverLink = await getWaiverLink(location_slug);
-  //// console.log('pagedata',pageData);
 
-  const safePageData = JSON.parse(JSON.stringify(pageData));
-  const safeWaiverLink = JSON.parse(JSON.stringify(waiverLink));
-  const attractionsData = getDataByParentId(data, category_slug);
-  // console.log("waiverLink", waiverLink);
+  // 2️⃣ Derived data
+  const attractionsData = data
+    ? getDataByParentId(data, category_slug)
+    : null;
+
+  // 3️⃣ ✅ SINGLE SOURCE OF TRUTH for 404
+  if (
+    location_slug !== LOCATION_NAME ||
+    !data ||
+    !pageData ||
+    !waiverLink ||
+    !attractionsData ||
+    attractionsData.length === 0
+  ) {
+    notFound(); // 👉 app/not-found.jsx
+  }
+
+  // 4️⃣ Safe clone (BEST PRACTICE)
+  const safePageData = structuredClone(pageData);
+  const safeWaiverLink = structuredClone(waiverLink);
   return (
     <main>
       <section>
         <section className="aero_category_section_wrapper">
-          <section className="aero-max-container">
-              <MotionImage
+                <MotionImage
             pageData={safePageData}
             waiverLink={safeWaiverLink}
           />
+          <section className="aero-max-container">
+        
 
             <section className="aero_category_section_card_wrapper">
               {attractionsData[0]?.children?.map((item, i) => {

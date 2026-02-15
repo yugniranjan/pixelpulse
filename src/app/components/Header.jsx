@@ -6,7 +6,7 @@ import Image from "next/image";
 import MenuButton from "./smallComponents/MenuButton";
 import TopHeader from "./smallComponents/TopHeader";
 import { MdOutlinePermContactCalendar } from "react-icons/md";
-import logo from "@public/assets/images/logo.jpg";
+import logo from "@public/assets/images/logo.png";
 import LogoutButton from "./LogoutButton";
 
 const Header = ({ location_slug, menudata, configdata, token }) => {

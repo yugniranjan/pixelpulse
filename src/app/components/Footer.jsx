@@ -13,7 +13,7 @@ import facebookicon from "@public/assets/images/social_icon/facebook.png";
 import twittericon from "@public/assets/images/social_icon/twitter.png";
 import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
 import instagramicon from "@public/assets/images/social_icon/instagram.png";
-import logo from '@public/assets/images/logo.jpg'
+import logo from '@public/assets/images/logo.png'
 import Script from "next/script";
 
 

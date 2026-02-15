@@ -518,6 +518,7 @@
 /* BPJ section  */
 .aero_home-headerimg-wrapper {
   position: relative;
+  padding-block: 100px;
 }
 
 .aero_home_BPJ_wrapper div {
@@ -807,9 +808,9 @@ ul.attractions-grid li {
     gap: 2rem;
   }
 
-  .aero_home-headerimg-wrapper article {
+  /* .aero_home-headerimg-wrapper article {
     width: 60%;
-  }
+  } */
 
   article.aero_home_BPJ_wrapper {
     width: 100%;

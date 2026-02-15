@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import ImageUploader from "@/components/ImageUploader";
 
 const BlogEditor = dynamic(() => import("@/components/Editor"), {
   ssr: false,
@@ -12,16 +13,17 @@ const BlogEditor = dynamic(() => import("@/components/Editor"), {
 export default function EditBlog() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-
   const router = useRouter();
 
-  const editorDataRef = useRef(null); // 🔥 final editor data
+  const editorDataRef = useRef(null);
 
   const [title, setTitle] = useState("");
   const [initialContent, setInitialContent] = useState(null);
+  const [featuredImage, setFeaturedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Fetch blog only once
+  /* ================= FETCH BLOG ================= */
   useEffect(() => {
     if (!id) return;
 
@@ -29,11 +31,18 @@ export default function EditBlog() {
       .then((res) => res.json())
       .then((data) => {
         setTitle(data.title);
-        setInitialContent(data.content); // 👈 editor initial data
+        setInitialContent(data.content);
+        setImagePreview(data.featuredImage || null);
       });
   }, [id]);
 
+  /* ================= UPDATE BLOG ================= */
   const updateBlog = async () => {
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
     if (!editorDataRef.current) {
       toast.error("Editor content missing");
       return;
@@ -41,19 +50,37 @@ export default function EditBlog() {
 
     setLoading(true);
 
-    await fetch(`/api/blogs/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        content: editorDataRef.current, // 🔥 always latest
-      }),
-    });
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append(
+      "content",
+      JSON.stringify(editorDataRef.current)
+    );
 
-    // ✅ clear autosave draft
-    localStorage.removeItem(`blog-draft-${id}`);
+    if (featuredImage) {
+      formData.append("featuredImage", featuredImage);
+    }
 
-    router.push("/admin/blogs");
+    try {
+      const res = await fetch(`/api/blogs/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.removeItem(`blog-draft-${id}`);
+        toast.success("Blog updated");
+        router.push("/admin/blogs");
+      } else {
+        toast.error("Update failed");
+      }
+    } catch (err) {
+      toast.error("Something went wrong");
+    }
+
+    setLoading(false);
   };
 
   if (!initialContent) {
@@ -64,6 +91,7 @@ export default function EditBlog() {
     <div style={{ maxWidth: 800, margin: "40px auto" }}>
       <h1>Edit Blog</h1>
 
+      {/* Title */}
       <input
         placeholder="Blog Title"
         value={title}
@@ -75,15 +103,40 @@ export default function EditBlog() {
         }}
       />
 
-      {/* 🔥 Editor */}
+      {/* ⭐ Featured Image */}
+      <div style={{ marginBottom: 24 }}>
+        <h3>Featured Image</h3>
+
+        <ImageUploader onUpload={(url) => {
+          setFeaturedImage(url);
+          setImagePreview(url);
+        }} />
+
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            style={{
+              width: "100%",
+              maxHeight: 300,
+              objectFit: "cover",
+              marginTop: 12,
+              borderRadius: 8,
+            }}
+          />
+        )}
+      </div>
+
+      {/* Editor */}
       <BlogEditor
         blogId={id}
-        apiData={initialContent} // only once
+        apiData={initialContent}
         onChangeData={(data) => {
           editorDataRef.current = data;
         }}
       />
 
+      {/* Buttons */}
       <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
         <button
           onClick={updateBlog}
@@ -109,7 +162,6 @@ export default function EditBlog() {
             fontWeight: 600,
             backgroundColor: "#f3f4f6",
             border: "none",
-            cursor: "pointer",
           }}
         >
           Preview

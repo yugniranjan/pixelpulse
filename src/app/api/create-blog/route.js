@@ -5,13 +5,16 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req) {
-  const body = await req.json();
-  if (!body.title || !body.content) {
+  const body = await req.formData();
+  if (!body.get("title") || !body.get("content") || !body.get("featuredImage")) {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
+  console.log(body.get("title"), body.get("content"), body.get("featuredImage"));
+  return
   const doc = {
-    title: body.title,
-    content: body.content,
+    title: body.get("title"),
+    content: body.get("content"),
+    featuredImage: body.get("featuredImage"),
     status: "published",
     createdAt: new Date(),
     updatedAt: new Date(),

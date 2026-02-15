@@ -67,12 +67,17 @@ export default function AllBlogs() {
       {/* HEADER */}
       <div className="table-header">
         <h2>Blogs</h2>
+        <div>
+        <button className="delete-btn" style={{fontSize:"16px", marginRight:"10px", padding:"8px 16px", color: "white", backgroundColor: "var(--primary-color)"}}>
+          <Link href="/admin/blog">Add New Blog</Link>
+        </button>
         <input
           type="text"
           placeholder="Search blog..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        </div>
       </div>
 
       {/* TABLE */}
@@ -104,7 +109,7 @@ export default function AllBlogs() {
                 <tr key={blog.id}>
                   <td>
                     <img
-                      src={blog.featuredImage || "/assets/images/logo.jpg"}
+                      src={blog.featuredImage || "/assets/images/logo.png"}
                       className="table-image"
                       alt="blog"
                     />
