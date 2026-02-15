@@ -108,10 +108,10 @@ export default function PixelPulseVaughan() {
         </div>
       </div>
 
-     <!--<div className="container section cta-box">
+     <div className="container section cta-box">
         <p>{pixelPulseContent.cta}</p>
         <button>Book Now</button>
-      </div>-->
+      </div>
 
       <div className="container section">
         <h2>Tag Lines</h2>
