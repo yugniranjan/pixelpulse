@@ -32,9 +32,9 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
             style={{ justifyContent: "flex-start" }}
           >
             <MenuButton navList={navList} location_slug={location_slug} />
-            <Link href="/" className="d-flex-center" prefetch>
+            {/* <Link href="/" className="d-flex-center" prefetch>
               <GrLocation fontSize={30} color="#fff" />
-            </Link>
+            </Link> */}
           </div>
         </div>
 

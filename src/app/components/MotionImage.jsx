@@ -22,7 +22,7 @@ const MotionImage = ({ pageData, waiverLink }) => {
             <source src={item.video} type="video/mp4" />
           </video>
 
-          <article className="image-content">
+          {/* <article className="image-content">
 
             <SectionHeading mainHeading="true" className="section-heading-orange">
               Pixel Pulse <br /> <span> Play n Party</span>
@@ -47,7 +47,7 @@ const MotionImage = ({ pageData, waiverLink }) => {
                 </Link>
               </div>
             )}
-          </article>
+          </article> */}
         </section>
       ) : (
         <motion.div

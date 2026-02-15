@@ -89,9 +89,9 @@ const Home = async () => {
 
   return (
     <main>
-      {promotionPopup.length > 0 && (
+      {/* {promotionPopup.length > 0 && (
         <PromotionModal promotionPopup={promotionPopup} />
-      )}
+      )} */}
 
       <MotionImage pageData={safeHeaderImage} waiverLink={waiverLink} />
 

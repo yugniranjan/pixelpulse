@@ -1,5 +1,5 @@
 .pixel-pulse {
-  background: #1B211A;
+  background: var(--black-color);
   color: #e5e7eb;
   padding: 100px 20px;
   font-family: "Poppins", system-ui, sans-serif;
@@ -52,7 +52,7 @@
   content: "";
   width: 80px;
   height: 4px;
-  background: linear-gradient(90deg, #22d3ee, #a855f7);
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
   display: block;
   margin: 14px auto 0;
   border-radius: 999px;
