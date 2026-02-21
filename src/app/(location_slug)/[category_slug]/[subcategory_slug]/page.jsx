@@ -84,7 +84,7 @@ const Subcategory = async ({ params }) => {
         />
       </section>
 
-      <ImageMarquee imagesString={pagedata.headerimage} />
+      {/* <ImageMarquee imagesString={pagedata.headerimage} /> */}
 
       <section className="aero_home_article_section">
         <section className="aero-max-container aero_home_seo_section">

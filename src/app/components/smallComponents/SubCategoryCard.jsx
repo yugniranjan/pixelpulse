@@ -17,34 +17,33 @@ const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, p
         <circle cx="12" cy="12" r="10" />
         <path d="M12 8v4l3 3" />
       </svg>{title}</h2>
-      <section className="aero-max-container ">
 
+      <section className="aero-max-container aero_home-playsection-2 ">
         <ul className="attractions-grid">
           {attractionsData?.map((item, i) => (
             <li key={i}>
               <Link
                 href={`/${location_slug}/${item?.parentid}/${item?.path}`}
                 prefetch
-                key={i}
               >
-
                 <article className="d-flex-dir-col">
-                  <figure >
+                  <figure>
                     <Image
                       src={item?.smallimage}
                       width={330}
-                      height={240}
-                      alt={item?.title}
-
+                      height={200}
+                      alt={item?.iconalttextforhomepage}
                       unoptimized
                     />
-                    <figcaption className="figcaption-bg"><h3>{item?.desc}</h3></figcaption>
-                  </figure>   </article>
-              </Link></li>
+                    <figcaption className="figcaption-bg">
+                      <h3>{item?.desc}</h3>
+                    </figcaption>
+                  </figure>{" "}
+                </article>
+              </Link>
+            </li>
           ))}
-
         </ul>
-
       </section>
 
     </section>

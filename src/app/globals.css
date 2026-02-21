@@ -102,6 +102,7 @@ header:first-child + * {
   text-transform: uppercase;
   letter-spacing: 2px;
   user-select: none;
+  padding-top: 1.3em;
 }
 .section-heading span {
   color: var(--primary-color);

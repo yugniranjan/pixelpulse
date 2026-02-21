@@ -203,7 +203,7 @@
 } */
 
 .aero_home_video-container video {
-  height: 500px;
+  height: 80dvh;
   object-fit: cover;
   filter: opacity(0.6);
 }
@@ -771,10 +771,6 @@ ul.attractions-grid li {
 
   .aero-col-3 .aero-header-logo {
     justify-content: flex-start;
-  }
-
-  .aero_home_video-container video {
-    height: 700px;
   }
 
   .aero-home-h1heading {

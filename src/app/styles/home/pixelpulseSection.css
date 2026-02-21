@@ -1,7 +1,7 @@
 .pixel-pulse {
   background: var(--black-color);
   color: #e5e7eb;
-  padding: 100px 20px;
+  padding: 60px 20px;
   font-family: "Poppins", system-ui, sans-serif;
   overflow-x: hidden;
 }

@@ -1,10 +1,7 @@
 import '../../styles/blogs.css'
 import React from "react";
-import { getDataByParentId } from '@/utils/customFunctions';
 import Link from 'next/link';
 import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
-import { fetchData } from '@/utils/fetchData';
-import { m } from 'framer-motion';
 import { db } from "@/lib/firestore";
 import { slugify } from '@/utils/slugify';
 import SectionHeading from '@/components/home/SectionHeading';
@@ -51,7 +48,7 @@ const page = async ({ params }) => {
               <article className="aero-blog-main-article-card" key={item.id}>
                 <div className="aero-blog-img-section">
                   <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
-                    <img src={item.image || "/assets/images/logo.png"} alt="Article Image" />
+                    <img src={item.featuredImage || "/assets/images/logo.png"} alt="Article Image" />
                   </Link>
                 </div>
                 <div className="aero-blog-content-section">

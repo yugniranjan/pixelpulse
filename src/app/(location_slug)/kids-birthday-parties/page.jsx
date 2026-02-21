@@ -2,7 +2,6 @@ import React, { Children } from "react";
 import "../../styles/kidsparty.css";
 import "../../styles/subcategory.css";
 
-import ImageMarquee from "@/components/ImageMarquee";
 import {
   fetchsheetdata,
   fetchPageData,
@@ -10,9 +9,11 @@ import {
   fetchMenuData,
   getWaiverLink,
 } from "@/lib/sheets";
-import FaqCard from "@/components/smallComponents/FaqCard";
-import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
+// import ImageMarquee from "@/components/ImageMarquee";
+// import FaqCard from "@/components/smallComponents/FaqCard";
+// import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
 import MotionImage from "@/components/MotionImage";
+
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
     location: params.location_slug || "st-catharines",
@@ -33,9 +34,17 @@ const Page = async ({ params }) => {
   ]);
   const attractions = menudata?.filter((item) => item.path == "attractions")[0];
 
+  function serialize(data) {
+  return JSON.parse(JSON.stringify(data));
+}
+
+
   return (
     <main>
-      <MotionImage pageData={data} waiverLink={waiverLink} />
+      <MotionImage
+  pageData={serialize(data)}
+  waiverLink={serialize(waiverLink)}
+/>
 
       <section className="subcategory_main_section-bg">
         <section className="aero-max-container">

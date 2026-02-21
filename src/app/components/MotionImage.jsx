@@ -55,7 +55,7 @@ const MotionImage = ({ pageData, waiverLink }) => {
           // initial={{ scale: 1 }}
           // animate={{ scale: 1.1 }}
           // transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
-          style={{ maxHeight: "600px", minHeight: "450px" }}
+          style={{height:"70dvh" }}
         >
           {/* <Image
             src={
@@ -71,17 +71,21 @@ const MotionImage = ({ pageData, waiverLink }) => {
 
           <motion.article
             className="image-content"
-            // initial={{ opacity: 0 }}
-            // animate={{ opacity: 1 }}
-            // transition={{ duration: 3 }}
+          // initial={{ opacity: 0 }}
+          // animate={{ opacity: 1 }}
+          // transition={{ duration: 3 }}
           >
             <SectionHeading mainHeading="true" className="section-heading-orange">
               Pixel Pulse <br /> <span> Play n Party</span>
             </SectionHeading>
 
+            {/* {
+              item.smalltext && 
+            } */}
             <p
-              dangerouslySetInnerHTML={{ __html: item.smalltext || "" }}
-            />
+                dangerouslySetInnerHTML={{ __html: item.smalltext || "" }}
+              />
+
 
             {waiverLink && (
               <div className="aero-btn-booknow">
