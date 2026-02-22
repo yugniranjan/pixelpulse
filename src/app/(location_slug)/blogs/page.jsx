@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import '../../styles/blogs.css'
 import React from "react";
 import Link from 'next/link';
@@ -5,7 +6,6 @@ import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
 import { slugify } from '@/utils/slugify';
 import SectionHeading from '@/components/home/SectionHeading';
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -17,15 +17,22 @@ export async function generateMetadata({ params }) {
 }
 
 export async function getBlogs() {
-  const snapshot = await db
-    .collection("blogs")
-    .orderBy("createdAt", "desc")
-    .get();
+  try {
+    const snapshot = await db
+      .collection("blogs")
+      .orderBy("createdAt", "desc")
+      .get();
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+    return snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((blog) => blog.createdAt); // extra safety
+  } catch (error) {
+    console.error("Firestore Error:", error);
+    return [];
+  }
 }
 
 

@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
 import "../../../styles/blogs.css";
-import { fetchPageData,fetchMenuData, generateMetadataLib } from "@/lib/sheets";
+import { fetchPageData, fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
 import { notFound } from "next/navigation";
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
@@ -125,38 +125,40 @@ export default async function BlogDetail({ searchParams }) {
     notFound();
   }
 
-return (
-  <main className="aero_blog_detail_page">
-    <section className="aero_blog_container">
+  return (
+    <main className="aero_blog_detail_page">
+      <section className="aero_blog_container">
 
-      {/* Featured Image */}
-      {data?.featuredImage && (
-        <div className="aero_blog_featured_image">
-          <img
-            src={data.featuredImage}
-            alt={data.title}
-          />
-        </div>
-      )}
+        {/* Featured Image */}
+        {data?.featuredImage && (
+          <div className="aero_blog_featured_image">
+            <img
+              src={data.featuredImage}
+              alt={data.title}
+            />
+          </div>
+        )}
 
-      {/* Title */}
-      <h1 className="aero_blog_title">{data?.title}</h1>
+        {/* Title */}
+        <h1 className="aero_blog_title">{data?.title}</h1>
 
-      {/* Meta (optional) */}
-      {data?.updatedAt && (
-        <p className="aero_blog_meta">
-          Last updated on{" "}
-          {new Date(data.updatedAt.seconds * 1000).toDateString()}
-        </p>
-      )}
+        {/* Meta (optional) */}
+        {data?.updatedAt && (
+          <p className="aero_blog_meta">
+            Last updated on{" "}
+            {data?.updatedAt?.seconds
+              ? new Date(data.updatedAt.seconds * 1000).toDateString()
+              : null}
+          </p>
+        )}
 
-      {/* Content */}
-      <article className="aero_blog_content">
-        {renderEditorBlocks(data?.content?.blocks)}
-      </article>
+        {/* Content */}
+        <article className="aero_blog_content">
+          {renderEditorBlocks(data?.content?.blocks)}
+        </article>
 
-    </section>
-  </main>
-);
+      </section>
+    </main>
+  );
 
 }

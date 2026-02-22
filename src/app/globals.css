@@ -136,6 +136,7 @@ header:first-child + * {
   font-size: 6.5rem;
   filter: drop-shadow(3px 3px 0px white);
   margin-bottom: 0.1em;
+   padding-top: 0;
 }
 }
 
