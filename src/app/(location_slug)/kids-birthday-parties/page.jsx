@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import React, { Children } from "react";
 import "../../styles/kidsparty.css";
 import "../../styles/subcategory.css";

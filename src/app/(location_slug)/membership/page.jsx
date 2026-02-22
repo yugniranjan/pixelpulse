@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import React from "react";
 import "../../styles/subcategory.css";
 import MotionImage from "@/components/MotionImage";

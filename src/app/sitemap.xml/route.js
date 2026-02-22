@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache  } from "@/lib/sheets";

@@ -1,4 +1,5 @@
 
+export const dynamic = "force-dynamic";
 import "./styles/home.css";
 import "./styles/promotions.css";
 import Image from "next/image";
