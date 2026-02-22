@@ -2,6 +2,7 @@ import "../../../styles/blogs.css";
 import { fetchPageData,fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
 import { notFound } from "next/navigation";
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { slug } = params;

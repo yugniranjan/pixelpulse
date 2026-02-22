@@ -5,6 +5,7 @@ import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
 import { slugify } from '@/utils/slugify';
 import SectionHeading from '@/components/home/SectionHeading';
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
