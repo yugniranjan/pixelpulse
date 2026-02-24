@@ -750,7 +750,7 @@ ul.attractions-grid li {
 
   .aero-btn-booknow-1.aero-btn-booknow {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     align-items: center;
     gap: 6px;
   }

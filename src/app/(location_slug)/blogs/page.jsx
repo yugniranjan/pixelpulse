@@ -17,6 +17,7 @@ export async function generateMetadata({ params }) {
 }
 
 export async function getBlogs() {
+
   try {
     const snapshot = await db
       .collection("blogs")
@@ -28,10 +29,10 @@ export async function getBlogs() {
         id: doc.id,
         ...doc.data(),
       }))
-      .filter((blog) => blog.createdAt); // extra safety
+      .filter((blog) => blog.createdAt); 
   } catch (error) {
     console.error("Firestore Error:", error);
-    return [];
+    return [];  
   }
 }
 
@@ -41,6 +42,7 @@ const page = async ({ params }) => {
   const location_slug = params?.location_slug || 'st-catharines';
 
   const extractBlogData = await getBlogs();
+  console.log(extractBlogData);
 
   return (
     <main className="aero-blog-main-section">
@@ -56,7 +58,7 @@ const page = async ({ params }) => {
               <article className="aero-blog-main-article-card" key={item.id}>
                 <div className="aero-blog-img-section">
                   <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
-                    <img src={item.featuredImage || "/assets/images/logo.png"} alt="Article Image" />
+                    <img src={item?.featuredImage || "/assets/images/logo.png"} alt="Article Image" />
                   </Link>
                 </div>
                 <div className="aero-blog-content-section">
