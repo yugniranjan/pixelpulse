@@ -40,9 +40,7 @@ export async function getBlogs() {
 
 const page = async ({ params }) => {
   const location_slug = params?.location_slug || 'st-catharines';
-
   const extractBlogData = await getBlogs();
-  console.log(extractBlogData);
 
   return (
     <main className="aero-blog-main-section">

@@ -1,9 +1,10 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 import { db } from "@/lib/firestore";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+
 
 export async function POST(req) {
   const { email, password } = await req.json();
