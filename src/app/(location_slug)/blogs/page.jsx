@@ -1,4 +1,6 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import '../../styles/blogs.css'
 import React from "react";
 import Link from 'next/link';
