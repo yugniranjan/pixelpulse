@@ -1,4 +1,3 @@
-// /app/api/admin/login/route.js
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -6,15 +5,16 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createPostHandler } from "@/lib/postHandler";
+import handlePost from "@/lib/postHandler";
 
-
-// Actual POST logic
 async function loginLogic(req) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
-    return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Email and password required" },
+      { status: 400 }
+    );
   }
 
   const snap = await db
@@ -25,29 +25,53 @@ async function loginLogic(req) {
     .get();
 
   if (snap.empty) {
-    return NextResponse.json({ error: "Invalid email credentials" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Invalid email credentials" },
+      { status: 401 }
+    );
   }
 
-  const admin = snap.docs[0].data();
+  const adminDoc = snap.docs[0];
+  const admin = adminDoc.data();
+
   const match = await bcrypt.compare(password, admin.passwordHash);
 
   if (!match) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Invalid credentials" },
+      { status: 401 }
+    );
   }
 
-  const token = jwt.sign({ email, role: admin.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  const token = jwt.sign(
+    { uid: adminDoc.id, email, role: admin.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
 
-  const res = NextResponse.json({ success: true, message: "Logged in successfully" }, { status: 200 });
+  const res = NextResponse.json(
+    { success: true, message: "Logged in successfully" },
+    { status: 200 }
+  );
 
   res.cookies.set("admin_token", token, {
     httpOnly: true,
-    secure: true, // production: true
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
+    maxAge: 60 * 60 * 24,
   });
 
   return res;
 }
 
-// Wrap loginLogic with reusable POST handler
-export const POST = createPostHandler(loginLogic);
+// ✅ POST handler
+export const POST = handlePost(loginLogic);
+
+// ✅ Optional: GET pe 405 + Allow header
+export function GET() {
+  return new NextResponse("Method Not Allowed", {
+    status: 405,
+    headers: { Allow: "POST" },
+  });
+}

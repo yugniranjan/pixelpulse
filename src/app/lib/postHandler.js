@@ -1,32 +1,14 @@
 import { NextResponse } from "next/server";
 
-/**
- * Wrap your POST logic with this handler
- * @param {Function} fn - async function(req) => NextResponse
- * @returns a handler function usable in route.js
- */
-export function createPostHandler(fn) {
-  return async function handler(req) {
-    if (req.method !== "POST") {
-      return NextResponse.json(
-        { error: "Method Not Allowed" },
-        { status: 405 }
-      );
-    }
-
+export default function handlePost(handler) {
+  return async function (req, context) {
     try {
-      // Call the actual POST logic
-      const res = await fn(req);
-
-      // Add CORS headers (optional, adjust for production)
-      res.headers.set("Access-Control-Allow-Origin", "*"); 
-      res.headers.set("Access-Control-Allow-Methods", "POST");
-
-      return res;
+      return await handler(req, context);
     } catch (err) {
-      console.error("POST handler error:", err);
+      console.error("API Error:", err);
+
       return NextResponse.json(
-        { error: "Server Error" },
+        { error: "Internal Server Error" },
         { status: 500 }
       );
     }
