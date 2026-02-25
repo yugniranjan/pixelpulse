@@ -67,11 +67,3 @@ async function loginLogic(req) {
 
 // ✅ POST handler
 export const POST = handlePost(loginLogic);
-
-// ✅ Optional: GET pe 405 + Allow header
-export function GET() {
-  return new NextResponse("Method Not Allowed", {
-    status: 405,
-    headers: { Allow: "POST" },
-  });
-}
