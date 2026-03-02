@@ -43,7 +43,8 @@ export default function Breadcrumbs() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <section className="breadcrumb-container">
+      {
+        breadcrumbs.length > 0 && <section className="breadcrumb-container">
         <nav aria-label="Breadcrumb" className="breadcrumb aero-max-container">
           <ol>
             <li>
@@ -66,6 +67,8 @@ export default function Breadcrumbs() {
           </ol>
         </nav>
       </section>
+      }
+      
     </>
   );
 }

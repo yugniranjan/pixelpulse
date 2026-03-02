@@ -15,7 +15,7 @@ import {
   getWaiverLink,
   generateMetadataLib,
 } from "@/lib/sheets";
-import { LOCATION_NAME } from "./lib/constant";
+import { BOOKING_URL, LOCATION_NAME } from "./lib/constant";
 import PixelPulseSection from "./components/home/PixelPulseSection";
 import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
@@ -104,9 +104,10 @@ const Home = async () => {
 
             <section className="aero_home-actionbtn-wrap">
               <Link
-                href={`/programs`}
+                href={BOOKING_URL}
                 className="aero-btn-booknow"
                 prefetch
+                target="_blank"
               >
                 <button>BOOK NOW</button>
               </Link>

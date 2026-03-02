@@ -1,6 +1,8 @@
 import React from "react";
 import "src/app/styles/home/pixelpulseSection.css";
 import SectionHeading from "./SectionHeading";
+import Link from "next/link";
+import { BOOKING_URL } from "@/lib/constant";
 
 const pixelPulseContent = {
   hero: {
@@ -110,7 +112,7 @@ export default function PixelPulseVaughan() {
 
      <div className="container section cta-box">
         <p>{pixelPulseContent.cta}</p>
-        <button>Book Now</button>
+        <Link href={BOOKING_URL} target="_blank"> <button>Book Now</button></Link>
       </div>
 
       <div className="container section">
