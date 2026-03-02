@@ -11,7 +11,7 @@ import SectionHeading from '@/components/home/SectionHeading';
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug || 'st-catharines',
+    location: params.location_slug || 'vaughan',
     category: '',
     page: 'blogs'
   });
@@ -41,7 +41,7 @@ export async function getBlogs() {
 
 
 const page = async ({ params }) => {
-  const location_slug = params?.location_slug || 'st-catharines';
+  const location_slug = params?.location_slug || 'vaughan';
   const extractBlogData = await getBlogs();
 
   return (

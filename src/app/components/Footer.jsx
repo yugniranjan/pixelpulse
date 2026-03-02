@@ -67,16 +67,16 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
 
       <section className="aero-max-container">
         {/* Rating */}
-        {reviewdata && <RatingComponent ratingdata={reviewdata} />}
+        {/* {reviewdata && <RatingComponent ratingdata={reviewdata} />} */}
 
         {/* Logo + Socials */}
-        <div className="d-flex-center aero_logo_social_wrap">
+        <div className="aero_logo_social_wrap d-flex-center ">
           <Link href={`/${location_slug}`} prefetch>
             <Image
               src={logo}
               alt="pixelpulseplay Logo"
               width={100}
-              height={93.42}
+              height={80}
               unoptimized
             />
           </Link>

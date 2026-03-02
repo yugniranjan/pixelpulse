@@ -3,7 +3,7 @@
   color: var(--white-color);
 }
 .subcategory_main_section {
-  min-height: 50vh;
+  /* min-height: 50vh; */
   align-content: center;
   line-height: 32px;
   padding: 1.5em 1em 3em;

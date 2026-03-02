@@ -53,11 +53,22 @@ const Category = async ({ params }) => {
   return (
     <main>
       <section>
-        <section className="aero_category_section_wrapper">
-                <MotionImage
+      
+        <section className="aero_home_article_section">
+          <section className="aero-max-container aero_home_seo_section">
+            <div
+              dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
+            />
+            <div
+              dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
+            />
+          </section>
+        </section>
+          <section className="aero_category_section_wrapper">
+                {/* <MotionImage
             pageData={safePageData}
             waiverLink={safeWaiverLink}
-          />
+          /> */}
           <section className="aero-max-container">
         
 
@@ -93,16 +104,6 @@ const Category = async ({ params }) => {
                 );
               })}
             </section>
-          </section>
-        </section>
-        <section className="aero_home_article_section">
-          <section className="aero-max-container aero_home_seo_section">
-            <div
-              dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
-            />
-            <div
-              dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
-            />
           </section>
         </section>
       </section>

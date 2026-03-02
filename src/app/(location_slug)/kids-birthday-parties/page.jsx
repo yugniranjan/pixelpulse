@@ -17,7 +17,7 @@ import MotionImage from "@/components/MotionImage";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
-    location: params.location_slug || "st-catharines",
+    location: params.location_slug || "vaughan",
     category: "",
     page: "kids-birthday-parties",
   });
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
 }
 
 const Page = async ({ params }) => {
-  const location_slug = params.location_slug || "st-catharines";
+  const location_slug = params.location_slug || "vaughan";
   const waiverLink = await getWaiverLink(location_slug);
   const [data, birthdaydata, menudata] = await Promise.all([
     fetchPageData(location_slug, "kids-birthday-parties"),

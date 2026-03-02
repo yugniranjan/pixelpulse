@@ -8,12 +8,12 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/st-catharines",
+        source: "/vaughan",
         destination: "/",
         permanent: true,
       },
       {
-        source: "/st-catharines/:path*",
+        source: "/vaughan/:path*",
         destination: "/:path*",
         permanent: true,
       },

@@ -10,6 +10,7 @@ import { fetchMenuData, fetchsheetdata, getReviewsData } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
+import Breadcrumbs from "./components/Breadcrumb";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -55,7 +56,7 @@ const token = cookies().get("admin_token")?.value;
   ]);
 
   const locationid = sheetdata?.[0]?.locationid || null;
-  const reviewdata = await getReviewsData(locationid)
+  // const reviewdata = await getReviewsData(locationid)
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -63,12 +64,13 @@ const token = cookies().get("admin_token")?.value;
         <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}
         <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
+        <Breadcrumbs/>
         <Suspense fallback={<Loading />}>{children}</Suspense>
         <Footer
           location_slug={location_slug}
           configdata={configdata}
           menudata={menudata}
-          reviewdata={reviewdata}
+          // reviewdata={reviewdata}
         />
         <div id="modal-root"></div>
       </body>

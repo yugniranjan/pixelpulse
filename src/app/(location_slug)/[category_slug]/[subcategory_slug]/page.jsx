@@ -18,7 +18,7 @@ import { LOCATION_NAME } from "@/lib/constant";
 
 export async function generateMetadata({ params }) {
   const {
-    location_slug = LOCATION_NAME || 'st-catharines',
+    location_slug = LOCATION_NAME || 'vaughan',
     subcategory_slug,
     category_slug,
   } = params;

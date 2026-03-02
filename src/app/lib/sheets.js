@@ -196,21 +196,20 @@ async function generateMetadataLib({ location, category, page }) {
   };
 }
 
-async function getReviewsData(locationid){
-  // console.log(locationid);
-  const cacheKey = `reviews:${locationid}`;
-  const cached = reviewesData.get(cacheKey);
+// async function getReviewsData(locationid){
+//   const cacheKey = `reviews:${locationid}`;
+//   const cached = reviewesData.get(cacheKey);
   
-  if(cached)
-  {
-       return cached;
-  }
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/getreviews?locationid=${locationid}`;
-   const response = await fetch(url, {next: {revalidate: 3600*24*5}}); 
-   const data = await response.json();
-  reviewesData.set(cacheKey,data);
-  return data;
-}
+//   if(cached)
+//   {
+//        return cached;
+//   }
+//   const url = `${process.env.NEXT_PUBLIC_API_URL}/getreviews?locationid=${locationid}`;
+//    const response = await fetch(url, {next: {revalidate: 3600*24*5}}); 
+//    const data = await response.json();
+//   reviewesData.set(cacheKey,data);
+//   return data;
+// }
    
 
 
@@ -221,6 +220,6 @@ module.exports = {
   generateMetadataLib,
   fetchFaqData,
   getWaiverLink,
-  getReviewsData,
+  // getReviewsData,
   fetchsheetdataNoCache
 };

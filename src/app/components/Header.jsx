@@ -46,7 +46,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
               prefetch
             >
               <Image
-                src={logo}
+                src="https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png"
                 height="71"
                 width="71"
                 alt="logo"
@@ -60,13 +60,13 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
               <GrLocation />
               {location_slug}
             </Link> */}
-            <Link
+            {/* <Link
               href={`/${location_slug}/about-us/faq`}
               className="desktop-container"
               prefetch
             >
               <div className="aero-faq">FAQ&apos;s</div>
-            </Link>
+            </Link> */}
           </div>
         </div>
 

@@ -94,7 +94,7 @@ header:first-child + * {
 }
 
 .section-heading{
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: 0.5em;
@@ -130,7 +130,7 @@ header:first-child + * {
   }
 
   .section-heading{
-  font-size: 3.5rem;
+  font-size: 3rem;
 }
   .section-heading-main{
   font-size: 6.5rem;
@@ -381,4 +381,52 @@ header:first-child + * {
   .aero_blog_title {
     font-size: 1.9rem;
   }
+}
+
+.breadcrumb-container{
+background-color: var(--black-color);
+}
+
+.breadcrumb {
+  padding: 12px 0;
+  font-size: 14px;
+}
+
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb li {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.breadcrumb li + li::before {
+  content: "›";
+  margin: 0 8px;
+  color: #9ca3af;
+}
+
+.breadcrumb li[aria-current="page"] {
+  color: var(--primary-color);
+  font-weight: 600;
+  pointer-events: none;
 }

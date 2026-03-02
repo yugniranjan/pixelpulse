@@ -21,7 +21,7 @@ import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
 
 export async function generateMetadata() {
-  const location_slug = LOCATION_NAME || "st-catharines";
+  const location_slug = LOCATION_NAME || "vaughan";
   const metadata = await generateMetadataLib({
     location: location_slug,
     category: "",
@@ -32,7 +32,7 @@ export async function generateMetadata() {
 
 const Home = async () => {
 
-  const location_slug = LOCATION_NAME;
+  const location_slug = LOCATION_NAME || "vaughan";
 
   const waiverLink = await getWaiverLink(location_slug);
 
