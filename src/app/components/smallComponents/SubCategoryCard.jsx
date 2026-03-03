@@ -32,7 +32,7 @@ const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, p
                       src={item?.smallimage}
                       width={330}
                       height={200}
-                      alt={item?.iconalttextforhomepage}
+                      alt={item?.metatitle}
                       unoptimized
                     />
                     <figcaption className="figcaption-bg">

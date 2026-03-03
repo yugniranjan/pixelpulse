@@ -56,7 +56,7 @@
 .aero_category_section_card_img {
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   transition: transform 0.3s ease;
 }

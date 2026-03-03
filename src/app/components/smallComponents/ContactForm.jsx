@@ -3,11 +3,13 @@
 import { useState ,useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import "../../styles/contactus.css"; 
+import { LOCATION_NAME } from "@/lib/constant";
 
 function ContactForm() {
   const router = useRouter(); 
   const [currentLocation, setCurrentLocation] = useState(""); 
   const [formData, setFormData] = useState({
+    from: LOCATION_NAME,
     fullName: "",
     email: "",
     phone: "",

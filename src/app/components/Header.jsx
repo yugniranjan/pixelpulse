@@ -25,6 +25,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
   //   : null;
   return (
     <header>
+      <div>
       <section className="d-flex aero-col-3">
         <div className="aero-menu-location app-container">
           <div
@@ -140,6 +141,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
           </div>
         </nav>
       </section>
+      </div>
     </header>
   );
 };

@@ -7,12 +7,15 @@
   align-content: center;
   line-height: 32px;
   padding: 1.5em 1em 3em;
+    text-transform: capitalize;
+    font-weight: 300;
 }
 
 .subcategory_main_section :is(h1, h2, h3, h4),
 .boxcircle {
   text-align: center;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 .subcategory_main_section .boxcircle {
   margin-bottom: 1em;
@@ -121,7 +124,8 @@
 /* faq's section */
 .entry-content {
   counter-reset: question answer;
-  display: 'flex'; alignItems: 'center'; gap: '0.5rem' ;
+  display: flex; 
+  align-items: center; gap: 0.5rem;
 }
 .entry-content h3 {
   text-align: left;
@@ -208,8 +212,8 @@
 }
 
 @media screen and (min-width: 992px) {
-  .subcategory_main_section #container p{
-    text-align: left;
+  .subcategory_main_section #container p, .subcategory_main_section{
+    align-content: flex-start;
   }
   .box img {
     padding-right: 1em;
@@ -217,6 +221,7 @@
   .subcategory_main_section :is(h1, h2, h3),
   .boxcircle {
     font-size: 1.5rem;
+    text-align: left;
   }
   .entry-content p {
     font-size: 1rem;

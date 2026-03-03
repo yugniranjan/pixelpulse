@@ -372,6 +372,8 @@
   width: 100%;
   height: auto;
   transition: 0.5s ease-in-out;
+  aspect-ratio: 1 / 1.5;
+  object-fit: cover;
 }
 
 .aero_home-playsection-2 article:hover>img {
@@ -686,7 +688,7 @@
 .figcaption-bg {
   width: 100%;
   /* 👈 This makes it match the image's width */
-  background-image: url("/assets/images/home/line_pattern.svg");
+  background-color: var(--secondary-color);
   /* or any path in /public */
   background-size: cover;
   background-position: center;

@@ -68,10 +68,10 @@ function renderEditorBlocks(blocks) {
       case "list":
         return block.data.style === "ordered" ? (
           <ol key={index}>
-            {block.data.items.map((item, i) => (
+            {block.data.items.map((item, i) => (console.log("item", item),
               <li
                 key={i}
-                dangerouslySetInnerHTML={{ __html: item }}
+                dangerouslySetInnerHTML={{ __html: item?.content }}
               />
             ))}
           </ol>
@@ -80,7 +80,7 @@ function renderEditorBlocks(blocks) {
             {block.data.items.map((item, i) => (
               <li
                 key={i}
-                dangerouslySetInnerHTML={{ __html: item }}
+                dangerouslySetInnerHTML={{ __html: item?.content }}
               />
             ))}
           </ul>
@@ -124,6 +124,8 @@ export default async function BlogDetail({ searchParams }) {
   if (!data) {
     notFound();
   }
+
+  // console.log("Blog Data:", data?.content?.blocks);
 
   return (
     <main className="aero_blog_detail_page">

@@ -15,10 +15,11 @@ import {
 } from "@/lib/sheets";
 import Link from "next/link";
 import { LOCATION_NAME } from "@/lib/constant";
+import SectionHeading from "@/components/home/SectionHeading";
 
 export async function generateMetadata({ params }) {
   const {
-    location_slug = LOCATION_NAME || 'vaughan',
+    location_slug = LOCATION_NAME || "vaughan",
     subcategory_slug,
     category_slug,
   } = params;
@@ -48,14 +49,14 @@ const Subcategory = async ({ params }) => {
   const categoryData = (
     await getDataByParentId(menudata, category_slug)
   )[0]?.children?.filter(
-    (child) => child.path !== subcategory_slug && child.isactive == 1
+    (child) => child.path !== subcategory_slug && child.isactive == 1,
   );
 
   const attractionsData = Array.isArray(data)
     ? getDataByParentId(data, subcategory_slug)
     : [];
 
-    const safePageData = JSON.parse(JSON.stringify(attractionsData));
+  const safePageData = JSON.parse(JSON.stringify(attractionsData));
   const safeWaiverLink = JSON.parse(JSON.stringify(waiverLink));
 
   const pagedata = attractionsData?.[0];
@@ -68,13 +69,22 @@ const Subcategory = async ({ params }) => {
       </section>
 
       <section className="subcategory_main_section-bg">
-        <section className="aero-max-container">
-          <div
+        <section className="aero-max-container ">
+          <div style={{ padding: "40px 0 10px 0" }}>
+            <SectionHeading mainHeading="true">
+              <span>{pagedata?.title}</span>
+            </SectionHeading>
+          </div>
+          <div className="subcategory_main_section">
+            <h2>{pagedata?.metatitle}</h2>
+            <p>{pagedata?.metadescription}</p>
+            {/* <div
             className="subcategory_main_section"
             dangerouslySetInnerHTML={{
               __html: pagedata.section1 || "",
             }}
-          />
+          /> */}
+          </div>
         </section>
         <SubCategoryCard
           attractionsData={categoryData}
