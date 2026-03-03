@@ -98,7 +98,7 @@ export default function PixelPulseVaughan() {
         <p>{pixelPulseContent.whyChoose.description}</p>
       </div>
 
-      <div className="container section">
+      {/* <div className="container section">
         <h2>{pixelPulseContent.attractions.title}</h2>
         <div className="grid">
           {pixelPulseContent.attractions.list.map((item, index) => (
@@ -108,14 +108,14 @@ export default function PixelPulseVaughan() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}  
 
      <div className="container section cta-box">
         <p>{pixelPulseContent.cta}</p>
         <Link href={BOOKING_URL} target="_blank"> <button>Book Now</button></Link>
       </div>
 
-      <div className="container section">
+      {/* <div className="container section">
         <h2>Tag Lines</h2>
         <div className="tagline-grid">
           {pixelPulseContent.tagLines.map((tag, index) => (
@@ -133,7 +133,7 @@ export default function PixelPulseVaughan() {
             <li key={index}>{item}</li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </section>
   );
 }

@@ -72,6 +72,7 @@ const token = cookies().get("admin_token")?.value;
           menudata={menudata}
           // reviewdata={reviewdata}
         />
+        {/* <script src='https://square.site/appointments/buyer/widget/8l5i0sfoms83a9/LD5QMJPJD957Q.js'></script> */}
         <div id="modal-root"></div>
       </body>
     </html>

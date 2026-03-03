@@ -70,7 +70,7 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
         {/* {reviewdata && <RatingComponent ratingdata={reviewdata} />} */}
 
         {/* Logo + Socials */}
-        <div className="aero_logo_social_wrap d-flex-center ">
+        {/* <div className="aero_logo_social_wrap d-flex-center ">
           <Link href={`/${location_slug}`} prefetch>
             <Image
               src={logo}
@@ -102,7 +102,7 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
               </Link>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Footer Menus */}
         <section className="aero_footer_col-4-wrapper">
@@ -177,14 +177,14 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
       </section>
 
       {/* Chat Script */}
-      {chatid && (
+      {/* {chatid && (
         <Script
           src="https://widgets.leadconnectorhq.com/loader.js"
           data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
           data-widget-id={chatid}
           strategy="afterInteractive"
         />
-      )}
+      )} */}
     </footer>
   );
 };
