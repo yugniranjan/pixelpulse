@@ -335,6 +335,7 @@ const Home = async () => {
             <SectionHeading className="section-heading-white">
               <span> Latest</span>  Articles & News
             </SectionHeading>
+            
             <h3 style={{color:"white", textAlign:"center"}}>Every Updated Article</h3>
 
             <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
