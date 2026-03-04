@@ -50,8 +50,7 @@ async function fetchsheetdata(sheetName, location) {
       }
     });
     const distinctLocations = Array.from(locationSet);
-    //// console.log("Distinct Locations:", distinctLocations);
-    // Cache per sheet and location
+    
     workbook.SheetNames.forEach((name) => {
       const worksheet = workbook.Sheets[name];
       let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
@@ -70,7 +69,6 @@ async function fetchsheetdata(sheetName, location) {
           m => m.location?.includes(loc) || m.location === ""
         );
         const cacheKeyLocal = `${name}:${loc}`;
-      //  // console.log('setting cache for: ',cacheKeyLocal)
         sheetCache.set(cacheKeyLocal, {
           data: filteredData,
           timestamp: now,
@@ -131,7 +129,7 @@ async function fetchFaqData(location, page) {
 }
 
 async function getWaiverLink(location){
-  // console.log('yoyo',location);
+
   const cacheKey = `waiver:${location}`;
   const cached = waiverLinkCache.get(cacheKey);
   // console.log(cacheKey, cached);
