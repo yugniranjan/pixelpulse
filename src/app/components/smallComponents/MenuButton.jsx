@@ -15,14 +15,14 @@ const MenuButton = ({ navList, location_slug }) => {
         onClick={() => setMobile_nav(!mobile_nav)}
       />
       {mobile_nav && (
-        <nav className="d-flex-center aero-list-7-1">
+        <nav className="d-flex-center aero-list-7-1 navbar">
           {navList &&
             navList.map((item) => {
               return (
                 <Link
                   href={`/${location_slug}/${item?.navUrl}`}
                   key={item.navName}
-                  className="aero-app-changelocation"
+                  className="aero-app-changelocation nav-link"
                   onClick={() => setMobile_nav(!mobile_nav)}
                 >
                   {item.navName}

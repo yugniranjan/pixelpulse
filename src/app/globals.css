@@ -51,6 +51,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+.d-flex-end{
+  display: flex;
+  justify-content: flex-end;
+}
 a {
   color: inherit;
   text-decoration: none;
@@ -428,4 +432,108 @@ background-color: var(--black-color);
   color: var(--primary-color);
   font-weight: 600;
   pointer-events: none;
+}
+
+
+/* Overlay background */
+.booking-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.booking-overlayShow {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Sidebar panel */
+.booking-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 480px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  transform: translateX(100%);
+  transition: transform 0.5s ease-in-out;
+  z-index: 1000;
+}
+
+.booking-sidebarOpen {
+  transform: translateX(0);
+}
+
+/* Close button */
+.booking-closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 54.63px !important;
+}
+
+/* Content */
+.booking-sidebarContent {
+  padding: 20px;
+  margin-top: 40px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+@media (max-width:768px){
+  .booking-sidebar{
+    width:100%;
+  }
+}
+
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  color: black;
+}
+
+.nav-link::before,
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  width: 0;
+  height: 2px;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--secondary-color),
+    transparent
+  );
+  transition: width 0.3s ease;
+}
+
+.nav-link::before {
+  left: 50%;
+}
+
+.nav-link::after {
+  right: 50%;
+}
+
+.nav-link:hover::before,
+.nav-link:hover::after {
+  width: 50%;
+}
+
+.nav-link.active::after {
+  width: 100%;
+  left: 0;
 }

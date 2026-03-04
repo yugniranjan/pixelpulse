@@ -19,6 +19,8 @@ import { BOOKING_URL, LOCATION_NAME } from "./lib/constant";
 import PixelPulseSection from "./components/home/PixelPulseSection";
 import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
+import BookingButton from "./components/smallComponents/BookingButton";
+
 
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME || "vaughan";
@@ -103,14 +105,10 @@ const Home = async () => {
             <SectionHeading> JUMP STRAIGHT <span>TO</span>  </SectionHeading>
 
             <section className="aero_home-actionbtn-wrap">
-              <Link
-                href={BOOKING_URL}
-                className="aero-btn-booknow"
-                prefetch
-                target="_blank"
-              >
-                <button>BOOK NOW</button>
-              </Link>
+              <div className="aero-btn-booknow">
+               <BookingButton title="Book Now" />
+              </div>
+              
               <Link
                 href={`/kids-birthday-parties`}
                 className="aero-btn-booknow"

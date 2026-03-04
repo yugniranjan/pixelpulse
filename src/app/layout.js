@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
 import Breadcrumbs from "./components/Breadcrumb";
 
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const inter = Poppins({
@@ -72,7 +73,6 @@ const token = cookies().get("admin_token")?.value;
           menudata={menudata}
           // reviewdata={reviewdata}
         />
-        {/* <script src='https://square.site/appointments/buyer/widget/8l5i0sfoms83a9/LD5QMJPJD957Q.js'></script> */}
         <div id="modal-root"></div>
       </body>
     </html>

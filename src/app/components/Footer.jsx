@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import "../styles/home.css";
 import event_icon from "@public/assets/images/home/event_icon.svg";
@@ -18,8 +17,6 @@ import Script from "next/script";
 
 
 const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
-  
-
 
   if (!configdata?.length || !menudata?.length) return null;
 
@@ -52,12 +49,12 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
           />
           <article className="aero-max-container aero_home_BPJ_wrapper">
             {[
-              { icon: event_icon, text: "Birthday Parties", url:`/${location_slug}/${birthDaypartyData?.[0]?.path}`  },
-              { icon: park_feature_icon, text: "Park Features", url:`/${location_slug}/${attractionsData?.[0]?.path}` },
-              { icon: jump_icon, text: "Group Events" , url:`/${location_slug}/${groupsData?.[0]?.path}`},
+              { icon: event_icon, text: "Birthday Parties", url: `/${location_slug}/${birthDaypartyData?.[0]?.path}` },
+              { icon: park_feature_icon, text: "Park Features", url: `/${location_slug}/${attractionsData?.[0]?.path}` },
+              { icon: jump_icon, text: "Group Events", url: `/${location_slug}/${groupsData?.[0]?.path}` },
             ].map((item, index) => (
               <div className="d-flex-center" key={index}>
-              <a href={item.url} >  <Image src={item.icon} width={90} height={80} alt={item.text} unoptimized /></a>
+                <a href={item.url} >  <Image src={item.icon} width={90} height={80} alt={item.text} unoptimized /></a>
                 <span>{item.text}</span>
               </div>
             ))}
@@ -116,30 +113,33 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
               </li>
             ))}
           </ul>
-          <ul>
-            <li>Programs</li>
-            {programsData?.[0]?.children?.map((item, i) => (
-              <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                  {item?.desc}
-                </Link>
-              </li>
-            ))}
-            {companyData?.[0]?.children?.length > 0 && (
-              <>
-                <li>Company</li>
-                {companyData[0].children.map((item, i) => (
-                  item?.isactive == 1 && (
-                    <li key={i}>
-                      <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                        {item?.desc}
-                      </Link>
-                    </li>
-                  )
-                ))}
-              </>
-            )}
-          </ul>
+          {
+            programsData.length > 0 && (<ul>
+              <li>Programs</li>
+              {programsData?.[0]?.children?.map((item, i) => (
+                <li key={i}>
+                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                    {item?.desc}
+                  </Link>
+                </li>
+              ))}
+              {companyData?.[0]?.children?.length > 0 && (
+                <>
+                  <li>Company</li>
+                  {companyData[0].children.map((item, i) => (
+                    item?.isactive == 1 && (
+                      <li key={i}>
+                        <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                          {item?.desc}
+                        </Link>
+                      </li>
+                    )
+                  ))}
+                </>
+              )}
+            </ul>)
+          }
+
           <ul>
             <li>Groups</li>
             {groupsData?.[0]?.children?.map((item, i) => (
