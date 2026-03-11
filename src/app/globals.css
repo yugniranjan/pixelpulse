@@ -99,15 +99,14 @@ header:first-child + * {
 }
 
 .section-heading{
-  font-size: 2.5rem;
+  font-size: 2.5rem !important;
   font-weight: bold;
-  text-align: center;
+  text-align: center !important;
   margin-bottom: 0.5em;
   line-height: 1.2;
   text-transform: capitalize;
   letter-spacing: 2px;
   user-select: none;
-  padding-top: 1.3em;
 }
 .section-heading span {
   color: var(--primary-color);
@@ -135,7 +134,7 @@ header:first-child + * {
   }
 
   .section-heading{
-  font-size: 3rem;
+  font-size: 3rem !important;
 }
   .section-heading-main{
   font-size: 3.5rem;
@@ -305,6 +304,7 @@ header:first-child + * {
 .aero_blog_featured_image img {
   width: 100%;
   height: auto;
+  max-height: 400px;
   object-fit: cover;
 }
 
@@ -391,7 +391,7 @@ background-color: var(--black-color);
 }
 
 .breadcrumb {
-  padding: 12px 0;
+  padding: 12px;
   font-size: 14px;
 }
 

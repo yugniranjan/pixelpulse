@@ -1,6 +1,7 @@
 .aero_category_section_wrapper {
   background-color: var(--black-color);
-  padding: 3em 0.75em;
+  /* padding: 3em 0.75em; */
+  color: var(--white-color);
 }
 
 .aero_category_main_heading {

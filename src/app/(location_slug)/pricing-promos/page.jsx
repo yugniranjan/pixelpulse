@@ -1,10 +1,12 @@
 export const dynamic = "force-dynamic";
 import React from "react";
 import "../../styles/subcategory.css";
+import "../../styles/promotions.css";
 import MotionImage from "@/components/MotionImage";
 import { getDataByParentId } from "@/utils/customFunctions";
 
 import { fetchsheetdata, getWaiverLink, fetchPageData,generateMetadataLib } from "@/lib/sheets";
+import Promotions from "@/components/home/Promotions";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -21,10 +23,10 @@ const page = async ({ params }) => {
   // const { location_slug = 'vaughan' } = params;
   const location_slug = 'vaughan'
   
-  const [memberData, dataconfig] = await Promise.all([
+  const [memberData, dataconfig, promotions] = await Promise.all([
     await fetchPageData(location_slug, 'pricing-promos'),
     await fetchsheetdata('config',location_slug),
- 
+    await fetchsheetdata('promotions',location_slug)
   ]);
   const waiverLink = await getWaiverLink(location_slug);
   
@@ -123,6 +125,8 @@ const page = async ({ params }) => {
                 __html: memberData?.section2 || "",
               }}
             ></div>
+
+             <Promotions promotions={promotions}/>
           </section>
         </section>
       </section>

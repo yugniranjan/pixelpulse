@@ -21,7 +21,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
   const navList = (Array.isArray(menudata) ? menudata : [])
     .filter((item) => item.isactive === 1)
     .map((item) => ({ navName: item.desc, navUrl: item.path.toLowerCase() }))
-    .sort((a, b) => a.navName.localeCompare(b.navName));
+    // .sort((a, b) => a.navName.localeCompare(b.navName));
 
   // console.log(configdata.length);
   const estoreConfig = Array.isArray(configdata)

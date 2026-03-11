@@ -16,6 +16,7 @@
   text-align: center;
   font-size: 0.9rem;
   font-weight: 500;
+  margin-top: 0 !important;
 }
 .subcategory_main_section .boxcircle {
   margin-bottom: 1em;
@@ -209,6 +210,14 @@
   width: 140px;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.pricing_promo_main_section li{
+  margin-left: 15px;
+    padding: 5px;
+}
+.pricing_promo_main_section > h3:first-child {
+  font-size: 1.7rem !important;
 }
 
 @media screen and (min-width: 992px) {
