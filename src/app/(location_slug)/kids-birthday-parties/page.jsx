@@ -14,6 +14,7 @@ import {
 // import FaqCard from "@/components/smallComponents/FaqCard";
 // import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
 import MotionImage from "@/components/MotionImage";
+import SectionHeading from "@/components/home/SectionHeading";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -49,10 +50,8 @@ const Page = async ({ params }) => {
 
       <section className="subcategory_main_section-bg">
         <section className="aero-max-container">
-          <center>
-            <h2 style={{ paddingTop: "60px" }}>
-              Birthday Party Packages & Pricing
-            </h2>
+          <center style={{ padding: "20px 0 40px" }}>
+            <SectionHeading mainHeading="true">Birthday Party<span>  Packages & Pricing</span></SectionHeading>
           </center>
           <p>
             At pixelpulseplay {location_slug}, we offer competitively priced

@@ -65,7 +65,7 @@ const Category = async ({ params }) => {
           /> */}
           <section className="aero-max-container">
             <div style={{padding:"50px 0 40px 0"}}>
-                     <SectionHeading mainHeading="true">All <span>Attractions</span></SectionHeading>
+                     <SectionHeading mainHeading="true"><span>{attractionsData[0]?.desc}</span></SectionHeading>
                      </div>
             <section className="aero-blog-main-article-wrapper">
               {attractionsData[0]?.children?.map((item, i) => {

@@ -467,6 +467,7 @@
   color: var(--black-color);
   text-align: left;
   padding: 0 0.5em 1em;
+  margin-bottom: 2px !important;
 }
 
 /* feature section */
@@ -672,6 +673,7 @@
 
 .aero_footer_article-card img {
   border-radius: 50%;
+  border: 1px solid var(--white-color);
 }
 
 .aero_footer_article-card div h6 {
@@ -722,6 +724,11 @@ ul.attractions-grid {
 /* Each LI: fixed width on desktop, full width on mobile */
 ul.attractions-grid li {
   width: 259px;
+}
+.attractions-grid li article {
+     border: 1px solid var(--white-color);
+    border-radius: 5px;
+     padding: 5px;
 }
 
 @media (max-width: 768px) {

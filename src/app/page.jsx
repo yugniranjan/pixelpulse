@@ -292,7 +292,7 @@ const Home = async () => {
 
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
-          <section className="aero-max-container">
+          <section className="aero-max-container" style={{marginBottom:"60px"}}>
             <SectionHeading className="section-heading-white">
               <span> Latest</span>  Articles & News
             </SectionHeading>
@@ -312,7 +312,7 @@ const Home = async () => {
       )}
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_feature_section-bg">
-          <section className="aero-max-container aero_home_feature_section">
+          <section className="aero-max-container aero_home_feature_section" style={{padding:"5em 0 5em"}}>
             {[
               { num: 130, label: "Trampolines" },
               { num: 27000, label: "Square Feet" },

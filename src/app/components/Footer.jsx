@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import Image from "next/image";
 import "../styles/home.css";
@@ -14,9 +14,33 @@ import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
 import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import logo from '@public/assets/images/logo.png'
 import Script from "next/script";
+import { db } from "@/lib/firestore";
+import { slugify } from "@/utils/slugify";
 
 
-const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
+export async function getBlogs() {
+
+  try {
+    const snapshot = await db
+      .collection("blogs")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((blog) => blog.createdAt); 
+  } catch (error) {
+    console.error("Firestore Error:", error);
+    return [];  
+  }
+}
+
+
+const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
+   const extractBlogData = await getBlogs();
 
   if (!configdata?.length || !menudata?.length) return null;
 
@@ -152,12 +176,14 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
           </ul>
           <ul>
             <li>Latest News</li>
-            {blogsData?.[0]?.children?.slice(0, 4).map((item, i) => (
+            {extractBlogData?.slice(0, 4).map((item, i) => { 
+              const slug = slugify(item.title);
+              return (
               <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
                   <article className="d-flex-center aero_footer_article-card">
                     <Image
-                      src={item?.smallimage}
+                      src={item?.featuredImage}
                       alt={item?.title}
                       title={item?.title}
                       width={50}
@@ -165,13 +191,15 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
                       unoptimized
                     />
                     <div>
-                      <h6>{item?.pageid}</h6>
+                      <h6> {item?.updatedAt?.seconds
+              ? new Date(item.updatedAt.seconds * 1000).toDateString()
+              : null}</h6>
                       <p>{item?.title}</p>
                     </div>
                   </article>
                 </Link>
               </li>
-            ))}
+            )})}
           </ul>
         </section>
       </section>
