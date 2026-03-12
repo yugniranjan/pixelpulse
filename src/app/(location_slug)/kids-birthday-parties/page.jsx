@@ -37,18 +37,17 @@ const Page = async ({ params }) => {
   const attractions = menudata?.filter((item) => item.path == "attractions")[0];
 
   function serialize(data) {
-  return JSON.parse(JSON.stringify(data));
-}
-
+    return JSON.parse(JSON.stringify(data));
+  }
 
   return (
     <main>
       <MotionImage
-  pageData={serialize(data)}
-  waiverLink={serialize(waiverLink)}
-/>
+        pageData={serialize(data)}
+        waiverLink={serialize(waiverLink)}
+      />
 
-      <section className="subcategory_main_section-bg">
+      {/* <section className="subcategory_main_section-bg">
         <section className="aero-max-container">
           <center style={{ padding: "20px 0 40px" }}>
             <SectionHeading mainHeading="true">Birthday Party<span>  Packages & Pricing</span></SectionHeading>
@@ -80,6 +79,68 @@ const Page = async ({ params }) => {
             })}
           </article>
         </section>
+      </section> */}
+
+      <section className="subcategory_main_section-bg gaming_bg">
+        <section className="aero-max-container">
+          <center style={{ padding: "20px 0 40px" }}>
+            <SectionHeading mainHeading="true">
+              Birthday Party <span>Packages & Pricing</span>
+            </SectionHeading>
+          </center>
+
+          <p className="birthday_desc">
+            At pixelpulseplay {location_slug}, we offer exciting birthday party
+            packages designed for fun, games, and unforgettable celebrations.
+            Pick the package that fits your party size.
+          </p>
+
+          <div className="pricing_compare_wrapper">
+            <table className="gaming_pricing_table">
+              <thead>
+                <tr>
+                  <th className="feature_col">Features</th>
+
+                  {birthdaydata.map((item, i) => (
+                    <th key={i}>
+                      <div className="gaming_package_header">
+                        <h3>{item?.plantitle}</h3>
+
+                        <div className="gaming_price">${item?.price}</div>
+
+                        <span className="gaming_category">
+                          {item?.category}
+                        </span>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                {Array.from(
+                  new Set(
+                    birthdaydata.flatMap((item) => item.includes.split(";")),
+                  ),
+                ).map((feature, i) => (
+                  <tr key={i}>
+                    <td className="feature_name">{feature}</td>
+
+                    {birthdaydata.map((pkg, j) => {
+                      const includes = pkg.includes.split(";");
+
+                      return (
+                        <td key={j} className="feature_value">
+                          {includes.includes(feature) ? "🎮" : "—"}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
       {/* <SubCategoryCard attractionsData={attractions.children} location_slug={location_slug} theme={'default'} title={`Activities & Attractions`} text={[attractions.metadescription]} />
@@ -88,14 +149,14 @@ const Page = async ({ params }) => {
       
      */}
 
-      <section className="aero_home_article_section">
-        {/* <section className="aero-max-container">
+      {/* <section className="aero_home_article_section">
+        <section className="aero-max-container">
           <div
             className="subcategory_main_section"
             dangerouslySetInnerHTML={{ __html: data?.section1 || "" }}
           />
-        </section> */}
-      </section>
+        </section>
+      </section> */}
       <section className="aero_home_article_section">
         <section className="aero-max-container aero_home_seo_section">
           <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
