@@ -59,6 +59,7 @@ const Subcategory = async ({ params }) => {
 
     const jsonLDschema = await generateSchema(
     data,
+    '',
     subcategory_slug,
     category_slug
   );
@@ -118,7 +119,7 @@ const Subcategory = async ({ params }) => {
        <script
         type="application/ld+json"
         suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: jsonLDschema }}
+        dangerouslySetInnerHTML={{ __html: jsonLDschema || "" }}
       />
     </main>
   );
