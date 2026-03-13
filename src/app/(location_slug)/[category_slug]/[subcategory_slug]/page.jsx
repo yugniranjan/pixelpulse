@@ -12,6 +12,7 @@ import {
   fetchMenuData,
   generateMetadataLib,
   getWaiverLink,
+  generateSchema,
 } from "@/lib/sheets";
 import Link from "next/link";
 import { LOCATION_NAME } from "@/lib/constant";
@@ -55,6 +56,13 @@ const Subcategory = async ({ params }) => {
   const attractionsData = Array.isArray(data)
     ? getDataByParentId(data, subcategory_slug)
     : [];
+
+    const jsonLDschema = await generateSchema(
+    data,
+    subcategory_slug,
+    category_slug
+  );
+
 
   const safePageData = JSON.parse(JSON.stringify(attractionsData));
   const safeWaiverLink = JSON.parse(JSON.stringify(waiverLink));
@@ -106,6 +114,12 @@ const Subcategory = async ({ params }) => {
           />
         </section>
       </section>
+
+       <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: jsonLDschema }}
+      />
     </main>
   );
 };

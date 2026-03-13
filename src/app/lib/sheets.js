@@ -11,7 +11,10 @@ const reviewesData = new Map();
 
 async function fetchsheetdata(sheetName, location) {
   const cacheKey = `${sheetName}:${location || 'all'}`;
-  
+  if(sheetName === 'refresh'){
+    console.log('refreshing data');
+    sheetCache.clear();
+  }
   const now = Date.now();
 
   const cached = sheetCache.get(cacheKey);
@@ -209,6 +212,34 @@ async function generateMetadataLib({ location, category, page }) {
 //   return data;
 // }
    
+async function generateSchema(pagedata, locationData, category, page ) {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const metadataItem = pagedata;//?.find((item) => item.path === pagefordata);
+//console.log('pagedata', pagedata);
+  let canonicalPath = pagedata?.location;
+  if (category && page) {
+    canonicalPath += `/${category}/${page}`;
+  } else if (page) {
+     canonicalPath += `/${page}`;
+  } else if (category) {
+    canonicalPath += `/${category}`;
+  }
+
+
+  const fullUrl = `${BASE_URL}/${canonicalPath}`;
+  const imageUrl = metadataItem?.headerimage?.startsWith("http")
+    ? metadataItem.headerimage
+    : `${BASE_URL}${metadataItem?.headerimage || ""}`;
+
+  const filled = locationData?.[0]?.schema
+  .replace('"{{metadesc}}"', JSON.stringify(metadataItem?.metadescription || "Fun for all ages at AeroSports!"))
+  .replace('"{{image}}"', JSON.stringify(imageUrl))
+  .replace('"{{url}}"', JSON.stringify(fullUrl));
+
+  return     filled;
+
+}
 
 
 module.exports = {
@@ -219,5 +250,6 @@ module.exports = {
   fetchFaqData,
   getWaiverLink,
   // getReviewsData,
+  generateSchema,
   fetchsheetdataNoCache
 };

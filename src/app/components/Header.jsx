@@ -95,7 +95,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
               style={{ color: "white" }}
             >
               <MdOutlinePermContactCalendar />
-              <span>Inquiry Now</span>
+              <span>Inquire Now</span>
             </Link>
 
             {/* {estoreConfig?.value && (

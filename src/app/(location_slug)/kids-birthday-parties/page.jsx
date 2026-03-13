@@ -9,6 +9,7 @@ import {
   generateMetadataLib,
   fetchMenuData,
   getWaiverLink,
+  generateSchema,
 } from "@/lib/sheets";
 // import ImageMarquee from "@/components/ImageMarquee";
 // import FaqCard from "@/components/smallComponents/FaqCard";
@@ -31,9 +32,11 @@ const Page = async ({ params }) => {
   const [data, birthdaydata, menudata] = await Promise.all([
     fetchPageData(location_slug, "kids-birthday-parties"),
     fetchsheetdata("birthday packages", location_slug),
-
     fetchMenuData(location_slug),
   ]);
+
+  const jsonLDschema = await generateSchema(data, '', '', "kids-birthday-parties");
+
   const attractions = menudata?.filter((item) => item.path == "attractions")[0];
 
   function serialize(data) {
@@ -42,10 +45,10 @@ const Page = async ({ params }) => {
 
   return (
     <main>
-      <MotionImage
+      {/* <MotionImage
         pageData={serialize(data)}
         waiverLink={serialize(waiverLink)}
-      />
+      /> */}
 
       {/* <section className="subcategory_main_section-bg">
         <section className="aero-max-container">
@@ -84,7 +87,7 @@ const Page = async ({ params }) => {
 <section className="subcategory_main_section-bg gaming_bg">
   <section className="aero-max-container">
 
-    <center className="birthday_heading">
+    <center className="birthday_heading" style={{marginBottom:"20px"}}>
       <SectionHeading mainHeading="true">
         Birthday Party <span>Packages & Pricing</span>
       </SectionHeading>
@@ -155,6 +158,12 @@ const Page = async ({ params }) => {
           <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
         </section>
       </section>
+
+      	  <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: jsonLDschema  || "" }}
+      />
     </main>
   );
 };

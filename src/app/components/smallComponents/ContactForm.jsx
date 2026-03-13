@@ -33,7 +33,7 @@ function ContactForm() {
 
  const handleSubmit = async (e) => {
   // // console.log('contact form'); 
-  formData.locationEmail='event@aerosportsparks.ca'
+  formData.locationEmail='pixelpulseplayzone@gmail.com'
   formData.subject = currentLocation +' ' + formData.selectedEvent + ' from ' + formData.fullName + ' on ' + formData.date + ' at ' + formData.time;
    e.preventDefault();
    try {
