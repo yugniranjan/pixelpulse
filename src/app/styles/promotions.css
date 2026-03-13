@@ -1,161 +1,217 @@
-  /* Grid of promotion cards */
-  .promotions__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-  }
-  
-  /* Individual card */
-  .promotion-card {
-    position: relative;
-    background-color: #111;      /* very dark grey for contrast */
-    border: 2px solid #fff;      /* white border */
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .promotion-card:hover {
-    transform: scale(1.05);
-    box-shadow:
-      0 10px 15px -3px rgba(255, 255, 255, 0.1),
-      0 4px 6px -4px rgba(255, 255, 255, 0.1);
-  }
-  
-  .promotion-card__badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background-color: var(--primary-color);      /* white badge */
-    color: #000;                 /* black text */
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-  
-  .promotion-card__title {
-    margin: 2.5rem 1rem 0.5rem;
-    font-size: 1.25rem !important;
-    font-weight: 700;
-    color: #fff;                 /* white title */
-    text-align: center !important;
-  }
-  
-  .promotion-card__description {
-    margin: 0 1rem 1.5rem;
-    font-size: 1rem;
-    color: #ddd;                 /* light gray */
-    text-align: center;
-  }
-  
-  .promotion-card__details {
-    background-color: #222;      /* dark gray box for validity/code */
-    margin: 0 1rem 1.5rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-  }
-  
-  .promotion-card__validity {
-    display: block;
-    font-size: 0.875rem;
-    color: #aaa;                 /* medium gray */
-    margin-bottom: 0.25rem;
-  }
-  
-  .promotion-card__code {
-    font-weight: 700;
-    color: #fff;                 /* white code text */
-  }
-  
-  .promotion-card__btn {
-    display: block;
-    text-align: center;
-    margin: 0 1rem 1.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: transparent;
-    color: #fff;
-    border: 2px solid #fff;      /* white outline button */
-    text-decoration: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .promotion-card__btn:hover {
-    background-color: #fff;
-    color: #000;
-  }
-  
-  /* --------------- Offer Section --------------- */
 
-.offer-section {
-    padding: 4rem 1rem;
-    background-color: #ffffff;
-  }
-  
-  .offer-section__inner {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-  
-  /* Individual Card */
-  .offer-card {
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .offer-card:hover {
-    transform: translateY(-5px);
-    box-shadow:
-      0 12px 20px rgba(0,0,0,0.15),
-      0 4px 6px rgba(0,0,0,0.1);
-  }
-  
-  /* Image Header */
-  .offer-card__img {
-    position: relative;
-    height: 180px;
-    background-size: cover;
-    background-position: center;
-  }
-  
-  .offer-card__title {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    margin: 0;
-    color: #ffffff;
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
-  }
+/* ---------- CARD GRID ---------- */
 
-  .offer-card__body {
-    padding: 1.5rem;
-  }
-  
-  /* Button */
-  .offer-card__btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    border: 2px solid #f97316;  
-    border-radius: 0.375rem;
-    color: #f97316;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .offer-card__btn:hover {
-    background-color: #f97316;
-    color: #ffffff;
-  }
-  
+.aero_pricingpromo_card_wrapper{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+  margin-top:40px;
+}
+
+/* ---------- CARD ---------- */
+
+.aero_pricingpromo_card{
+  background:#151528;
+  border-radius:16px;
+  padding:28px 24px;
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:.3s ease;
+  text-align:center;
+  min-height:240px;
+}
+
+.aero_pricingpromo_card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 15px 35px rgba(255,75,43,.25);
+}
+
+/* ---------- AGE LABEL ---------- */
+
+.aero_pricingpromo_card-heading{
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#9c9ccf;
+  margin-bottom:5px;
+}
+
+/* ---------- AGE VALUE ---------- */
+
+.aero_pricingpromo_card-para{
+  font-size:22px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:18px;
+}
+
+/* ---------- DETAILS CONTAINER ---------- */
+
+.aero_pricingpromo_card-1{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  text-align:left;
+}
+
+/* ---------- LEFT COLUMN ---------- */
+
+.aero_pricingpromo_card-21{
+  flex:1;
+}
+
+.aero_pricingpromo_card-21 h4{
+  font-size:13px;
+  color:#9c9ccf;
+  margin-bottom:10px;
+  font-weight:500;
+}
+
+/* ---------- RIGHT COLUMN ---------- */
+
+.aero_pricingpromo_card-22{
+  flex:1;
+}
+
+.aero_pricingpromo_card-22 p{
+  font-size:14px;
+  color:#fff;
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+/* ---------- PROMOTIONS GRID ---------- */
+
+.promotions__grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  margin-top:30px;
+}
+
+/* ---------- PROMOTION CARD ---------- */
+
+.promotion-card{
+  position:relative;
+  background:#151528;
+  border-radius:16px;
+  padding:30px 22px;
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  text-align:center;
+  transition:.3s;
+}
+
+.promotion-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 40px rgba(255,75,43,.2);
+}
+
+/* ---------- BADGE ---------- */
+
+.promotion-card__badge{
+  position:absolute;
+  top:0;
+  right:0;
+  background:var(--secondary-color);
+  color:#fff;
+  padding:0 10px;
+  font-size:12px;
+  border-radius:20px;
+  font-weight:600;
+}
+
+/* ---------- TITLE ---------- */
+
+.promotion-card__title{
+  font-size:20px !important;
+  font-weight:700;
+  color:#fff;
+  margin-top:10px;
+  margin-bottom:10px;
+  text-align:center !important;
+}
+
+/* ---------- DESCRIPTION ---------- */
+
+.promotion-card__description{
+  font-size:14px;
+  color:#cfcfe6;
+  margin-bottom:18px;
+  line-height:1.6;
+}
+
+/* ---------- DETAILS ---------- */
+
+.promotion-card__details{
+  background:#1d1d36;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:18px;
+}
+
+.promotion-card__validity{
+  font-size:12px;
+  color:#aaa;
+  margin-right: 20px;
+}
+
+.promotion-card__code{
+  font-weight:700;
+  color:#fff;
+  font-size:14px;
+}
+
+/* ---------- BUTTON ---------- */
+
+.promotion-card__btn{
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:8px;
+  background:var(--secondary-color);
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  transition:.3s;
+}
+
+.promotion-card__btn:hover{
+  background:#ff3c1f;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width:768px){
+
+.pricing_promo_main_section{
+  text-align: center;
+}
+
+.aero_pricingpromo_card{
+  padding:22px 18px;
+}
+
+.aero_pricingpromo_card-1{
+  flex-direction:column;
+  text-align:center;
+}
+
+.aero_pricingpromo_card-21,
+.aero_pricingpromo_card-22{
+  text-align:center;
+}
+
+.aero_pricingpromo_card-21 h4,
+.aero_pricingpromo_card-22 p{
+  margin-bottom:8px;
+}
+
+.promotion-card{
+  padding:40px 18px;
+}
+
+}

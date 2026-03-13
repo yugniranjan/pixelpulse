@@ -81,67 +81,60 @@ const Page = async ({ params }) => {
         </section>
       </section> */}
 
-      <section className="subcategory_main_section-bg gaming_bg">
-        <section className="aero-max-container">
-          <center style={{ padding: "20px 0 40px" }}>
-            <SectionHeading mainHeading="true">
-              Birthday Party <span>Packages & Pricing</span>
-            </SectionHeading>
-          </center>
+<section className="subcategory_main_section-bg gaming_bg">
+  <section className="aero-max-container">
 
-          <p className="birthday_desc">
-            At pixelpulseplay {location_slug}, we offer exciting birthday party
-            packages designed for fun, games, and unforgettable celebrations.
-            Pick the package that fits your party size.
-          </p>
+    <center className="birthday_heading">
+      <SectionHeading mainHeading="true">
+        Birthday Party <span>Packages & Pricing</span>
+      </SectionHeading>
+    </center>
 
-          <div className="pricing_compare_wrapper">
-            <table className="gaming_pricing_table">
-              <thead>
-                <tr>
-                  <th className="feature_col">Features</th>
+    <p className="birthday_desc">
+      At pixelpulseplay {location_slug}, we offer exciting birthday party
+      packages designed for fun, games, and unforgettable celebrations.
+      Pick the package that fits your party size.
+    </p>
 
-                  {birthdaydata.map((item, i) => (
-                    <th key={i}>
-                      <div className="gaming_package_header">
-                        <h3>{item?.plantitle}</h3>
+    <div className="pricing_horizontal_container">
 
-                        <div className="gaming_price">${item?.price}</div>
+      {birthdaydata.map((item, i) => {
 
-                        <span className="gaming_category">
-                          {item?.category}
-                        </span>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+        const includedata = item.includes.split(";");
 
-              <tbody>
-                {Array.from(
-                  new Set(
-                    birthdaydata.flatMap((item) => item.includes.split(";")),
-                  ),
-                ).map((feature, i) => (
-                  <tr key={i}>
-                    <td className="feature_name">{feature}</td>
+        return (
+          <div key={i} className="pricing_horizontal_card">
 
-                    {birthdaydata.map((pkg, j) => {
-                      const includes = pkg.includes.split(";");
+            <div className="package_price_box">
+              <div className="price">${item?.price}</div>
+              <span className="category">{item?.category}</span>
+            </div>
 
-                      return (
-                        <td key={j} className="feature_value">
-                          {includes.includes(feature) ? "🎮" : "—"}
-                        </td>
-                      );
-                    })}
-                  </tr>
+            <div className="package_details">
+
+              <h3 className="package_title">
+                {item?.plantitle}
+              </h3>
+
+              <ul className="package_features">
+
+                {includedata.map((feature, j) => (
+                  <li key={j}>🎮 {feature}</li>
                 ))}
-              </tbody>
-            </table>
+
+              </ul>
+
+            </div>
+
           </div>
-        </section>
-      </section>
+        );
+
+      })}
+
+    </div>
+
+  </section>
+</section>
 
       {/* <SubCategoryCard attractionsData={attractions.children} location_slug={location_slug} theme={'default'} title={`Activities & Attractions`} text={[attractions.metadescription]} />
 
