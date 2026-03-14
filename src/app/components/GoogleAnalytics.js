@@ -4,22 +4,23 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import Script from "next/script";
 
-const globalTrackingId = "G-1TETQERPZN";
+// const globalTrackingId = "G-1TETQERPZN";
+const globalTrackingId = "G-C6K82QG464";
 
-const locationTrackingIds = {
-  london: "G-L59BND7FS0",
-  windsor: "G-KWJLE4VJRW",
-  LOCATION_NAME: "G-CJJLRQ2Q2Y",
-  oakville: "G-D5W5H2N64H",
-  scarborough: "G-D5W5H2N64H",
-};
+// const locationTrackingIds = {
+//   london: "G-L59BND7FS0",
+//   windsor: "G-KWJLE4VJRW",
+//   LOCATION_NAME: "G-CJJLRQ2Q2Y",
+//   oakville: "G-D5W5H2N64H",
+//   scarborough: "G-D5W5H2N64H",
+// };
 
 export default function GoogleAnalytics() {
   const pathname = usePathname();
   const initialized = useRef(false);
 
-  const locationSlug = pathname?.split("/")[1] || "";
-  const locationTrackingId = locationTrackingIds[locationSlug];
+  // const locationSlug = pathname?.split("/")[1] || "";
+  // const locationTrackingId = locationTrackingIds[locationSlug];
 
   useEffect(() => {
     if (!initialized.current && window.gtag) {
@@ -29,11 +30,11 @@ export default function GoogleAnalytics() {
     if (window.gtag) {
       window.gtag("config", globalTrackingId, { page_path: pathname });
 
-      if (locationTrackingId) {
-        window.gtag("config", locationTrackingId, { page_path: pathname });
-      }
+      // if (locationTrackingId) {
+      //   window.gtag("config", locationTrackingId, { page_path: pathname });
+      // }
     }
-  }, [pathname, locationTrackingId]);
+  }, [pathname]);
 
   return (
     <>

@@ -85,60 +85,60 @@ const Page = async ({ params }) => {
         </section>
       </section> */}
 
-<section className="subcategory_main_section-bg gaming_bg">
-  <section className="aero-max-container">
+      <section className="subcategory_main_section-bg gaming_bg">
+        <section className="aero-max-container">
 
-    <center className="birthday_heading" style={{marginBottom:"20px"}}>
-      <SectionHeading mainHeading="true">
-        Birthday Party <span>Packages & Pricing</span>
-      </SectionHeading>
-    </center>
+          <center className="birthday_heading" style={{ marginBottom: "20px" }}>
+            <SectionHeading mainHeading="true">
+              Birthday Party <span>Packages & Pricing</span>
+            </SectionHeading>
+          </center>
 
-    <p className="birthday_desc">
-      At pixelpulseplay {location_slug}, we offer exciting birthday party
-      packages designed for fun, games, and unforgettable celebrations.
-      Pick the package that fits your party size.
-    </p>
+          <p className="birthday_desc">
+            At pixelpulseplay {location_slug}, we offer exciting birthday party
+            packages designed for fun, games, and unforgettable celebrations.
+            Pick the package that fits your party size.
+          </p>
 
-    <div className="pricing_horizontal_container">
+          <div className="pricing_horizontal_container">
 
-      {birthdaydata.map((item, i) => {
+            {birthdaydata.map((item, i) => {
 
-        const includedata = item.includes.split(";");
+              const includedata = item.includes.split(";");
 
-        return (
-          <div key={i} className="pricing_horizontal_card">
+              return (
+                <div key={i} className="pricing_horizontal_card">
 
-            <div className="package_price_box">
-              <div className="price">${item?.price}</div>
-              <span className="category">{item?.category}</span>
-            </div>
+                  <div className="package_price_box">
+                    <div className="price">${item?.price}</div>
+                    <span className="category">{item?.category}</span>
+                  </div>
 
-            <div className="package_details">
+                  <div className="package_details">
 
-              <h3 className="package_title">
-                {item?.plantitle}
-              </h3>
+                    <h3 className="package_title">
+                      {item?.plantitle}
+                    </h3>
 
-              <ul className="package_features">
+                    <ul className="package_features">
 
-                {includedata.map((feature, j) => (
-                  <li key={j}>🎮 {feature}</li>
-                ))}
+                      {includedata.map((feature, j) => (
+                        <li key={j}>🎮 {feature}</li>
+                      ))}
 
-              </ul>
+                    </ul>
 
-            </div>
+                  </div>
+
+                </div>
+              );
+
+            })}
 
           </div>
-        );
 
-      })}
-
-    </div>
-
-  </section>
-</section>
+        </section>
+      </section>
 
       {/* <SubCategoryCard attractionsData={attractions.children} location_slug={location_slug} theme={'default'} title={`Activities & Attractions`} text={[attractions.metadescription]} />
 
@@ -154,21 +154,25 @@ const Page = async ({ params }) => {
           />
         </section>
       </section> */}
-      <section className="aero_home_article_section">
-        <section className="aero-max-container aero_home_seo_section">
-          <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
-        </section>
-      </section>
 
-      <div className="d-flex-center aero-btn-booknow" style={{padding:"2em", backgroundColor:"var(--black-color)"}}>
-          <BookingButton title="Book Now" />
-        </div>
+      {
+        data?.seosection && (<section className="aero_home_article_section">
+          <section className="aero-max-container aero_home_seo_section">
+            <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
+          </section>
+        </section>)
+      }
 
 
-      	  <script
+      <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
+        <BookingButton title="Book Now" />
+      </div>
+
+
+      <script
         type="application/ld+json"
         suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: jsonLDschema  || "" }}
+        dangerouslySetInnerHTML={{ __html: jsonLDschema || "" }}
       />
     </main>
   );

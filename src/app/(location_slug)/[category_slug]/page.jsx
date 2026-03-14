@@ -72,14 +72,16 @@ const Category = async ({ params }) => {
             <div style={{ padding: "50px 0 40px 0" }}>
               <SectionHeading mainHeading="true"><span>{attractionsData[0]?.desc}</span></SectionHeading>
             </div>
+            {
+              pageData?.seosection && (<section className="aero_home_article_section">
+                <section className="aero-max-container aero_home_seo_section">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
+                  />
+                </section>
+              </section>)
+            }
 
-            <section className="aero_home_article_section">
-              <section className="aero-max-container aero_home_seo_section">
-                <div
-                  dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
-                />
-              </section>
-            </section>
 
             <section className="aero-blog-main-article-wrapper">
               {attractionsData[0]?.children?.map((item, i) => {
@@ -135,15 +137,19 @@ const Category = async ({ params }) => {
           </section>
         </section>
 
-        <section className="aero_home_article_section">
-          <section className="aero-max-container aero_home_seo_section">
-            <div
-              dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
-            />
-          </section>
-        </section>
 
-        <div className="d-flex-center aero-btn-booknow" style={{padding:"2em", backgroundColor:"var(--black-color)"}}>
+        {
+          pageData?.section1 && (<section className="aero_home_article_section">
+            <section className="aero-max-container aero_home_seo_section">
+              <div
+                dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
+              />
+            </section>
+          </section>)
+        }
+
+
+        <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
           <BookingButton title="Book Now" />
         </div>
 

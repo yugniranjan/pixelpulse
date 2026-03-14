@@ -76,12 +76,16 @@ const page = async ({ params }) => {
       <section className="subcategory_main_section-bg">
         <section className="aero-max-container">
           <section className="subcategory_main_section">
-            <div
-              className="pricing_promo_main_section"
-              dangerouslySetInnerHTML={{
-                __html: memberData?.section1 || "",
-              }}
-            ></div>
+            {
+              memberData?.section1 && (
+                <div
+                  className="pricing_promo_main_section"
+                  dangerouslySetInnerHTML={{
+                    __html: memberData?.section1 || "",
+                  }}
+                ></div>
+              )
+            }
 
             <section className="aero_pricingpromo_card_wrapper">
               {mergedArray?.map((item, index) => (
