@@ -2,21 +2,18 @@ export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
+import { getBlogs } from '@/(location_slug)/blogs/page';
 export async function GET() {
   const siteUrl = process.env.SITE_URL;
   const dynamicPaths = new Set();
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
+    const extractBlogData = await getBlogs();
 
     rows.forEach(row => {
       const { location, parentid, path } = row;
       const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
-      // const excludedLocations = ["vaughan"];
-      // const locations = location
-      //   ?.split(',')
-      //   .map(l => l.trim().toLowerCase())
-      //   .filter(loc => !excludedLocations.includes(loc)) || [];
 
       dynamicPaths.add(`${siteUrl}`);
       locations.forEach(loc => {
@@ -33,6 +30,22 @@ export async function GET() {
         }
       });
     });
+
+
+    extractBlogData?.forEach(blog => {
+
+      if (blog?.status === "published") {
+
+        const slug = blog?.title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-");
+
+        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`); 
+      }
+    });
+
+
   } catch (error) {
     console.error("Sitemap generation error:", error);
   }
