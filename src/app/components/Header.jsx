@@ -4,6 +4,8 @@ import "../styles/home.css";
 import Link from "next/link";
 import { GrLocation } from "react-icons/gr";
 import Image from "next/image";
+import logo_desktop from "@public/assets/images/logoD.png";
+import logo_mobile from "@public/assets/images/logo.png";
 import MenuButton from "./smallComponents/MenuButton";
 import TopHeader from "./smallComponents/TopHeader";
 import { MdOutlinePermContactCalendar } from "react-icons/md";
@@ -16,12 +18,12 @@ import { usePathname } from "next/navigation";
 
 const Header = ({ location_slug, menudata, configdata, token }) => {
 
-   const pathname = usePathname();
+  const pathname = usePathname();
 
   const navList = (Array.isArray(menudata) ? menudata : [])
     .filter((item) => item.isactive === 1)
     .map((item) => ({ navName: item.desc, navUrl: item.path.toLowerCase() }))
-    // .sort((a, b) => a.navName.localeCompare(b.navName));
+  // .sort((a, b) => a.navName.localeCompare(b.navName));
 
   // console.log(configdata.length);
   const estoreConfig = Array.isArray(configdata)
@@ -54,14 +56,24 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                 className="aero_main_logo"
                 prefetch
               >
-                <Image
+                {/* <Image
                   src="https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png"
                   height="71"
                   width="71"
                   alt="logo"
                   title="logo"
                   unoptimized
-                />
+                /> */}
+                <picture>
+                  <source media="(max-width:768px)" srcSet={logo_mobile.src} />
+                  <Image
+                    src={logo_desktop.src}
+                    width={71}
+                    height={71}
+                    alt="logo"
+                    unoptimized
+                  />
+                </picture>
               </Link>
             </div>
             <div className="aero-menu-location">
@@ -89,7 +101,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
           <div className="aero-btn-booknow-1 aero-btn-booknow desktop-container">
             {token && <LogoutButton />}
             <Link
-              href={`/${location_slug}/contactus`}  
+              href={`/${location_slug}/contactus`}
               prefetch
               className="aero-header-contactus-btn aero-d-changelocation"
               style={{ color: "white" }}

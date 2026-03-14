@@ -16,6 +16,7 @@ import {
 // import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
 import MotionImage from "@/components/MotionImage";
 import SectionHeading from "@/components/home/SectionHeading";
+import BookingButton from "@/components/smallComponents/BookingButton";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -158,6 +159,11 @@ const Page = async ({ params }) => {
           <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
         </section>
       </section>
+
+      <div className="d-flex-center aero-btn-booknow" style={{padding:"2em", backgroundColor:"var(--black-color)"}}>
+          <BookingButton title="Book Now" />
+        </div>
+
 
       	  <script
         type="application/ld+json"

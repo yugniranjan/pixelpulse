@@ -8,6 +8,7 @@ import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
 import { slugify } from '@/utils/slugify';
 import SectionHeading from '@/components/home/SectionHeading';
+import BookingButton from '@/components/smallComponents/BookingButton';
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -72,6 +73,10 @@ const page = async ({ params }) => {
         </section>
 
       </section>
+      <div className="d-flex-center aero-btn-booknow" style={{padding:"2em", backgroundColor:"var(--black-color)"}}>
+          <BookingButton title="Book Now" />
+        </div>
+
     </main>
   );
 };

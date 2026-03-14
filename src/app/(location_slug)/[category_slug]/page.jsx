@@ -14,6 +14,7 @@ import MotionImage from "@/components/MotionImage";
 import { LOCATION_NAME } from "@/lib/constant";
 import { notFound } from "next/navigation";
 import SectionHeading from "@/components/home/SectionHeading";
+import BookingButton from "@/components/smallComponents/BookingButton";
 export async function generateMetadata({ params }) {
   const { location_slug = LOCATION_NAME, category_slug } = params;
 
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }) {
 const Category = async ({ params }) => {
   const { location_slug = LOCATION_NAME, category_slug } = params;
 
-    if (category_slug === "refresh") {
+  if (category_slug === "refresh") {
     await fetchsheetdata("refresh", location_slug);
     return "data refreshed";
   }
@@ -71,6 +72,15 @@ const Category = async ({ params }) => {
             <div style={{ padding: "50px 0 40px 0" }}>
               <SectionHeading mainHeading="true"><span>{attractionsData[0]?.desc}</span></SectionHeading>
             </div>
+
+            <section className="aero_home_article_section">
+              <section className="aero-max-container aero_home_seo_section">
+                <div
+                  dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
+                />
+              </section>
+            </section>
+
             <section className="aero-blog-main-article-wrapper">
               {attractionsData[0]?.children?.map((item, i) => {
                 return (
@@ -127,20 +137,21 @@ const Category = async ({ params }) => {
 
         <section className="aero_home_article_section">
           <section className="aero-max-container aero_home_seo_section">
-            {/* <div
-              dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
-            /> */}
             <div
-              dangerouslySetInnerHTML={{ __html: pageData?.seosection || "" }}
+              dangerouslySetInnerHTML={{ __html: pageData?.section1 || "" }}
             />
           </section>
         </section>
 
-         <script
-        type="application/ld+json"
-        // suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: jsonLDschema || "" }}
-      />
+        <div className="d-flex-center aero-btn-booknow" style={{padding:"2em", backgroundColor:"var(--black-color)"}}>
+          <BookingButton title="Book Now" />
+        </div>
+
+        <script
+          type="application/ld+json"
+          // suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: jsonLDschema || "" }}
+        />
       </section>
     </main>
   );

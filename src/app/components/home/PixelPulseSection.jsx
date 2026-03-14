@@ -8,8 +8,8 @@ import BookingButton from "../smallComponents/BookingButton";
 const pixelPulseContent = {
   hero: {
     title: {
-      titleOne:"Welcome to",
-      titleTwo:"Pixel Pulse Vaughan"
+      titleOne: "Welcome to",
+      titleTwo: "Pixel Pulse Vaughan"
     },
     description:
       "Pixel Pulse Vaughan is a next-generation indoor entertainment destination serving families across Vaughan, Woodbridge, Maple, and Concord. Our immersive play arena features interactive Pixel & tile games, physical and cognitive challenge rooms, arcade games, and private party spaces—designed for active, screen-powered fun with no trampolines. From birthday parties and school field trips to team events and group celebrations, Pixel Pulse delivers high-energy experiences that bring kids, families, and groups together from across the GTA."
@@ -109,12 +109,13 @@ export default function PixelPulseVaughan() {
             </div>
           ))}
         </div>
-      </div> */}  
+      </div> */}
 
-     <div className="container section cta-box">
+      <div className="container section cta-box">
         <p>{pixelPulseContent.cta}</p>
-        {/* <Link href={BOOKING_URL} target="_blank"> <button>Book Now</button></Link> */}
-        <BookingButton title="Book Now" />
+        <div className="d-flex-center aero-btn-booknow" >
+          <BookingButton title="Book Now" />
+        </div>
       </div>
 
       {/* <div className="container section">

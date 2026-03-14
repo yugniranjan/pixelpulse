@@ -13,7 +13,7 @@ import { LOCATION_NAME } from "./lib/constant";
 import Breadcrumbs from "./components/Breadcrumb";
 
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.SITE_URL;
 
 const inter = Poppins({
   subsets: ["latin"],
@@ -21,23 +21,26 @@ const inter = Poppins({
 });
 
 export const metadata = {
-  title: "Discover Fun-Filled Adventures with ONE PASS in Ontario",
-  description: "Explore the thrill of Aero Sports Trampoline Parks in Ontario, offering diverse activities in multiple locations for family-friendly fun and adventure.",
+  title: "Pixel Pulse Play Vaughan – Ultimate Indoor Arcade & Challenge Rooms",
+  description:
+    "Visit Pixel Pulse Play in Vaughan, Ontario – an exciting indoor entertainment destination featuring interactive challenge rooms, arcade games, and fun activities for families, kids, and groups.",
   robots: {
     index: true,
   },
-  "google-site-verification": "SJEMRcmJ9QPGTx8rq7FFoeypG8tObUDWFunTqQXgRx8",
+  "google-site-verification": "fE5Jeszg5L-634-PPeLFUy9CQRKQNs",
   alternates: {
-    canonical: BASE_URL + '/',
+    canonical: BASE_URL + "/",
   },
   openGraph: {
     type: "website",
     url: BASE_URL,
-    title: "pixelpulseplay Trampoline Park Locations: St. Catharines, Niagara Falls, Windsor, London, Oakville,scarborough",
-    description: "The GTA's ultimate play destination: A huge trampoline park with climbing walls, towering slides, a jungle gym, obstacle courses, dodgeball, and more. Ideal for birthday parties!",
+    title:
+      "Pixel Pulse Play Vaughan – Arcade Games & Interactive Challenge Rooms",
+    description:
+      "Experience Pixel Pulse Play in Vaughan, Ontario. Enjoy exciting challenge rooms, arcade games, and immersive activities perfect for birthdays, families, and group events.",
     images: [
       {
-        url: "https://storage.googleapis.com/aerosports/logo_white.png",
+        url: "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
       },
     ],
   },

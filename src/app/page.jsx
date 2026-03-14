@@ -275,6 +275,7 @@ const Home = async () => {
                           width={330}
                           height={200}
                           alt={item?.iconalttextforhomepage}
+                          blurDataURL={item?.smallimage}
                           unoptimized
                         />
                         <figcaption className="figcaption-bg">
@@ -310,7 +311,7 @@ const Home = async () => {
           </section>
         </section>
       )}
-      {attractionsData?.[0]?.children?.length > 0 && (
+      {/* {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_feature_section-bg">
           <section className="aero-max-container aero_home_feature_section" style={{padding:"5em 0 5em"}}>
             {[
@@ -326,15 +327,17 @@ const Home = async () => {
             ))}
           </section>
         </section>
-      )}
-      {/* {attractionsData?.[0]?.children?.length > 0 && (
+      )} */}
+     
+      <PixelPulseSection />
+
+       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
           <section className="aero-max-container aero_home_seo_section">
             <div dangerouslySetInnerHTML={{ __html: seosection }} />
           </section>
         </section>
-      )} */}
-      <PixelPulseSection />
+      )}
       {location_slug === LOCATION_NAME && (
         <script
           type="application/ld+json"

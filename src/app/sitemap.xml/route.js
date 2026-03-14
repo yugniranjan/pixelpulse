@@ -1,29 +1,35 @@
 export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
-import { fetchsheetdataNoCache  } from "@/lib/sheets";
+import { fetchsheetdataNoCache } from "@/lib/sheets";
 export async function GET() {
-  const siteUrl = 'https://www.pixelpulseplayparks.ca';
+  const siteUrl = process.env.SITE_URL;
   const dynamicPaths = new Set();
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
-    
+
     rows.forEach(row => {
       const { location, parentid, path } = row;
-      const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+      // const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+      const excludedLocations = ["vaughan"];
+      const locations = location
+        ?.split(',')
+        .map(l => l.trim().toLowerCase())
+        .filter(loc => !excludedLocations.includes(loc)) || [];
+
       dynamicPaths.add(`${siteUrl}`);
       locations.forEach(loc => {
         // Homepage for location
         dynamicPaths.add(`${siteUrl}/${loc}`);
-        if(path!='home'){
-              // Construct path
-              const basePath = (!parentid || parentid.toLowerCase() === path.toLowerCase())
-                ? `/${loc}/${path.toLowerCase()}`
-                : `/${loc}/${parentid.toLowerCase()}/${path.toLowerCase()}`;
+        if (path != 'home') {
+          // Construct path
+          const basePath = (!parentid || parentid.toLowerCase() === path.toLowerCase())
+            ? `/${loc}/${path.toLowerCase()}`
+            : `/${loc}/${parentid.toLowerCase()}/${path.toLowerCase()}`;
 
-            
-              dynamicPaths.add(`${siteUrl}${basePath}`);
+
+          dynamicPaths.add(`${siteUrl}${basePath}`);
         }
       });
     });

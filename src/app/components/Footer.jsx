@@ -55,9 +55,10 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const attractionsData = getDataByParentId(menudata, "attractions");
   const programsData = getDataByParentId(menudata, "programs");
   const groupsData = getDataByParentId(menudata, "groups-events");
-  const companyData = getDataByParentId(menudata, "aboutus");
+  const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
   const birthDaypartyData = getDataByParentId(menudata, "kids-birthday-parties");
+
   return (
     <footer className="aero_footer_section-bg">
       {/* Hero Section */}
@@ -137,8 +138,8 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               </li>
             ))}
           </ul>
-          {
-            programsData.length > 0 && (<ul>
+          {/* {
+            programsData?.length > 0 && (<ul>
               <li>Programs</li>
               {programsData?.[0]?.children?.map((item, i) => (
                 <li key={i}>
@@ -146,7 +147,8 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                     {item?.desc}
                   </Link>
                 </li>
-              ))}
+              ))} */}
+              <ul>
               {companyData?.[0]?.children?.length > 0 && (
                 <>
                   <li>Company</li>
@@ -161,8 +163,9 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                   ))}
                 </>
               )}
-            </ul>)
-          }
+            </ul>
+            {/* )
+          } */}
 
           <ul>
             <li>Groups</li>

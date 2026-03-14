@@ -95,6 +95,17 @@ const Subcategory = async ({ params }) => {
           /> */}
           </div>
         </section>
+
+      <section className="aero_home_article_section">
+        <section className="aero-max-container aero_home_seo_section">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: pagedata.seosection || "",
+            }}
+          />
+        </section>
+      </section>
+
         <SubCategoryCard
           attractionsData={categoryData}
           location_slug={location_slug}
@@ -106,15 +117,7 @@ const Subcategory = async ({ params }) => {
 
       {/* <ImageMarquee imagesString={pagedata.headerimage} /> */}
 
-      <section className="aero_home_article_section">
-        <section className="aero-max-container aero_home_seo_section">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: pagedata.seosection || "",
-            }}
-          />
-        </section>
-      </section>
+
 
        <script
         type="application/ld+json"

@@ -5,8 +5,9 @@ import "../../styles/promotions.css";
 import MotionImage from "@/components/MotionImage";
 import { getDataByParentId } from "@/utils/customFunctions";
 
-import { fetchsheetdata, getWaiverLink, fetchPageData,generateMetadataLib } from "@/lib/sheets";
+import { fetchsheetdata, getWaiverLink, fetchPageData, generateMetadataLib } from "@/lib/sheets";
 import Promotions from "@/components/home/Promotions";
+import BookingButton from "@/components/smallComponents/BookingButton";
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -22,16 +23,16 @@ export async function generateMetadata({ params }) {
 const page = async ({ params }) => {
   // const { location_slug = 'vaughan' } = params;
   const location_slug = 'vaughan'
-  
+
   const [memberData, dataconfig, promotions] = await Promise.all([
     await fetchPageData(location_slug, 'pricing-promos'),
-    await fetchsheetdata('config',location_slug),
-    await fetchsheetdata('promotions',location_slug)
+    await fetchsheetdata('config', location_slug),
+    await fetchsheetdata('promotions', location_slug)
   ]);
   const waiverLink = await getWaiverLink(location_slug);
-  
-  
-    const pricingheader = dataconfig?.filter(
+
+
+  const pricingheader = dataconfig?.filter(
     (item) => item.key === "pricingheader"
   );
   const filterheadervalue = pricingheader
@@ -85,7 +86,7 @@ const page = async ({ params }) => {
             <section className="aero_pricingpromo_card_wrapper">
               {mergedArray?.map((item, index) => (
                 <div className="aero_pricingpromo_card" key={index}>
-                  <h3 className="aero_pricingpromo_card-heading">Age</h3>
+                  <h3 className="aero_pricingpromo_card-heading">Time</h3>
                   <p className="aero_pricingpromo_card-para">{item?.value1}</p>
 
                   <div className="aero_pricingpromo_card-1 d-flex">
@@ -119,6 +120,11 @@ const page = async ({ params }) => {
               ))}
             </section>
 
+            <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
+              <BookingButton title="Book Now" />
+            </div>
+
+
             <div
               className="pricing_promo_main_section"
               dangerouslySetInnerHTML={{
@@ -126,7 +132,7 @@ const page = async ({ params }) => {
               }}
             ></div>
 
-             <Promotions promotions={promotions}/>
+            <Promotions promotions={promotions} />
           </section>
         </section>
       </section>
