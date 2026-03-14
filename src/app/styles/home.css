@@ -330,7 +330,7 @@
   font-size: 1rem;
   font-weight: 400;
   line-height: 24px;
-  text-align: center;
+  /* text-align: center; */
 }
 
 .aero_home-playsection-1 p {

@@ -1,9 +1,8 @@
-
 /* ---------- CARD GRID ---------- */
 
 .aero_pricingpromo_card_wrapper{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  grid-template-columns:repeat(2,1fr);
   gap:30px;
   margin-top:40px;
 }
@@ -67,6 +66,7 @@
   color:#9c9ccf;
   margin-bottom:10px;
   font-weight:500;
+  width: 100%;
 }
 
 /* ---------- RIGHT COLUMN ---------- */
@@ -80,13 +80,14 @@
   color:#fff;
   margin-bottom:10px;
   font-weight:600;
+  width: 100%;
 }
 
 /* ---------- PROMOTIONS GRID ---------- */
 
 .promotions__grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  grid-template-columns:repeat(3,1fr);
   gap:30px;
   margin-top:30px;
 }
@@ -115,8 +116,8 @@
 
 .promotion-card__badge{
   position:absolute;
-  top:0;
-  right:0;
+  top:4px;
+  right:4px;
   background:var(--secondary-color);
   color:#fff;
   padding:0 10px;
@@ -128,12 +129,10 @@
 /* ---------- TITLE ---------- */
 
 .promotion-card__title{
-  font-size:20px !important;
+  font-size:20px;
   font-weight:700;
   color:#fff;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-align:center !important;
+  margin:10px 0;
 }
 
 /* ---------- DESCRIPTION ---------- */
@@ -157,7 +156,7 @@
 .promotion-card__validity{
   font-size:12px;
   color:#aaa;
-  margin-right: 20px;
+  margin-right:20px;
 }
 
 .promotion-card__code{
@@ -183,20 +182,42 @@
   background:#ff3c1f;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ---------- TABLET ---------- */
+
+@media (max-width:1200px){
+
+.aero_pricingpromo_card_wrapper{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.promotions__grid{
+  grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+/* ---------- MOBILE ---------- */
 
 @media (max-width:768px){
 
-.pricing_promo_main_section{
-  text-align: center;
+/* .pricing_promo_main_section{
+  text-align:center;
+} */
+
+.aero_pricingpromo_card_wrapper{
+  grid-template-columns:1fr;
+}
+
+.promotions__grid{
+  grid-template-columns:1fr;
 }
 
 .aero_pricingpromo_card{
-  padding:22px 18px;
+  padding:20px 16px;
 }
 
 .aero_pricingpromo_card-1{
-  flex-direction:column;
+  gap:10px;
   text-align:center;
 }
 
@@ -205,13 +226,16 @@
   text-align:center;
 }
 
-.aero_pricingpromo_card-21 h4,
-.aero_pricingpromo_card-22 p{
-  margin-bottom:8px;
+.aero_pricingpromo_card-para{
+  font-size:20px;
 }
 
 .promotion-card{
-  padding:40px 18px;
+  padding:24px 16px;
+}
+
+.promotion-card__title{
+  font-size:18px;
 }
 
 }
