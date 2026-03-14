@@ -11,12 +11,12 @@ export async function GET() {
 
     rows.forEach(row => {
       const { location, parentid, path } = row;
-      // const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
-      const excludedLocations = ["vaughan"];
-      const locations = location
-        ?.split(',')
-        .map(l => l.trim().toLowerCase())
-        .filter(loc => !excludedLocations.includes(loc)) || [];
+      const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+      // const excludedLocations = ["vaughan"];
+      // const locations = location
+      //   ?.split(',')
+      //   .map(l => l.trim().toLowerCase())
+      //   .filter(loc => !excludedLocations.includes(loc)) || [];
 
       dynamicPaths.add(`${siteUrl}`);
       locations.forEach(loc => {
