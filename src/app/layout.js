@@ -20,16 +20,26 @@ const inter = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export const metadata = {
+export async function generateMetadata() {
+  const location_slug = LOCATION_NAME;
+  const configdata = await fetchsheetdata("config", location_slug);
+  const dynamicMeta = Object.fromEntries(
+    configdata
+      .filter((item) => item.key.startsWith("meta_"))
+      .map((item) => [item.key.replace("meta_", ""), item.value])
+  );
+return {
   title: "Pixel Pulse Play Vaughan – Ultimate Indoor Arcade & Challenge Rooms",
   description:
     "Visit Pixel Pulse Play in Vaughan, Ontario – an exciting indoor entertainment destination featuring interactive challenge rooms, arcade games, and fun activities for families, kids, and groups.",
   robots: {
     index: true,
   },
-  "google-site-verification": "fE5Jeszg5L-634-PPeLFUy9CQRKQNs",
   alternates: {
     canonical: BASE_URL + "/",
+  },
+  other: {
+   ...dynamicMeta,
   },
   openGraph: {
     type: "website",
@@ -44,7 +54,7 @@ export const metadata = {
       },
     ],
   },
-};
+}};
 
 export default async function RootLayout({ children }) {
 const token = cookies().get("admin_token")?.value;
