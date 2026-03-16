@@ -79,6 +79,13 @@ export async function getBlogs() {
   }
 }
 
+
+const page = async ({ params }) => {
+  const location_slug = params?.location_slug || "vaughan";
+  const extractBlogData = await getBlogs();
+
+
+
 const schema = {
   "@context": "https://schema.org",
   "@type": "Blog",
@@ -106,10 +113,6 @@ const schema = {
     };
   }),
 };
-
-const page = async ({ params }) => {
-  const location_slug = params?.location_slug || "vaughan";
-  const extractBlogData = await getBlogs();
 
   return (
     <main className="aero-blog-main-section">
