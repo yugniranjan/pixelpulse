@@ -1,8 +1,6 @@
 import React from "react";
 import "src/app/styles/home/pixelpulseSection.css";
 import SectionHeading from "./SectionHeading";
-import Link from "next/link";
-import { BOOKING_URL } from "@/lib/constant";
 import BookingButton from "../smallComponents/BookingButton";
 
 const pixelPulseContent = {

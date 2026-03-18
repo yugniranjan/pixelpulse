@@ -1,4 +1,3 @@
-
 export const dynamic = "force-dynamic";
 import "./styles/home.css";
 import "./styles/promotions.css";
@@ -15,13 +14,12 @@ import {
   getWaiverLink,
   generateMetadataLib,
 } from "@/lib/sheets";
-import { BOOKING_URL, LOCATION_NAME } from "./lib/constant";
+import { LOCATION_NAME } from "./lib/constant";
 import PixelPulseSection from "./components/home/PixelPulseSection";
 import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
 import BookingButton from "./components/smallComponents/BookingButton";
 import Promotions from "./components/home/Promotions";
-
 
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME || "vaughan";
@@ -34,7 +32,6 @@ export async function generateMetadata() {
 }
 
 const Home = async () => {
-
   const location_slug = LOCATION_NAME || "vaughan";
 
   const waiverLink = await getWaiverLink(location_slug);
@@ -45,33 +42,44 @@ const Home = async () => {
     // fetchsheetdata("promotions", location_slug),
   ]);
 
-  const homepageSection1 = Array.isArray(dataconfig) ? dataconfig.find((item) => item.key === "homepageSection1")?.value ?? "" : "";
-  const promotionPopup = Array.isArray(dataconfig) ? dataconfig.filter((item) => item.key === "promotion-popup") : [];
-  const header_image = Array.isArray(data) ? data.filter((item) => item.path === "home") : [];
-  const safeHeaderImage = header_image ? JSON.parse(JSON.stringify(header_image)) : {};
+  const homepageSection1 = Array.isArray(dataconfig)
+    ? (dataconfig.find((item) => item.key === "homepageSection1")?.value ?? "")
+    : "";
+  const promotionPopup = Array.isArray(dataconfig)
+    ? dataconfig.filter((item) => item.key === "promotion-popup")
+    : [];
+  const header_image = Array.isArray(data)
+    ? data.filter((item) => item.path === "home")
+    : [];
+  const safeHeaderImage = header_image
+    ? JSON.parse(JSON.stringify(header_image))
+    : {};
   const seosection = header_image?.[0]?.seosection || "";
-  const attractionsData = Array.isArray(data) ? getDataByParentId(data, "attractions") || [] : [];
-  const blogsData = Array.isArray(data) ? getDataByParentId(data, "blogs") || [] : [];
+  const attractionsData = Array.isArray(data)
+    ? getDataByParentId(data, "attractions") || []
+    : [];
+  const blogsData = Array.isArray(data)
+    ? getDataByParentId(data, "blogs") || []
+    : [];
 
-  const stCatharinesSchema = {
+  const vaughanSchema = {
     "@context": "https://schema.org",
     "@type": "AmusementPark",
-    name: "pixelpulseplay Trampoline Park",
+    name: "Pixel Pulse Play Vaughan",
     description:
-      "A fun-filled trampoline park offering amusement, activities, mini golf, and kids' party services, axe throw.",
+      "A fun-filled trampoline park in Vaughan, Ontario offering amusement, activities, mini golf, and kids' party services.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "333 Ontario Street",
-      addressLocality: "St. Catharines",
+      streetAddress: "960 Edgeley Blvd #2",
+      addressLocality: "Vaughan",
       addressRegion: "ON",
-      postalCode: "L2R 5L3",
+      postalCode: "L4K 4V4",
       addressCountry: "Canada",
     },
-    telephone: "+1(289)-362-3377",
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 43.159374,
-      longitude: -79.246862,
+      latitude: 43.83433,
+      longitude: -79.50891,
     },
     openingHours: [
       "Mo-Th 10:00-20:00",
@@ -85,10 +93,6 @@ const Home = async () => {
       ratingValue: "4.5",
       reviewCount: "150",
     },
-    sameAs: [
-      "https://www.facebook.com/AeroSportsTrampolinePark",
-      "https://www.instagram.com/aerosportspark",
-    ],
   };
 
   return (
@@ -102,14 +106,16 @@ const Home = async () => {
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home-actionbtn-bg">
           <section className="aero-max-container aero_home-actionbtn">
-
-            <SectionHeading> JUMP STRAIGHT <span>TO</span>  </SectionHeading>
+            <SectionHeading>
+              {" "}
+              JUMP STRAIGHT <span>TO</span>{" "}
+            </SectionHeading>
 
             <section className="aero_home-actionbtn-wrap">
               <div className="aero-btn-booknow">
-               <BookingButton title="Book Now" />
+                <BookingButton title="Book Now" />
               </div>
-              
+
               <Link
                 href={`/kids-birthday-parties`}
                 className="aero-btn-booknow"
@@ -117,11 +123,7 @@ const Home = async () => {
               >
                 <button>BIRTHDAY PARTIES</button>
               </Link>
-              <Link
-                href={`/attractions`}
-                className="aero-btn-booknow"
-                prefetch
-              >
+              <Link href={`/attractions`} className="aero-btn-booknow" prefetch>
                 <button>VIEW ATTRACTIONS</button>
               </Link>
             </section>
@@ -133,13 +135,14 @@ const Home = async () => {
       <section className="aero_home-playsection">
         <section className="aero_home-playsection-bg">
           <section className="aero-max-container aero_home-playsection-1 d-flex-dir-col">
-
-            <SectionHeading>  <span>LEVEL UP YOUR PLAY</span> <br /> AT PIXEL PULSE VAUGHAN  </SectionHeading>
+            <SectionHeading>
+              {" "}
+              <span>LEVEL UP YOUR PLAY</span> <br /> AT PIXEL PULSE VAUGHAN{" "}
+            </SectionHeading>
 
             <p>{homepageSection1}</p>
           </section>
         </section>
-
 
         {/* <Promotions promotions={promotions}/> */}
 
@@ -253,21 +256,14 @@ const Home = async () => {
           <SectionHeading className="section-heading-white">
             Explore <span>attractions</span>
           </SectionHeading>
-          <Link
-            href={`/attractions`}
-            className="aero-btn-booknow"
-            prefetch
-          >
+          <Link href={`/attractions`} className="aero-btn-booknow" prefetch>
             View All
           </Link>
           <section className="aero-max-container aero_home-playsection-2 ">
             <ul className="attractions-grid">
               {attractionsData[0]?.children?.map((item, i) => (
                 <li key={i}>
-                  <Link
-                    href={`/${item?.parentid}/${item?.path}`}
-                    prefetch
-                  >
+                  <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                     <article className="d-flex-dir-col">
                       <figure>
                         <Image
@@ -293,12 +289,17 @@ const Home = async () => {
 
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
-          <section className="aero-max-container" style={{marginBottom:"60px"}}>
+          <section
+            className="aero-max-container"
+            style={{ marginBottom: "60px" }}
+          >
             <SectionHeading className="section-heading-white">
-              <span> Latest</span>  Articles & News
+              <span> Latest</span> Articles & News
             </SectionHeading>
-            
-            <h3 style={{color:"white", textAlign:"center"}}>Every Updated Article</h3>
+
+            <h3 style={{ color: "white", textAlign: "center" }}>
+              Every Updated Article
+            </h3>
 
             <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
             <Link
@@ -328,10 +329,10 @@ const Home = async () => {
           </section>
         </section>
       )} */}
-     
+
       <PixelPulseSection />
 
-       {attractionsData?.[0]?.children?.length > 0 && (
+      {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home_article_section">
           <section className="aero-max-container aero_home_seo_section">
             <div dangerouslySetInnerHTML={{ __html: seosection }} />
@@ -342,7 +343,7 @@ const Home = async () => {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(stCatharinesSchema),
+            __html: JSON.stringify(vaughanSchema),
           }}
         />
       )}

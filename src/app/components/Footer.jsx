@@ -183,7 +183,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               const slug = slugify(item.title);
               return (
               <li key={i}>
-                <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
+                <Link href={`/blogs/${slug}?uid=${item.id}`} prefetch>
                   <article className="d-flex-center aero_footer_article-card">
                     <Image
                       src={item?.featuredImage}
