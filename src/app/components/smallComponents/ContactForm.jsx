@@ -4,6 +4,7 @@ import { useState ,useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import "../../styles/contactus.css"; 
 import { LOCATION_NAME } from "@/lib/constant";
+import { toast } from "sonner";
 
 function ContactForm() {
   const router = useRouter(); 
@@ -32,13 +33,12 @@ function ContactForm() {
   };
 
  const handleSubmit = async (e) => {
-  // // console.log('contact form'); 
-  formData.locationEmail='pixelpulseplayzone@gmail.com'
-  formData.subject = currentLocation +' ' + formData.selectedEvent + ' from ' + formData.fullName + ' on ' + formData.date + ' at ' + formData.time;
+  formData.locationEmail='hemap9047@gmail.com';
+  formData.subject = `New Inquiry: ${formData.selectedEvent} at ${currentLocation} - ${formData.fullName} (${formData.date} ${formData.time})`;
    e.preventDefault();
    try {
  
-     const response = await fetch(`https://apis-351216.nn.r.appspot.com/api/email`, {
+     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/email`, {
        method: "POST",
        headers: {
          "Content-Type": "application/json",
@@ -47,9 +47,7 @@ function ContactForm() {
      });
 
      if (response.ok) {
-       setSuccessMessage(
-         "Success! Contact form has been successfully submitted."
-       );
+       toast.success("Your message has been sent successfully! We will get back to you shortly.");
        setFormData({
          fullName: "",
          email: "",
@@ -60,10 +58,10 @@ function ContactForm() {
          selectedEvent: "",
        });
      } else {
-       console.error("Failed to send email");
+        toast.error("Failed to send your message. Please try again later.");
      }
    } catch (error) {
-     console.error("Error:", error);
+     toast.error("An error occurred while sending your message. Please try again later.");
    }
  };
 
