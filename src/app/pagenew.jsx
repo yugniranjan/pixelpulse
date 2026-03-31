@@ -1,4 +1,4 @@
-import "./styles/home.css";
+import "./styles/newhome.css";
 import "./styles/promotions.css";
 import Image from "next/image";
 import Link from "next/link";
