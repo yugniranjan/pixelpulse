@@ -34,7 +34,7 @@ const pixelPulseSchema = {
   "@type": "AmusementPark",
   name: "Pixel Pulse Play — Next-Gen Indoor Gaming",
   description:
-    "Vaughan's next-generation indoor gaming arena with laser mazes, interactive tile challenges, climbing walls, and more.",
+    "Vaughan's next-generation indoor gaming arena with laser mazes, interactive tile challenges, climbing walls, and more."
   address: {
     "@type": "PostalAddress",
     addressLocality: "Vaughan",
