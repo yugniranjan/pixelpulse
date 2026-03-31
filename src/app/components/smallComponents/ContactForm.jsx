@@ -1,14 +1,16 @@
-"use client"; 
+"use client";
 
-import { useState ,useEffect } from "react";
-import { useRouter } from "next/navigation"; 
-import "../../styles/contactus.css"; 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import "../../styles/contactus.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { toast } from "sonner";
+import { fetchsheetdata } from "@/lib/sheets";
 
 function ContactForm() {
-  const router = useRouter(); 
-  const [currentLocation, setCurrentLocation] = useState(""); 
+  const router = useRouter();
+  const location_slug = LOCATION_NAME;
+  const [currentLocation, setCurrentLocation] = useState("");
   const [formData, setFormData] = useState({
     from: LOCATION_NAME,
     fullName: "",
@@ -20,50 +22,62 @@ function ContactForm() {
     selectedEvent: "",
   });
 
-  const [successMessage, setSuccessMessage] = useState(""); 
+  const [dataconfig, setDataconfig] = useState([]);
+
   useEffect(() => {
-    const currentUrl = window.location.href; 
-    const pathSegments = new URL(currentUrl).pathname.split("/"); 
-    const locationSegment = pathSegments[1]; // LOCATION_NAME is the second segment
-    setCurrentLocation(locationSegment); // Update state with extracted location
+    const getData = async () => {
+      const data = await fetchsheetdata("locations", location_slug);
+      setDataconfig(data);
+    };
+    getData();
   }, []);
+
+ const email = dataconfig?.find(item => item.email)?.email;
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    const pathSegments = new URL(currentUrl).pathname.split("/");
+    const locationSegment = pathSegments[1]; 
+    setCurrentLocation(locationSegment); 
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
- const handleSubmit = async (e) => {
-  formData.locationEmail='hemap9047@gmail.com';
-  formData.subject = `New Inquiry: ${formData.selectedEvent} at ${currentLocation} - ${formData.fullName} (${formData.date} ${formData.time})`;
-   e.preventDefault();
-   try {
- 
-     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/email`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify(formData),
-     });
+  const handleSubmit = async (e) => {
+    formData.locationEmail = `${email}`;
+    formData.subject = `New Inquiry: ${formData.selectedEvent} at ${currentLocation} - ${formData.fullName} (${formData.date} ${formData.time})`;
+    e.preventDefault();
+    try {
 
-     if (response.ok) {
-       toast.success("Your message has been sent successfully! We will get back to you shortly.");
-       setFormData({
-         fullName: "",
-         email: "",
-         phone: "",
-         date: "",
-         time: "",
-         message: "",
-         selectedEvent: "",
-       });
-     } else {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast.success("Your message has been sent successfully! We will get back to you shortly.");
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          date: "",
+          time: "",
+          message: "",
+          selectedEvent: "",
+        });
+      } else {
         toast.error("Failed to send your message. Please try again later.");
-     }
-   } catch (error) {
-     toast.error("An error occurred while sending your message. Please try again later.");
-   }
- };
+      }
+    } catch (error) {
+      toast.error("An error occurred while sending your message. Please try again later.");
+    }
+  };
 
   return (
     <div>
@@ -164,8 +178,6 @@ function ContactForm() {
           Send
         </button>
       </form>
-
-      {successMessage && <p className="success-message">{successMessage}</p>}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+/*
 .aero_kids_party {
   background: #ed087178;
   max-width: 500px;
@@ -55,7 +56,6 @@
   display: inline-flex;
 }
 
-/* bogo offers page css */
 
 .bogo_main_section {
   padding: 3em 1em;
@@ -101,11 +101,12 @@
     width: 120px;
   }
 }
+*/
 
 
 .gaming_bg{
   background:#0f0f1a;
-  padding:80px 0;
+  padding:30px 0;
 }
 
 .birthday_desc{
@@ -116,7 +117,6 @@
   line-height:1.7;
 }
 
-/* container */
 
 .pricing_horizontal_container{
   display:flex;
@@ -124,7 +124,6 @@
   gap:25px;
 }
 
-/* horizontal card */
 
 .pricing_horizontal_card{
   display:flex;
@@ -140,11 +139,9 @@
   box-shadow:0 15px 35px rgba(235, 135, 43, 0.2);
 }
 
-/* price box */
-
 .package_price_box{
   min-width:180px;
-  background:linear-gradient(135deg,#ff4b2b, var(--primary-color));
+  background:linear-gradient(160deg,#ff4b2b, var(--primary-color));
   color:white;
   display:flex;
   flex-direction:column;
@@ -163,8 +160,6 @@
   opacity:.9;
 }
 
-/* details */
-
 .package_details{
   padding:25px;
   flex:1;
@@ -181,7 +176,6 @@
   padding:0;
   margin:0;
   display:grid;
-  /* grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); */
   gap:10px;
 }
 
@@ -190,7 +184,6 @@
   color:#dcdcff;
 }
 
-/* mobile */
 
 @media (max-width:700px){
 
@@ -202,4 +195,130 @@
   width:100%;
 }
 
+}
+
+
+
+
+/* Section */
+.pricing_section {
+  padding: 60px 20px;
+  background: #0b1220;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Scroll */
+.table_wrapper {
+  overflow-x: auto;
+}
+
+/* Table */
+.comparison_table {
+  width: 100%;
+  min-width: 750px;
+  border-collapse: collapse;
+  background: #111827;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Header */
+.comparison_table thead {
+  background: #1f2937;
+}
+
+.feature_col {
+  text-align: left;
+  padding: 20px;
+  color: #9ca3af;
+  font-size: xx-large;
+}
+
+.plan_col {
+  padding: 0;
+}
+
+/* Plan box */
+.plan_box {
+  padding: 25px 15px;
+  text-align: center;
+}
+
+.plan_price {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.plan_name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white-color);
+  margin-top: 5px;
+}
+
+.plan_category {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Highlight plan */
+.highlight .plan_box {
+  background: linear-gradient(135deg, #ff4b2b, #28a745);
+  border-radius: 10px;
+}
+
+/* Body */
+.comparison_table td {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.comparison_table td:first-child {
+  text-align: left;
+  color: #9ca3af;
+  font-size: 16px;
+  width: 250px;
+}
+
+/* Feature name */
+.feature_name {
+  text-align: left;
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+/* Value */
+.value_cell {
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+/* Hover */
+.comparison_table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.rules_section {
+  margin-top: 40px;
+}
+
+.rules_title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.rules_list {
+  padding-left: 20px;
+}
+
+.rule_item {
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
