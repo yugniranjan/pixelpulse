@@ -23,7 +23,11 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
   const navItems = [
     { navName: "Home", navUrl: "", href: basePath || "/" },
     ...(Array.isArray(menudata) ? menudata : [])
-    .filter((item) => item.isactive === 1)
+    .filter(
+      (item) =>
+        item.isactive === 1 &&
+        !["contactus", "contact-us", "blogs"].includes(item.path?.toLowerCase()),
+    )
     .map((item) => ({
       navName: item.desc,
       navUrl: item.path.toLowerCase(),

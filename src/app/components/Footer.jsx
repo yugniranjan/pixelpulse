@@ -58,6 +58,10 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
   const birthDaypartyData = getDataByParentId(menudata, "kids-birthday-parties");
+  const companyChildren = companyData?.[0]?.children || [];
+  const hasFooterContactLink = companyChildren.some(
+    (item) => item?.path?.toLowerCase() === "contactus" && item?.isactive == 1,
+  );
 
   return (
     <footer className="aero_footer_section-bg">
@@ -170,6 +174,13 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                       </li>
                     )
                   ))}
+                  {!hasFooterContactLink && (
+                    <li>
+                      <Link href={`/${location_slug}/contactus`} prefetch>
+                        Contact Us
+                      </Link>
+                    </li>
+                  )}
                 </>
               )}
             </ul>
