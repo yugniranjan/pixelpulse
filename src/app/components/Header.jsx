@@ -124,14 +124,18 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
               style={{ position: "relative" }}
               className="aero-header-changelocation-wrap"
             >
-              <Link
-                href={`/${location_slug}/contactus`}
-                prefetch
-                className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid aero-app-changelocation app-container"
-                style={{ marginRight: "0" }}
-              >
-                <span>Enquire</span>
-              </Link>
+              <div className="aero-header-mobile-actions app-container">
+                <Link
+                  href={`/${location_slug}/contactus`}
+                  prefetch
+                  className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid"
+                >
+                  <span>Enquire</span>
+                </Link>
+                <div className="aero-header-booking">
+                  <BookingButton title="Book Visit" />
+                </div>
+              </div>
               <div className="app-container">
                 {token && <LogoutButton />}
               </div>

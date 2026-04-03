@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
-const BookingModal = ({ isOpen, onClose }) => {
+const BookingModal = ({ isOpen, onClose, bookingType }) => {
   const location_slug = LOCATION_NAME;
   const pathname = usePathname();
 
@@ -64,8 +64,10 @@ const BookingModal = ({ isOpen, onClose }) => {
   const lilypadposParty = dataconfig.find((item) => item.key === "lilypadpos_party")?.value;
   const lilypadposTicket = dataconfig.find((item) => item.key === "lilypadpos_ticket")?.value;
 
-  const iframeUrl = pathname === "/kids-birthday-parties" ? lilypadposParty : lilypadposTicket;
-  const isPartyPath = pathname === "/kids-birthday-parties";
+  const isPartyPath =
+    bookingType === "party" ||
+    (bookingType !== "ticket" && pathname === "/kids-birthday-parties");
+  const iframeUrl = isPartyPath ? lilypadposParty : lilypadposTicket;
 
   if (!isOpen || !modalRoot) return null;
 

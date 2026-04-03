@@ -18,6 +18,7 @@ import { LOCATION_NAME } from "./lib/constant";
 import PixelPulseSection from "./components/home/PixelPulseSection";
 import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
+import BookingButton from "./components/smallComponents/BookingButton";
 
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME || "vaughan";
@@ -224,9 +225,7 @@ const Home = async () => {
             </SectionHeading>
 
             <div className="ppp-ctabar__buttons">
-              <Link href="/programs" className="ppp-btn ppp-btn--primary" prefetch>
-                BOOK NOW
-              </Link>
+              <BookingButton title="Book Now" className="ppp-btn ppp-btn--primary" bookingType="ticket" />
               <Link href="/kids-birthday-parties" className="ppp-btn ppp-btn--outline" prefetch>
                 BIRTHDAY PARTIES
               </Link>
@@ -399,9 +398,11 @@ const Home = async () => {
                     </li>
                   ))}
                 </ul>
-                <Link href={p.href} className="ppp-btn ppp-btn--primary ppp-pricing__cta" prefetch>
-                  {p.cta}
-                </Link>
+                <BookingButton
+                  title={p.cta}
+                  className="ppp-btn ppp-btn--primary ppp-pricing__cta"
+                  bookingType={p.href === "/kids-birthday-parties" ? "party" : "ticket"}
+                />
               </article>
             ))}
           </div>
@@ -472,9 +473,7 @@ const Home = async () => {
             Located in Vaughan — serving all of the GTA.
           </p>
           <div className="ppp-cta-band__actions">
-            <Link href="/programs" className="ppp-btn ppp-btn--primary" prefetch>
-              🎮 Book Now
-            </Link>
+            <BookingButton title="Book Now" className="ppp-btn ppp-btn--primary" bookingType="ticket" />
             <Link href="/contact" className="ppp-btn ppp-btn--outline" prefetch>
               📍 Get Directions
             </Link>

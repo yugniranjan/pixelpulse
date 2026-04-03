@@ -253,15 +253,17 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.aero-header-booking button {
+.aero-header-booking button,
+.aero-header-cta--solid {
   top: auto;
   border: 2px solid var(--primary-color);
   background: var(--primary-color);
-  color: #050810;
+  color: #050810 !important;
   box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
 }
 
-.aero-header-booking button:hover {
+.aero-header-booking button:hover,
+.aero-header-cta--solid:hover {
   top: auto;
   background: #fbae7b;
   transform: translateY(-2px);
@@ -272,19 +274,6 @@
   border: 2px solid var(--primary-color);
   color: var(--primary-color) !important;
   background: transparent;
-}
-
-.aero-header-cta--solid {
-  border: 2px solid var(--primary-color);
-  background: var(--primary-color);
-  color: #050810 !important;
-  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
-}
-
-.aero-header-cta--solid:hover {
-  background: #fbae7b;
-  transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(251, 174, 123, 0.6);
 }
 
 .navbar {
@@ -320,16 +309,22 @@
   background: #a4cf5f;
   box-shadow: 0 0 18px rgba(251, 174, 123, 0.28);
   backdrop-filter: blur(14px);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 @media (max-width: 991px) {
+  .aero-header-booking.app-container {
+    display: none;
+  }
+
   .desktop-container {
     display: none;
   }
 
   .aero-col-3 {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 0.75rem;
     height: auto;
@@ -339,6 +334,10 @@
 
   .aero-col-3 > div {
     flex-basis: auto;
+  }
+
+  .aero-col-3 > .app-container:last-child {
+    display: none;
   }
 
   .aero-col-3 .aero-header-logo.desktop-container {
@@ -363,13 +362,6 @@
     object-fit: contain;
   }
 
-  .aero-header-booking.app-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    min-width: 0;
-  }
-
   .aero-header-booking button,
   .aero-header-cta {
     min-height: 36px;
@@ -385,33 +377,35 @@
   }
 
   .aero-header-changelocation-wrap {
-    flex-wrap: nowrap;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     min-height: 54px;
     padding: 0.35rem 0.85rem;
+    gap: 0.75rem;
   }
 
-  .aero-header-mobile-location {
-    flex: 1 1 auto;
+  .aero-header-mobile-actions {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking {
+    flex: 0 0 100px;
+  }
+
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking button {
+    width: 100%;
     min-width: 0;
-    justify-content: flex-start;
-    padding-inline: 0.9rem;
-    font-size: 0.76rem;
-    letter-spacing: 0.08em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
-  .aero-header-changelocation-wrap .aero-header-contactus-btn {
-    flex: 0 0 auto;
-    min-width: fit-content;
-    white-space: nowrap;
-  }
-
-  .aero-header-changelocation-wrap .app-container {
-    flex: 0 0 auto;
+  .aero-header-mobile-actions .aero-header-booking {
+    padding-top: 0.35rem;
   }
 }
 
@@ -443,19 +437,15 @@
     padding: 0.35rem 0.7rem;
   }
 
-  .aero-header-mobile-location {
-    padding: 0.6rem 0.75rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
+  .aero-header-mobile-actions {
+    gap: 0.75rem;
   }
 
-  .aero-header-contactus-btn span {
-    display: none;
-  }
-
-  .aero-header-contactus-btn {
-    min-width: 40px;
-    padding-inline: 10px;
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking button {
+    min-height: 34px;
+    padding: 8px 10px;
+    font-size: 0.68rem;
   }
 }
 
@@ -572,7 +562,7 @@
   height: 0;
   border-left: 0px solid transparent;
   border-right: 100vw solid transparent;
-  border-bottom: 35px solid #17cd07;
+  border-bottom: 35px solid #a4cf5f;
 }
 
 /* playground section */
