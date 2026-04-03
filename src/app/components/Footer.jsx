@@ -1,6 +1,5 @@
-'use client';
+// 'use client';
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import "../styles/home.css";
 import event_icon from "@public/assets/images/home/event_icon.svg";
@@ -15,11 +14,33 @@ import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
 import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import logo from '@public/assets/images/logo.png'
 import Script from "next/script";
+import { db } from "@/lib/firestore";
+import { slugify } from "@/utils/slugify";
 
 
-const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
-  
+export async function getBlogs() {
 
+  try {
+    const snapshot = await db
+      .collection("blogs")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((blog) => blog.createdAt); 
+  } catch (error) {
+    console.error("Firestore Error:", error);
+    return [];  
+  }
+}
+
+
+const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
+   const extractBlogData = await getBlogs();
 
   if (!configdata?.length || !menudata?.length) return null;
 
@@ -34,30 +55,40 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
   const attractionsData = getDataByParentId(menudata, "attractions");
   const programsData = getDataByParentId(menudata, "programs");
   const groupsData = getDataByParentId(menudata, "groups-events");
-  const companyData = getDataByParentId(menudata, "aboutus");
+  const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
   const birthDaypartyData = getDataByParentId(menudata, "kids-birthday-parties");
+
   return (
     <footer className="aero_footer_section-bg">
       {/* Hero Section */}
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home-headerimg-wrapper">
           <Image
-            src="https://storage.googleapis.com/aerosports/windsor-new/kids-activity-glow-in-the-dark.webp"
-            alt="Glow Night Event"
+            src="/assets/images/shootinggame.jpg"
+            alt="Shooting game"
             width={1200}
             height={600}
-            title="Glow Night Event"
+            title="Shooting game"
             unoptimized
           />
           <article className="aero-max-container aero_home_BPJ_wrapper">
             {[
-              { icon: event_icon, text: "Birthday Parties", url:`/${location_slug}/${birthDaypartyData?.[0]?.path}`  },
-              { icon: park_feature_icon, text: "Park Features", url:`/${location_slug}/${attractionsData?.[0]?.path}` },
-              { icon: jump_icon, text: "Group Events" , url:`/${location_slug}/${groupsData?.[0]?.path}`},
+              { icon: event_icon, text: "Birthday Parties", url: `/${location_slug}/${birthDaypartyData?.[0]?.path}` },
+             
+              { icon: jump_icon, text: "Group Events", url: `/${location_slug}/${groupsData?.[0]?.path}` },
             ].map((item, index) => (
               <div className="d-flex-center" key={index}>
-              <a href={item.url} >  <Image src={item.icon} width={90} height={80} alt={item.text} unoptimized /></a>
+                <a href={item.url} >
+                  <Image
+                    src={item.icon}
+                    width={90}
+                    height={80}
+                    alt={item.text}
+                    className={item.text === "Birthday Parties" ? "aero_home_BPJ_icon--glow" : ""}
+                    unoptimized
+                  />
+                </a>
                 <span>{item.text}</span>
               </div>
             ))}
@@ -67,16 +98,16 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
 
       <section className="aero-max-container">
         {/* Rating */}
-        {reviewdata && <RatingComponent ratingdata={reviewdata} />}
+        {/* {reviewdata && <RatingComponent ratingdata={reviewdata} />} */}
 
         {/* Logo + Socials */}
-        <div className="d-flex-center aero_logo_social_wrap">
+        {/* <div className="aero_logo_social_wrap d-flex-center ">
           <Link href={`/${location_slug}`} prefetch>
             <Image
               src={logo}
               alt="pixelpulseplay Logo"
               width={100}
-              height={93.42}
+              height={80}
               unoptimized
             />
           </Link>
@@ -102,7 +133,7 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
               </Link>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Footer Menus */}
         <section className="aero_footer_col-4-wrapper">
@@ -116,30 +147,35 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
               </li>
             ))}
           </ul>
-          <ul>
-            <li>Programs</li>
-            {programsData?.[0]?.children?.map((item, i) => (
-              <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                  {item?.desc}
-                </Link>
-              </li>
-            ))}
-            {companyData?.[0]?.children?.length > 0 && (
-              <>
-                <li>Company</li>
-                {companyData[0].children.map((item, i) => (
-                  item?.isactive == 1 && (
-                    <li key={i}>
-                      <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                        {item?.desc}
-                      </Link>
-                    </li>
-                  )
-                ))}
-              </>
-            )}
-          </ul>
+          {/* {
+            programsData?.length > 0 && (<ul>
+              <li>Programs</li>
+              {programsData?.[0]?.children?.map((item, i) => (
+                <li key={i}>
+                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                    {item?.desc}
+                  </Link>
+                </li>
+              ))} */}
+              <ul>
+              {companyData?.[0]?.children?.length > 0 && (
+                <>
+                  <li>Company</li>
+                  {companyData[0].children.map((item, i) => (
+                    item?.isactive == 1 && (
+                      <li key={i}>
+                        <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                          {item?.desc}
+                        </Link>
+                      </li>
+                    )
+                  ))}
+                </>
+              )}
+            </ul>
+            {/* )
+          } */}
+
           <ul>
             <li>Groups</li>
             {groupsData?.[0]?.children?.map((item, i) => (
@@ -152,12 +188,14 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
           </ul>
           <ul>
             <li>Latest News</li>
-            {blogsData?.[0]?.children?.slice(0, 4).map((item, i) => (
+            {extractBlogData?.slice(0, 4).map((item, i) => { 
+              const slug = slugify(item.title);
+              return (
               <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                <Link href={`/blogs/${slug}?uid=${item.id}`} prefetch>
                   <article className="d-flex-center aero_footer_article-card">
                     <Image
-                      src={item?.smallimage}
+                      src={item?.featuredImage}
                       alt={item?.title}
                       title={item?.title}
                       width={50}
@@ -165,26 +203,28 @@ const Footer = ({ location_slug, configdata, menudata, reviewdata }) => {
                       unoptimized
                     />
                     <div>
-                      <h6>{item?.pageid}</h6>
+                      <h6> {item?.updatedAt?.seconds
+              ? new Date(item.updatedAt.seconds * 1000).toDateString()
+              : null}</h6>
                       <p>{item?.title}</p>
                     </div>
                   </article>
                 </Link>
               </li>
-            ))}
+            )})}
           </ul>
         </section>
       </section>
 
       {/* Chat Script */}
-      {chatid && (
+      {/* {chatid && (
         <Script
           src="https://widgets.leadconnectorhq.com/loader.js"
           data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
           data-widget-id={chatid}
           strategy="afterInteractive"
         />
-      )}
+      )} */}
     </footer>
   );
 };

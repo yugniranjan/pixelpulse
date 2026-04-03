@@ -1,4 +1,5 @@
 // src/lib/firebaseAdmin.js
+export const runtime = "nodejs";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 

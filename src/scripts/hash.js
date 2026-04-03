@@ -1,5 +1,5 @@
 // scripts/hash.js
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
-const hash = await bcrypt.hash("Admin@pixelpulse", 10);
+const hash = await bcrypt.hash("", 10);
 console.log(hash);

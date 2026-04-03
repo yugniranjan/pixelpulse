@@ -1,31 +1,51 @@
+export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
-import { fetchsheetdataNoCache  } from "@/lib/sheets";
+import { fetchsheetdataNoCache } from "@/lib/sheets";
+import { getBlogs } from '@/(location_slug)/blogs/page';
 export async function GET() {
-  const siteUrl = 'https://www.pixelpulseplayparks.ca';
+  const siteUrl = process.env.SITE_URL;
   const dynamicPaths = new Set();
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
-    
+    const extractBlogData = await getBlogs();
+
     rows.forEach(row => {
       const { location, parentid, path } = row;
       const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+
       dynamicPaths.add(`${siteUrl}`);
       locations.forEach(loc => {
         // Homepage for location
         dynamicPaths.add(`${siteUrl}/${loc}`);
-        if(path!='home'){
-              // Construct path
-              const basePath = (!parentid || parentid.toLowerCase() === path.toLowerCase())
-                ? `/${loc}/${path.toLowerCase()}`
-                : `/${loc}/${parentid.toLowerCase()}/${path.toLowerCase()}`;
+        if (path != 'home') {
+          // Construct path
+          const basePath = (!parentid || parentid.toLowerCase() === path.toLowerCase())
+            ? `/${loc}/${path.toLowerCase()}`
+            : `/${loc}/${parentid.toLowerCase()}/${path.toLowerCase()}`;
 
-            
-              dynamicPaths.add(`${siteUrl}${basePath}`);
+
+          dynamicPaths.add(`${siteUrl}${basePath}`);
         }
       });
     });
+
+
+    extractBlogData?.forEach(blog => {
+
+      if (blog?.status === "published") {
+
+        const slug = blog?.title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-");
+
+        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`); 
+      }
+    });
+
+
   } catch (error) {
     console.error("Sitemap generation error:", error);
   }

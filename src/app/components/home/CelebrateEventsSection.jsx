@@ -1,5 +1,5 @@
+import '../../styles/home/celebrateEventsSection.css';
 import Link from "next/link";
-import "src/app/styles/home/celebrateEventsSection.css";
 import SectionHeading from "./SectionHeading";
 
 export default function CelebrateEventsSection() {
@@ -35,7 +35,7 @@ export default function CelebrateEventsSection() {
         <section className="aero_home_article_section">
             <section className="aero-max-container">
                 <SectionHeading className="section-heading-white">
-                    <span>Celebrate</span> your event 
+                    <span>Celebrate</span> your event
                 </SectionHeading>
 
 

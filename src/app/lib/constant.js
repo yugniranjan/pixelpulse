@@ -1,1 +1,1 @@
-export const LOCATION_NAME = "st-catharines"
+export const LOCATION_NAME = "vaughan"

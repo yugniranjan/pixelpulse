@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://pixelpulse.com
+Host: https://www.pixelpulse.com
 
 # Sitemaps
-Sitemap: https://pixelpulse.com/sitemap.xml
+Sitemap: https://www.pixelpulse.com/sitemap.xml

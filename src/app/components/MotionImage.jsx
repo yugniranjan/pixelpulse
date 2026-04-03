@@ -22,7 +22,7 @@ const MotionImage = ({ pageData, waiverLink }) => {
             <source src={item.video} type="video/mp4" />
           </video>
 
-          <article className="image-content">
+          {/* <article className="image-content">
 
             <SectionHeading mainHeading="true" className="section-heading-orange">
               Pixel Pulse <br /> <span> Play n Party</span>
@@ -47,15 +47,15 @@ const MotionImage = ({ pageData, waiverLink }) => {
                 </Link>
               </div>
             )}
-          </article>
+          </article> */}
         </section>
       ) : (
         <motion.div
-          className="image-container"
+          // className="image-container"
           // initial={{ scale: 1 }}
           // animate={{ scale: 1.1 }}
           // transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
-          style={{ maxHeight: "600px", minHeight: "450px" }}
+          // style={{height:"70dvh" }}
         >
           {/* <Image
             src={
@@ -69,19 +69,18 @@ const MotionImage = ({ pageData, waiverLink }) => {
             priority
           /> */}
 
-          <motion.article
+          {/* <motion.article
             className="image-content"
-            // initial={{ opacity: 0 }}
-            // animate={{ opacity: 1 }}
-            // transition={{ duration: 3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 3 }}
           >
             <SectionHeading mainHeading="true" className="section-heading-orange">
               Pixel Pulse <br /> <span> Play n Party</span>
             </SectionHeading>
-
             <p
-              dangerouslySetInnerHTML={{ __html: item.smalltext || "" }}
-            />
+                dangerouslySetInnerHTML={{ __html: item.smalltext || "" }}
+              />
 
             {waiverLink && (
               <div className="aero-btn-booknow">
@@ -98,7 +97,7 @@ const MotionImage = ({ pageData, waiverLink }) => {
                 </Link>
               </div>
             )}
-          </motion.article>
+          </motion.article> */}
         </motion.div>
       )}
     </section>

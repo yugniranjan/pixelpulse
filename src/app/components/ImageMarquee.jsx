@@ -30,7 +30,7 @@ if (imagesString) {
             <img 
               src={DEFAULT_IMAGE}
               alt="pixelpulseplay Fun"
-              title="pixelpulseplay Trampoline Park"
+              title="pixelpulseplay"
               width={400}
               height={267}
               loading='lazy'

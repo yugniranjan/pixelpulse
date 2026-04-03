@@ -7,9 +7,14 @@ const sheetCache = new Map();
 const CACHE_TTL = 1000 * 60 * 15; // 15 min
 const waiverLinkCache = new Map();
 const reviewesData = new Map();
+
+
 async function fetchsheetdata(sheetName, location) {
   const cacheKey = `${sheetName}:${location || 'all'}`;
-  
+  if(sheetName === 'refresh'){
+    console.log('refreshing data');
+    sheetCache.clear();
+  }
   const now = Date.now();
 
   const cached = sheetCache.get(cacheKey);
@@ -48,8 +53,7 @@ async function fetchsheetdata(sheetName, location) {
       }
     });
     const distinctLocations = Array.from(locationSet);
-    //// console.log("Distinct Locations:", distinctLocations);
-    // Cache per sheet and location
+    
     workbook.SheetNames.forEach((name) => {
       const worksheet = workbook.Sheets[name];
       let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
@@ -68,7 +72,6 @@ async function fetchsheetdata(sheetName, location) {
           m => m.location?.includes(loc) || m.location === ""
         );
         const cacheKeyLocal = `${name}:${loc}`;
-      //  // console.log('setting cache for: ',cacheKeyLocal)
         sheetCache.set(cacheKeyLocal, {
           data: filteredData,
           timestamp: now,
@@ -129,7 +132,7 @@ async function fetchFaqData(location, page) {
 }
 
 async function getWaiverLink(location){
-  // console.log('yoyo',location);
+
   const cacheKey = `waiver:${location}`;
   const cached = waiverLinkCache.get(cacheKey);
   // console.log(cacheKey, cached);
@@ -194,22 +197,49 @@ async function generateMetadataLib({ location, category, page }) {
   };
 }
 
-async function getReviewsData(locationid){
-  // console.log(locationid);
-  const cacheKey = `reviews:${locationid}`;
-  const cached = reviewesData.get(cacheKey);
+// async function getReviewsData(locationid){
+//   const cacheKey = `reviews:${locationid}`;
+//   const cached = reviewesData.get(cacheKey);
   
-  if(cached)
-  {
-       return cached;
-  }
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/getreviews?locationid=${locationid}`;
-   const response = await fetch(url, {next: {revalidate: 3600*24*5}}); 
-   const data = await response.json();
-  reviewesData.set(cacheKey,data);
-  return data;
-}
+//   if(cached)
+//   {
+//        return cached;
+//   }
+//   const url = `${process.env.NEXT_PUBLIC_API_URL}/getreviews?locationid=${locationid}`;
+//    const response = await fetch(url, {next: {revalidate: 3600*24*5}}); 
+//    const data = await response.json();
+//   reviewesData.set(cacheKey,data);
+//   return data;
+// }
    
+async function generateSchema(pagedata, locationData, category, page ) {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const metadataItem = pagedata;//?.find((item) => item.path === pagefordata);
+//console.log('pagedata', pagedata);
+  let canonicalPath = pagedata?.location;
+  if (category && page) {
+    canonicalPath += `/${category}/${page}`;
+  } else if (page) {
+     canonicalPath += `/${page}`;
+  } else if (category) {
+    canonicalPath += `/${category}`;
+  }
+
+
+  const fullUrl = `${BASE_URL}/${canonicalPath}`;
+  const imageUrl = metadataItem?.headerimage?.startsWith("http")
+    ? metadataItem.headerimage
+    : `${BASE_URL}${metadataItem?.headerimage || ""}`;
+
+  const filled = locationData?.[0]?.schema
+  .replace('"{{metadesc}}"', JSON.stringify(metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!"))
+  .replace('"{{image}}"', JSON.stringify(imageUrl))
+  .replace('"{{url}}"', JSON.stringify(fullUrl));
+
+  return     filled;
+
+}
 
 
 module.exports = {
@@ -219,6 +249,7 @@ module.exports = {
   generateMetadataLib,
   fetchFaqData,
   getWaiverLink,
-  getReviewsData,
+  // getReviewsData,
+  generateSchema,
   fetchsheetdataNoCache
 };

@@ -1,5 +1,5 @@
-
 import "./styles/home.css";
+import "./styles/pagenew.css";
 import "./styles/promotions.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,365 +20,476 @@ import CelebrateEventsSection from "./components/home/CelebrateEventsSection";
 import SectionHeading from "./components/home/SectionHeading";
 
 export async function generateMetadata() {
-  const location_slug = LOCATION_NAME || "st-catharines";
-  const metadata = await generateMetadataLib({
-    location: location_slug,
-    category: "",
-    page: "",
-  });
-  return metadata;
+  const location_slug = LOCATION_NAME || "vaughan";
+  try {
+    const metadata = await generateMetadataLib({
+      location: location_slug,
+      category: "",
+      page: "",
+    });
+    return metadata;
+  } catch (error) {
+    console.error("home metadata failed:", error);
+    return {
+      title: "Pixel Pulse Play Vaughan",
+      description: "Indoor arcade games, challenge rooms, and family fun in Vaughan.",
+    };
+  }
 }
 
-const Home = async () => {
+/* ─── JSON-LD schema updated for Vaughan ─── */
+const pixelPulseSchema = {
+  "@context": "https://schema.org",
+  "@type": "AmusementPark",
+  name: "Pixel Pulse Play — Next-Gen Indoor Gaming",
+  description:
+    "Vaughan's next-generation indoor gaming arena with laser mazes, interactive tile challenges, climbing walls, and more.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Vaughan",
+    addressRegion: "ON",
+    addressCountry: "Canada",
+  },
+  priceRange: "$$",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "5000",
+  },
+  sameAs: [
+    "https://www.facebook.com/pixelpulseplay",
+    "https://www.instagram.com/pixelpulseplay",
+  ],
+};
 
+/* ─── Stat bar data ─── */
+const STATS = [
+  { num: 8,    label: "Unique Attractions" },
+  { num: 5000, label: "Happy Players" },
+  { num: 4,    label: "Party Rooms" },
+  { num: 1,    label: "GTA Interactive Arena" },
+];
+
+/* ─── Pricing tiers ─── */
+const PRICING = [
+  {
+    tier: "Starter",
+    name: "Explorer Pass (30 Min)",
+    price: 19,
+    unit: "per player",
+    tag: null,
+    features: [
+      "Access to game zones",
+      "30-minute session",
+      
+    ],
+    cta: "Book Explorer",
+    href: "/programs",
+  },
+  {
+    tier: "Best Value",
+    name: "All-Access Pass (60 Min)",
+    price: 29,
+    unit: "per player",
+    tag: "Most Popular",
+    features: [
+      "All game zones",
+      "60-minute session",
+      
+    ],
+    cta: "Book All-Access",
+    href: "/programs",
+  },
+  {
+    tier: "Celebration",
+    name: "Party Package (90 Min)",
+    price: 38,
+    unit: "per player",
+    tag: null,
+    features: [
+      "All game zones",
+       "90-minute session",
+    ],
+    cta: "Book Party",
+    href: "/kids-birthday-parties",
+  },
+];
+
+/* ─── Why Pixel Pulse reasons ─── */
+const WHY_REASONS = [
+  {
+    icon: "🧠",
+    title: "Physical + Cognitive Play",
+    body: "Every game builds real skills — reaction time, teamwork, strategy, and physical coordination.",
+  },
+  {
+    icon: "🛡️",
+    title: "Safe & Supervised",
+    body: "Trained staff on the floor at all times. Clean, maintained equipment and full safety protocols.",
+  },
+  {
+    icon: "⚡",
+    title: "Next-Gen Technology",
+    body: "Interactive digital floors, laser sensors, reactive walls — built from scratch for the experience.",
+  },
+  {
+    icon: "🎪",
+    title: "Something for Everyone",
+    body: "Distinct zones mean there's always a new challenge. Kids, teens, and adults all find their game.",
+  },
+];
+
+/* ─── Testimonials ─── */
+const REVIEWS = [
+  {
+    stars: 5,
+    body: "We've been to every indoor playground in the GTA. Pixel Pulse is on a completely different level. My kids begged to come back the next weekend.",
+    name: "Sarah M.",
+    role: "Mom of 3 · Vaughan",
+  },
+  {
+    stars: 5,
+    body: "Booked a birthday party here — honestly one of the easiest and best party experiences I've ever had. The staff handled everything.",
+    name: "James T.",
+    role: "Dad · Woodbridge",
+  },
+  {
+    stars: 5,
+    body: "We brought our team of 22 for a corporate event. The energy was incredible — even our most reserved colleagues were fully engaged.",
+    name: "Aisha K.",
+    role: "HR Manager · Maple",
+  },
+];
+
+const Home = async () => {
   const location_slug = LOCATION_NAME;
 
-  const waiverLink = await getWaiverLink(location_slug);
+  let waiverLink = "";
+  let data = [];
+  let dataconfig = [];
+  let promotions = [];
 
-  const [data, dataconfig, promotions] = await Promise.all([
-    fetchMenuData(location_slug),
-    fetchsheetdata("config", location_slug),
-    fetchsheetdata("promotions", location_slug),
-  ]);
+  try {
+    [waiverLink, data, dataconfig, promotions] = await Promise.all([
+      getWaiverLink(location_slug),
+      fetchMenuData(location_slug),
+      fetchsheetdata("config", location_slug),
+      fetchsheetdata("promotions", location_slug),
+    ]);
+  } catch (error) {
+    console.error("home page data failed:", error);
+  }
 
-  const homepageSection1 = Array.isArray(dataconfig) ? dataconfig.find((item) => item.key === "homepageSection1")?.value ?? "" : "";
-  const promotionPopup = Array.isArray(dataconfig) ? dataconfig.filter((item) => item.key === "promotion-popup") : [];
-  const header_image = Array.isArray(data) ? data.filter((item) => item.path === "home") : [];
-  const safeHeaderImage = header_image ? JSON.parse(JSON.stringify(header_image)) : {};
-  const seosection = header_image?.[0]?.seosection || "";
-  const attractionsData = Array.isArray(data) ? getDataByParentId(data, "attractions") || [] : [];
-  const blogsData = Array.isArray(data) ? getDataByParentId(data, "blogs") || [] : [];
+  const homepageSection1 =
+    Array.isArray(dataconfig)
+      ? dataconfig.find((item) => item.key === "homepageSection1")?.value ?? ""
+      : "";
 
-  const stCatharinesSchema = {
-    "@context": "https://schema.org",
-    "@type": "AmusementPark",
-    name: "pixelpulseplay Trampoline Park",
-    description:
-      "A fun-filled trampoline park offering amusement, activities, mini golf, and kids' party services, axe throw.",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "333 Ontario Street",
-      addressLocality: "St. Catharines",
-      addressRegion: "ON",
-      postalCode: "L2R 5L3",
-      addressCountry: "Canada",
-    },
-    telephone: "+1(289)-362-3377",
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 43.159374,
-      longitude: -79.246862,
-    },
-    openingHours: [
-      "Mo-Th 10:00-20:00",
-      "Fr 10:00-21:00",
-      "Sa 10:00-21:00",
-      "Su 10:00-20:00",
-    ],
-    priceRange: "$$",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.5",
-      reviewCount: "150",
-    },
-    sameAs: [
-      "https://www.facebook.com/AeroSportsTrampolinePark",
-      "https://www.instagram.com/aerosportspark",
-    ],
-  };
+  const promotionPopup = Array.isArray(dataconfig)
+    ? dataconfig.filter((item) => item.key === "promotion-popup")
+    : [];
+
+  const header_image = Array.isArray(data)
+    ? data.filter((item) => item.path === "home")
+    : [];
+
+  const safeHeaderImage = header_image
+    ? JSON.parse(JSON.stringify(header_image))
+    : {};
+
+  const attractionsData = Array.isArray(data)
+    ? getDataByParentId(data, "attractions") || []
+    : [];
+
+  const blogsData = Array.isArray(data)
+    ? getDataByParentId(data, "blogs") || []
+    : [];
 
   return (
-    <main>
+    <main className="ppp-home">
+      {/* ── Promotion popup ── */}
       {promotionPopup.length > 0 && (
         <PromotionModal promotionPopup={promotionPopup} />
       )}
 
+      {/* ── Hero ── */}
       <MotionImage pageData={safeHeaderImage} waiverLink={waiverLink} />
 
+      {/* ── Quick-action CTA bar ── */}
       {attractionsData?.[0]?.children?.length > 0 && (
-        <section className="aero_home-actionbtn-bg">
-          <section className="aero-max-container aero_home-actionbtn">
+        <section className="ppp-ctabar">
+          <div className="aero-max-container ppp-ctabar__inner">
+            <SectionHeading>
+              JUMP STRAIGHT <span>TO</span>
+            </SectionHeading>
 
-            <SectionHeading> JUMP STRAIGHT <span>TO</span>  </SectionHeading>
-
-            <section className="aero_home-actionbtn-wrap">
-              <Link
-                href={`/programs`}
-                className="aero-btn-booknow"
-                prefetch
-              >
-                <button>BOOK NOW</button>
+            <div className="ppp-ctabar__buttons">
+              <Link href="/programs" className="ppp-btn ppp-btn--primary" prefetch>
+                BOOK NOW
               </Link>
-              <Link
-                href={`/kids-birthday-parties`}
-                className="aero-btn-booknow"
-                prefetch
-              >
-                <button>BIRTHDAY PARTIES</button>
+              <Link href="/kids-birthday-parties" className="ppp-btn ppp-btn--outline" prefetch>
+                BIRTHDAY PARTIES
               </Link>
-              <Link
-                href={`/attractions`}
-                className="aero-btn-booknow"
-                prefetch
-              >
-                <button>VIEW ATTRACTIONS</button>
+              <Link href="/attractions" className="ppp-btn ppp-btn--outline" prefetch>
+                VIEW ATTRACTIONS
               </Link>
-            </section>
-          </section>
-          <div className="aero_home_triangle"></div>
+            </div>
+          </div>
+          <div className="aero_home_triangle" />
         </section>
       )}
 
-      <section className="aero_home-playsection">
-        <section className="aero_home-playsection-bg">
-          <section className="aero-max-container aero_home-playsection-1 d-flex-dir-col">
-
-            <SectionHeading>  <span>LEVEL UP YOUR PLAY</span> <br /> AT PIXEL PULSE VAUGHAN  </SectionHeading>
-
-            <p>{homepageSection1}</p>
-          </section>
-        </section>
-
-        {attractionsData?.[0]?.children?.length > 0 && (
-          <section className="aero_home_article_section">
-            <section className="aero-max-container">
-
-              <SectionHeading className="section-heading-white">
-                Current <span>Promotions</span>
-              </SectionHeading>
-
-              <p>
-                Do not miss out on these amazing deals! Save big on your next
-                visit.
-              </p>
-
-              <div className="promotions__grid">
-                {promotions.map((promo, index) => (
-                  <article key={index} className="promotion-card">
-                    <span className="promotion-card__badge">{promo.badge}</span>
-
-                    <h3 className="promotion-card__title">{promo.title}</h3>
-
-                    <p className="promotion-card__description">
-                      {promo.description}
-                    </p>
-
-                    <div className="promotion-card__details">
-                      <time className="promotion-card__validity">
-                        {promo.validity}
-                      </time>
-                      <span className="promotion-card__code">
-                        Code: {promo.code}
-                      </span>
-                    </div>
-
-                    <a href={promo.link} className="promotion-card__btn">
-                      {promo.linktext}
-                    </a>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </section>
-        )}
-
-        {/* <section className="aero_home_article_section">
-          <section className="aero-max-container">
-            <h2 className="heading-with-icon">
-              {" "}
-              <svg
-                className="promotions__icon"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="8" width="18" height="4" rx="1"></rect>
-                <path d="M12 8v13"></path>
-                <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
-                <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path>
-              </svg>{" "}
-              Celeberate your event
-            </h2>
-            <p>Elevate your event to next level at pixelpulseplay! </p>
-            <div className="offer-section__inner container">
-     
-              <article className="offer-card">
-                <div
-                  className="offer-card__img"
-                  style={{
-                    backgroundImage:
-                      "url('https://storage.googleapis.com/aerosports/team-building-aerosports-trampoline-park.png')",
-                  }}
-                  role="img"
-                  aria-label="Memberships"
-                >
-                  <h3 className="offer-card__title">CORPORATE EVENTS</h3>
-                </div>
-                <div className="offer-card__body">
-                  <p>
-                    Elevate your corporate events at Pixel Pulse, where immersive challenges inspire teamwork, strategic thinking, and shared wins in a high-energy environment.
-                  </p>
-                  <Link
-                    href={`/groups-events/corporate-parties-events-groups`}
-                    className="sigma_btn-custom"
-                  >
-                    More Info →
-                  </Link>
-                </div>
-              </article>
-
-      
-              <article className="offer-card">
-                <div
-                  className="offer-card__img"
-                  style={{
-                    backgroundImage:
-                      "url('https://storage.googleapis.com/aerosports/celeberate-your-birthday-parties-at-aerosports.png')",
-                  }}
-                  role="img"
-                  aria-label="Birthday Parties"
-                >
-                  <h3 className="offer-card__title">BIRTHDAY PARTIES</h3>
-                </div>
-                <div className="offer-card__body">
-                  <p>
-                    The best kids birthday parties in Vaughan. All-inclusive Pixel & tile games, immersive fun, private room, party host, pizza, and excitement.
-                  </p>
-                  <a
-                    href={`/kids-birthday-parties`}
-                    className="sigma_btn-custom"
-                  >
-                    COMPARE PACKAGES →
-                  </a>
-                </div>
-              </article>
-
-      
-              <article className="offer-card">
-                <div
-                  className="offer-card__img"
-                  style={{
-                    backgroundImage:
-                      "url('https://storage.googleapis.com/aerosports/schools-field-trips-at-aerosports.png')",
-                  }}
-                  role="img"
-                  aria-label="Jump Tickets"
-                >
-                  <h3 className="offer-card__title">Field Trips</h3>
-                </div>
-                <div className="offer-card__body">
-                  <p>
-                   We offer special field trip and team event rates for groups of 20-40 players. For groups of 20+ or to book space and food, please call us.
-                  </p>
-                  <a
-                    href={`/groups-events/school-groups`}
-                    className="sigma_btn-custom"
-                  >
-                    More Info →
-                  </a>
-                </div>
-              </article>
-            </div>
-          </section>
-        </section> */}
-
-        <CelebrateEventsSection />
-
-        <section className="aero_home_article_section">
-          <SectionHeading className="section-heading-white">
-            Explore <span>attractions</span>
+      {/* ── Level Up intro section ── */}
+      <section className="ppp-intro">
+        <div className="aero-max-container ppp-intro__inner">
+          <SectionHeading>
+            <span>LEVEL UP YOUR PLAY</span>
+            <br />
+            AT PIXEL PULSE VAUGHAN
           </SectionHeading>
-          <Link
-            href={`/attractions`}
-            className="aero-btn-booknow"
-            prefetch
-          >
-            View All
-          </Link>
-          <section className="aero-max-container aero_home-playsection-2 ">
-            <ul className="attractions-grid">
+          <p className="ppp-intro__body">{homepageSection1}</p>
+        </div>
+      </section>
+
+      {/* ── Stats bar ── 
+      {attractionsData?.[0]?.children?.length > 0 && (
+        <section className="ppp-stats">
+          <div className="aero-max-container ppp-stats__grid">
+            {STATS.map((item, i) => (
+              <article key={i} className="ppp-stats__card">
+                <Countup num={item.num} />
+                <span className="ppp-stats__label">{item.label}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}*/}
+
+      {/* ── Attractions grid ── */}
+      {attractionsData?.[0]?.children?.length > 0 && (
+        <section className="ppp-section ppp-attractions">
+          <div className="aero-max-container">
+            <SectionHeading className="section-heading-white">
+              EPIC <span>GAME ROOMS</span>
+            </SectionHeading>
+            <p className="ppp-section__sub">
+              Every zone is designed to challenge your body and mind. Run, climb, aim, and think your way through next-level physical gaming.
+            </p>
+
+            <ul className="ppp-attractions__grid">
               {attractionsData[0]?.children?.map((item, i) => (
-                <li key={i}>
-                  <Link
-                    href={`/${item?.parentid}/${item?.path}`}
-                    prefetch
-                  >
-                    <article className="d-flex-dir-col">
-                      <figure>
+                <li key={i} className="ppp-attractions__item">
+                  <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
+                    <article className="ppp-attraction-card">
+                      <figure className="ppp-attraction-card__fig">
                         <Image
                           src={item?.smallimage}
-                          width={330}
-                          height={200}
+                          width={400}
+                          height={260}
                           alt={item?.iconalttextforhomepage}
                           unoptimized
+                          className="ppp-attraction-card__img"
                         />
-                        <figcaption className="figcaption-bg">
-                          <h3>{item?.desc}</h3>
-                        </figcaption>
-                      </figure>{" "}
+                        <div className="ppp-attraction-card__overlay">
+                          <h3 className="ppp-attraction-card__title">
+                            {item?.desc}
+                          </h3>
+                        </div>
+                      </figure>
                     </article>
                   </Link>
                 </li>
               ))}
             </ul>
-          </section>
+
+            <div className="ppp-section__cta-row">
+              <Link href="/attractions" className="ppp-btn ppp-btn--outline" prefetch>
+                View All Attractions →
+              </Link>
+            </div>
+          </div>
         </section>
+      )}
+
+      {/* ── Promotions ── */}
+      {promotions?.length > 0 && (
+        <section className="ppp-section ppp-promos">
+          <div className="aero-max-container">
+            <SectionHeading className="section-heading-white">
+              Current <span>Promotions</span>
+            </SectionHeading>
+            <p className="ppp-section__sub">
+              Don't miss out on these amazing deals! Save big on your next visit.
+            </p>
+
+            <div className="promotions__grid">
+              {promotions.map((promo, index) => (
+                <article key={index} className="promotion-card">
+                  <span className="promotion-card__badge">{promo.badge}</span>
+                  <h3 className="promotion-card__title">{promo.title}</h3>
+                  <p className="promotion-card__description">{promo.description}</p>
+                  <div className="promotion-card__details">
+                    <time className="promotion-card__validity">{promo.validity}</time>
+                    <span className="promotion-card__code">Code: {promo.code}</span>
+                  </div>
+                  <a href={promo.link} className="promotion-card__btn">
+                    {promo.linktext}
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Celebrate / Events ── */}
+      <CelebrateEventsSection />
+
+      {/* ── Why Pixel Pulse ── */}
+      <section className="ppp-section ppp-why">
+        <div className="aero-max-container">
+          <SectionHeading>
+            NOT JUST ANOTHER <span>PLAYGROUND</span>
+          </SectionHeading>
+
+          <ul className="ppp-why__grid">
+            {WHY_REASONS.map((r, i) => (
+              <li key={i} className="ppp-why__card">
+                <span className="ppp-why__icon" aria-hidden="true">
+                  {r.icon}
+                </span>
+                <h3 className="ppp-why__title">{r.title}</h3>
+                <p className="ppp-why__body">{r.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
-      {attractionsData?.[0]?.children?.length > 0 && (
-        <section className="aero_home_article_section">
-          <section className="aero-max-container">
-            <SectionHeading className="section-heading-white">
-              <span> Latest</span>  Articles & News
-            </SectionHeading>
-            <h3 style={{color:"white", textAlign:"center"}}>Every Updated Article</h3>
+      {/* ── Pricing ── */}
+      <section className="ppp-section ppp-pricing" id="pricing">
+        <div className="aero-max-container">
+          <SectionHeading className="section-heading-white">
+            SIMPLE, TRANSPARENT <span>PRICING</span>
+          </SectionHeading>
+          <p className="ppp-section__sub">
+            No hidden fees. Pick your pass and jump straight in.
+          </p>
 
-            <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
-            <Link
-              href={`/blogs`}
-              className="aero-btn-booknow aero-btn-article-section"
-              prefetch
-            >
-              <button>View All</button>
-            </Link>
-          </section>
-        </section>
-      )}
-      {attractionsData?.[0]?.children?.length > 0 && (
-        <section className="aero_home_feature_section-bg">
-          <section className="aero-max-container aero_home_feature_section">
-            {[
-              { num: 130, label: "Trampolines" },
-              { num: 27000, label: "Square Feet" },
-              { num: 4, label: "Party Rooms" },
-              { num: 6, label: "Fun Attractions" },
-            ].map((item, i) => (
-              <article key={i} className="aero_home_feature_section-card">
-                <Countup num={item.num} />
-                <div>{item.label}</div>
+          <div className="ppp-pricing__grid">
+            {PRICING.map((p, i) => (
+              <article
+                key={i}
+                className={`ppp-pricing__card${p.tag ? " ppp-pricing__card--featured" : ""}`}
+              >
+                {p.tag && (
+                  <span className="ppp-pricing__badge">{p.tag}</span>
+                )}
+                <p className="ppp-pricing__tier">{p.tier}</p>
+                <h3 className="ppp-pricing__name">{p.name}</h3>
+                <div className="ppp-pricing__price">
+                  <span className="ppp-pricing__dollar">$</span>
+                  <span className="ppp-pricing__amount">{p.price}</span>
+                  <span className="ppp-pricing__unit">/{p.unit}</span>
+                </div>
+                <ul className="ppp-pricing__features">
+                  {p.features.map((f, j) => (
+                    <li key={j} className="ppp-pricing__feature">
+                      <span className="ppp-pricing__check">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={p.href} className="ppp-btn ppp-btn--primary ppp-pricing__cta" prefetch>
+                  {p.cta}
+                </Link>
               </article>
             ))}
-          </section>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Reviews ── */}
+      <section className="ppp-section ppp-reviews">
+        <div className="aero-max-container">
+          <SectionHeading>
+            PARENTS &amp; KIDS <span>LOVE IT</span>
+          </SectionHeading>
+
+          <div className="ppp-reviews__grid">
+            {REVIEWS.map((r, i) => (
+              <article key={i} className="ppp-review-card">
+                <div className="ppp-review-card__stars" aria-label={`${r.stars} stars`}>
+                  {"★".repeat(r.stars)}
+                </div>
+                <blockquote className="ppp-review-card__quote">
+                  "{r.body}"
+                </blockquote>
+                <footer className="ppp-review-card__footer">
+                  <div className="ppp-review-card__avatar" aria-hidden="true">
+                    {r.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="ppp-review-card__name">{r.name}</p>
+                    <p className="ppp-review-card__role">{r.role}</p>
+                  </div>
+                </footer>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Blog / Articles ── */}
+      {attractionsData?.[0]?.children?.length > 0 && (
+        <section className="ppp-section ppp-blog">
+          <div className="aero-max-container">
+            <SectionHeading className="section-heading-white">
+              FROM THE <span>PIXEL PULSE BLOG</span>
+            </SectionHeading>
+            <p className="ppp-section__sub">
+              Tips, guides, and updates from Vaughan's favourite gaming arena.
+            </p>
+
+            <BlogCard blogsData={blogsData[0]} location_slug={location_slug} />
+
+            <div className="ppp-section__cta-row">
+              <Link href="/blogs" className="ppp-btn ppp-btn--outline" prefetch>
+                View All Articles →
+              </Link>
+            </div>
+          </div>
         </section>
       )}
-      {/* {attractionsData?.[0]?.children?.length > 0 && (
-        <section className="aero_home_article_section">
-          <section className="aero-max-container aero_home_seo_section">
-            <div dangerouslySetInnerHTML={{ __html: seosection }} />
-          </section>
-        </section>
-      )} */}
+
+      {/* ── Final CTA band ── */}
+      <section className="ppp-cta-band">
+        <div className="aero-max-container ppp-cta-band__inner">
+          <SectionHeading>
+            YOUR NEXT ADVENTURE <span>AWAITS</span>
+          </SectionHeading>
+          <p className="ppp-cta-band__sub">
+            Book online in seconds. Walk-ins welcome based on availability.
+            Located in Vaughan — serving all of the GTA.
+          </p>
+          <div className="ppp-cta-band__actions">
+            <Link href="/programs" className="ppp-btn ppp-btn--primary" prefetch>
+              🎮 Book Now
+            </Link>
+            <Link href="/contact" className="ppp-btn ppp-btn--outline" prefetch>
+              📍 Get Directions
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pixel Pulse branded section ── */}
       <PixelPulseSection />
+
+      {/* ── JSON-LD ── */}
       {location_slug === LOCATION_NAME && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(stCatharinesSchema),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(pixelPulseSchema) }}
         />
       )}
     </main>
