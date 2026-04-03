@@ -474,7 +474,13 @@ const Home = async () => {
           </p>
           <div className="ppp-cta-band__actions">
             <BookingButton title="Book Now" className="ppp-btn ppp-btn--primary" bookingType="ticket" />
-            <Link href="/contact" className="ppp-btn ppp-btn--outline" prefetch>
+            <Link
+              href="https://maps.app.goo.gl/anxfwSCGYZNpNmnC7"
+              className="ppp-btn ppp-btn--outline"
+              target="_blank"
+              rel="noopener noreferrer"
+              prefetch={false}
+            >
               📍 Get Directions
             </Link>
           </div>
