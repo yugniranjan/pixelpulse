@@ -398,7 +398,7 @@
 
 @media (max-width: 768px) {
   .ppp-party-hero {
-    padding-top: 3.25rem;
+    padding: 3.25rem 0 1.25rem;
   }
 
   .ppp-party-hero__copy,
@@ -427,12 +427,97 @@
     width: 100%;
   }
 
+  .ppp-party-layout {
+    gap: 1.25rem;
+  }
+
+  .ppp-party-intro {
+    padding-top: 0.75rem;
+  }
+
+  .birthday_desc,
+  .ppp-party-section-intro p,
+  .ppp-party-content p,
+  .ppp-party-content li,
+  .ppp-party-rules li {
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
   .ppp-party-cta-band__inner {
     flex-direction: column;
     align-items: center;
   }
 
+  .ppp-party-table-wrap {
+    overflow: visible;
+  }
+
+  .ppp-party-table,
+  .ppp-party-table thead,
+  .ppp-party-table tbody,
+  .ppp-party-table tr,
+  .ppp-party-table th,
+  .ppp-party-table td {
+    display: block;
+    width: 100%;
+  }
+
   .ppp-party-table {
-    min-width: 700px;
+    min-width: 0;
+    background: transparent;
+    border-spacing: 0;
+  }
+
+  .ppp-party-table thead {
+    display: none;
+  }
+
+  .ppp-party-table tbody {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .ppp-party-table tr {
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .ppp-party-table td {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 0.75rem;
+    align-items: start;
+    padding: 14px 16px;
+    text-align: left;
+  }
+
+  .ppp-party-table td::before {
+    content: attr(data-label);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ppp-party-feature {
+    width: 100%;
+    font-weight: 700;
+  }
+
+  .ppp-party-value {
+    justify-items: end;
+    text-align: right !important;
+  }
+
+  .ppp-party-value::before {
+    justify-self: start;
+  }
+
+  .ppp-party-rules {
+    margin-top: 1.5rem;
   }
 }
