@@ -304,6 +304,10 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.ppp-party-mobile-cards {
+  display: none;
+}
+
 .ppp-party-rules {
   margin-top: 2rem;
 }
@@ -450,71 +454,77 @@
   }
 
   .ppp-party-table-wrap {
-    overflow: visible;
-  }
-
-  .ppp-party-table,
-  .ppp-party-table thead,
-  .ppp-party-table tbody,
-  .ppp-party-table tr,
-  .ppp-party-table th,
-  .ppp-party-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .ppp-party-table {
-    min-width: 0;
-    background: transparent;
-    border-spacing: 0;
-  }
-
-  .ppp-party-table thead {
     display: none;
   }
 
-  .ppp-party-table tbody {
+  .ppp-party-mobile-cards {
     display: grid;
     gap: 1rem;
   }
 
-  .ppp-party-table tr {
+  .ppp-party-mobile-card {
+    border-radius: 22px;
+    overflow: hidden;
     background: #111827;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-    overflow: hidden;
   }
 
-  .ppp-party-table td {
+  .ppp-party-mobile-card.is-featured .ppp-party-mobile-card__head {
+    background: linear-gradient(135deg, #ff4b2b, rgba(251, 174, 123, 0.9));
+  }
+
+  .ppp-party-mobile-card__head {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: 0.75rem;
-    align-items: start;
-    padding: 14px 16px;
-    text-align: left;
+    gap: 0.4rem;
+    padding: 1rem 1rem 0.95rem;
+    background: #1a2233;
   }
 
-  .ppp-party-table td::before {
-    content: attr(data-label);
+  .ppp-party-mobile-card__eyebrow {
     color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .ppp-party-mobile-card__head h3 {
+    margin: 0;
+    color: var(--white-color);
+    font-size: 1.15rem;
+    text-transform: none;
+  }
+
+  .ppp-party-mobile-card__head p {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  .ppp-party-mobile-card__body {
+    display: grid;
+  }
+
+  .ppp-party-mobile-card__row {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.9rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .ppp-party-mobile-card__label {
+    color: rgba(255, 255, 255, 0.72);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .ppp-party-feature {
-    width: 100%;
-    font-weight: 700;
-  }
-
-  .ppp-party-value {
-    justify-items: end;
-    text-align: right !important;
-  }
-
-  .ppp-party-value::before {
-    justify-self: start;
+  .ppp-party-mobile-card__value {
+    color: var(--white-color);
+    font-size: 0.96rem;
+    line-height: 1.55;
   }
 
   .ppp-party-rules {
