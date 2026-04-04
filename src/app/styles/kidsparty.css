@@ -243,39 +243,49 @@
 .ppp-party-table__feature-col {
   text-align: left;
   padding: 20px;
-  color: #9ca3af;
+  color: #e5e7eb;
   font-size: 1.1rem;
+  background: linear-gradient(180deg, #202a3d 0%, #161e2d 100%);
 }
 
 .ppp-party-plan {
   padding: 24px 16px;
   text-align: center;
+  background: linear-gradient(135deg, #ff4b2b, rgba(251, 174, 123, 0.9));
 }
 
 .ppp-party-plan__eyebrow {
   display: inline-block;
   margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .ppp-party-plan h3 {
   margin: 0 0 0.4rem;
-  color: var(--white-color);
+  color: #ffffff;
   font-size: 1.1rem;
+  line-height: 1.25;
   text-transform: none;
 }
 
 .ppp-party-plan p {
-  color: var(--primary-color);
+  color: #ffffff;
   font-size: 1.35rem;
   font-weight: 800;
 }
 
 .ppp-party-table__plan-col.is-featured .ppp-party-plan {
   background: linear-gradient(135deg, #ff4b2b, rgba(251, 174, 123, 0.9));
+}
+
+.ppp-party-table__plan-col.is-featured .ppp-party-plan__eyebrow,
+.ppp-party-table__plan-col.is-featured .ppp-party-plan h3,
+.ppp-party-table__plan-col.is-featured .ppp-party-plan p {
+  color: #ffffff;
 }
 
 .ppp-party-table td,
@@ -477,11 +487,11 @@
     display: grid;
     gap: 0.4rem;
     padding: 1rem 1rem 0.95rem;
-    background: #1a2233;
+    background: linear-gradient(135deg, #ff4b2b, rgba(251, 174, 123, 0.9));
   }
 
   .ppp-party-mobile-card__eyebrow {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.88);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -497,7 +507,7 @@
 
   .ppp-party-mobile-card__head p {
     margin: 0;
-    color: var(--primary-color);
+    color: #ffffff;
     font-size: 1.25rem;
     font-weight: 800;
   }
