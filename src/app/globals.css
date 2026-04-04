@@ -633,6 +633,47 @@ header:first-child + * {
   line-height: 1.7;
 }
 
+.booking-shell__header-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1rem;
+}
+
+.booking-shell__party-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.booking-shell__party-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  background: rgba(251, 174, 123, 0.12);
+  color: var(--white-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.booking-shell__party-cta:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.2);
+  box-shadow: 0 0 22px rgba(251, 174, 123, 0.3);
+}
+
 .booking-shell__meta {
   display: flex;
   flex-wrap: wrap;
@@ -681,6 +722,16 @@ header:first-child + * {
   text-align: center;
   color: var(--white-color);
   padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .booking-shell__header-copy {
+    align-items: stretch;
+  }
+
+  .booking-shell__party-cta {
+    width: 100%;
+  }
 }
 
 /* nav links */
