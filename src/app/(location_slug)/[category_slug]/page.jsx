@@ -108,7 +108,7 @@ const Category = async ({ params }) => {
   // 2️⃣ Derived data
   const attractionsData = data ? getDataByParentId(data, category_slug) : null;
   const isAttractionsPage = category_slug === "attractions";
-  const isGroupsEventsPage = category_slug === "groups-events";
+  const isGroupsEventsPage = category_slug === "group-events";
   const isAboutPage = category_slug === "about-us";
   const attractionItems =
     attractionsData?.[0]?.children?.filter((item) => item?.isactive == 1) || [];

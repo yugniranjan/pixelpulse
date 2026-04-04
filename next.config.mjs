@@ -1,15 +1,19 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  output: "standalone",
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
-        source: "/st-catharines",
+        source: "/vaughan",
         destination: "/",
         permanent: true,
       },
       {
-        source: "/st-catharines/:path*",
+        source: "/vaughan/:path*",
         destination: "/:path*",
         permanent: true,
       },
@@ -31,8 +35,8 @@ const nextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_API_URL: "https://apis-351216.nn.r.appspot.com/api",
-    NEXT_PUBLIC_BASE_URL: "https://www.pixelpulseplay.ca",
+    NEXT_PUBLIC_API_URL: "https://websitebackend-439220.ue.r.appspot.com",
+    NEXT_PUBLIC_BASE_URL: "https://pixelpulseplay.ca",
   },
 };
 

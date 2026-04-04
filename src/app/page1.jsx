@@ -187,7 +187,7 @@ const Home = async () => {
                     Elevate your corporate events at Pixel Pulse, where immersive challenges inspire teamwork, strategic thinking, and shared wins in a high-energy environment.
                   </p>
                   <Link
-                    href={`/groups-events/corporate-parties-events-groups`}
+                    href={`/group-events/corporate-parties-events-groups`}
                     className="sigma_btn-custom"
                   >
                     More Info →
@@ -239,7 +239,7 @@ const Home = async () => {
                    We offer special field trip and team event rates for groups of 20-40 players. For groups of 20+ or to book space and food, please call us.
                   </p>
                   <a
-                    href={`/groups-events/school-groups`}
+                    href={`/group-events/school-groups`}
                     className="sigma_btn-custom"
                   >
                     More Info →

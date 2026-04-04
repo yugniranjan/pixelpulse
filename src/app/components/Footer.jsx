@@ -54,7 +54,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
 
   const attractionsData = getDataByParentId(menudata, "attractions");
   const programsData = getDataByParentId(menudata, "programs");
-  const groupsData = getDataByParentId(menudata, "groups-events");
+  const groupsData = getDataByParentId(menudata, "group-events");
   const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
   const birthDaypartyData = getDataByParentId(menudata, "kids-birthday-parties");

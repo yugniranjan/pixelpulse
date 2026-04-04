@@ -98,7 +98,7 @@ const Subcategory = async ({ params }) => {
   const pagedata = attractionsData?.[0];
   if (!pagedata) return;
   const isAttractionDetailPage = category_slug === "attractions";
-  const isGroupsDetailPage = category_slug === "groups-events";
+  const isGroupsDetailPage = category_slug === "group-events";
   const introText =
     stripHtml(pagedata?.seosection || "") ||
     pagedata?.metadescription ||
