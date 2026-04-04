@@ -116,6 +116,32 @@ const PricingComparison = ({ birthdaydata }) => {
         </table>
       </div>
 
+      <div className="ppp-party-mobile-cards">
+        {packages.map((plan, index) => (
+          <article
+            key={index}
+            className={`ppp-party-mobile-card${index === spotlightIndex ? " is-featured" : ""}`}
+          >
+            <div className="ppp-party-mobile-card__head">
+              <span className="ppp-party-mobile-card__eyebrow">
+                {index === spotlightIndex ? "Most Popular" : "Package"}
+              </span>
+              <h3>{plan.name}</h3>
+              <p>{plan["Package Price"]}</p>
+            </div>
+
+            <div className="ppp-party-mobile-card__body">
+              {features.slice(1).map((feature, featureIndex) => (
+                <div className="ppp-party-mobile-card__row" key={featureIndex}>
+                  <span className="ppp-party-mobile-card__label">{feature}</span>
+                  <span className="ppp-party-mobile-card__value">{plan[feature] || "-"}</span>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
       {parsedData.standard_rules?.length > 0 && (
         <div className="ppp-party-rules">
           <h3>Standard rules for every package</h3>
