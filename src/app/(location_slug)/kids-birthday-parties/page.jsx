@@ -98,9 +98,15 @@ const PricingComparison = ({ birthdaydata }) => {
           <tbody>
             {features.slice(1).map((feature, index) => (
               <tr key={index}>
-                <td className="ppp-party-feature">{feature}</td>
+                <td className="ppp-party-feature" data-label="Feature">
+                  {feature}
+                </td>
                 {packages.map((plan, planIndex) => (
-                  <td key={planIndex} className="ppp-party-value">
+                  <td
+                    key={planIndex}
+                    className="ppp-party-value"
+                    data-label={plan.name}
+                  >
                     {plan[feature] || "-"}
                   </td>
                 ))}
