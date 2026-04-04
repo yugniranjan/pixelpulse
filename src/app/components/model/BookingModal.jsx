@@ -93,10 +93,25 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
 
             <div className="booking-shell__header">
               <h2>{isPartyPath ? "Book A Party" : "Book Your Visit"}</h2>
-              <p>
-                Reserve your spot in a few clicks. Pick a time, confirm your details,
-                and get ready for high-energy play.
-              </p>
+              <div className="booking-shell__header-copy">
+                <p>
+                  Reserve your spot in a few clicks. Pick a time, confirm your details,
+                  and get ready for high-energy play.
+                </p>
+                {!isPartyPath && lilypadposParty && (
+                  <p className="booking-shell__party-inline">
+                    Click here to{" "}
+                    <a
+                      href={lilypadposParty}
+                      className="booking-shell__party-cta"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Book A Birthday Party
+                    </a>
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="booking-shell__meta">
