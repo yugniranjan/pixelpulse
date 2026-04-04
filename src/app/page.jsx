@@ -162,35 +162,15 @@ const REVIEWS = [
   },
 ];
 
-const HOMEPAGE_PROMOTION_FALLBACKS = [
-  {
-    badge: "Popular",
-    title: "Weekday Party Special",
-    description: "Monday to Thursday $50 off",
-    validity: "Monday - Thursday only",
-    code: "BDAY50",
-    link: "/kids-birthday-parties",
-    linktext: "Claim Offer",
-  },
-  {
-    badge: "New",
-    title: "University Students Special",
-    description: "Show your student ID and save 25%",
-    validity: "Valid until March 31st",
-    code: "STUDENT25",
-    link: "/pricing-promos",
-    linktext: "Claim Offer",
-  },
-];
-
 const UNIVERSITY_STUDENTS_SPECIAL = {
-  badge: "New",
+  badge: "Student Offer",
   title: "University Students Special",
-  description: "Show your student ID and save 25%",
-  validity: "Valid until March 31st",
-  code: "STUDENT25",
+  description:
+    "Valid student ID gets you a special discounted visit made for study breaks, group hangs, and after-class fun.",
+  validity: "Limited-time offer",
+  code: "STUDENT",
   link: "/pricing-promos",
-  linktext: "Claim Offer",
+  linktext: "View Offer",
 };
 
 const Home = async () => {
@@ -244,8 +224,8 @@ const Home = async () => {
           UNIVERSITY_STUDENTS_SPECIAL.title.toLowerCase(),
       )
       ? promotions
-      : [...HOMEPAGE_PROMOTION_FALLBACKS, ...promotions]
-    : HOMEPAGE_PROMOTION_FALLBACKS;
+      : [UNIVERSITY_STUDENTS_SPECIAL, ...promotions]
+    : [UNIVERSITY_STUDENTS_SPECIAL];
 
   return (
     <main className="ppp-home">
