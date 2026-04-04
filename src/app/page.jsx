@@ -6,7 +6,6 @@ import Link from "next/link";
 import { getDataByParentId } from "@/utils/customFunctions";
 import Countup from "@/components/Countup";
 import MotionImage from "@/components/MotionImage";
-import PromotionModal from "@/components/model/PromotionModal";
 import BlogCard from "@/components/smallComponents/BlogCard";
 import {
   fetchsheetdata,
@@ -162,17 +161,6 @@ const REVIEWS = [
   },
 ];
 
-const UNIVERSITY_STUDENTS_SPECIAL = {
-  badge: "Student Offer",
-  title: "University Students Special",
-  description:
-    "Valid student ID gets you a special discounted visit made for study breaks, group hangs, and after-class fun.",
-  validity: "Limited-time offer",
-  code: "STUDENT",
-  link: "/pricing-promos",
-  linktext: "View Offer",
-};
-
 const Home = async () => {
   const location_slug = LOCATION_NAME;
 
@@ -217,23 +205,8 @@ const Home = async () => {
     ? getDataByParentId(data, "blogs") || []
     : [];
 
-  const homepagePromotions = Array.isArray(promotions)
-    ? promotions.some(
-        (promo) =>
-          promo?.title?.trim().toLowerCase() ===
-          UNIVERSITY_STUDENTS_SPECIAL.title.toLowerCase(),
-      )
-      ? promotions
-      : [UNIVERSITY_STUDENTS_SPECIAL, ...promotions]
-    : [UNIVERSITY_STUDENTS_SPECIAL];
-
   return (
     <main className="ppp-home">
-      {/* ── Promotion popup ── */}
-      {(promotionPopup.length > 0 || homepagePromotions.length > 0) && (
-        <PromotionModal promotionPopup={promotionPopup} promotions={homepagePromotions} />
-      )}
-
       {/* ── Hero ── */}
       <MotionImage pageData={safeHeaderImage} waiverLink={waiverLink} />
 
@@ -332,7 +305,7 @@ const Home = async () => {
       )}
 
       {/* ── Promotions ── */}
-      {homepagePromotions?.length > 0 && (
+      {promotions?.length > 0 && (
         <section className="ppp-section ppp-promos">
           <div className="aero-max-container">
             <SectionHeading className="section-heading-white">
@@ -343,7 +316,7 @@ const Home = async () => {
             </p>
 
             <div className="promotions__grid">
-              {homepagePromotions.map((promo, index) => (
+              {promotions.map((promo, index) => (
                 <article key={index} className="promotion-card">
                   <span className="promotion-card__badge">{promo.badge}</span>
                   <h3 className="promotion-card__title">{promo.title}</h3>
