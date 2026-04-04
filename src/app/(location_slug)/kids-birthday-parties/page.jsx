@@ -63,15 +63,7 @@ const PricingComparison = ({ birthdaydata }) => {
 
   return (
     <section className="ppp-party-pricing">
-      <div className="ppp-party-section-intro">
-        <SectionHeading className="section-heading-white">
-          Package <span>Comparison</span>
-        </SectionHeading>
-        <p>
-          Compare the included features, pick the party style that fits your group,
-          and book the experience that feels easiest to say yes to.
-        </p>
-      </div>
+      
 
       <div className="ppp-party-table-wrap">
         <table className="ppp-party-table">
