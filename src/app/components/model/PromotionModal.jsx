@@ -13,7 +13,7 @@ const PromotionModal = ({ promotionPopup = [], promotions = [] }) => {
 
   const closeModal = () => setIsModalOpen(false);
   const sanitizedHTML = promotionPopup[0]?.value?.replace(/<br\s*\/?>/gi, "") || "";
-  const popupPromotions = Array.isArray(promotions) ? promotions.slice(0, 2) : [];
+  const featuredPromotion = Array.isArray(promotions) ? promotions[0] : null;
 
   return (
     <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -22,32 +22,32 @@ const PromotionModal = ({ promotionPopup = [], promotions = [] }) => {
           dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
           className="aero_promotion_popup"
         />
-      ) : popupPromotions.length > 0 ? (
-        <section className="aero_promotion_popup_grid">
-          {popupPromotions.map((promotion, index) => (
-            <article className="aero_promotion_popup aero_promotion_popup--card" key={index}>
-              {promotion.badge && (
-                <span className="aero_promotion_popup__badge">{promotion.badge}</span>
-              )}
-              <h2>{promotion.title || "Current Promotion"}</h2>
-              {promotion.description && <p>{promotion.description}</p>}
-              <div className="aero_promotion_popup__meta">
-                {promotion.validity && <time>Valid: {promotion.validity}</time>}
-                {promotion.code && <span>Code: {promotion.code}</span>}
-              </div>
-              {promotion.link && (
-                <a
-                  href={promotion.link}
-                  className="aero_promotion_popup__cta"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {promotion.linktext || "Claim Offer"}
-                </a>
-              )}
-            </article>
-          ))}
-        </section>
+      ) : featuredPromotion ? (
+        <article className="aero_promotion_popup aero_promotion_popup--card">
+          {featuredPromotion.badge && (
+            <span className="aero_promotion_popup__badge">{featuredPromotion.badge}</span>
+          )}
+          <h2>{featuredPromotion.title || "Current Promotion"}</h2>
+          {featuredPromotion.description && <p>{featuredPromotion.description}</p>}
+          <div className="aero_promotion_popup__meta">
+            {featuredPromotion.validity && (
+              <time>{featuredPromotion.validity}</time>
+            )}
+            {featuredPromotion.code && (
+              <span>Code: {featuredPromotion.code}</span>
+            )}
+          </div>
+          {featuredPromotion.link && (
+            <a
+              href={featuredPromotion.link}
+              className="aero_promotion_popup__cta"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {featuredPromotion.linktext || "Claim Offer"}
+            </a>
+          )}
+        </article>
       ) : null}
     </Modal>
   );
