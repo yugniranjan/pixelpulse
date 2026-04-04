@@ -4,7 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(5, 8, 16, 0.7);
+  backdrop-filter: blur(12px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,59 +13,143 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: linear-gradient(180deg, rgba(9, 17, 27, 0.96), rgba(4, 8, 15, 0.98));
+  color: #f8fafc;
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: 24px;
   min-width: 300px;
-  max-width: 60vw;    
+  width: min(92vw, 620px);
   max-height: 90vh;
   overflow-y: auto;
   box-sizing: border-box;
   position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
 }
 
 .modal-close {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
   font-size: .8rem;
   cursor: pointer;
-  color: #333;
+  color: #fff;
   padding: 0;
   line-height: 1;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
 }
 
 .modal-close:hover,
 .modal-close:focus {
-  color: red;
+  color: #fbae7b;
+  background: rgba(251, 174, 123, 0.12);
+  transform: translateY(-1px);
   outline: none;
 }
-.modal-body button {
-  background-color: #e91e63; /* Pink */
-  color: white;
-  border: none;
-  padding: 0.6em 1.5em;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  user-select: none;
-  display: inline-block;
+
+.modal-body {
+  color: #e2e8f0;
 }
 
+.aero_promotion_popup--card {
+  display: grid;
+  gap: 1rem;
+}
+
+.aero_promotion_popup_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.aero_promotion_popup h1,
+.aero_promotion_popup h2,
+.aero_promotion_popup h3 {
+  color: #fff;
+  margin: 0;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+.aero_promotion_popup p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.75;
+}
+
+.aero_promotion_popup__badge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(251, 174, 123, 0.14);
+  color: #fbae7b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aero_promotion_popup__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: #94a3b8;
+  font-size: 0.92rem;
+}
+
+.aero_promotion_popup__cta,
+.aero_promotion_popup a,
+.modal-body button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 46px;
+  padding: 0.8rem 1.25rem;
+  border: 2px solid #fbae7b;
+  border-radius: 8px;
+  background: #fbae7b;
+  color: #050810;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 22px rgba(251, 174, 123, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aero_promotion_popup__cta:hover,
+.aero_promotion_popup a:hover,
 .modal-body button:hover,
 .modal-body button:focus {
-  background-color: #d81b60; /* Slightly darker pink */
-  box-shadow: 0 6px 12px rgba(216, 27, 96, 0.5);
+  background: rgba(251, 174, 123, 0.92);
+  box-shadow: 0 0 28px rgba(251, 174, 123, 0.42);
+  transform: translateY(-2px);
   outline: none;
 }
 
-.modal-body button:active {
-  background-color: #c2185b; /* Even darker pink */
-  box-shadow: 0 2px 4px rgba(194, 24, 91, 0.6);
+@media (max-width: 640px) {
+  .modal-content {
+    width: min(94vw, 620px);
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .aero_promotion_popup_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aero_promotion_popup__cta,
+  .aero_promotion_popup a,
+  .modal-body button {
+    width: 100%;
+  }
 }
