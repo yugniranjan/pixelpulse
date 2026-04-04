@@ -220,20 +220,6 @@ const PricingPromosPage = async ({ params }) => {
               </div>
             </article>
 
-            {(pageData?.section2 || extraText) && (
-              <article className="ppp-content-card pricing_promo_main_section">
-                <SectionHeading className="section-heading-white">
-                  Helpful <span>Details</span>
-                </SectionHeading>
-                <div
-                  className="ppp-richtext"
-                  dangerouslySetInnerHTML={{
-                    __html: pageData?.section2 || "",
-                  }}
-                />
-              </article>
-            )}
-
             {hasPromotions && (
               <article className="ppp-promotions-block">
                 <div className="ppp-section-intro">
@@ -283,6 +269,20 @@ const PricingPromosPage = async ({ params }) => {
                     </article>
                   ))}
                 </div>
+              </article>
+            )}
+
+            {(pageData?.section2 || extraText) && (
+              <article className="ppp-content-card pricing_promo_main_section">
+                <SectionHeading className="section-heading-white">
+                  Helpful <span>Details</span>
+                </SectionHeading>
+                <div
+                  className="ppp-richtext"
+                  dangerouslySetInnerHTML={{
+                    __html: pageData?.section2 || "",
+                  }}
+                />
               </article>
             )}
           </section>
