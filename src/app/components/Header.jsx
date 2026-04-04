@@ -91,7 +91,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
               prefetch
               className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid aero-d-changelocation"
             >
-              <span>Enquire</span>
+              <span>Inquire</span>
             </Link>
 
             <div className="aero-header-booking">
@@ -134,7 +134,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                   prefetch
                   className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid"
                 >
-                  <span>Enquire</span>
+                  <span>Inquire</span>
                 </Link>
                 <div className="aero-header-booking">
                   <BookingButton title="Book Visit" />
