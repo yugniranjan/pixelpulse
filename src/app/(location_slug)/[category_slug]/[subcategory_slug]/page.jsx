@@ -46,11 +46,8 @@ function getPreferredHeroImage(pageData) {
 }
 
 export async function generateMetadata({ params }) {
-  const {
-    location_slug = LOCATION_NAME || "vaughan",
-    subcategory_slug,
-    category_slug,
-  } = params;
+  const { subcategory_slug, category_slug } = await params;
+  const location_slug = LOCATION_NAME || "vaughan";
   const metadata = await generateMetadataLib({
     location: location_slug,
     category: category_slug,
@@ -60,12 +57,8 @@ export async function generateMetadata({ params }) {
 }
 
 const Subcategory = async ({ params }) => {
-  // console.log("console", params);
-  const {
-    location_slug = LOCATION_NAME,
-    subcategory_slug,
-    category_slug,
-  } = params;
+  const { subcategory_slug, category_slug } = await params;
+  const location_slug = LOCATION_NAME;
   const [data, dataconfig, menudata] = await Promise.all([
     fetchsheetdata("Data", location_slug),
     fetchsheetdata("config", location_slug),
@@ -120,11 +113,6 @@ const Subcategory = async ({ params }) => {
                   <div className="aero-btn-booknow">
                     <BookingButton title="Book Now" />
                   </div>
-                  {safeWaiverLink && (
-                    <Link href={safeWaiverLink} target="_blank" className="ppp-subcategory-hero__link">
-                      Complete Waiver
-                    </Link>
-                  )}
                 </div>
 
                 <div className="ppp-subcategory-hero__stats">
@@ -133,7 +121,7 @@ const Subcategory = async ({ params }) => {
                     <span>More attractions</span>
                   </div>
                   <div className="ppp-subcategory-stat">
-                    <strong>{location_slug.replace(/-/g, " ")}</strong>
+                    <strong>{LOCATION_NAME.replace(/-/g, " ")}</strong>
                     <span>Location served</span>
                   </div>
                   <div className="ppp-subcategory-stat">
@@ -193,7 +181,7 @@ const Subcategory = async ({ params }) => {
                     {categoryData.map((item, i) => (
                       <article className="ppp-subcategory-card" key={item.pageid || i}>
                         <Link
-                          href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                          href={`/${item?.parentid}/${item?.path}`}
                           prefetch
                           className="ppp-subcategory-card__media"
                         >
@@ -204,12 +192,12 @@ const Subcategory = async ({ params }) => {
                         </Link>
 
                         <div className="ppp-subcategory-card__body">
-                          <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                          <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                             <h3>{item?.desc}</h3>
                             <p>{item?.metatitle}</p>
                           </Link>
                           <Link
-                            href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                            href={`/${item?.parentid}/${item?.path}`}
                             prefetch
                             className="ppp-subcategory-card__link"
                           >
@@ -230,19 +218,32 @@ const Subcategory = async ({ params }) => {
             <div className="aero-max-container ppp-groupdetail-hero__inner">
               <div className="ppp-pricing-hero__panel ppp-groupdetail-hero__panel--single">
                 <div className="ppp-pricing-hero-card ppp-groupdetail-hero-card--single">
-                  <span className="ppp-pricing-hero-card__label">Group Events</span>
-                  <h2>{pagedata?.metatitle || pagedata?.title}</h2>
-                  <p className="ppp-groupdetail-hero__text">{introText}</p>
+                  <div className="ppp-about-hero-card">
+                  { <article className="ppp-groupdetail-overview">
+                <SectionHeading className="section-heading-white" mainHeading="true">
+                  <span>{pagedata?.title}</span>
+                </SectionHeading>
+                <h2>{pagedata?.metatitle}</h2>
+                <p>{pagedata?.metadescription}</p>
+              </article>}
+ <a
+  className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid aero-d-changelocation"
+  href="/vaughan/contactus"
+>
+  <span>Inquire</span>
+</a>
+                  </div>
 
                   <div className="ppp-groupdetail-hero__actions">
-                    <div className="aero-btn-booknow">
-                      <BookingButton title="Inquire Now" />
-                    </div>
-                    {safeWaiverLink && (
+                    
+                    
+                      
+                    
+                    {/*safeWaiverLink && (
                       <Link href={safeWaiverLink} target="_blank" className="ppp-groupdetail-hero__link">
                         Complete Waiver
                       </Link>
-                    )}
+                    )*/}
                   </div>
 
                   <div className="ppp-groupdetail-hero-card__image">
@@ -258,14 +259,7 @@ const Subcategory = async ({ params }) => {
 
           <section className="subcategory_main_section-bg">
             <section className="aero-max-container ppp-groupdetail-layout">
-              <article className="ppp-groupdetail-overview">
-                <SectionHeading className="section-heading-white" mainHeading="true">
-                  <span>{pagedata?.title}</span>
-                </SectionHeading>
-                <h2>{pagedata?.metatitle}</h2>
-                <p>{pagedata?.metadescription}</p>
-              </article>
-
+            
               {pagedata?.seosection && (
                 <article className="ppp-groupdetail-content">
                   <SectionHeading className="section-heading-white">

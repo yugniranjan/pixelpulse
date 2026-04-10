@@ -13,7 +13,7 @@
 .ppp-blogs-hero {
   position: relative;
   overflow: hidden;
-  padding: 4.5rem 0 2rem;
+  padding: 2rem 0;
 }
 
 .ppp-blogs-hero::before,
@@ -45,12 +45,15 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.9fr);
+  grid-template-columns: 1fr;
   gap: 1.75rem;
   align-items: stretch;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .ppp-blogs-hero__copy,
+.ppp-about-hero-card,
 .ppp-blogs-hero-card,
 .ppp-blog-card {
   backdrop-filter: blur(16px);
@@ -63,6 +66,7 @@
 
 .ppp-blogs-hero__eyebrow,
 .ppp-blogs-stat span,
+.ppp-about-hero-card__label,
 .ppp-blogs-hero-card__label,
 .ppp-blog-card__meta {
   font-size: 0.8rem;
@@ -110,27 +114,40 @@
 
 .ppp-blogs-hero__panel {
   display: flex;
+  width: 100%;
 }
 
+.ppp-about-hero-card,
 .ppp-blogs-hero-card {
   width: 100%;
   border-radius: 28px;
   padding: clamp(1.4rem, 2.6vw, 2rem);
+  align-self: stretch;
+  border: 1px solid rgba(251, 174, 123, 0.18);
+  background:
+    linear-gradient(180deg, rgba(20, 27, 39, 0.88), rgba(9, 14, 22, 0.94)),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.08), transparent 36%);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.ppp-about-hero-card h2,
 .ppp-blogs-hero-card h2 {
   margin: 0.8rem 0 1rem;
-  font-size: clamp(1.45rem, 3vw, 2rem);
-  line-height: 1.08;
+ font-size: clamp(1.0rem, 2vw, 2.0rem);
+  line-height: 1.5;
   text-transform: none;
 }
 
+.ppp-about-hero-card ul,
 .ppp-blogs-hero-card ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.ppp-about-hero-card li,
 .ppp-blogs-hero-card li {
   position: relative;
   padding-left: 1.2rem;
@@ -139,6 +156,7 @@
   line-height: 1.7;
 }
 
+.ppp-about-hero-card li::before,
 .ppp-blogs-hero-card li::before {
   content: "";
   position: absolute;

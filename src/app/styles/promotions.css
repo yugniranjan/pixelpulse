@@ -165,7 +165,7 @@
 .ppp-pricing-hero {
   position: relative;
   overflow: hidden;
-  padding: 4.5rem 0 0.5rem;
+  padding: 2rem 0;
 }
 
 .ppp-pricing-hero::before,
@@ -202,6 +202,7 @@
   align-items: stretch;
 }
 
+.ppp-about-hero-card,
 .ppp-pricing-hero-card,
 .ppp-content-card,
 .ppp-pricing-card,
@@ -214,6 +215,7 @@
 .ppp-pricing-card__eyebrow,
 .ppp-inline-cta__eyebrow,
 .ppp-promo-card__meta span,
+.ppp-about-hero-card__label,
 .ppp-pricing-hero-card__label {
   font-size: 0.8rem;
   letter-spacing: 0.14em;
@@ -296,6 +298,7 @@
   width: 100%;
 }
 
+.ppp-about-hero-card,
 .ppp-pricing-hero-card {
   width: 100%;
   border-radius: 28px;
@@ -303,19 +306,22 @@
   align-self: stretch;
 }
 
+.ppp-about-hero-card h2,
 .ppp-pricing-hero-card h2 {
   margin: 0.8rem 0 1rem;
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.08;
+  font-size: clamp(1.0rem, 2vw, 2.0rem);
+  line-height: 1.5;
   text-transform: none;
 }
 
+.ppp-about-hero-card ul,
 .ppp-pricing-hero-card ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.ppp-about-hero-card li,
 .ppp-pricing-hero-card li {
   position: relative;
   padding-left: 1.2rem;
@@ -324,6 +330,7 @@
   line-height: 1.7;
 }
 
+.ppp-about-hero-card li::before,
 .ppp-pricing-hero-card li::before {
   content: "";
   position: absolute;

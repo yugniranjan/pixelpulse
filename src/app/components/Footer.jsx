@@ -19,6 +19,9 @@ import { slugify } from "@/utils/slugify";
 
 
 export async function getBlogs() {
+  if (!db) {
+    return [];
+  }
 
   try {
     const snapshot = await db

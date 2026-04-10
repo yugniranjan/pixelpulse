@@ -12,7 +12,7 @@ export async function generateMetadata({ params, searchParams }) {
   const id = searchParams?.uid;
   const BASE_URL = process.env.SITE_URL;
 
-  if (!id) return {};
+  if (!id || !db) return {};
 
   const doc = await db.collection("blogs").doc(id).get();
 
@@ -71,7 +71,7 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 async function getBlogById(id) {
-  if (!id) return null;
+  if (!id || !db) return null;
 
   const doc = await db.collection("blogs").doc(id).get();
 

@@ -8,7 +8,7 @@
 .ppp-party-hero {
   position: relative;
   overflow: hidden;
-  padding: 4.5rem 0 2rem;
+  padding: 2rem 0;
 }
 
 .ppp-party-hero::before,
@@ -16,16 +16,16 @@
   content: "";
   position: absolute;
   border-radius: 999px;
-  filter: blur(26px);
+  filter: blur(20px);
   opacity: 0.55;
 }
 
 .ppp-party-hero::before {
-  width: 280px;
-  height: 280px;
+  width: 260px;
+  height: 260px;
   top: -70px;
-  left: -80px;
-  background: rgba(255, 75, 43, 0.18);
+  left: -60px;
+  background: rgba(251, 174, 123, 0.2);
 }
 
 .ppp-party-hero::after {
@@ -33,19 +33,20 @@
   height: 320px;
   right: -90px;
   bottom: 10px;
-  background: rgba(251, 174, 123, 0.14);
+  background: rgba(164, 207, 95, 0.14);
 }
 
 .ppp-party-hero__inner {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+  grid-template-columns: 1fr;
   gap: 1.75rem;
   align-items: stretch;
 }
 
 .ppp-party-hero__copy,
+.ppp-about-hero-card,
 .ppp-party-hero-card,
 .ppp-party-pricing,
 .ppp-party-content {
@@ -59,6 +60,7 @@
 
 .ppp-party-hero__eyebrow,
 .ppp-party-stat span,
+.ppp-about-hero-card__label,
 .ppp-party-hero-card__label,
 .ppp-party-cta-band__eyebrow {
   font-size: 0.8rem;
@@ -141,27 +143,41 @@
 
 .ppp-party-hero__panel {
   display: flex;
+  width: 100%;
 }
 
+.ppp-about-hero-card,
 .ppp-party-hero-card {
   width: 100%;
   border-radius: 28px;
   padding: clamp(1.4rem, 2.6vw, 2rem);
+  align-self: stretch;
+  border: 1px solid rgba(251, 174, 123, 0.18);
+  background:
+    linear-gradient(180deg, rgba(20, 27, 39, 0.88), rgba(9, 14, 22, 0.94)),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.08), transparent 36%);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.ppp-about-hero-card h2,
 .ppp-party-hero-card h2 {
   margin: 0.8rem 0 1rem;
-  font-size: clamp(1.45rem, 3vw, 2.1rem);
-  line-height: 1.08;
+  font-size: clamp(1.0rem, 2vw, 2.0rem);
+  line-height: 1.5;
   text-transform: none;
+  color: var(--white-color);
 }
 
+.ppp-about-hero-card ul,
 .ppp-party-hero-card ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.ppp-about-hero-card li,
 .ppp-party-hero-card li {
   position: relative;
   padding-left: 1.2rem;
@@ -170,6 +186,7 @@
   line-height: 1.7;
 }
 
+.ppp-about-hero-card li::before,
 .ppp-party-hero-card li::before {
   content: "";
   position: absolute;
@@ -178,7 +195,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff4b2b, var(--primary-color));
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
 }
 
 .gaming_bg {

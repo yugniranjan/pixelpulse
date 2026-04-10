@@ -1,9 +1,17 @@
 /* header css start  */
 .aero-header-shell {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 90;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 120;
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.aero-header-spacer {
+  height: 116px;
 }
 
 .aero_menu_location_icon {

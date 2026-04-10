@@ -82,7 +82,8 @@ const ABOUT_US_THEME_HTML = `
 `;
 
 export async function generateMetadata({ params }) {
-  const { location_slug = LOCATION_NAME, category_slug } = params;
+  const { category_slug } = await params;
+  const location_slug = LOCATION_NAME;
 
   const metadata = await generateMetadataLib({
     location: location_slug,
@@ -93,7 +94,8 @@ export async function generateMetadata({ params }) {
 }
 
 const Category = async ({ params }) => {
-  const { location_slug = LOCATION_NAME, category_slug } = params;
+  const { category_slug } = await params;
+  const location_slug = LOCATION_NAME;
 
   if (category_slug === "refresh") {
     await fetchsheetdata("refresh", location_slug);
@@ -126,12 +128,7 @@ const Category = async ({ params }) => {
   );
 
   // 3️⃣ ✅ SINGLE SOURCE OF TRUTH for 404
-  if (
-    location_slug !== LOCATION_NAME ||
-    !data ||
-    !attractionsData ||
-    attractionsData.length === 0
-  ) {
+  if (!data || !attractionsData || attractionsData.length === 0) {
     notFound(); // 👉 app/not-found.jsx
   }
 
@@ -143,8 +140,8 @@ const Category = async ({ params }) => {
             <section className="ppp-attractions-hero">
               <div className="aero-max-container ppp-attractions-hero__inner">
                 <div className="ppp-attractions-hero__panel">
-                  <div className="ppp-attractions-hero-card">
-                    <span className="ppp-attractions-hero-card__label">Built for repeat play</span>
+                  <div className="ppp-about-hero-card">
+                    <span className="ppp-about-hero-card__label">Built for repeat play</span>
                     <h2>Each room combines movement, speed, lights, and score chasing in a way that keeps every visit fresh.</h2>
                     <ul>
                       <li>Fast rounds that are easy to jump into</li>
@@ -220,8 +217,8 @@ const Category = async ({ params }) => {
             <section className="ppp-groups-hero">
               <div className="aero-max-container ppp-groups-hero__inner">
                 <div className="ppp-groups-hero__panel">
-                  <div className="ppp-groups-hero-card">
-                    <span className="ppp-groups-hero-card__label">Made for all kinds of groups</span>
+                  <div className="ppp-about-hero-card">
+                    <span className="ppp-about-hero-card__label">Made for all kinds of groups</span>
                     <h2>Plan a visit that feels organized for adults, exciting for kids, and easy for coordinators.</h2>
                     <ul>
                       <li>Great for school trips, camps, teams, and company outings</li>
@@ -450,10 +447,11 @@ const Category = async ({ params }) => {
           </section>)
         }
 
-
-        <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
-          <BookingButton title="Book Now" />
-        </div>
+        {!isGroupsEventsPage && (
+          <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
+            <BookingButton title="Book Now" />
+          </div>
+        )}
 
         <script
           type="application/ld+json"

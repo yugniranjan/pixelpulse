@@ -6,12 +6,14 @@ import React from "react";
 import Link from "next/link";
 import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
 import { db } from "@/lib/firestore";
+import { LOCATION_NAME } from "@/lib/constant";
 import { slugify } from "@/utils/slugify";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 
 export async function generateMetadata({ params }) {
-  const location_slug = params?.location_slug || "vaughan";
+  await params;
+  const location_slug = LOCATION_NAME || "vaughan";
   const BASE_URL = process.env.SITE_URL;
 
   const title = `Blogs | Pixel Pulse Play ${location_slug}`;
@@ -61,6 +63,10 @@ export async function generateMetadata({ params }) {
 }
 
 export async function getBlogs() {
+  if (!db) {
+    return [];
+  }
+
   try {
     const snapshot = await db
       .collection("blogs")
@@ -90,7 +96,8 @@ function formatBlogDate(createdAt) {
 }
 
 const page = async ({ params }) => {
-  const location_slug = params?.location_slug || "vaughan";
+  await params;
+  const location_slug = LOCATION_NAME || "vaughan";
   const extractBlogData = await getBlogs();
 
 
@@ -136,8 +143,8 @@ const schema = {
           
 
           <div className="ppp-blogs-hero__panel">
-            <div className="ppp-blogs-hero-card">
-              <span className="ppp-blogs-hero-card__label">What you'll find</span>
+            <div className="ppp-about-hero-card">
+              <span className="ppp-about-hero-card__label">What you'll find</span>
               <h2>Helpful reads for planning visits, discovering attractions, and making group play even better.</h2>
               <ul>
                 <li>Planning tips for families, parties, and group outings</li>

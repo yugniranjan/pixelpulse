@@ -123,12 +123,24 @@ async function fetchMenuData(location) {
  */
 async function fetchPageData(location, page) {
   const jsonData = await fetchsheetdata("Data", location);
-  const filtered= jsonData.filter(m => m.path?.toUpperCase().includes(page.toUpperCase()));
+  const normalizedPage = typeof page === "string" ? page.toUpperCase() : "";
+  if (!normalizedPage) {
+    return null;
+  }
+  const filtered = jsonData.filter(
+    (m) => typeof m.path === "string" && m.path.toUpperCase().includes(normalizedPage)
+  );
   return filtered[0];
 }
 async function fetchFaqData(location, page) {
   const jsonData = await fetchsheetdata("faq", location);
-  return jsonData.filter(m => m.path?.toUpperCase().includes(page.toUpperCase()));
+  const normalizedPage = typeof page === "string" ? page.toUpperCase() : "";
+  if (!normalizedPage) {
+    return [];
+  }
+  return jsonData.filter(
+    (m) => typeof m.path === "string" && m.path.toUpperCase().includes(normalizedPage)
+  );
 }
 
 async function getWaiverLink(location){

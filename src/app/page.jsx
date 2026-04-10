@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getDataByParentId } from "@/utils/customFunctions";
 import Countup from "@/components/Countup";
 import MotionImage from "@/components/MotionImage";
+import PromotionModal from "@/components/model/PromotionModal";
 import BlogCard from "@/components/smallComponents/BlogCard";
 import {
   fetchsheetdata,
@@ -188,6 +189,16 @@ const Home = async () => {
   const promotionPopup = Array.isArray(dataconfig)
     ? dataconfig.filter((item) => item.key === "promotion-popup")
     : [];
+  const safePromotions = Array.isArray(promotions)
+    ? JSON.parse(JSON.stringify(promotions))
+    : [];
+  const hasPromotionRows = Array.isArray(promotions)
+    ? safePromotions.some((promo) =>
+        Object.values(promo || {}).some(
+          (value) => typeof value === "string" && value.trim() !== ""
+        )
+      )
+    : false;
 
   const header_image = Array.isArray(data)
     ? data.filter((item) => item.path === "home")
@@ -207,6 +218,13 @@ const Home = async () => {
 
   return (
     <main className="ppp-home">
+      {hasPromotionRows && (
+        <PromotionModal
+          promotionPopup={promotionPopup}
+          promotions={safePromotions}
+        />
+      )}
+
       {/* ── Hero ── */}
       <MotionImage pageData={safeHeaderImage} waiverLink={waiverLink} />
 
@@ -305,7 +323,7 @@ const Home = async () => {
       )}
 
       {/* ── Promotions ── */}
-      {promotions?.length > 0 && (
+      {safePromotions?.length > 0 && (
         <section className="ppp-section ppp-promos">
           <div className="aero-max-container">
             <SectionHeading className="section-heading-white">
@@ -316,7 +334,7 @@ const Home = async () => {
             </p>
 
             <div className="promotions__grid">
-              {promotions.map((promo, index) => (
+              {safePromotions.map((promo, index) => (
                 <article key={index} className="promotion-card">
                   <span className="promotion-card__badge">{promo.badge}</span>
                   <h3 className="promotion-card__title">{promo.title}</h3>

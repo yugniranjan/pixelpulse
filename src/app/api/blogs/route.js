@@ -5,6 +5,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
+  if (!db) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   const snap = await db
     .collection("blogs")
     .orderBy("createdAt", "desc")

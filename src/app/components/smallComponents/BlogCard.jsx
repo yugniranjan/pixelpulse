@@ -6,6 +6,9 @@ import React from 'react'
 
 
 export async function getBlogs() {
+  if (!db) {
+    return [];
+  }
 
   try {
     const snapshot = await db
@@ -26,8 +29,7 @@ export async function getBlogs() {
 }
 
 const BlogCard = async ({ blogsData, location_slug }) => {
-   const extractBlogData = await getBlogs();
-  //  console.log("Extracted Blog Data:", extractBlogData);
+  const extractBlogData = await getBlogs();
   return (
     <section className="aero_home_article_card-wrapper">
       {extractBlogData &&

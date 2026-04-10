@@ -1,11 +1,23 @@
 import { Storage } from "@google-cloud/storage";
 
-const storage = new Storage({
-  projectId: process.env.GCP_PROJECT_ID,
-  credentials: {
-    client_email: process.env.GCP_CLIENT_EMAIL,
-    private_key: process.env.GCP_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  },
-});
+const privateKey = process.env.GCP_PRIVATE_KEY;
+const credentials =
+  process.env.GCP_CLIENT_EMAIL && privateKey
+    ? {
+        client_email: process.env.GCP_CLIENT_EMAIL,
+        private_key: privateKey.replace(/\\n/g, "\n"),
+      }
+    : null;
 
-export const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
+const storage =
+  process.env.GCP_PROJECT_ID && credentials
+    ? new Storage({
+        projectId: process.env.GCP_PROJECT_ID,
+        credentials,
+      })
+    : null;
+
+export const bucket =
+  storage && process.env.GCS_BUCKET_NAME
+    ? storage.bucket(process.env.GCS_BUCKET_NAME)
+    : null;

@@ -1,8 +1,8 @@
 import './styles/notfound.css';
 import { headers } from 'next/headers';
 
-export default function NotFound() {
-  const headersList = headers();
+export default async function NotFound() {
+  const headersList = await headers();
   const url = headersList.get('x-invoke-path') || headersList.get('referer') || '';
   // fallback to extract pathname from referer or empty string
   const keyword = url.split('/').filter(Boolean).pop() || 'page';

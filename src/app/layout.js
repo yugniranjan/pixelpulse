@@ -6,7 +6,8 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { fetchMenuData, fetchsheetdata } from "./lib/sheets";
+import FloatingWaiverButton from "./components/FloatingWaiverButton";
+import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
@@ -71,19 +72,22 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
-const token = cookies().get("admin_token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
   let menudata = [];
   let configdata = [];
   let sheetdata = [];
+  let waiverLink = "";
 
   try {
-    [menudata, configdata, sheetdata] = await Promise.all([
+    [menudata, configdata, sheetdata, waiverLink] = await Promise.all([
       fetchMenuData(location_slug),
       fetchsheetdata('config', location_slug),
       fetchsheetdata('locations', location_slug),
+      getWaiverLink(location_slug),
     ]);
   } catch (error) {
     console.error("layout data failed:", error);
@@ -93,7 +97,10 @@ const token = cookies().get("admin_token")?.value;
   // const reviewdata = await getReviewsData(locationid)
   return (
     <html lang="en">
-      <body className={`${poppins.className} ${jakarta.className}`}>
+      <body
+        className={`${poppins.className} ${jakarta.className}`}
+        suppressHydrationWarning
+      >
         <Toaster position="top-right" />
         <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}
@@ -106,6 +113,7 @@ const token = cookies().get("admin_token")?.value;
           menudata={menudata}
           // reviewdata={reviewdata}
         />
+        <FloatingWaiverButton waiverLink={waiverLink} />
         <div id="modal-root"></div>
       </body>
     </html>

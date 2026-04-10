@@ -190,8 +190,8 @@ const Page = async ({ params }) => {
       <section className="ppp-party-hero">
         <div className="aero-max-container ppp-party-hero__inner">
           <div className="ppp-party-hero__panel">
-            <div className="ppp-party-hero-card">
-              <span className="ppp-party-hero-card__label">Why it works</span>
+            <div className="ppp-about-hero-card">
+              <span className="ppp-about-hero-card__label">Why it works</span>
               <h2>All the energy of an active party, with less planning stress and more memorable moments.</h2>
               <ul>
                 <li>Interactive play that keeps the whole group engaged</li>
@@ -239,11 +239,6 @@ const Page = async ({ params }) => {
             <div className="aero-btn-booknow">
               <BookingButton title="Book Now" />
             </div>
-            {waiverLink && (
-              <Link href={waiverLink} target="_blank" className="ppp-party-hero__link">
-                Waiver
-              </Link>
-            )}
           </div>
         </div>
       </section>

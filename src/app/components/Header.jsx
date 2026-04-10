@@ -9,7 +9,6 @@ import MenuButton from "./smallComponents/MenuButton";
 import LogoutButton from "./LogoutButton";
 import BookingButton from "./smallComponents/BookingButton";
 import { usePathname } from "next/navigation";
-import { LOCATION_NAME } from "@/lib/constant";
 
 function normalizePath(path = "/") {
   if (!path) return "/";
@@ -18,10 +17,9 @@ function normalizePath(path = "/") {
 
 const Header = ({ location_slug, menudata, configdata, token }) => {
   const pathname = usePathname();
-  const basePath = location_slug === LOCATION_NAME ? "" : `/${location_slug}`;
 
   const navItems = [
-    { navName: "Home", navUrl: "", href: basePath || "/" },
+    { navName: "Home", navUrl: "", href: "/" },
     ...(Array.isArray(menudata) ? menudata : [])
     .filter(
       (item) =>
@@ -31,13 +29,14 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
     .map((item) => ({
       navName: item.desc,
       navUrl: item.path.toLowerCase(),
-      href: `${basePath}/${item.path.toLowerCase()}` || `/${item.path.toLowerCase()}`,
+      href: `/${item.path.toLowerCase()}`,
     })),
   ];
 
   return (
-    <header className="aero-header-shell">
-      <div>
+    <>
+      <header className="aero-header-shell">
+        <div>
         <section className="d-flex aero-col-3 aero-header-top">
           <div className="aero-menu-location app-container">
             <div
@@ -51,7 +50,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
           <div className="desktop-container aero-header-logo">
             <div className="aero_main_logo_wrap">
               <Link
-                href={`/${location_slug}`}
+                href="/"
                 className="aero_main_logo"
                 prefetch
               >
@@ -81,7 +80,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
             className="aero-btn-booknow aero-header-booking app-container"
             style={{ textAlign: "right" }}
           >
-            <BookingButton title="Book Visit" />
+            <BookingButton title="Book Now" />
           </div>
 
           <div className="aero-btn-booknow-1 aero-btn-booknow desktop-container">
@@ -95,7 +94,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
             </Link>
 
             <div className="aero-header-booking">
-              <BookingButton title="Book Visit" />
+              <BookingButton title="Book Now" />
             </div>
           </div>
         </section>
@@ -108,7 +107,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                   const normalizedPathname = normalizePath(pathname);
                   const normalizedHref = normalizePath(item.href);
                   const isActive =
-                    normalizedHref === (basePath || "/")
+                    normalizedHref === "/"
                       ? normalizedPathname === normalizedHref
                       : normalizedPathname === normalizedHref ||
                         normalizedPathname.startsWith(`${normalizedHref}/`);
@@ -137,7 +136,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                   <span>Inquire</span>
                 </Link>
                 <div className="aero-header-booking">
-                  <BookingButton title="Book Visit" />
+                  <BookingButton title="Book Now" />
                 </div>
               </div>
               <div className="app-container">
@@ -146,8 +145,10 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
             </div>
           </nav>
         </section>
-      </div>
-    </header>
+        </div>
+      </header>
+      <div className="aero-header-spacer" aria-hidden="true" />
+    </>
   );
 };
 

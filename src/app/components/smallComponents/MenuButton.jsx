@@ -4,7 +4,6 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
 import { usePathname } from "next/navigation";
-import { LOCATION_NAME } from "@/lib/constant";
 
 function normalizePath(path = "/") {
   if (!path) return "/";
@@ -14,7 +13,6 @@ function normalizePath(path = "/") {
 const MenuButton = ({ navList, location_slug }) => {
   const [mobile_nav, setMobile_nav] = useState(false);
   const pathname = usePathname();
-  const basePath = location_slug === LOCATION_NAME ? "" : `/${location_slug}`;
 
   return (
     <>
@@ -31,11 +29,13 @@ const MenuButton = ({ navList, location_slug }) => {
         <nav className="d-flex-center aero-list-7-1 navbar">
           {navList &&
             navList.map((item) => {
-              const href = item?.href || `${basePath}/${item?.navUrl}` || `/${item?.navUrl}`;
+              const href =
+                item?.href ||
+                (item?.navUrl ? `/${item.navUrl}` : "/");
               const normalizedPathname = normalizePath(pathname);
               const normalizedHref = normalizePath(href);
               const isActive =
-                normalizedHref === (basePath || "/")
+                normalizedHref === "/"
                   ? normalizedPathname === normalizedHref
                   : normalizedPathname === normalizedHref ||
                     normalizedPathname.startsWith(`${normalizedHref}/`);

@@ -18,8 +18,8 @@ const page = () => {
           </div>
 
           <div className="ppp-contact-hero__panel">
-            <div className="ppp-contact-hero-card">
-              <span className="ppp-contact-hero-card__label">Fastest way to connect</span>
+            <div className="ppp-about-hero-card">
+              <span className="ppp-about-hero-card__label">Fastest way to connect</span>
               <h2>Send us the key details and we&apos;ll help you sort out the best next step.</h2>
               <ul>
                 <li>Ask about parties, bookings, and visit planning</li>

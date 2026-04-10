@@ -12,10 +12,12 @@ import {
   fetchPageData,
   generateMetadataLib,
 } from "@/lib/sheets";
+import { LOCATION_NAME } from "@/lib/constant";
 
 export async function generateMetadata({ params }) {
+  await params;
   const metadata = await generateMetadataLib({
-    location: params.location_slug || "vaughan",
+    location: LOCATION_NAME || "vaughan",
     category: "",
     page: "pricing-promos",
   });
@@ -91,7 +93,8 @@ function buildPricingCards(pricingRows, detailKeys, pricingHeaders) {
 }
 
 const PricingPromosPage = async ({ params }) => {
-  const location_slug = params?.location_slug || "vaughan";
+  await params;
+  const location_slug = LOCATION_NAME || "vaughan";
 
   let pageData = null;
   let configData = [];
@@ -129,8 +132,8 @@ const PricingPromosPage = async ({ params }) => {
       <section className="ppp-pricing-hero">
         <div className="aero-max-container ppp-pricing-hero__inner">
           <div className="ppp-pricing-hero__panel">
-            <div className="ppp-pricing-hero-card">
-              <span className="ppp-pricing-hero-card__label">Best way to plan</span>
+            <div className="ppp-about-hero-card">
+              <span className="ppp-about-hero-card__label">Best way to plan</span>
               <h2>Pick your session, reserve online, then stack the best available promotion.</h2>
               <ul>
                 <li>Quick-glance pricing cards for every play duration</li>
@@ -175,7 +178,7 @@ const PricingPromosPage = async ({ params }) => {
                           {card.details.map((detail, detailIndex) => (
                             <div
                               className="ppp-pricing-card__detail"
-                              key={`${card.duration}-${detail.label || detailIndex}`}
+                              key={`${card.title}-${card.duration || "details"}-${detail.label || "row"}-${detailIndex}`}
                             >
                               <span>{detail.label || "Details"}</span>
                               <strong>{detail.value}</strong>
@@ -212,11 +215,6 @@ const PricingPromosPage = async ({ params }) => {
                 <div className="aero-btn-booknow">
                   <BookingButton title="Book Now" />
                 </div>
-                {waiverLink && (
-                  <Link href={waiverLink} target="_blank" className="ppp-pricing-hero__link">
-                    Waiver
-                  </Link>
-                )}
               </div>
             </article>
 
