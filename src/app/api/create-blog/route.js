@@ -5,6 +5,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req) {
+  if (!db) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   const body = await req.formData();
   if (!body.get("title") || !body.get("content") || !body.get("featuredImage")) {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
@@ -26,4 +33,3 @@ export async function POST(req) {
     id: ref.id,
   });
 }
-

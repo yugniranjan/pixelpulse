@@ -56,13 +56,7 @@ const PromotionModal = ({ promotionPopup = [], promotions = [] }) => {
           <span className="aero_promotion_backdrop__grid" />
         </div>
 
-        <div className="aero_promotion_intro">
-          <span className="aero_promotion_kicker">Limited-Time Offers</span>
-          <h2>Play More. Spend Less.</h2>
-          <p>
-            Fresh deals built for birthdays, group visits, and next-level arcade sessions.
-          </p>
-        </div>
+        
 
         {sanitizedHTML ? (
           <div

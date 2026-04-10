@@ -6,6 +6,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(_, { params }) {
+  if (!db) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   const doc = await db.collection("blogs").doc(params.id).get();
 
   if (!doc.exists) {
@@ -35,6 +42,13 @@ export async function GET(_, { params }) {
 
 
 export async function PUT(req, { params }) {
+  if (!db) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   const formData = await req.formData();
 
   const title = formData.get("title");
@@ -77,6 +91,13 @@ export async function PUT(req, { params }) {
 
 
 export async function DELETE(_, { params }) {
+  if (!db) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   await db.collection("blogs").doc(params.id).delete();
 
   return NextResponse.json({ success: true });

@@ -5,7 +5,7 @@ import "../../styles/blogs.css";
 import React from "react";
 import Link from "next/link";
 import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
-import { db } from "@/lib/firestore";
+import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
 import { LOCATION_NAME } from "@/lib/constant";
 import { slugify } from "@/utils/slugify";
 import SectionHeading from "@/components/home/SectionHeading";
@@ -62,29 +62,6 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export async function getBlogs() {
-  if (!db) {
-    return [];
-  }
-
-  try {
-    const snapshot = await db
-      .collection("blogs")
-      .orderBy("createdAt", "desc")
-      .get();
-
-    return snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter((blog) => blog.createdAt);
-  } catch (error) {
-    console.error("Firestore Error:", error);
-    return [];
-  }
-}
-
 function formatBlogDate(createdAt) {
   if (!createdAt?.seconds) return "Latest update";
 
@@ -98,7 +75,11 @@ function formatBlogDate(createdAt) {
 const page = async ({ params }) => {
   await params;
   const location_slug = LOCATION_NAME || "vaughan";
-  const extractBlogData = await getBlogs();
+  const extractBlogData = await fetchBlogs();
+  const blogsToRender =
+    Array.isArray(extractBlogData) && extractBlogData.length > 0
+      ? extractBlogData
+      : getFallbackBlogs();
 
 
 
@@ -109,13 +90,13 @@ const schema = {
   description:
     "Read the latest blogs, guides, and updates from Pixel Pulse Play.",
   url: `${process.env.SITE_URL}/${location_slug}/blogs`,
-  blogPost: extractBlogData?.map((blog) => {
+  blogPost: blogsToRender?.map((blog) => {
     const slug = slugify(blog.title);
 
     return {
       "@type": "BlogPosting",
       headline: blog.title,
-      url: `${process.env.SITE_URL}/${location_slug}/blogs/${slug}?uid=${blog.id}`,
+      url: blog.href || `${process.env.SITE_URL}/${location_slug}/blogs/${slug}?uid=${blog.id}`,
       image:
         blog.featuredImage ||
         "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
@@ -167,12 +148,13 @@ const schema = {
         </div>
 
         <section className="ppp-blogs-grid">
-          {extractBlogData?.map((item) => {
+          {blogsToRender?.map((item) => {
             const slug = slugify(item.title);
+            const href = item.href || `blogs/${slug}?uid=${item.id}`;
             return (
               <article className="ppp-blog-card" key={item.id}>
                 <div className="ppp-blog-card__media">
-                  <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
+                  <Link href={href} prefetch>
                     <img
                       src={item?.featuredImage || "/assets/images/logo.png"}
                       alt={item?.title || "Blog article image"}
@@ -180,15 +162,15 @@ const schema = {
                   </Link>
                 </div>
                 <div className="ppp-blog-card__body">
-                  <span className="ppp-blog-card__meta">{formatBlogDate(item.createdAt)}</span>
-                  <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
+                  <span className="ppp-blog-card__meta">{formatBlogDate(item.createdAt || item.updatedAt)}</span>
+                  <Link href={href} prefetch>
                     <h2 className="ppp-blog-card__title">{item.title}</h2>
                     {item?.metaDescription && (
                       <p className="ppp-blog-card__excerpt">{item.metaDescription}</p>
                     )}
                   </Link>
                   <Link
-                    href={`blogs/${slug}?uid=${item.id}`}
+                    href={href}
                     prefetch
                     className="ppp-blog-card__link"
                   >

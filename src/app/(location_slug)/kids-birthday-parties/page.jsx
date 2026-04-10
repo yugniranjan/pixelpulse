@@ -191,8 +191,10 @@ const Page = async ({ params }) => {
         <div className="aero-max-container ppp-party-hero__inner">
           <div className="ppp-party-hero__panel">
             <div className="ppp-about-hero-card">
-              <span className="ppp-about-hero-card__label">Why it works</span>
-              <h2>All the energy of an active party, with less planning stress and more memorable moments.</h2>
+              <SectionHeading className="section-heading-white" mainHeading={true}>
+              Birthday Party <span>Packages & Pricing</span>
+            </SectionHeading>
+              <h2>All the energy of an active party, with less planning stress and more memorable moments.</h2> 
               <ul>
                 <li>Interactive play that keeps the whole group engaged</li>
                 <li>Structured package options that simplify decision-making</li>
@@ -205,17 +207,7 @@ const Page = async ({ params }) => {
 
       <section className="subcategory_main_section-bg gaming_bg">
         <section className="aero-max-container ppp-party-layout">
-          <article className="ppp-party-intro">
-            <SectionHeading className="section-heading-white" mainHeading={true}>
-              Birthday Party <span>Packages & Pricing</span>
-            </SectionHeading>
-            <p className="birthday_desc">
-              At Pixel Pulse Play {location_slug}, our birthday party packages are designed
-              to make planning simpler while giving kids a celebration that feels active,
-              modern, and seriously fun.
-            </p>
-          </article>
-
+         
           <PricingComparison birthdaydata={birthdayPackages} />
 
           {data?.seosection && (

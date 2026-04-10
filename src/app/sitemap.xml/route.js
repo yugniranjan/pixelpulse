@@ -2,14 +2,14 @@ export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
-import { getBlogs } from '@/(location_slug)/blogs/page';
+import { fetchBlogs } from "@/lib/blogs";
 export async function GET() {
   const siteUrl = process.env.SITE_URL;
   const dynamicPaths = new Set();
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
-    const extractBlogData = await getBlogs();
+    const extractBlogData = await fetchBlogs();
 
     rows.forEach(row => {
       const { location, parentid, path } = row;

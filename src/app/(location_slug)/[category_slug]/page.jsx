@@ -141,7 +141,9 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-attractions-hero__inner">
                 <div className="ppp-attractions-hero__panel">
                   <div className="ppp-about-hero-card">
-                    <span className="ppp-about-hero-card__label">Built for repeat play</span>
+                   <SectionHeading className="section-heading-white">
+                      Featured <span>Experiences</span>
+                    </SectionHeading>
                     <h2>Each room combines movement, speed, lights, and score chasing in a way that keeps every visit fresh.</h2>
                     <ul>
                       <li>Fast rounds that are easy to jump into</li>
@@ -168,15 +170,7 @@ const Category = async ({ params }) => {
                 )}
 
                 <section className="ppp-attractions-grid-wrap">
-                  <div className="ppp-attractions-section-intro">
-                    <SectionHeading className="section-heading-white">
-                      Featured <span>Experiences</span>
-                    </SectionHeading>
-                    <p>
-                      From reaction-based digital rooms to action-driven skill games,
-                      every attraction is designed to keep players moving and engaged.
-                    </p>
-                  </div>
+                 
 
                   <section className="ppp-attractions-grid">
                     {attractionItems.map((item, i) => (
@@ -218,7 +212,9 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-groups-hero__inner">
                 <div className="ppp-groups-hero__panel">
                   <div className="ppp-about-hero-card">
-                    <span className="ppp-about-hero-card__label">Made for all kinds of groups</span>
+                    <SectionHeading className="section-heading-white">
+                      Group <span>Experiences</span>
+                    </SectionHeading>
                     <h2>Plan a visit that feels organized for adults, exciting for kids, and easy for coordinators.</h2>
                     <ul>
                       <li>Great for school trips, camps, teams, and company outings</li>
@@ -245,15 +241,7 @@ const Category = async ({ params }) => {
                 )}
 
                 <section className="ppp-groups-grid-wrap">
-                  <div className="ppp-groups-section-intro">
-                    <SectionHeading className="section-heading-white">
-                      Group <span>Experiences</span>
-                    </SectionHeading>
-                    <p>
-                      Explore event formats built for team bonding, shared play,
-                      and standout moments for groups of all ages.
-                    </p>
-                  </div>
+                  
 
                   <section className="ppp-groups-grid">
                     {attractionItems.map((item, i) => (
@@ -295,7 +283,10 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-about-hero__inner">
                 <div className="ppp-about-hero__panel">
                   <div className="ppp-about-hero-card">
-                    <span className="ppp-about-hero-card__label">What we stand for</span>
+                    
+                    <SectionHeading className="section-heading-white">
+                     What we <span>stand for</span>
+                    </SectionHeading>
                     <h2>A modern indoor play concept designed to feel active, social, and easy to come back to.</h2>
                     <ul>
                       <li>Digital-first game play that keeps kids moving and engaged</li>

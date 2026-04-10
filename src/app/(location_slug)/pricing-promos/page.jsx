@@ -133,7 +133,9 @@ const PricingPromosPage = async ({ params }) => {
         <div className="aero-max-container ppp-pricing-hero__inner">
           <div className="ppp-pricing-hero__panel">
             <div className="ppp-about-hero-card">
-              <span className="ppp-about-hero-card__label">Best way to plan</span>
+             <SectionHeading className="section-heading-white">
+                  Session <span>Pricing</span>
+                </SectionHeading>
               <h2>Pick your session, reserve online, then stack the best available promotion.</h2>
               <ul>
                 <li>Quick-glance pricing cards for every play duration</li>
@@ -149,15 +151,7 @@ const PricingPromosPage = async ({ params }) => {
         <div className="aero-max-container">
           <section className="subcategory_main_section ppp-pricing-layout">
             <article className="ppp-pricing-block">
-              <div className="ppp-section-intro">
-                <SectionHeading className="section-heading-white">
-                  Session <span>Pricing</span>
-                </SectionHeading>
-                <p>
-                  Compare session lengths and rates at a glance, then jump straight
-                  into booking.
-                </p>
-              </div>
+             
 
               {hasPricingCards ? (
                 <div className="ppp-pricing-grid">

@@ -224,7 +224,7 @@ const Subcategory = async ({ params }) => {
                   <span>{pagedata?.title}</span>
                 </SectionHeading>
                 <h2>{pagedata?.metatitle}</h2>
-                <p>{pagedata?.metadescription}</p>
+               {/* <p>{pagedata?.metadescription}</p>*/}
               </article>}
  <a
   className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid aero-d-changelocation"

@@ -707,7 +707,7 @@
 .ppp-about-hero-card h2 {
   margin: 0.8rem 0 1rem;
   font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.08;
+ line-height: 1.5;
   text-transform: none;
 }
 

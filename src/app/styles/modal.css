@@ -35,16 +35,17 @@
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.06);
+  top: 2px;
+  right: 1px;
+ 
+  background: #a4cf5f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   width: 36px;
   height: 36px;
   font-size: .8rem;
   cursor: pointer;
-  color: #fff;
+  color: #000;
   padding: 0;
   line-height: 1;
   transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;

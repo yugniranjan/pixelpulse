@@ -6,6 +6,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req) {
+  if (!bucket) {
+    return NextResponse.json(
+      { error: "Storage is not configured locally" },
+      { status: 503 }
+    );
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file");
