@@ -9,7 +9,7 @@ export default function CelebrateEventsSection() {
             img: "https://storage.googleapis.com/aerosports/team-building-aerosports-trampoline-park.png",
             desc:
                 "Elevate your corporate events at Pixel Pulse, where immersive challenges inspire teamwork, strategic thinking, and shared wins in a high-energy environment.",
-            link: "/groups-events/corporate-parties-events-groups",
+            link: "/group-events/corporate-parties-events-groups",
             linkText: "More Info →",
             isNextLink: true
         },
@@ -26,7 +26,7 @@ export default function CelebrateEventsSection() {
             img: "https://storage.googleapis.com/aerosports/schools-field-trips-at-aerosports.png",
             desc:
                 "We offer special field trip and team event rates for groups of 20-40 players. For groups of 20+ or to book space and food, please call us.",
-            link: "/groups-events/school-groups",
+            link: "/group-events/school-groups",
             linkText: "More Info →"
         }
     ];

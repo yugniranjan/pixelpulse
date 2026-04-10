@@ -5,13 +5,15 @@ import "../../styles/blogs.css";
 import React from "react";
 import Link from "next/link";
 import { fetchMenuData, generateMetadataLib } from "@/lib/sheets";
-import { db } from "@/lib/firestore";
+import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
+import { LOCATION_NAME } from "@/lib/constant";
 import { slugify } from "@/utils/slugify";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 
 export async function generateMetadata({ params }) {
-  const location_slug = params?.location_slug || "vaughan";
+  await params;
+  const location_slug = LOCATION_NAME || "vaughan";
   const BASE_URL = process.env.SITE_URL;
 
   const title = `Blogs | Pixel Pulse Play ${location_slug}`;
@@ -60,29 +62,24 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export async function getBlogs() {
-  try {
-    const snapshot = await db
-      .collection("blogs")
-      .orderBy("createdAt", "desc")
-      .get();
+function formatBlogDate(createdAt) {
+  if (!createdAt?.seconds) return "Latest update";
 
-    return snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter((blog) => blog.createdAt);
-  } catch (error) {
-    console.error("Firestore Error:", error);
-    return [];
-  }
+  return new Date(createdAt.seconds * 1000).toLocaleDateString("en-CA", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
-
 const page = async ({ params }) => {
-  const location_slug = params?.location_slug || "vaughan";
-  const extractBlogData = await getBlogs();
+  await params;
+  const location_slug = LOCATION_NAME || "vaughan";
+  const extractBlogData = await fetchBlogs();
+  const blogsToRender =
+    Array.isArray(extractBlogData) && extractBlogData.length > 0
+      ? extractBlogData
+      : getFallbackBlogs();
 
 
 
@@ -93,13 +90,13 @@ const schema = {
   description:
     "Read the latest blogs, guides, and updates from Pixel Pulse Play.",
   url: `${process.env.SITE_URL}/${location_slug}/blogs`,
-  blogPost: extractBlogData?.map((blog) => {
+  blogPost: blogsToRender?.map((blog) => {
     const slug = slugify(blog.title);
 
     return {
       "@type": "BlogPosting",
       headline: blog.title,
-      url: `${process.env.SITE_URL}/${location_slug}/blogs/${slug}?uid=${blog.id}`,
+      url: blog.href || `${process.env.SITE_URL}/${location_slug}/blogs/${slug}?uid=${blog.id}`,
       image:
         blog.featuredImage ||
         "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
@@ -115,42 +112,67 @@ const schema = {
 };
 
   return (
-    <main className="aero-blog-main-section">
+    <main className="aero-blog-main-section ppp-blogs-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(schema),
         }}
       />
-      <section className="aero-max-container">
-        {/* <h1 className="aero-blog-main-heading" style={{paddingTop:'80px'}}>All Blogs</h1> */}
-        <div style={{ padding: "50px 0 40px 0" }}>
+      <section className="ppp-blogs-hero">
+        
+          
+
+          <div className="ppp-blogs-hero__panel">
+            <div className="ppp-about-hero-card">
+              <span className="ppp-about-hero-card__label">What you'll find</span>
+              <h2>Helpful reads for planning visits, discovering attractions, and making group play even better.</h2>
+              <ul>
+                <li>Planning tips for families, parties, and group outings</li>
+                <li>Highlights from attractions, experiences, and events</li>
+                <li>Useful updates that keep your next visit easy to organize</li>
+              </ul>
+            </div>
+          </div>
+        
+      </section>
+
+      <section className="aero-max-container ppp-blogs-layout">
+        <div className="ppp-blogs-section-intro">
           <SectionHeading mainHeading="true">
             All <span>Blogs</span>
           </SectionHeading>
+          <p>
+            Browse the latest posts and jump into the topics that matter most to your next Pixel Pulse visit.
+          </p>
         </div>
-        <section className="aero-blog-main-article-wrapper">
-          {extractBlogData?.map((item) => {
+
+        <section className="ppp-blogs-grid">
+          {blogsToRender?.map((item) => {
             const slug = slugify(item.title);
+            const href = item.href || `blogs/${slug}?uid=${item.id}`;
             return (
-              <article className="aero-blog-main-article-card" key={item.id}>
-                <div className="aero-blog-img-section">
-                  <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
+              <article className="ppp-blog-card" key={item.id}>
+                <div className="ppp-blog-card__media">
+                  <Link href={href} prefetch>
                     <img
                       src={item?.featuredImage || "/assets/images/logo.png"}
-                      alt="Article Image"
+                      alt={item?.title || "Blog article image"}
                     />
                   </Link>
                 </div>
-                <div className="aero-blog-content-section">
-                  <span className="aero-blog-updated-time">{item.pageid}</span>
-                  <Link href={`blogs/${slug}?uid=${item.id}`} prefetch>
-                    <h2 className="aero-blog-second-heading">{item.title}</h2>
+                <div className="ppp-blog-card__body">
+                  <span className="ppp-blog-card__meta">{formatBlogDate(item.createdAt || item.updatedAt)}</span>
+                  <Link href={href} prefetch>
+                    <h2 className="ppp-blog-card__title">{item.title}</h2>
+                    {item?.metaDescription && (
+                      <p className="ppp-blog-card__excerpt">{item.metaDescription}</p>
+                    )}
                   </Link>
                   <Link
-                    href={`blogs/${slug}?uid=${item.id}`}
+                    href={href}
                     prefetch
-                    className="aero-blog-readmore-btn"
+                    className="ppp-blog-card__link"
                   >
                     READ MORE
                   </Link>

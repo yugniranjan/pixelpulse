@@ -1,8 +1,9 @@
 export const dynamic = "force-dynamic";
-import React, { Children } from "react";
+
+import React from "react";
+import Link from "next/link";
 import "../../styles/kidsparty.css";
 import "../../styles/subcategory.css";
-
 import {
   fetchsheetdata,
   fetchPageData,
@@ -11,14 +12,17 @@ import {
   getWaiverLink,
   generateSchema,
 } from "@/lib/sheets";
-// import ImageMarquee from "@/components/ImageMarquee";
-// import FaqCard from "@/components/smallComponents/FaqCard";
-// import SubCategoryCard from "@/components/smallComponents/SubCategoryCard";
-import MotionImage from "@/components/MotionImage";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
 
+function stripHtml(html = "") {
+  return html
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
@@ -30,8 +34,6 @@ export async function generateMetadata({ params }) {
 }
 
 const PricingComparison = ({ birthdaydata }) => {
-
-  // 🔥 Parse sheet data
   const parsedData = (() => {
     try {
       if (birthdaydata?.packages) return birthdaydata;
@@ -39,11 +41,7 @@ const PricingComparison = ({ birthdaydata }) => {
       const raw = birthdaydata?.[0]?.value;
       if (!raw) return null;
 
-      const cleaned = raw
-        .replace(/<br\/>/g, "")
-        .replace(/\n/g, "")
-        .trim();
-
+      const cleaned = raw.replace(/<br\/>/g, "").replace(/\n/g, "").trim();
       return JSON.parse(cleaned);
     } catch (err) {
       console.error("JSON parse error:", err);
@@ -51,236 +49,191 @@ const PricingComparison = ({ birthdaydata }) => {
     }
   })();
 
-  if (!parsedData || !parsedData.packages) {
-    return <Loading message="Loading pricing data..." />;
+  if (!parsedData || !parsedData.packages?.length) {
+    return (
+      <div className="ppp-party-loading">
+        <Loading message="Loading pricing data..." />
+      </div>
+    );
   }
 
-  // ✅ Dynamic features
-  const features = Object.keys(parsedData.packages[0]).filter(
-    key => key !== "name"
-  );
+  const packages = parsedData.packages;
+  const features = Object.keys(packages[0]).filter((key) => key !== "name");
+  const spotlightIndex = packages.length > 1 ? 1 : 0;
 
   return (
-    <section className="pricing_section">
-      <div className="container">
+    <section className="ppp-party-pricing">
+      
 
-        {/* TABLE */}
-        <div className="table_wrapper">
-          <table className="comparison_table">
+      <div className="ppp-party-table-wrap">
+        <table className="ppp-party-table">
+          <thead>
+            <tr>
+              <th className="ppp-party-table__feature-col">Features</th>
+              {packages.map((plan, index) => (
+                <th
+                  key={index}
+                  className={`ppp-party-table__plan-col${index === spotlightIndex ? " is-featured" : ""}`}
+                >
+                  <div className="ppp-party-plan">
+                    <span className="ppp-party-plan__eyebrow">
+                      {index === spotlightIndex ? "Most Popular" : "Package"}
+                    </span>
+                    <h3>{plan.name}</h3>
+                    <p>{plan["Package Price"]}</p>
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
 
-            {/* HEADER */}
-            <thead>
-              <tr>
-                <th className="feature_col">Features</th>
-
-                {parsedData.packages.map((plan, i) => (
-                  <th key={i} className={`plan_col ${i === 1 ? "highlight" : ""}`}>
-                    <div className="plan_box">
-                      <h3 className="plan_name">{plan.name}</h3>
-                      <p className="plan_price">{plan["Package Price"]}</p>
-                    </div>
-                  </th>
+          <tbody>
+            {features.slice(1).map((feature, index) => (
+              <tr key={index}>
+                <td className="ppp-party-feature" data-label="Feature">
+                  {feature}
+                </td>
+                {packages.map((plan, planIndex) => (
+                  <td
+                    key={planIndex}
+                    className="ppp-party-value"
+                    data-label={plan.name}
+                  >
+                    {plan[feature] || "-"}
+                  </td>
                 ))}
               </tr>
-            </thead>
-
-            {/* BODY */}
-            <tbody>
-              {features.slice(1).map((feature, i) => (
-                <tr key={i}>
-                  <td className="feature_name">{feature}</td>
-
-                  {parsedData.packages.map((plan, j) => (
-                    <td key={j} className="value_cell">
-                      {plan[feature] || "-"}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
-
-        {/* 🔥 STANDARD RULES */}
-        {parsedData.standard_rules && (
-          <div className="rules_section">
-            <h3 className="rules_title">
-              Following standard rules apply to each package:
-            </h3>
-
-            <ul className="rules_list">
-              {parsedData.standard_rules.map((rule, i) => (
-                <li key={i} className="rule_item">
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      <div className="ppp-party-mobile-cards">
+        {packages.map((plan, index) => (
+          <article
+            key={index}
+            className={`ppp-party-mobile-card${index === spotlightIndex ? " is-featured" : ""}`}
+          >
+            <div className="ppp-party-mobile-card__head">
+              <span className="ppp-party-mobile-card__eyebrow">
+                {index === spotlightIndex ? "Most Popular" : "Package"}
+              </span>
+              <h3>{plan.name}</h3>
+              <p>{plan["Package Price"]}</p>
+            </div>
+
+            <div className="ppp-party-mobile-card__body">
+              {features.slice(1).map((feature, featureIndex) => (
+                <div className="ppp-party-mobile-card__row" key={featureIndex}>
+                  <span className="ppp-party-mobile-card__label">{feature}</span>
+                  <span className="ppp-party-mobile-card__value">{plan[feature] || "-"}</span>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {parsedData.standard_rules?.length > 0 && (
+        <div className="ppp-party-rules">
+          <h3>Standard rules for every package</h3>
+          <ul>
+            {parsedData.standard_rules.map((rule, index) => (
+              <li key={index}>{rule}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 };
 
-
-
 const Page = async ({ params }) => {
   const location_slug = params.location_slug || "vaughan";
-  const waiverLink = await getWaiverLink(location_slug);
-  const [data, dataconfig, menudata] = await Promise.all([
-    fetchPageData(location_slug, "kids-birthday-parties"),
-    fetchsheetdata("config", location_slug),
-    fetchMenuData(location_slug),
-  ]);
 
-  const jsonLDschema = await generateSchema(data, '', '', "kids-birthday-parties");
+  let waiverLink = "";
+  let data = null;
+  let dataconfig = [];
+  let menudata = [];
+  let jsonLDschema = "";
 
-  const attractions = menudata?.filter((item) => item.path == "attractions")[0];
-
-  function serialize(data) {
-    return JSON.parse(JSON.stringify(data));
+  try {
+    [waiverLink, data, dataconfig, menudata] = await Promise.all([
+      getWaiverLink(location_slug),
+      fetchPageData(location_slug, "kids-birthday-parties"),
+      fetchsheetdata("config", location_slug),
+      fetchMenuData(location_slug),
+    ]);
+  } catch (error) {
+    console.error("kids birthday parties data failed:", error);
   }
 
-    const fiterBirthdayData = Array.isArray(dataconfig)
+  try {
+    jsonLDschema = await generateSchema(data, "", "", "kids-birthday-parties");
+  } catch (error) {
+    console.error("kids birthday parties schema failed:", error);
+  }
+
+  const birthdayPackages = Array.isArray(dataconfig)
     ? dataconfig.filter((item) => item.key === "birthday_packages")
     : [];
 
-  // console.log("Birthday Data:", fiterBirthdayData);
-  // return
+  const attractions = menudata?.find((item) => item.path === "attractions");
+  const attractionCount = attractions?.children?.filter((item) => item?.isactive == 1)?.length || 0;
+
+  const introText =
+    stripHtml(data?.seosection || "") ||
+    "Plan a high-energy birthday party packed with digital games, active play, and a celebration setup that feels easy from booking to cake time.";
 
   return (
-    <main>
-      {/* <MotionImage
-        pageData={serialize(data)}
-        waiverLink={serialize(waiverLink)}
-      /> */}
-
-      {/* <section className="subcategory_main_section-bg">
-        <section className="aero-max-container">
-          <center style={{ padding: "20px 0 40px" }}>
-            <SectionHeading mainHeading="true">Birthday Party<span>  Packages & Pricing</span></SectionHeading>
-          </center>
-          <p>
-            At pixelpulseplay {location_slug}, we offer competitively priced
-            birthday party packages in our private party rooms—perfectly located
-            near you. Choose the package that fits your budget and guest list:
-          </p>
-          <article className="aero_bp_2_main_section">
-            {birthdaydata.map((item, i) => {
-              const includedata = item.includes.split(";");
-              return (
-                <div key={i} className="aero_bp_card_wrap">
-                  <div className="aero-bp-boxcircle-wrap">
-                    <span className="aero-bp-boxcircle">${item?.price}</span>
-                  </div>
-                  <div className="aero-bp-boxcircle-wrap">{item?.category}</div>
-                  <h2 className="d-flex-center aero_bp_card_wrap_heading">
-                    {item?.plantitle}
-                  </h2>
-                  <ul className="aero_bp_card_wrap_list">
-                    {includedata?.map((item, i) => {
-                      return <li key={i}>{item}</li>;
-                    })}
-                  </ul>
-                </div>
-              );
-            })}
-          </article>
-        </section>
-      </section> */}
-
-     <section className="subcategory_main_section-bg gaming_bg">
-      <section className="aero-max-container">
-
-        <center style={{ padding: "20px 0 40px" }}>
-            <SectionHeading mainHeading="true">Birthday Party<span>  Packages & Pricing</span></SectionHeading>
-          </center>
-          <p className="birthday_desc">
-            At pixelpulseplay {location_slug}, we offer competitively priced
-            birthday party packages in our private party rooms—perfectly located
-            near you. Choose the package that fits your budget and guest list:
-          </p>
-
-        {/* <div className="pricing_table_wrapper">
-
-          <table className="pricing_table">
-            <thead>
-              <tr>
-                <th>Package</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Includes</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {birthdaydata.map((item, i) => {
-                const includedata = item.includes.split(";");
-
-                return (
-                  <tr key={i}>
-                    <td data-label="Package" className="package_title">
-                      {item?.plantitle}
-                    </td>
-
-                    <td data-label="Price" className="price">
-                      ${item?.price}
-                    </td>
-
-                    <td data-label="Category">
-                      <span className="category">{item?.category}</span>
-                    </td>
-
-                    <td data-label="Includes">
-                      <ul className="feature_list">
-                        {includedata.map((feature, j) => (
-                          <li key={j}>🎮 {feature}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-        </div> */}
-         <PricingComparison birthdaydata={fiterBirthdayData} />
-
+    <main className="ppp-party-page">
+      <section className="ppp-party-hero">
+        <div className="aero-max-container ppp-party-hero__inner">
+          <div className="ppp-party-hero__panel">
+            <div className="ppp-about-hero-card">
+              <SectionHeading className="section-heading-white" mainHeading={true}>
+              Birthday Party <span>Packages & Pricing</span>
+            </SectionHeading>
+              <h2>All the energy of an active party, with less planning stress and more memorable moments.</h2> 
+              <ul>
+                <li>Interactive play that keeps the whole group engaged</li>
+                <li>Structured package options that simplify decision-making</li>
+                <li>Great fit for birthdays that need movement, excitement, and space</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </section>
-      </section>
-     
 
-      {/* <SubCategoryCard attractionsData={attractions.children} location_slug={location_slug} theme={'default'} title={`Activities & Attractions`} text={[attractions.metadescription]} />
+      <section className="subcategory_main_section-bg gaming_bg">
+        <section className="aero-max-container ppp-party-layout">
+         
+          <PricingComparison birthdaydata={birthdayPackages} />
 
-        <FaqCard page={'kids-birthday-parties'} location_slug={location_slug} />
-      
-     */}
-
-      {/* <section className="aero_home_article_section">
-        <section className="aero-max-container">
-          <div
-            className="subcategory_main_section"
-            dangerouslySetInnerHTML={{ __html: data?.section1 || "" }}
-          />
+          {data?.seosection && (
+            <article className="ppp-party-content">
+              <SectionHeading className="section-heading-white">
+                Plan The <span>Celebration</span>
+              </SectionHeading>
+              <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
+            </article>
+          )}
         </section>
-      </section> */}
+      </section>
 
-      {
-        data?.seosection && (<section className="aero_home_article_section">
-          <section className="aero-max-container aero_home_seo_section">
-            <div dangerouslySetInnerHTML={{ __html: data?.seosection || "" }} />
-          </section>
-        </section>)
-      }
-
-
-      <div className="d-flex-center aero-btn-booknow" style={{ padding: "2em", backgroundColor: "var(--black-color)" }}>
-        <BookingButton title="Book Now" />
-      </div>
-
+      <section className="ppp-party-cta-band">
+        <div className="aero-max-container ppp-party-cta-band__inner">
+          <div>
+            <p className="ppp-party-cta-band__eyebrow">Ready to lock it in?</p>
+            <h3>Reserve your date and let the party countdown begin.</h3>
+          </div>
+          <div className="ppp-party-cta-band__actions">
+            <div className="aero-btn-booknow">
+              <BookingButton title="Book Now" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <script
         type="application/ld+json"

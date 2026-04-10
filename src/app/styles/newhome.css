@@ -1,0 +1,619 @@
+/* ================================================================
+   ppp-home.css  —  Pixel Pulse Play Homepage Styles
+   Design direction: dark arcade / neon-gaming / next-gen
+   Palette: deep black base, electric cyan accent, magenta pop
+   ================================================================ */
+
+/* ── Design tokens ── */
+:root {
+  --ppp-black:      #050810;
+  --ppp-dark:       #0d1117;
+  --ppp-card:       #111827;
+  --ppp-card-border:#1f2d40;
+  --ppp-cyan:       #00e5ff;
+  --ppp-cyan-dim:   #00b8cc;
+  --ppp-magenta:    #ff2d78;
+  --ppp-yellow:     #ffd200;
+  --ppp-white:      #f0f6ff;
+  --ppp-muted:      #8a9bb5;
+  --ppp-radius-sm:  6px;
+  --ppp-radius-md:  12px;
+  --ppp-radius-lg:  18px;
+
+  /* Neon glow helpers */
+  --glow-cyan:      0 0 18px rgba(0, 229, 255, 0.35);
+  --glow-magenta:   0 0 18px rgba(255, 45, 120, 0.35);
+
+  /* Typography */
+  --font-display:   'Barlow Condensed', 'Impact', sans-serif;
+  --font-body:      'DM Sans', 'Segoe UI', sans-serif;
+}
+
+/* Load Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+/* ── Base reset for home scope ── */
+.ppp-home {
+  font-family: var(--font-body);
+  background: var(--ppp-black);
+  color: var(--ppp-white);
+  overflow-x: hidden;
+}
+
+/* ================================================================
+   REUSABLE COMPONENTS
+   ================================================================ */
+
+/* ── Buttons ── */
+.ppp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--ppp-radius-sm);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  border: 2px solid transparent;
+}
+
+.ppp-btn--primary {
+  background: var(--ppp-cyan);
+  color: var(--ppp-black);
+  border-color: var(--ppp-cyan);
+  box-shadow: var(--glow-cyan);
+}
+.ppp-btn--primary:hover {
+  background: #00ffff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(0, 229, 255, 0.6);
+}
+
+.ppp-btn--outline {
+  background: transparent;
+  color: var(--ppp-cyan);
+  border-color: var(--ppp-cyan);
+}
+.ppp-btn--outline:hover {
+  background: rgba(0, 229, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan);
+}
+
+/* ── Section wrapper ── */
+.ppp-section {
+  padding: 80px 0;
+  position: relative;
+}
+
+/* ── Section subtitle ── */
+.ppp-section__sub {
+  text-align: center;
+  color: var(--ppp-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 48px;
+}
+
+/* ── CTA row below grid ── */
+.ppp-section__cta-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* ================================================================
+   CTA BAR  (quick nav below hero)
+   ================================================================ */
+.ppp-ctabar {
+  background: var(--ppp-dark);
+  border-top: 1px solid var(--ppp-card-border);
+  border-bottom: 1px solid var(--ppp-card-border);
+  padding: 32px 0 0;
+  position: relative;
+}
+
+.ppp-ctabar__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.ppp-ctabar__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  padding-bottom: 32px;
+}
+
+/* ================================================================
+   INTRO  (Level Up section)
+   ================================================================ */
+.ppp-intro {
+  padding: 80px 0;
+  background: linear-gradient(180deg, var(--ppp-dark) 0%, var(--ppp-black) 100%);
+}
+
+.ppp-intro__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.ppp-intro__body {
+  color: var(--ppp-muted);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ================================================================
+   STATS BAR
+   ================================================================ */
+.ppp-stats {
+  padding: 40px 0;
+  background: var(--ppp-card);
+  border-top: 1px solid var(--ppp-card-border);
+  border-bottom: 1px solid var(--ppp-card-border);
+}
+
+.ppp-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+
+.ppp-stats__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+  border-right: 1px solid var(--ppp-card-border);
+  text-align: center;
+}
+.ppp-stats__card:last-child {
+  border-right: none;
+}
+
+/* Override Countup number to use cyan */
+.ppp-stats__card .countup-num,
+.ppp-stats__card [class*="countup"] {
+  color: var(--ppp-cyan);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ppp-stats__label {
+  color: var(--ppp-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ================================================================
+   ATTRACTIONS GRID
+   ================================================================ */
+.ppp-attractions {
+  background: var(--ppp-black);
+}
+
+.ppp-attractions__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ppp-attraction-card {
+  border-radius: var(--ppp-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--ppp-card-border);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--ppp-card);
+}
+
+.ppp-attraction-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--ppp-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.ppp-attraction-card__fig {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+}
+
+.ppp-attraction-card__img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.ppp-attraction-card:hover .ppp-attraction-card__img {
+  transform: scale(1.05);
+}
+
+.ppp-attraction-card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 16px 16px;
+  background: linear-gradient(transparent, rgba(5, 8, 16, 0.92));
+}
+
+.ppp-attraction-card__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--ppp-white);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* ================================================================
+   PROMOTIONS  (inherits promotions.css, override theming)
+   ================================================================ */
+.ppp-promos {
+  background: var(--ppp-dark);
+}
+
+/* ================================================================
+   WHY PIXEL PULSE
+   ================================================================ */
+.ppp-why {
+  background: var(--ppp-black);
+}
+
+.ppp-why__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ppp-why__card {
+  background: var(--ppp-card);
+  border: 1px solid var(--ppp-card-border);
+  border-radius: var(--ppp-radius-lg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ppp-why__card:hover {
+  border-color: var(--ppp-cyan-dim);
+  box-shadow: var(--glow-cyan);
+}
+
+.ppp-why__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.ppp-why__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--ppp-cyan);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.ppp-why__body {
+  color: var(--ppp-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ================================================================
+   PRICING
+   ================================================================ */
+.ppp-pricing {
+  background: var(--ppp-dark);
+}
+
+.ppp-pricing__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.ppp-pricing__card {
+  background: var(--ppp-card);
+  border: 1px solid var(--ppp-card-border);
+  border-radius: var(--ppp-radius-lg);
+  padding: 36px 28px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ppp-pricing__card:hover {
+  border-color: var(--ppp-cyan-dim);
+}
+.ppp-pricing__card--featured {
+  border-color: var(--ppp-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.ppp-pricing__badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ppp-cyan);
+  color: var(--ppp-black);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.ppp-pricing__tier {
+  color: var(--ppp-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.ppp-pricing__name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--ppp-white);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ppp-pricing__price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  color: var(--ppp-cyan);
+}
+.ppp-pricing__dollar {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.ppp-pricing__amount {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.ppp-pricing__unit {
+  font-size: 0.85rem;
+  color: var(--ppp-muted);
+  margin-left: 4px;
+}
+
+.ppp-pricing__features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--ppp-card-border);
+  padding-top: 16px;
+  flex: 1;
+}
+.ppp-pricing__feature {
+  font-size: 0.88rem;
+  color: var(--ppp-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.ppp-pricing__check {
+  color: var(--ppp-cyan);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ppp-pricing__cta {
+  width: 100%;
+  margin-top: auto;
+}
+
+/* ================================================================
+   REVIEWS
+   ================================================================ */
+.ppp-reviews {
+  background: var(--ppp-black);
+}
+
+.ppp-reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.ppp-review-card {
+  background: var(--ppp-card);
+  border: 1px solid var(--ppp-card-border);
+  border-radius: var(--ppp-radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.2s ease;
+}
+.ppp-review-card:hover {
+  border-color: var(--ppp-magenta);
+}
+
+.ppp-review-card__stars {
+  color: var(--ppp-yellow);
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.ppp-review-card__quote {
+  color: var(--ppp-white);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin: 0;
+  font-style: normal;
+  flex: 1;
+}
+
+.ppp-review-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--ppp-card-border);
+  padding-top: 16px;
+}
+
+.ppp-review-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ppp-cyan), var(--ppp-magenta));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--ppp-black);
+  flex-shrink: 0;
+}
+
+.ppp-review-card__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ppp-white);
+  margin: 0;
+}
+.ppp-review-card__role {
+  font-size: 0.78rem;
+  color: var(--ppp-muted);
+  margin: 0;
+}
+
+/* ================================================================
+   BLOG SECTION
+   ================================================================ */
+.ppp-blog {
+  background: var(--ppp-dark);
+}
+
+/* ================================================================
+   FINAL CTA BAND
+   ================================================================ */
+.ppp-cta-band {
+  padding: 100px 0;
+  background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.06) 0%, var(--ppp-black) 70%);
+  border-top: 1px solid var(--ppp-card-border);
+  text-align: center;
+}
+
+.ppp-cta-band__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.ppp-cta-band__sub {
+  color: var(--ppp-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.ppp-cta-band__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 900px) {
+  .ppp-stats__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ppp-stats__card:nth-child(2) {
+    border-right: none;
+  }
+  .ppp-stats__card:nth-child(1),
+  .ppp-stats__card:nth-child(2) {
+    border-bottom: 1px solid var(--ppp-card-border);
+  }
+}
+
+@media (max-width: 600px) {
+  .ppp-section {
+    padding: 56px 0;
+  }
+  .ppp-attractions__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ppp-pricing__grid {
+    grid-template-columns: 1fr;
+  }
+  .ppp-reviews__grid {
+    grid-template-columns: 1fr;
+  }
+  .ppp-why__grid {
+    grid-template-columns: 1fr;
+  }
+  .ppp-stats__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ppp-ctabar__buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ppp-btn {
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .ppp-attractions__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -14,33 +14,12 @@ import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
 import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import logo from '@public/assets/images/logo.png'
 import Script from "next/script";
-import { db } from "@/lib/firestore";
+import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
 import { slugify } from "@/utils/slugify";
 
 
-export async function getBlogs() {
-
-  try {
-    const snapshot = await db
-      .collection("blogs")
-      .orderBy("createdAt", "desc")
-      .get();
-
-    return snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter((blog) => blog.createdAt); 
-  } catch (error) {
-    console.error("Firestore Error:", error);
-    return [];  
-  }
-}
-
-
 const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
-   const extractBlogData = await getBlogs();
+  const extractBlogData = await fetchBlogs();
 
   if (!configdata?.length || !menudata?.length) return null;
 
@@ -54,10 +33,17 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
 
   const attractionsData = getDataByParentId(menudata, "attractions");
   const programsData = getDataByParentId(menudata, "programs");
-  const groupsData = getDataByParentId(menudata, "groups-events");
+  const groupsData = getDataByParentId(menudata, "group-events");
   const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
   const birthDaypartyData = getDataByParentId(menudata, "kids-birthday-parties");
+  const companyChildren = companyData?.[0]?.children || [];
+  const blogChildren = blogsData?.[0]?.children || [];
+  const hasFooterContactLink = companyChildren.some(
+    (item) => item?.path?.toLowerCase() === "contactus" && item?.isactive == 1,
+  );
+  const hasLatestNews = Array.isArray(extractBlogData) && extractBlogData.length > 0;
+  const fallbackLatestNews = getFallbackBlogs().slice(0, 2);
 
   return (
     <footer className="aero_footer_section-bg">
@@ -65,21 +51,30 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
       {attractionsData?.[0]?.children?.length > 0 && (
         <section className="aero_home-headerimg-wrapper">
           <Image
-            src="https://storage.googleapis.com/aerosports/windsor-new/kids-activity-glow-in-the-dark.webp"
-            alt="Glow Night Event"
+            src="/assets/images/shootinggame.jpg"
+            alt="Shooting game"
             width={1200}
             height={600}
-            title="Glow Night Event"
+            title="Shooting game"
             unoptimized
           />
           <article className="aero-max-container aero_home_BPJ_wrapper">
             {[
               { icon: event_icon, text: "Birthday Parties", url: `/${location_slug}/${birthDaypartyData?.[0]?.path}` },
-              { icon: park_feature_icon, text: "Park Features", url: `/${location_slug}/${attractionsData?.[0]?.path}` },
+             
               { icon: jump_icon, text: "Group Events", url: `/${location_slug}/${groupsData?.[0]?.path}` },
             ].map((item, index) => (
               <div className="d-flex-center" key={index}>
-                <a href={item.url} >  <Image src={item.icon} width={90} height={80} alt={item.text} unoptimized /></a>
+                <a href={item.url} >
+                  <Image
+                    src={item.icon}
+                    width={90}
+                    height={80}
+                    alt={item.text}
+                    className={item.text === "Birthday Parties" ? "aero_home_BPJ_icon--glow" : ""}
+                    unoptimized
+                  />
+                </a>
                 <span>{item.text}</span>
               </div>
             ))}
@@ -161,6 +156,13 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                       </li>
                     )
                   ))}
+                  {!hasFooterContactLink && (
+                    <li>
+                      <Link href={`/${location_slug}/contactus`} prefetch>
+                        Contact Us
+                      </Link>
+                    </li>
+                  )}
                 </>
               )}
             </ul>
@@ -178,31 +180,77 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             ))}
           </ul>
           <ul>
+            <li>Blogs</li>
+            <li>
+              <Link href="/blogs" prefetch>
+                All Blogs
+              </Link>
+            </li>
+            {blogChildren.map((item, i) => (
+              item?.isactive == 1 && (
+                <li key={i}>
+                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                    {item?.desc}
+                  </Link>
+                </li>
+              )
+            ))}
+          </ul>
+          <ul>
             <li>Latest News</li>
-            {extractBlogData?.slice(0, 4).map((item, i) => { 
-              const slug = slugify(item.title);
-              return (
-              <li key={i}>
-                <Link href={`/blogs/${slug}?uid=${item.id}`} prefetch>
-                  <article className="d-flex-center aero_footer_article-card">
-                    <Image
-                      src={item?.featuredImage}
-                      alt={item?.title}
-                      title={item?.title}
-                      width={50}
-                      height={50}
-                      unoptimized
-                    />
-                    <div>
-                      <h6> {item?.updatedAt?.seconds
-              ? new Date(item.updatedAt.seconds * 1000).toDateString()
-              : null}</h6>
-                      <p>{item?.title}</p>
-                    </div>
-                  </article>
-                </Link>
-              </li>
-            )})}
+            {hasLatestNews ? (
+              extractBlogData.slice(0, 4).map((item, i) => {
+                const slug = slugify(item.title);
+                return (
+                  <li key={i}>
+                    <Link href={`/blogs/${slug}?uid=${item.id}`} prefetch>
+                      <article className="d-flex-center aero_footer_article-card">
+                        <Image
+                          src={
+                            item?.featuredImage ||
+                            "https://storage.googleapis.com/aerosports/common/gallery-thummbnail-wall-climbwall.jpg"
+                          }
+                          alt={item?.title}
+                          title={item?.title}
+                          width={50}
+                          height={50}
+                          unoptimized
+                        />
+                        <div>
+                          <h6>
+                            {item?.updatedAt?.seconds
+                              ? new Date(item.updatedAt.seconds * 1000).toDateString()
+                              : "Latest Update"}
+                          </h6>
+                          <p>{item?.title}</p>
+                        </div>
+                      </article>
+                    </Link>
+                  </li>
+                );
+              })
+            ) : (
+              fallbackLatestNews.map((item) => (
+                <li key={item.id}>
+                  <Link href={item.href} prefetch>
+                    <article className="d-flex-center aero_footer_article-card">
+                      <Image
+                        src={item.featuredImage}
+                        alt={item.title}
+                        title={item.title}
+                        width={50}
+                        height={50}
+                        unoptimized
+                      />
+                      <div>
+                        <h6>Latest Update</h6>
+                        <p>{item.title}</p>
+                      </div>
+                    </article>
+                  </Link>
+                </li>
+              ))
+            )}
           </ul>
         </section>
       </section>

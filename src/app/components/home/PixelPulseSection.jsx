@@ -85,7 +85,7 @@ const pixelPulseContent = {
 export default function PixelPulseVaughan() {
   return (
     <section className="pixel-pulse">
-      <div className="container hero">
+     {/* <div className="container hero">
         <SectionHeading>
           {pixelPulseContent.hero.title.titleOne} <br /> <span>{pixelPulseContent.hero.title.titleTwo}</span>
         </SectionHeading>
@@ -109,14 +109,14 @@ export default function PixelPulseVaughan() {
         </div>
       </div> */}
 
-      <div className="container section cta-box">
+      {/*<div className="container section cta-box">
         <p>{pixelPulseContent.cta}</p>
         <div className="d-flex-center aero-btn-booknow" >
           <BookingButton title="Book Now" />
         </div>
       </div>
 
-      {/* <div className="container section">
+       <div className="container section">
         <h2>Tag Lines</h2>
         <div className="tagline-grid">
           {pixelPulseContent.tagLines.map((tag, index) => (
