@@ -1,0 +1,135 @@
+.aero-bg {
+  background: linear-gradient(to top, transparent, var(--primary-color))
+    var(--secondary-color);
+  min-height: 100vh;
+}
+
+.aero-bg-padding {
+  padding: 1em 1em 3em;
+}
+
+.aero-img-heading {
+  margin-bottom: 20px;
+}
+.aero-img-heading img {
+  height: 100px;
+  width: auto;
+}
+.city-card-h1-heading {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #000;
+
+  text-shadow: -1px 1px 0 #fff, 1px 1px 0 #fff, 1px -1px 0 #fff,
+    -1px -1px 0 #fff;
+}
+
+.city-card-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+.city-card-wrap {
+  background: #fff;
+  box-shadow: 1px 1px 4px 0px #0000003b;
+  border-radius: 20px;
+  color: #000;
+  width: 23%;
+  text-align: center;
+  overflow: hidden;
+  width: 100%;
+}
+.city-card-wrap img {
+  width: 100%;
+  height: 300px;
+}
+
+.city-card-wrap h2 {
+  font-size: 1.5rem;
+  padding: 0.8em;
+  white-space: nowrap;
+}
+
+.city-card-wrap p {
+  font-size: 0.9rem;
+  padding: 0 1em 0.8em;
+  height: 55px;
+}
+
+.city-card-wrap button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background: var(--primary-color);
+  font-family: "Montserrat", sans-serif;
+  box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  margin: 5px auto 25px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+
+.city-card-wrap button:after {
+  content: " ";
+  width: 0%;
+  height: 100%;
+  background: var(--secondary-color);
+  color: var(--primary-color);
+  position: absolute;
+  transition: all 0.4s ease-in-out;
+  right: 0;
+}
+
+.city-card-wrap button:hover::after {
+  right: auto;
+  left: 0;
+  width: 100%;
+}
+
+.city-card-wrap button span {
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  padding: 18px;
+  color: #fff;
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  z-index: 20;
+  transition: all 0.3s ease-in-out;
+}
+
+.city-card-wrap button:hover span {
+  color: var(--white-color);
+  animation: scaleUp 0.3s ease-in-out;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .city-card-wrap {
+    width: 100%;
+  }
+  .aero-img-heading {
+    margin-bottom: 40px;
+  }
+  .city-card-wrap h2 {
+  font-size: 1.2rem;
+}
+}

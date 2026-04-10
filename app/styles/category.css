@@ -1,0 +1,1103 @@
+.aero_category_section_wrapper {
+  background-color: var(--black-color);
+  /* padding: 3em 0.75em; */
+  color: var(--white-color);
+}
+
+.ppp-attractions-page {
+  background:
+    radial-gradient(circle at top left, rgba(251, 174, 123, 0.14), transparent 24%),
+    radial-gradient(circle at top right, rgba(164, 207, 95, 0.12), transparent 20%),
+    linear-gradient(180deg, #050810 0%, #09111b 24%, #000000 100%);
+}
+
+.ppp-attractions-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 0;
+}
+
+.ppp-attractions-hero::before,
+.ppp-attractions-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(24px);
+  opacity: 0.5;
+}
+
+.ppp-attractions-hero::before {
+  width: 280px;
+  height: 280px;
+  top: -60px;
+  left: -70px;
+  background: rgba(251, 174, 123, 0.2);
+}
+
+.ppp-attractions-hero::after {
+  width: 320px;
+  height: 320px;
+  right: -90px;
+  bottom: 20px;
+  background: rgba(164, 207, 95, 0.16);
+}
+
+.ppp-attractions-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  align-items: stretch;
+}
+
+.ppp-attractions-hero__copy,
+.ppp-attractions-hero-card,
+.ppp-attractions-content,
+.ppp-attractions-grid-wrap,
+.ppp-attraction-card-modern {
+  backdrop-filter: blur(16px);
+}
+
+.ppp-attractions-hero__copy {
+  border-radius: 32px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+.ppp-attractions-hero__eyebrow,
+.ppp-attractions-stat span,
+.ppp-attractions-hero-card__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ppp-attractions-hero__title {
+  max-width: 13ch;
+  margin: 0.65rem 0 1rem;
+  font-size: clamp(2.6rem, 7vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.ppp-attractions-hero__text {
+  max-width: 58ch;
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.ppp-attractions-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+  margin-top: 1.6rem;
+}
+
+.ppp-attractions-hero__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 6px;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ppp-attractions-hero__link:hover,
+.ppp-attraction-card-modern__link:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.08);
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
+}
+
+.ppp-attractions-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.ppp-attractions-stat {
+  border-radius: 20px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ppp-attractions-stat strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--white-color);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  text-transform: capitalize;
+}
+
+.ppp-attractions-hero__panel {
+  display: flex;
+  width: 100%;
+}
+
+.ppp-attractions-hero-card {
+  width: 100%;
+  border-radius: 28px;
+  padding: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+.ppp-attractions-hero-card h2 {
+  margin: 0.8rem 0 1rem;
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  line-height: 1.08;
+  text-transform: none;
+}
+
+.ppp-attractions-hero-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-attractions-hero-card li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-attractions-hero-card li::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.ppp-attractions-layout {
+  display: grid;
+  gap: 1.75rem;
+  padding: 0 0 2.5rem;
+}
+
+.ppp-attractions-content,
+.ppp-attractions-grid-wrap {
+  border-radius: 28px;
+  padding: clamp(1.3rem, 2.6vw, 2.2rem);
+}
+
+.ppp-attractions-richtext {
+  color: var(--text-muted);
+  line-height: 1.85;
+  text-transform: none;
+}
+
+.ppp-attractions-richtext :is(h1, h2, h3, h4) {
+  text-transform: none;
+}
+
+.ppp-attractions-richtext p,
+.ppp-attractions-richtext li {
+  color: var(--text-muted);
+}
+
+.ppp-attractions-richtext ul li::before {
+  content: none;
+}
+
+.ppp-attractions-section-intro {
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.ppp-attractions-section-intro p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-attractions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.ppp-attraction-card-modern {
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ppp-attraction-card-modern:hover {
+  transform: translateY(-4px);
+  border-color: rgba(251, 174, 123, 0.32);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.ppp-attraction-card-modern__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.ppp-attraction-card-modern__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.ppp-attraction-card-modern:hover .ppp-attraction-card-modern__media img {
+  transform: scale(1.05);
+}
+
+.ppp-attraction-card-modern__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+
+.ppp-attraction-card-modern__body h2 {
+  margin: 0 0 0.55rem;
+  color: var(--white-color);
+  font-size: clamp(1.3rem, 2vw, 1.65rem);
+  text-align: left;
+  text-transform: none;
+}
+
+.ppp-attraction-card-modern__body p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-attraction-card-modern__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  width: fit-content;
+  padding: 14px 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-groups-page {
+  background:
+    radial-gradient(circle at top left, rgba(255, 75, 43, 0.14), transparent 24%),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.12), transparent 20%),
+    linear-gradient(180deg, #050810 0%, #09111b 24%, #000000 100%);
+}
+
+.ppp-groups-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 0;
+}
+
+.ppp-groups-hero::before,
+.ppp-groups-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(24px);
+  opacity: 0.52;
+}
+
+.ppp-groups-hero::before {
+  width: 280px;
+  height: 280px;
+  top: -60px;
+  left: -70px;
+  background: rgba(255, 75, 43, 0.2);
+}
+
+.ppp-groups-hero::after {
+  width: 320px;
+  height: 320px;
+  right: -90px;
+  bottom: 20px;
+  background: rgba(251, 174, 123, 0.16);
+}
+
+.ppp-groups-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  align-items: stretch;
+}
+
+.ppp-groups-hero__copy,
+.ppp-groups-hero-card,
+.ppp-groups-content,
+.ppp-groups-grid-wrap,
+.ppp-group-card-modern {
+  backdrop-filter: blur(16px);
+}
+
+.ppp-groups-hero__copy {
+  border-radius: 32px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+.ppp-groups-hero__eyebrow,
+.ppp-groups-stat span,
+.ppp-groups-hero-card__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ppp-groups-hero__title {
+  max-width: 12ch;
+  margin: 0.65rem 0 1rem;
+  font-size: clamp(2.6rem, 7vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.ppp-groups-hero__text {
+  max-width: 58ch;
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.ppp-groups-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+  margin-top: 1.6rem;
+}
+
+.ppp-groups-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.ppp-groups-stat {
+  border-radius: 20px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ppp-groups-stat strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--white-color);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  text-transform: capitalize;
+}
+
+.ppp-groups-hero__panel {
+  display: flex;
+  width: 100%;
+}
+
+.ppp-groups-hero-card {
+  width: 100%;
+  border-radius: 28px;
+  padding: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+.ppp-groups-hero-card h2 {
+  margin: 0.8rem 0 1rem;
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  line-height: 1.08;
+  text-transform: none;
+}
+
+.ppp-groups-hero-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-groups-hero-card li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-groups-hero-card li::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4b2b, var(--primary-color));
+}
+
+.ppp-groups-layout {
+  display: grid;
+  gap: 1.75rem;
+  padding: 0 0 2.5rem;
+}
+
+.ppp-groups-content,
+.ppp-groups-grid-wrap {
+  border-radius: 28px;
+  padding: clamp(1.3rem, 2.6vw, 2.2rem);
+}
+
+.ppp-groups-richtext {
+  color: var(--text-muted);
+  line-height: 1.85;
+  text-transform: none;
+}
+
+.ppp-groups-richtext :is(h1, h2, h3, h4) {
+  text-transform: none;
+}
+
+.ppp-groups-richtext p,
+.ppp-groups-richtext li {
+  color: var(--text-muted);
+}
+
+.ppp-groups-richtext ul li::before {
+  content: none;
+}
+
+.ppp-groups-section-intro {
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.ppp-groups-section-intro p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.ppp-group-card-modern {
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ppp-group-card-modern:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 75, 43, 0.32);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.ppp-group-card-modern__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.ppp-group-card-modern__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.ppp-group-card-modern:hover .ppp-group-card-modern__media img {
+  transform: scale(1.05);
+}
+
+.ppp-group-card-modern__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+
+.ppp-group-card-modern__body h2 {
+  margin: 0 0 0.55rem;
+  color: var(--white-color);
+  font-size: clamp(1.3rem, 2vw, 1.65rem);
+  text-align: left;
+  text-transform: none;
+}
+
+.ppp-group-card-modern__body p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-group-card-modern__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  width: fit-content;
+  padding: 14px 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-group-card-modern__link:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.08);
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
+}
+
+.ppp-about-page {
+  background:
+    radial-gradient(circle at top left, rgba(164, 207, 95, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.12), transparent 20%),
+    linear-gradient(180deg, #050810 0%, #09111b 24%, #000000 100%);
+}
+
+.ppp-about-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 4.5rem 0 2rem;
+}
+
+.ppp-about-hero::before,
+.ppp-about-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(24px);
+  opacity: 0.5;
+}
+
+.ppp-about-hero::before {
+  width: 280px;
+  height: 280px;
+  top: -60px;
+  left: -70px;
+  background: rgba(164, 207, 95, 0.2);
+}
+
+.ppp-about-hero::after {
+  width: 320px;
+  height: 320px;
+  right: -90px;
+  bottom: 20px;
+  background: rgba(251, 174, 123, 0.14);
+}
+
+.ppp-about-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  align-items: stretch;
+}
+
+.ppp-about-hero__copy,
+.ppp-about-hero-card,
+.ppp-about-content,
+.ppp-about-grid-wrap,
+.ppp-about-card-modern {
+  backdrop-filter: blur(16px);
+}
+
+.ppp-about-hero__copy {
+  border-radius: 32px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+.ppp-about-hero__eyebrow,
+.ppp-about-stat span,
+.ppp-about-hero-card__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ppp-about-hero__title {
+  max-width: 11ch;
+  margin: 0.75rem 0 1.1rem;
+  font-size: clamp(2.5rem, 6vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.ppp-about-hero__text {
+  max-width: 52ch;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(1.02rem, 1.4vw, 1.1rem);
+  line-height: 1.82;
+}
+
+.ppp-about-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.ppp-about-stat {
+  border-radius: 20px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ppp-about-stat strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--white-color);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  text-transform: capitalize;
+}
+
+.ppp-about-hero__panel {
+  display: flex;
+  width: 100%;
+}
+
+.ppp-about-hero-card {
+  width: 100%;
+  border-radius: 28px;
+  padding: clamp(1.4rem, 2.6vw, 2rem);
+  align-self: stretch;
+  border: 1px solid rgba(251, 174, 123, 0.18);
+  background:
+    linear-gradient(180deg, rgba(20, 27, 39, 0.88), rgba(9, 14, 22, 0.94)),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.08), transparent 36%);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.ppp-about-hero-card h2 {
+  margin: 0.8rem 0 1rem;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.08;
+  text-transform: none;
+}
+
+.ppp-about-hero-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-about-hero-card li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-about-hero-card li::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a4cf5f, var(--primary-color));
+}
+
+.ppp-about-layout {
+  display: grid;
+  gap: 1.75rem;
+  padding: 0 0 2.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ppp-about-content,
+.ppp-about-grid-wrap {
+  border-radius: 28px;
+  padding: clamp(1.3rem, 2.6vw, 2.2rem);
+}
+
+.ppp-about-richtext {
+  color: var(--text-muted);
+  line-height: 1.85;
+  text-transform: none;
+}
+
+.ppp-about-richtext .container {
+  display: grid;
+  gap: 1rem;
+}
+
+.ppp-about-richtext :is(h1, h2, h3, h4) {
+  text-transform: none;
+}
+
+.ppp-about-richtext h2 {
+  margin: 0 0 0.35rem;
+  color: var(--white-color);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.ppp-about-richtext h3 {
+  margin: 1.2rem 0 0.15rem;
+  color: var(--white-color);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  line-height: 1.2;
+}
+
+.ppp-about-richtext h4 {
+  margin: 0;
+  color: #a4cf5f;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ppp-about-richtext p,
+.ppp-about-richtext li {
+  color: var(--text-muted);
+}
+
+.ppp-about-richtext p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.ppp-about-richtext strong {
+  color: var(--white-color);
+}
+
+.ppp-about-richtext ul {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.35rem 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-about-richtext li {
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.ppp-about-richtext li::before {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a4cf5f, var(--primary-color));
+}
+
+.ppp-about-richtext a {
+  color: #a4cf5f;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ppp-about-richtext iframe {
+  width: 100%;
+  min-height: 340px;
+  border-radius: 22px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+}
+
+.ppp-about-section-intro {
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.ppp-about-section-intro p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.ppp-about-card-modern {
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ppp-about-card-modern:hover {
+  transform: translateY(-4px);
+  border-color: rgba(164, 207, 95, 0.32);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.ppp-about-card-modern__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.ppp-about-card-modern__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.ppp-about-card-modern:hover .ppp-about-card-modern__media img {
+  transform: scale(1.05);
+}
+
+.ppp-about-card-modern__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+
+.ppp-about-card-modern__body h2 {
+  margin: 0 0 0.55rem;
+  color: var(--white-color);
+  font-size: clamp(1.3rem, 2vw, 1.65rem);
+  text-align: left;
+  text-transform: none;
+}
+
+.ppp-about-card-modern__body p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.ppp-about-card-modern__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  width: fit-content;
+  padding: 14px 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-about-card-modern__link:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.08);
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
+}
+
+.aero_category_main_heading {
+  font-size: 1.5rem;
+  color: var(--white-color);
+  background-image: url(/assets/images/home/bg_img_category.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  height: 150px;
+  width: 100%;
+  margin-bottom: 2em;
+}
+
+.aero_category_section_card_wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding-bottom: 2.5em;
+}
+
+.aero_category_section_card_wrap {
+  position: relative;
+  border: 2px solid var(--white-color);
+  border-radius: 20px;
+  overflow: clip;
+  aspect-ratio: 3/2;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeSlideUp 0.6s ease forwards;
+}
+
+.aero_category_section_card_wrap:nth-child(1) { animation-delay: 0.1s; }
+.aero_category_section_card_wrap:nth-child(2) { animation-delay: 0.2s; }
+.aero_category_section_card_wrap:nth-child(3) { animation-delay: 0.3s; }
+/* Add more as needed, or use JS to assign delays dynamically */
+
+@keyframes fadeSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.aero_category_section_card_wrap:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+  z-index: 2;
+}
+
+.aero_category_section_card_img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.aero_category_section_card_wrap:hover .aero_category_section_card_img {
+  transform: scale(1.05);
+}
+
+.aero_category_section_card_desc {
+  background-color: var(--primary-color);
+  opacity: 0.9;
+  border-radius: 15px;
+  border: 2px solid var(--white-color);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5em;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  color: var(--white-color);
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: background-color 0.3s ease;
+}
+
+.aero_category_section_card_wrap:hover .aero_category_section_card_desc {
+  background-color: var(--secondary-color);
+}
+
+.aero_category_section_card_desc h2 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+.aero_category_section_card_desc p {
+  font-size: 0.9rem;
+  height: 60px;
+  padding: 0.5em 0;
+}
+
+.aero_category_section_card_desc span {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .ppp-attractions-hero__inner,
+  .ppp-attractions-grid,
+  .ppp-groups-hero__inner,
+  .ppp-groups-grid,
+  .ppp-about-hero__inner,
+  .ppp-about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-attractions-hero__title,
+  .ppp-groups-hero__title,
+  .ppp-about-hero__title {
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .ppp-attractions-hero {
+    padding-top: 3.25rem;
+  }
+
+  .ppp-groups-hero {
+    padding-top: 3.25rem;
+  }
+
+  .ppp-about-hero {
+    padding-top: 3.25rem;
+  }
+
+  .ppp-attractions-hero__copy,
+  .ppp-attractions-hero-card,
+  .ppp-attractions-content,
+  .ppp-attractions-grid-wrap,
+  .ppp-attraction-card-modern,
+  .ppp-groups-hero__copy,
+  .ppp-groups-hero-card,
+  .ppp-groups-content,
+  .ppp-groups-grid-wrap,
+  .ppp-group-card-modern,
+  .ppp-about-hero__copy,
+  .ppp-about-hero-card,
+  .ppp-about-content,
+  .ppp-about-grid-wrap,
+  .ppp-about-card-modern {
+    border-radius: 22px;
+  }
+
+  .ppp-attractions-hero__stats,
+  .ppp-groups-hero__stats,
+  .ppp-about-hero__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-attractions-hero__actions,
+  .ppp-groups-hero__actions {
+    width: 100%;
+  }
+
+  .ppp-attractions-hero__actions > *,
+  .ppp-groups-hero__actions > * {
+    width: 100%;
+  }
+
+  .ppp-attractions-hero__link,
+  .ppp-attraction-card-modern__link,
+  .ppp-group-card-modern__link,
+  .ppp-about-card-modern__link {
+    width: 100%;
+  }
+}

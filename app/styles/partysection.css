@@ -1,0 +1,75 @@
+/* Base styles for the section */
+.aero-party-section {
+    padding: 2rem 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  
+  .aero-party-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .aero-toggle-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .aero-toggle-item {
+    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+  }
+  
+  .aero-toggle-heading {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    justify-content: space-between;
+  }
+  
+  .aero-toggle-heading h3 {
+    font-size: 1.2rem;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .aero-toggle-heading svg {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+  
+  .aero-toggle-item.active .aero-toggle-heading svg {
+    transform: rotate(180deg);
+  }
+  
+  .aero-toggle-content {
+    margin-top: 1rem;
+    display: none;
+  }
+  
+  .aero-toggle-item.active .aero-toggle-content {
+    display: block;
+  }
+  
+  .aero-toggle-content p {
+    margin-bottom: 0.75rem;
+  }
+  
+  .aero-toggle-content ul {
+    padding-left: 1.25rem;
+  }
+  
+  .aero-toggle-content li {
+    list-style-type: disc;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Optional: Slight orange accent color like Sky Zone for action buttons/icons */
+  .aero-accent {
+    color: #fe5100;
+  }
+  
+  

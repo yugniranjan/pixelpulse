@@ -1,0 +1,1302 @@
+/* header css start  */
+.aero-header-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 120;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.aero-header-spacer {
+  height: 116px;
+}
+
+.aero_menu_location_icon {
+  gap: 0.5rem;
+}
+
+.aero-col-3 .aero-header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 0;
+  mix-blend-mode: plus-lighter;
+}
+
+.aero-col-3 {
+  background:
+    linear-gradient(90deg, rgba(5, 8, 16, 0.95) 0%, rgba(10, 17, 27, 0.88) 50%, rgba(5, 8, 16, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75em 1em;
+  height: 66px;
+}
+
+.aero-col-3>div {
+  flex-basis: 33.3%;
+  text-align: center;
+}
+
+.aero-col-3>div:first-child {
+  text-align: left;
+}
+
+.aero-col-3>div:last-child {
+  text-align: right;
+}
+
+.aero-list-7,
+.aero-list-7-1 {
+  background: rgba(5, 8, 16, 0.96);
+  padding: 4px 0;
+  flex-direction: column;
+  width: 100%;
+  position: absolute;
+  top: 66px;
+  left: 0;
+  text-align: center;
+  align-items: unset;
+}
+
+.aero-list-7-1 {
+  z-index: 20;
+  animation: listanimate 0.5s ease-in-out;
+  padding: 1.25rem 1rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+@keyframes listanimate {
+  0% {
+    transform: translateY(-200px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.aero_main_logo_wrap {
+  position: relative;
+}
+
+/* .aero_main_logo {
+  position: absolute;
+  inset: 0;
+  top: -26px;
+  z-index: 99;
+} */
+
+.aero_main_logo img {
+  max-width: 140px;
+  width: 100%;
+  height: auto;
+  padding: 5px;
+  object-fit: contain;
+}
+
+.aero_changelocation_height {
+  height: 50px;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.aero-menu-location {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.aero-d-changelocation {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  border: 1px solid var(--white-color);
+  padding: 0.6em 1.1em;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  text-wrap: nowrap;
+  color: var(--white-color);
+  transition: color 0.2s ease-out, background 0.2s ease-out;
+  text-transform: uppercase;
+}
+
+.aero-header-changelocation-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding-inline: 1rem;
+}
+
+.aero-app-changelocation {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--white-color);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.aero-header-mobile-location,
+.aero-header-location-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--white-color);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aero-header-location-chip {
+  min-height: 48px;
+}
+
+.aero-d-changelocation:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.aero-faq {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem 1rem;
+  transition: color 0.2s ease-out, background 0.2s ease-out;
+  height: 40px;
+  background-color: var(--white-color);
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-left: 10px;
+  border: 3px var(--white-color) solid;
+  border-radius: 20px;
+}
+
+.aero-faq:hover {
+  background-color: transparent;
+  color: var(--white-color);
+  border-color: #bc6371;
+}
+
+:is(.aero-list-7, .aero-list-7-1) a {
+  color: var(--white-color);
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.aero-mobile-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.aero-btn-booknow button,
+.sigma_btn-custom {
+  outline: none;
+  transition: top 0.05s linear, box-shadow 0.05s linear;
+  position: relative;
+  font-weight: 500;
+  border: none;
+  text-transform: uppercase;
+  font-size: 1rem;
+  border-radius: 12.5rem;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  color: #000;
+  box-shadow: 0 0.2rem #d2814e, 0 0.75rem #00000020,
+    inset -0.0625rem 0 #ffffff80, inset 0.0625rem 0 #ffffff80,
+    inset 0 0.0625rem #fff;
+}
+
+:is(.aero-btn-booknow button, .sigma_btn-custom):hover {
+  top: 4px;
+  box-shadow: 0 0.125rem #a0fb94, 0 0.25rem #00000020,
+    inset -0.0625rem 0 #ffffff80, inset 0.0625rem 0 #ffffff80,
+    inset 0 0.0625rem var(--white-color);
+}
+
+.aero-header-contactus-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0;
+}
+
+.aero-header-booking button,
+.aero-header-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  min-width: 112px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aero-header-booking button,
+.aero-header-cta--solid {
+  top: auto;
+  border: 2px solid var(--primary-color);
+  background: var(--primary-color);
+  color: #050810 !important;
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
+}
+
+.aero-header-booking button:hover,
+.aero-header-cta--solid:hover {
+  top: auto;
+  background: #fbae7b;
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(251, 174, 123, 0.6);
+}
+
+.aero-header-cta {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color) !important;
+  background: transparent;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--white-color);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  color: #050810;
+  background: #a4cf5f;
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.28);
+  backdrop-filter: blur(14px);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 991px) {
+  .aero-header-booking.app-container {
+    display: none;
+  }
+
+  .desktop-container {
+    display: none;
+  }
+
+  .aero-col-3 {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    height: auto;
+    min-height: 78px;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .aero-col-3 > div {
+    flex-basis: auto;
+  }
+
+  .aero-col-3 > .app-container:last-child {
+    display: none;
+  }
+
+  .aero-col-3 .aero-header-logo.desktop-container {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .aero_main_logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .aero_main_logo img {
+    max-width: 128px;
+    padding: 0;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .aero-header-booking button,
+  .aero-header-cta {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .aero_changelocation_height {
+    height: auto;
+    min-height: 54px;
+  }
+
+  .aero-header-changelocation-wrap {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 54px;
+    padding: 0.35rem 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .aero-header-mobile-actions {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking {
+    flex: 0 0 100px;
+  }
+
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .aero-header-mobile-actions .aero-header-booking {
+    padding-top: 0.35rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .aero-col-3 {
+    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    min-height: 72px;
+  }
+
+  .aero-mobile-menu-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .aero_main_logo img {
+    max-width: 110px;
+  }
+
+  .aero-header-booking button,
+  .aero-header-cta {
+    min-height: 34px;
+    padding: 8px 10px;
+    font-size: 0.68rem;
+  }
+
+  .aero-header-changelocation-wrap {
+    gap: 0.5rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .aero-header-mobile-actions {
+    gap: 0.75rem;
+  }
+
+  .aero-header-mobile-actions .aero-header-contactus-btn,
+  .aero-header-mobile-actions .aero-header-booking button {
+    min-height: 34px;
+    padding: 8px 10px;
+    font-size: 0.68rem;
+  }
+}
+
+.aero-header-cta:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.08);
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.35);
+}
+
+.aero-btn-kidslearnmore {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1em;
+  text-align: center;
+}
+
+.aero-btn-kidslearnmore button {
+  font-size: 0.6rem;
+}
+
+/* .aero_home_video-container {
+  max-height: 700px;
+  overflow: clip;
+  background-color: var(--black-color);
+} */
+
+.aero_home_video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: clamp(320px, 56vw, 620px);
+  max-height: 78dvh;
+  overflow: hidden;
+  background: #000;
+}
+
+.aero_home_video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: opacity(0.6);
+}
+
+.aero_home_video-toggle {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  min-height: 42px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 999px;
+  background: rgba(11, 15, 20, 0.72);
+  color: var(--white-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 18px rgba(251, 174, 123, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aero_home_video-toggle:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 174, 123, 0.16);
+  box-shadow: 0 0 24px rgba(251, 174, 123, 0.38);
+}
+
+@media (max-width: 768px) {
+  .aero_home_video-container {
+    aspect-ratio: 4 / 5;
+    min-height: 420px;
+    max-height: 72dvh;
+  }
+
+  .aero_home_video-toggle {
+    right: 0.85rem;
+    bottom: 0.85rem;
+    min-height: 38px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.76rem;
+  }
+}
+
+.aero-home-h1heading {
+  text-align: center;
+  margin-top: 50px;
+  color: var(--white-color);
+  font-size: 25px;
+}
+
+.aero-btn-article-section {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.aero-btn-article-section div {
+  padding: 1em 0 2em;
+}
+
+/* header css end  */
+.aero_home-headerimg-wrapper {
+  background-color: var(--black-color);
+}
+
+.aero_home-headerimg-wrapper,
+.aero_home-play-small-img,
+.aero_home_birthday_section,
+.aero_home_article_desc {
+  position: relative;
+}
+
+.aero_home-headerimg-wrapper img {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  opacity: 2;
+}
+
+.aero_home-headerimg-wrapper>img {
+  height: 600px;
+}
+
+.aero_home-headerimg-wrapper article,
+.aero_home-play-small-img span,
+.aero_home_birthday_section h2,
+.aero_home_birthday_section p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 90%;
+}
+
+
+.aero_home-headerimg-wrapper article p {
+ color: var(--white-color);
+  padding: 20px 10px;
+  text-align: center;
+  font-weight: 600;
+   font-size: 1.2rem;
+  line-height: 30px;
+  margin-bottom: 1.5em;
+  text-transform: capitalize;
+}
+
+/* action buttons  */
+.aero_home-actionbtn-bg {
+  background-color: var(--black-color);
+  color: var(--white-color);
+}
+
+.aero_home-actionbtn {
+  padding: 2.5em 1.5em;
+}
+
+.aero_home-actionbtn div button {
+  width: 100%;
+}
+
+.aero_home_triangle {
+  width: 0;
+  height: 0;
+  border-left: 0px solid transparent;
+  border-right: 100vw solid transparent;
+  border-bottom: 35px solid #a4cf5f;
+}
+
+/* playground section */
+.aero_home-playsection-bg,
+.aero_home_feature_section-bg {
+  background-color: #fde1c0;
+}
+
+.aero_home-playsection-1 {
+  gap: 1rem;
+  text-align: center;
+  padding: 2.5em 1.5em;
+  color: var(--black-color);
+}
+
+
+
+.aero_rating_second_heading {
+  color: var(--white-color);
+}
+
+.aero_rating_second_heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.aero_rating_second_heading {
+  padding: 1.5em 1em 0;
+}
+
+.aero_home-playsection-1 p,
+.aero_home_article_section p,
+.aero_rating_overallrating {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 24px;
+  /* text-align: center; */
+}
+
+.aero_home-playsection-1 p {
+  text-transform: capitalize;
+}
+
+.aero_home-actionbtn-wrap,
+.aero_home_article_card-wrapper,
+.aero_home_BPJ_wrapper,
+.aero_rating_wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  padding: 2em 0.5em;
+}
+
+.aero_home-actionbtn-wrap .aero-btn-booknow button {
+  width: 100%;
+}
+
+.aero_home_feature_section {
+  padding: 4em 1em;
+}
+
+.aero_home-playsection-2,
+.aero_home_feature_section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 2em 0.5em;
+}
+
+.aero_home-playsection-2 article {
+  overflow: hidden;
+}
+
+.aero_home-playsection-2 article img,
+.aero_home_article_card img {
+  width: 100%;
+  height: auto;
+  transition: 0.5s ease-in-out;
+  aspect-ratio: 1 / 1.2;
+  object-fit: cover;
+}
+
+.aero_home-playsection-2 article:hover>img {
+  transform: scale(1.05);
+}
+
+.aero_home-play-small-img span {
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--white-color);
+  text-transform: uppercase;
+}
+
+/* birthday image section */
+.aero_home_birthday_section img {
+  width: 100%;
+  height: auto;
+}
+
+.aero_home_birthday_section h2 {
+  top: calc(35% + 4vw);
+}
+
+.aero_home_birthday_section p {
+  font-size: 1rem;
+  letter-spacing: 0;
+  font-weight: 400;
+  top: calc(35% + 4vw);
+}
+
+/* article section  */
+.aero_home_article_section {
+  background-color: var(--black-color);
+  padding: 2em 0 1em;
+}
+
+.aero_home_article_card img {
+  border-radius: 0 0 30px 30px;
+  aspect-ratio: 3/2;
+}
+
+.aero_home_article_section p {
+  padding-bottom: 0.5em;
+  color: var(--white-color);
+}
+
+.aero_rating_overallrating {
+  padding-top: 0.5em;
+  color: var(--white-color);
+  font-style: oblique;
+}
+
+.aero_rating_overallrating strong {
+  color: var(--primary-color);
+}
+
+.aero_home_article_card {
+  background-color: var(--white-color);
+  box-shadow: 0 0 5px 2px #ffffff69;
+  transition: all 0.2s ease-in;
+  border-radius: 12px;
+  overflow: clip;
+}
+
+.aero_home_article_desc div {
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  background-color: #fbae7b;
+  border-radius: 50%;
+  position: absolute;
+  top: -32px;
+  left: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--black-color);
+  text-align: center;
+  align-content: center;
+}
+
+.aero_home_article_desc h3 {
+  font-size: 1.2rem;
+  padding: 1.5em 0.5em 0.5em;
+  color: var(--black-color);
+  height: 90px;
+  overflow: hidden;
+}
+
+.aero_home_article_desc p {
+  font-size: 0.75rem;
+  color: var(--black-color);
+  text-align: left;
+  padding: 0 0.5em 1em;
+  margin-bottom: 2px !important;
+}
+
+.aero_home_article_cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  margin: 1em 0.75em 1.1em;
+  padding: 0em 1.1em;
+  border: 2px solid var(--primary-color);
+  border-radius: 999px;
+  background: rgba(251, 174, 123, 0.1);
+  color: var(--black-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgba(251, 174, 123, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aero_home_article_card:hover .aero_home_article_cta {
+  transform: translateY(-2px);
+  background: var(--primary-color);
+  box-shadow: 0 0 22px rgba(251, 174, 123, 0.35);
+}
+
+/* feature section */
+.aero_home_feature_section-card {
+  text-align: center;
+  color: var(--black-color);
+  box-shadow: 0 0 8px var(--secondary-color);
+  border-radius: 30px;
+  padding: 1em 0;
+}
+
+.aero_home_feature_section-card div:first-child {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.aero_home_feature_section-card div:last-child {
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.5em 0;
+}
+
+/* Seo section  */
+.aero_home_seo_section {
+  color: var(--secondary-color);
+  padding: 0 1em;
+}
+
+.aero_home_seo_section :is(h2, h3) {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 1em;
+}
+
+.aero_home_seo_section p {
+  font-size: 0.8rem;
+  margin-bottom: 2em;
+}
+
+.aero_home_seo_section ul {
+  margin-bottom: 2.5em;
+}
+
+.aero_home_seo_section ul li {
+  font-size: 0.7rem;
+  margin-bottom: 1em;
+  margin-left: 2em;
+}
+
+/* footer css start  */
+/* BPJ section  */
+.aero_home-headerimg-wrapper {
+  position: relative;
+}
+
+.aero_home_BPJ_wrapper div {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.aero_home_BPJ_wrapper img {
+  width: 90px;
+  height: auto;
+}
+
+.aero_home_BPJ_wrapper .aero_home_BPJ_icon--glow {
+  filter: drop-shadow(0 0 10px rgba(251, 174, 123, 0.55))
+    drop-shadow(0 0 24px rgba(251, 174, 123, 0.32));
+}
+
+.aero_home_BPJ_wrapper span {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--white-color);
+}
+
+/* rating section */
+.aero_rating_wrapper {
+  color: var(--white-color);
+}
+
+.aero_rating_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1em 2em;
+  border: 1px solid;
+  border-radius: 12px;
+}
+
+.aero_rating_card h4 {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.aero_rating_card p {
+  font-size: 0.85rem;
+  line-height: 1.8;
+  font-weight: 200;
+  overflow: hidden;
+  transition: height 0.5s ease-in-out;
+  height: 150px;
+  position: relative;
+}
+
+.aero_rating_card p:hover {
+  height: 100%;
+}
+
+.aero_rating_card h5 {
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: oblique;
+  color: var(--primary-color);
+}
+
+.aero_rating_readmore {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 0.8rem;
+  background: var(--black-color);
+  padding: 0.5em 1em;
+  visibility: visible;
+  font-weight: 400;
+}
+
+.aero_rating_card p:hover span {
+  visibility: hidden;
+}
+
+/* main footer section */
+.aero_footer_section-bg {
+  background-color: var(--black-color);
+}
+
+.aero_logo_social_wrap {
+  flex-direction: column;
+  margin: 2em 2em 1em;
+  gap: 1rem;
+}
+
+.aero_social_icon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--white-color);
+  margin: 0.7em;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  color: var(--white-color);
+  transition: all 0.5s ease-in-out;
+}
+
+.aero_social_icon img {
+  background: var(--white-color);
+  border-radius: 50%;
+}
+
+.aero_footer_col-4-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1em;
+}
+
+.aero_footer_col-4-wrapper ul {
+  list-style: none;
+  flex-basis: 26%;
+}
+
+.aero_footer_col-4-wrapper ul:last-child {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.aero_footer_col-4-wrapper ul:last-child li:first-child {
+  width: 100%;
+  text-align: center;
+}
+
+.aero_footer_col-4-wrapper ul li {
+  font-size: 0.8rem;
+  color: var(--white-color);
+  font-weight: 400;
+  padding-bottom: 0.8em;
+}
+
+.aero_footer_col-4-wrapper ul li:first-child {
+  font-size: 1.3rem;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.5em;
+  font-weight: 500;
+  border-bottom: 0.1px solid #fff;
+}
+
+.aero_footer_article-card {
+  gap: 1rem;
+}
+
+.aero_footer_article-card img {
+  border-radius: 50%;
+  border: 1px solid var(--white-color);
+}
+
+.aero_footer_article-card div h6 {
+  font-size: 0.8rem;
+  font-weight: 400;
+  padding-bottom: 0.5em;
+}
+
+.aero_footer_article-card div p {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.figcaption-bg {
+  width: 100%;
+  /* 👈 This makes it match the image's width */
+  background-color: var(--secondary-color);
+  /* or any path in /public */
+  background-size: cover;
+  background-position: center;
+  color: white;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 0px;
+  margin-top: 0;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.attraction-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ul.attractions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each LI: fixed width on desktop, full width on mobile */
+ul.attractions-grid li {
+  width: 259px;
+}
+.attractions-grid li article {
+     border: 1px solid var(--white-color);
+    border-radius: 5px;
+     padding: 5px;
+}
+
+@media (max-width: 768px) {
+  ul.attractions-grid {
+    justify-content: center;
+  }
+
+  ul.attractions-grid li {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* footer css end  */
+
+@media screen and (min-width: 992px) {
+  .app-container {
+    display: none;
+  }
+
+  .desktop-container {
+    display: block;
+  }
+
+  .aero-btn-booknow button {
+    font-size: 1.2rem;
+  }
+
+  .aero-btn-booknow-1.aero-btn-booknow {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .aero-btn-kidslearnmore {
+    bottom: 3em;
+  }
+
+  .aero_home-actionbtn-wrap,
+  .aero_home_article_card-wrapper {
+    gap: 2rem;
+  }
+
+  .aero-col-3 {
+    padding: 1.25em;
+    height: 90px;
+  }
+
+  .aero-col-3 .aero-header-logo {
+    justify-content: flex-start;
+  }
+
+  .aero-home-h1heading {
+    font-size: 33px;
+  }
+
+  .aero-list-7,
+  .aero-list-7-1 {
+    padding: 14px 0;
+    top: 90px;
+  }
+
+  .aero-header-changelocation-wrap {
+    justify-content: flex-end;
+    padding-inline: 0;
+  }
+
+  .aero_home-headerimg-wrapper article p,
+  .aero_home-playsection-1 p,
+  .aero_home_article_section p,
+  .aero_rating_overallrating {
+    font-size: 1.2rem;
+    line-height: 30px;
+    margin-bottom: 3em;
+  }
+    .aero_home-headerimg-wrapper article p{
+      font-size: 2rem;
+      line-height: 1.4;
+      margin-bottom: 1em;
+    }
+
+  .aero_home-playsection-2,
+  .aero_home_feature_section {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+
+  /* .aero_home-headerimg-wrapper article {
+    width: 60%;
+  } */
+
+  article.aero_home_BPJ_wrapper {
+    width: 100%;
+  }
+
+  .aero_rating_second_heading {
+    font-size: 2rem;
+  }
+
+  .aero_home-actionbtn div button {
+    font-size: 1.1rem;
+  }
+
+  .aero_home_article_card:hover {
+    box-shadow: 0 0 5px 2px #dedada69;
+    transform: translateY(-5px);
+  }
+
+  .aero_home_article_desc p {
+    font-size: 1rem;
+  }
+
+  .aero_home_BPJ_wrapper span {
+    font-size: 1.8rem;
+  }
+
+  .aero_home-play-small-img span {
+    font-size: 1.5rem;
+  }
+
+  .aero_home_feature_section-card div:first-child {
+    font-size: 2rem;
+  }
+
+  .aero_home_seo_section :is(h2, h3) {
+    text-align: left;
+    font-size: 1.5rem;
+  }
+
+  .aero_home_seo_section p {
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  .aero_home_seo_section ul li {
+    font-size: 0.9rem;
+  }
+
+  .aero_main_logo {
+    top: -35px;
+  }
+
+  .aero_main_logo img {
+    max-width: 260px;
+  }
+
+  /* footer  */
+  .aero_home-headerimg-wrapper>img {
+    height: 400px;
+  }
+
+  .aero_logo_social_wrap {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .aero_social_icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    margin: 0.4em;
+  }
+
+  .aero_social_icon img {
+    background: var(--white-color);
+    border-radius: 50%;
+  }
+
+  .aero_social_icon img:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .aero_footer_col-4-wrapper {
+    flex-wrap: nowrap;
+    padding: 2em 1.5em 3em;
+    gap: 2rem;
+  }
+
+  .aero_footer_col-4-wrapper ul:last-child li:first-child {
+    text-align: left;
+  }
+
+  .aero_footer_col-4-wrapper ul li:first-child {
+    font-size: 1.45rem;
+  }
+
+  .aero_footer_col-4-wrapper ul li {
+    font-size: 0.9rem;
+  }
+
+  .aero_footer_article-card img {
+    min-width: 80px;
+    height: 80px;
+  }
+
+  .aero_footer_article-card div h6 {
+    font-size: 1rem;
+  }
+
+  .aero_footer_article-card div p {
+    font-size: 0.9rem;
+  }
+  
+}

@@ -1,0 +1,422 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 8, 16, 0.7);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background:
+    radial-gradient(circle at top left, rgba(164, 207, 95, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(251, 174, 123, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(9, 17, 27, 0.98), rgba(4, 8, 15, 0.99));
+  color: #f8fafc;
+  padding: 2rem;
+  border-radius: 24px;
+  min-width: 300px;
+  width: min(94vw, 760px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modal-close {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+ 
+  background: #a4cf5f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  font-size: .8rem;
+  cursor: pointer;
+  color: #000;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #fbae7b;
+  background: rgba(251, 174, 123, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.modal-body {
+  color: #e2e8f0;
+}
+
+.aero_promotion_shell {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  isolation: isolate;
+}
+
+.aero_promotion_shell > *:not(.aero_promotion_backdrop) {
+  position: relative;
+  z-index: 1;
+}
+
+.aero_promotion_backdrop {
+  position: absolute;
+  inset: -2rem;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aero_promotion_backdrop__orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(16px);
+  opacity: 0.6;
+  animation: aeroPromoFloat 14s ease-in-out infinite;
+}
+
+.aero_promotion_backdrop__orb--one {
+  top: -3rem;
+  left: -4rem;
+  width: 16rem;
+  height: 16rem;
+  background: radial-gradient(circle, rgba(164, 207, 95, 0.28), transparent 68%);
+}
+
+.aero_promotion_backdrop__orb--two {
+  right: -3rem;
+  top: 3rem;
+  width: 14rem;
+  height: 14rem;
+  background: radial-gradient(circle, rgba(251, 174, 123, 0.22), transparent 70%);
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.aero_promotion_backdrop__orb--three {
+  bottom: -5rem;
+  left: 35%;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle, rgba(143, 220, 255, 0.16), transparent 72%);
+  animation-duration: 20s;
+}
+
+.aero_promotion_backdrop__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.6), transparent 95%);
+  opacity: 0.12;
+  transform: perspective(900px) rotateX(72deg) scale(1.4) translateY(20%);
+  transform-origin: center top;
+  animation: aeroPromoGridShift 18s linear infinite;
+}
+
+.aero_promotion_intro {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem 1.3rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025)),
+    rgba(7, 12, 19, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 40px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(8px);
+}
+
+.aero_promotion_kicker {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.42rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(164, 207, 95, 0.16);
+  color: #d4eea7;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.aero_promotion_intro h2 {
+  margin: 0;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.aero_promotion_intro p {
+  margin: 0;
+  max-width: 38rem;
+  color: #d6dee9;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.aero_promotion_popup--card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.4rem;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    linear-gradient(145deg, rgba(10, 15, 24, 0.96), rgba(6, 10, 17, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 40px rgba(0, 0, 0, 0.24);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.aero_promotion_popup--card::before {
+  content: "";
+  position: absolute;
+  inset: auto -20% 72% auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(164, 207, 95, 0.22), transparent 68%);
+  animation: aeroPromoPulse 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.aero_promotion_popup--card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.06) 50%, transparent 80%);
+  transform: translateX(-140%);
+  animation: aeroPromoShimmer 7.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.aero_promotion_popup_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.aero_promotion_popup__topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.aero_promotion_popup__eyebrow {
+  color: #8fdcff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.aero_promotion_popup h1,
+.aero_promotion_popup h2,
+.aero_promotion_popup h3 {
+  color: #fff;
+  margin: 0;
+  line-height: 0.98;
+  text-transform: uppercase;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  letter-spacing: 0.02em;
+  font-size: 2rem;
+}
+
+.aero_promotion_popup p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.75;
+  font-size: 0.98rem;
+}
+
+.aero_promotion_popup__badge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(164, 207, 95, 0.22), rgba(251, 174, 123, 0.16));
+  color: #eff8da;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(164, 207, 95, 0.22);
+}
+
+.aero_promotion_popup__meta {
+  display: grid;
+  gap: 0.6rem;
+  color: #cbd5e1;
+  font-size: 0.92rem;
+}
+
+.aero_promotion_popup__meta_item {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aero_promotion_popup__meta_item strong {
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.aero_promotion_popup__cta,
+.aero_promotion_popup a,
+.modal-body button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 46px;
+  padding: 0.8rem 1.25rem;
+  border: 2px solid rgb(164, 207, 95);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgb(164, 207, 95), rgb(144, 192, 70));
+  color: #08110a;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow:
+    0 0 22px rgba(164, 207, 95, 0.24),
+    0 14px 28px rgba(164, 207, 95, 0.14);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.aero_promotion_popup__cta:hover,
+.aero_promotion_popup a:hover,
+.modal-body button:hover,
+.modal-body button:focus {
+  background: linear-gradient(135deg, rgb(181, 221, 116), rgb(156, 203, 84));
+  box-shadow:
+    0 0 28px rgba(164, 207, 95, 0.34),
+    0 18px 34px rgba(164, 207, 95, 0.18);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+@keyframes aeroPromoFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0.75rem, -1rem, 0) scale(1.06);
+  }
+}
+
+@keyframes aeroPromoGridShift {
+  0% {
+    transform: perspective(900px) rotateX(72deg) scale(1.4) translate3d(0, 20%, 0);
+  }
+  50% {
+    transform: perspective(900px) rotateX(72deg) scale(1.44) translate3d(-1%, 18%, 0);
+  }
+  100% {
+    transform: perspective(900px) rotateX(72deg) scale(1.4) translate3d(0, 20%, 0);
+  }
+}
+
+@keyframes aeroPromoPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes aeroPromoShimmer {
+  0%,
+  100% {
+    transform: translateX(-140%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  55% {
+    transform: translateX(140%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aero_promotion_backdrop__orb,
+  .aero_promotion_backdrop__grid,
+  .aero_promotion_popup--card::before,
+  .aero_promotion_popup--card::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    width: min(94vw, 620px);
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .aero_promotion_popup_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aero_promotion_intro h2,
+  .aero_promotion_popup h1,
+  .aero_promotion_popup h2,
+  .aero_promotion_popup h3 {
+    font-size: 1.7rem;
+  }
+
+  .aero_promotion_popup__cta,
+  .aero_promotion_popup a,
+  .modal-body button {
+    width: 100%;
+  }
+
+  .aero_promotion_backdrop {
+    inset: -1rem;
+  }
+}
