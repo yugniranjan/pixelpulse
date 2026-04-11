@@ -37,25 +37,38 @@ const BlogCard = async ({ blogsData, location_slug }) => {
       : fallbackCards;
 
   return (
-    <section className="aero_home_article_card-wrapper">
-      {cardsToRender.map((item) => (
-        <Link href={item.href} prefetch key={item.id}>
-          <article className="aero_home_article_card">
+    <section className="ppp-groups-grid">
+      {cardsToRender.map((item, index) => (
+        <article className="ppp-group-card-modern" key={`${item.id || item.href || "blog"}-${index}`}>
+          <Link
+            href={item.href}
+            prefetch
+            className="ppp-group-card-modern__media"
+          >
             <Image
               src={item.featuredImage}
-              width={120}
-              height={120}
-              alt="article image"
+              width={720}
+              height={420}
+              alt={item.title || "Blog article image"}
               title={item.title}
               unoptimized
             />
-            <div className="aero_home_article_desc">
-              <div>{item.order}</div>
-              <h3>{item.title}</h3>
-              <span className="aero_home_article_cta">Continue Reading</span>
-            </div>
-          </article>
-        </Link>
+          </Link>
+
+          <div className="ppp-group-card-modern__body">
+            <Link href={item.href} prefetch>
+              <h2>{item.title}</h2>
+              <p>{item.metaDescription || "Helpful updates, planning ideas, and local news from Pixel Pulse."}</p>
+            </Link>
+            <Link
+              href={item.href}
+              prefetch
+              className="ppp-group-card-modern__link"
+            >
+              Read Article
+            </Link>
+          </div>
+        </article>
       ))}
     </section>
   );
