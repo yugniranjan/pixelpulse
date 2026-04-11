@@ -77,7 +77,7 @@ const PricingComparison = ({ birthdaydata }) => {
                 >
                   <div className="ppp-party-plan">
                     <span className="ppp-party-plan__eyebrow">
-                      {index === spotlightIndex ? "Most Popular" : "Package"}
+                      {index === spotlightIndex ? "Most Popular" : ""}
                     </span>
                     <h3>{plan.name}</h3>
                     <p>{plan["Package Price"]}</p>

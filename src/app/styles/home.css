@@ -381,7 +381,7 @@
 
   .aero_changelocation_height {
     height: auto;
-    min-height: 54px;
+    /* min-height: 54px; */
   }
 
   .aero-header-changelocation-wrap {
@@ -394,7 +394,7 @@
   }
 
   .aero-header-mobile-actions {
-    display: flex;
+    display: flex !important;
     width: 100%;
     justify-content: center;
     align-items: center;
@@ -412,9 +412,9 @@
     min-width: 0;
   }
 
-  .aero-header-mobile-actions .aero-header-booking {
+  /* .aero-header-mobile-actions .aero-header-booking {
     padding-top: 0.35rem;
-  }
+  } */
 }
 
 @media (max-width: 640px) {
@@ -430,7 +430,7 @@
   }
 
   .aero_main_logo img {
-    max-width: 110px;
+    max-width: 75px;
   }
 
   .aero-header-booking button,
