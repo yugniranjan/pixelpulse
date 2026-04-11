@@ -1,6 +1,7 @@
 import "./styles/home.css";
 import "./styles/pagenew.css";
 import "./styles/promotions.css";
+import "./styles/category.css";
 import Image from "next/image";
 import Link from "next/link";
 import { getDataByParentId } from "@/utils/customFunctions";
