@@ -288,7 +288,7 @@ const Home = async () => {
             </p>
 
             <ul className="ppp-attractions__grid">
-              {attractionsData[0]?.children?.map((item, i) => (
+              {attractionsData[0]?.children?.slice(0, 8).map((item, i) => (
                 <li key={i} className="ppp-attractions__item">
                   <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                     <article className="ppp-attraction-card">
