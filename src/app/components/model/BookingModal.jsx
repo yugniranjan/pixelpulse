@@ -14,10 +14,21 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
   const [dataconfig, setDataconfig] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalRoot, setModalRoot] = useState(null);
+  const [selectedBookingMode, setSelectedBookingMode] = useState("ticket");
+
+  const initialPartyMode =
+    bookingType === "party" ||
+    (bookingType !== "ticket" && pathname === "/kids-birthday-parties");
 
   useEffect(() => {
     setModalRoot(document.getElementById("modal-root"));
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedBookingMode(initialPartyMode ? "party" : "ticket");
+    }
+  }, [initialPartyMode, isOpen]);
 
   useEffect(() => {
     let ignore = false;
@@ -64,9 +75,7 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
   const lilypadposParty = dataconfig.find((item) => item.key === "lilypadpos_party")?.value;
   const lilypadposTicket = dataconfig.find((item) => item.key === "lilypadpos_ticket")?.value;
 
-  const isPartyPath =
-    bookingType === "party" ||
-    (bookingType !== "ticket" && pathname === "/kids-birthday-parties");
+  const isPartyPath = selectedBookingMode === "party";
   const iframeUrl = isPartyPath ? lilypadposParty : lilypadposTicket;
 
   if (!isOpen || !modalRoot) return null;
@@ -101,14 +110,13 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
                 {!isPartyPath && lilypadposParty && (
                   <p className="booking-shell__party-inline">
                     Click here to{" "}
-                    <a
-                      href={lilypadposParty}
+                    <button
+                      type="button"
                       className="booking-shell__party-cta"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={() => setSelectedBookingMode("party")}
                     >
                       Book A Birthday Party
-                    </a>
+                    </button>
                   </p>
                 )}
               </div>
