@@ -38,6 +38,17 @@ export function getFallbackBlogs() {
   ];
 }
 
+function withTimeout(promise, label, timeoutMs = 5000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`${label} timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    }),
+  ]);
+}
+
 function getTimestampValue(value) {
   if (!value) return 0;
 
@@ -53,12 +64,65 @@ function getTimestampValue(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function parseContent(value) {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+
+  return value;
+}
+
+function getFirstImageFromContent(content) {
+  const blocks = Array.isArray(content?.blocks) ? content.blocks : [];
+  const imageBlock = blocks.find((block) => block?.type === "image");
+  return imageBlock?.data?.file?.url || "";
+}
+
+function getExcerptFromContent(content) {
+  const blocks = Array.isArray(content?.blocks) ? content.blocks : [];
+  const paragraphBlock = blocks.find(
+    (block) => block?.type === "paragraph" && block?.data?.text
+  );
+
+  const rawText = paragraphBlock?.data?.text || "";
+  const cleanText = rawText
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleanText;
+}
+
 function normalizeBlog(doc) {
   const data = doc.data() || {};
+  const content = parseContent(data.content);
+  const derivedFeaturedImage = getFirstImageFromContent(content);
+  const derivedMetaDescription = getExcerptFromContent(content);
 
   return {
     id: doc.id,
     ...data,
+    content,
+    featuredImage:
+      data.featuredImage ||
+      data.image ||
+      data.imageUrl ||
+      data.coverImage ||
+      data.thumbnail ||
+      derivedFeaturedImage ||
+      fallbackImage,
+    metaDescription:
+      data.metaDescription ||
+      data.excerpt ||
+      data.description ||
+      derivedMetaDescription,
   };
 }
 
@@ -68,22 +132,23 @@ export async function fetchBlogs() {
   }
 
   try {
-    const orderedSnapshot = await db
-      .collection("blogs")
-      .orderBy("createdAt", "desc")
-      .get();
+    const orderedSnapshot = await withTimeout(
+      db.collection("blogs").orderBy("createdAt", "desc").get(),
+      "Firestore ordered blog query",
+    );
 
-    const orderedBlogs = orderedSnapshot.docs.map(normalizeBlog);
-
-    if (orderedBlogs.length > 0) {
-      return orderedBlogs;
-    }
+    return orderedSnapshot.docs
+      .map(normalizeBlog)
+      .filter((blog) => blog.createdAt || blog.updatedAt);
   } catch (error) {
     console.error("Firestore ordered blog query failed:", error);
   }
 
   try {
-    const fallbackSnapshot = await db.collection("blogs").get();
+    const fallbackSnapshot = await withTimeout(
+      db.collection("blogs").get(),
+      "Firestore fallback blog query",
+    );
 
     return fallbackSnapshot.docs
       .map(normalizeBlog)
@@ -91,7 +156,8 @@ export async function fetchBlogs() {
         const aTime = getTimestampValue(a.createdAt) || getTimestampValue(a.updatedAt);
         const bTime = getTimestampValue(b.createdAt) || getTimestampValue(b.updatedAt);
         return bTime - aTime;
-      });
+      })
+      .filter((blog) => blog.createdAt || blog.updatedAt);
   } catch (error) {
     console.error("Firestore fallback blog query failed:", error);
     return [];

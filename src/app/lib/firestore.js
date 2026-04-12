@@ -1,6 +1,5 @@
-// src/lib/firebaseAdmin.js
 export const runtime = "nodejs";
-import { initializeApp, cert, getApps, getApp, applicationDefault } from "firebase-admin/app";
+import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 const normalizePrivateKey = (value) => {
@@ -18,7 +17,7 @@ const normalizePrivateKey = (value) => {
 
 const privateKey = normalizePrivateKey(process.env.GCP_PRIVATE_KEY);
 const projectId = process.env.GCP_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT;
-const firestoreDatabaseId = process.env.FIRESTORE_DATABASE_ID;
+const firestoreDatabaseId = process.env.FIRESTORE_DATABASE_ID || "pixelpulse";
 const serviceAccount = {
   projectId,
   clientEmail: process.env.GCP_CLIENT_EMAIL,
@@ -30,28 +29,14 @@ const hasFirebaseConfig =
   serviceAccount.clientEmail &&
   serviceAccount.privateKey;
 
-if (!getApps().length) {
-  if (hasFirebaseConfig) {
-    try {
-      initializeApp({
-        credential: cert(serviceAccount),
-        projectId,
-      });
-    } catch (error) {
-      console.error("Firebase admin init failed:", error);
-    }
-  } else if (projectId) {
+if (hasFirebaseConfig && !getApps().length) {
+  try {
     initializeApp({
-      credential: applicationDefault(),
-      projectId,
+      credential: cert(serviceAccount),
     });
+  } catch (error) {
+    console.error("Firebase admin init failed:", error);
   }
 }
 
-const app = getApps().length ? getApp() : null;
-
-export const db = app
-  ? firestoreDatabaseId
-    ? getFirestore(app, firestoreDatabaseId)
-    : getFirestore(app)
-  : null;
+export const db = hasFirebaseConfig ? getFirestore(undefined, firestoreDatabaseId) : null;
