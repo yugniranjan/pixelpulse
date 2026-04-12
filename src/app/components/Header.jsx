@@ -24,7 +24,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
     .filter(
       (item) =>
         item.isactive === 1 &&
-        !["contactus", "contact-us", "blogs"].includes(item.path?.toLowerCase()),
+        !["contactus", "contact-us"].includes(item.path?.toLowerCase()),
     )
     .map((item) => ({
       navName: item.desc,
