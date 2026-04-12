@@ -6,7 +6,6 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import FloatingWaiverButton from "./components/FloatingWaiverButton";
 import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
@@ -80,14 +79,11 @@ export default async function RootLayout({ children }) {
   let menudata = [];
   let configdata = [];
   let sheetdata = [];
-  let waiverLink = "";
-
   try {
-    [menudata, configdata, sheetdata, waiverLink] = await Promise.all([
+    [menudata, configdata, sheetdata] = await Promise.all([
       fetchMenuData(location_slug),
       fetchsheetdata('config', location_slug),
       fetchsheetdata('locations', location_slug),
-      getWaiverLink(location_slug),
     ]);
   } catch (error) {
     console.error("layout data failed:", error);
@@ -113,7 +109,6 @@ export default async function RootLayout({ children }) {
           menudata={menudata}
           // reviewdata={reviewdata}
         />
-        <FloatingWaiverButton waiverLink={waiverLink} />
         <div id="modal-root"></div>
       </body>
     </html>
