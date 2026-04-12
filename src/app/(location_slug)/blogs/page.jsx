@@ -120,9 +120,7 @@ const schema = {
         }}
       />
       <section className="ppp-blogs-hero">
-        
-          
-
+        <div className="aero-max-container ppp-blogs-hero__inner">
           <div className="ppp-blogs-hero__panel">
             <div className="ppp-about-hero-card">
               <span className="ppp-about-hero-card__label">What you'll find</span>
@@ -134,7 +132,7 @@ const schema = {
               </ul>
             </div>
           </div>
-        
+        </div>
       </section>
 
       <section className="aero-max-container ppp-blogs-layout">
