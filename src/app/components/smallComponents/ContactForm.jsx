@@ -164,8 +164,6 @@ function ContactForm() {
               <option value="">Select an event or inquiry type</option>
               <option value="BirthDay">BirthDay Party</option>
               <option value="Group Booking">Group Booking</option>
-              <option value="Admission">Admission</option>
-              <option value="Camp">Camp</option>
               <option value="Fund Raisers">Fund Raisers</option>
               <option value="Others">Others</option>
             </select>
