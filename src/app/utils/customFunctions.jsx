@@ -1,6 +1,12 @@
+function normalizePath(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
 export function getDataByParentId(data, path) {
-  return data?.filter((item) => item.path === path);
+  const normalizedPath = normalizePath(path);
+  return data?.filter((item) => normalizePath(item?.path) === normalizedPath);
 }
 export function getDataByBlogId(data, slug) {
-  return data.find((item) => item.path === slug);
+  const normalizedSlug = normalizePath(slug);
+  return data.find((item) => normalizePath(item?.path) === normalizedSlug);
 }
