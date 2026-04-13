@@ -104,53 +104,40 @@ export async function POST(request) {
             <div>New Inquiry</div>
         
 
-          <div>
-            <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:separate;border-spacing:10px 10px;">
-              <tr>
-                
-                <td>
+          
+            
                   <div>Inquiry Type</div>
-                  <div ">${String(selectedEvent || "Not provided")
+                  <div>${String(selectedEvent || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
-                </td>
-              </tr>
-              <tr>
-                <td>
+               
                   <div>Email</div>
-                  <div ${String(email || "Not provided")
+                  <div${String(email || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
-                </td>
-                <td>
+               
                   <div>Phone</div>
                   <div>${String(phone || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
-                </td>
-              </tr>
-              <tr>
-                <td>
+               
                   <div>Preferred Date</div>
                   <div${String(date || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
-                </td>
-                <td>
+                
                   <div>Preferred Time</div>
                   <div>${String(time || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
-                </td>
-              </tr>
-            </table>
+              
 
-            <div>
+            
               <div>Message</div>
               <div>${String(
                 message || "No message provided",
@@ -158,10 +145,9 @@ export async function POST(request) {
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+            
+          
+      
     `;
 
     await transporter.sendMail({
@@ -218,22 +204,22 @@ export async function POST(request) {
                 <div style="margin-top:8px;">
                   <a href="${ATTRACTIONS_URL}" style="color:#fbae7b;text-decoration:none;font-size:15px;font-weight:700;">View Attractions</a>
                 </div>
-                <p> Thank you Pixel Pulse Play </>
+               
               </div>
 
               ${primaryCtaHref ? `
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;">
-                  <a href="${primaryCtaHref}" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;background:linear-gradient(135deg,#fbae7b,#ffbf96);color:#111827;text-decoration:none;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;font-size:12px;">${primaryCtaLabel}</a>
+                  <a href="${primaryCtaHref}" style="display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 18px;border-radius:999px;background:linear-gradient(135deg,#fbae7b,#ffbf96);color:#111827;text-decoration:none;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;font-size:12px;">${primaryCtaLabel}</a>
                 </div>
               ` : ""}
 
-              <p style="margin:22px 0 0;font-size:15px;line-height:1.8;color:#cbd5e1;">
-                If your request is time-sensitive, you can reply directly to this email and our team will pick it up.
-              </p>
+             
             </div>
 
             <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:14px;line-height:1.7;color:#94a3b8;">
-              Pixel Pulse Play<br />
+              <p style="margin:22px 0 0;font-size:15px;line-height:1.8;color:#cbd5e1;">
+               Thank you Pixel Pulse Play 
+              </p><br />
               <a href="mailto:${CONTACT_EMAIL}" style="color:#fbae7b;text-decoration:none;">${CONTACT_EMAIL}</a>
             </div>
           </div>
