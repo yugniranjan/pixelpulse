@@ -12,7 +12,7 @@ const page = () => {
             <span className="ppp-contact-hero__eyebrow">Contact Pixel Pulse Play</span>
             <h1 className="aero_contact-mainheading">Let&apos;s Plan Your Visit</h1>
             <p className="ppp-contact-hero__text">
-              Reach out for admissions, birthday parties, group events, camp questions,
+              Reach out for birthday parties, group bookings, fundraisers,
               or anything else you want to plan with the Pixel Pulse Play team.
             </p>
           </div>
