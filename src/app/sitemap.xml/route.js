@@ -1,10 +1,9 @@
 export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
-import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { fetchBlogs } from "@/lib/blogs";
 export async function GET() {
-  const siteUrl = process.env.SITE_URL;
+  const siteUrl = (process.env.SITE_URL || "https://www.pixelpulseplay.ca").replace(/\/$/, "");
   const dynamicPaths = new Set();
 
   try {
@@ -12,8 +11,14 @@ export async function GET() {
     const extractBlogData = await fetchBlogs();
 
     rows.forEach(row => {
-      const { location, parentid, path } = row;
+      const location = typeof row?.location === "string" ? row.location : "";
+      const parentid = typeof row?.parentid === "string" ? row.parentid.trim().toLowerCase() : "";
+      const path = typeof row?.path === "string" ? row.path.trim().toLowerCase() : "";
       const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+
+      if (!path) {
+        return;
+      }
 
       dynamicPaths.add(`${siteUrl}`);
       locations.forEach(loc => {
@@ -21,9 +26,9 @@ export async function GET() {
         dynamicPaths.add(`${siteUrl}/${loc}`);
         if (path != 'home') {
           // Construct path
-          const basePath = (!parentid || parentid.toLowerCase() === path.toLowerCase())
-            ? `/${loc}/${path.toLowerCase()}`
-            : `/${loc}/${parentid.toLowerCase()}/${path.toLowerCase()}`;
+          const basePath = (!parentid || parentid === path)
+            ? `/${loc}/${path}`
+            : `/${loc}/${parentid}/${path}`;
 
 
           dynamicPaths.add(`${siteUrl}${basePath}`);
