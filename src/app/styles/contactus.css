@@ -230,6 +230,24 @@
   box-shadow: 0 0 28px rgba(251, 174, 123, 0.45);
 }
 
+.submit-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+  transform: none;
+  box-shadow: none;
+}
+
+.ppp-contact-form__note {
+  margin-top: 0.85rem;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.ppp-contact-form__note strong {
+  color: var(--white-color);
+}
+
 @media (max-width: 960px) {
   .ppp-contact-hero__inner,
   .ppp-contact-form__grid {
