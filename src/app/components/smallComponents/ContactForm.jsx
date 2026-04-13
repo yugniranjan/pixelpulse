@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import "../../styles/contactus.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { toast } from "sonner";
-import { fetchsheetdata } from "@/lib/sheets";
+
+const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 
 function ContactForm() {
   const location_slug = LOCATION_NAME;
   const [currentLocation, setCurrentLocation] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     from: LOCATION_NAME,
     firstName: "",
@@ -20,19 +22,6 @@ function ContactForm() {
     message: "",
     selectedEvent: "",
   });
-
-  const [dataconfig, setDataconfig] = useState([]);
-
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchsheetdata("locations", location_slug);
-      setDataconfig(data);
-    };
-    getData();
-  }, []);
-
- const email = dataconfig?.find(item => item.email)?.email;
-
   useEffect(() => {
     const currentUrl = window.location.href;
     const pathSegments = new URL(currentUrl).pathname.split("/");
@@ -47,16 +36,17 @@ function ContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       const payload = {
         ...formData,
+        from: currentLocation || LOCATION_NAME,
         fullName: `${formData.firstName} ${formData.lastName}`.trim(),
-        locationEmail: `${email}`,
+        locationEmail: CONTACT_EMAIL,
+        subject: `New Inquiry: ${formData.selectedEvent} at ${currentLocation || LOCATION_NAME}`.trim(),
       };
 
-      payload.subject = `New Inquiry: ${payload.selectedEvent} at ${currentLocation} - ${payload.fullName} (${payload.date} ${payload.time})`;
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/email`, {
+      const response = await fetch("/api/email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,24 +54,26 @@ function ContactForm() {
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        toast.success("Your message has been sent successfully! We will get back to you shortly.");
-        setFormData({
-          from: LOCATION_NAME,
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          date: "",
-          time: "",
-          message: "",
-          selectedEvent: "",
-        });
-      } else {
-        toast.error("Failed to send your message. Please try again later.");
+      if (!response.ok) {
+        throw new Error("Email send failed");
       }
+
+      toast.success("Your message has been sent successfully.");
+      setFormData({
+        from: LOCATION_NAME,
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        date: "",
+        time: "",
+        message: "",
+        selectedEvent: "",
+      });
     } catch (error) {
-      toast.error("An error occurred while sending your message. Please try again later.");
+      toast.error("We could not send your inquiry. Please try again later.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -191,8 +183,8 @@ function ContactForm() {
           </div>
         </div>
 
-        <button type="submit" className="submit-button">
-          Send Inquiry
+        <button type="submit" className="submit-button" disabled={submitting}>
+          {submitting ? "Sending..." : "Send Inquiry"}
         </button>
       </form>
     </div>
