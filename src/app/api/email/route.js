@@ -220,7 +220,7 @@ export async function POST(request) {
               <p style="margin:22px 0 0;font-size:15px;line-height:1.8;color:#cbd5e1;">
                Thank you Pixel Pulse Play 
               </p><br />
-              <a href="https://www.pixelpulseplay.ca/">www.pixelpulseplay.ca</a>
+              <a href="https://www.pixelpulseplay.ca/" style="color:#fbae7b;text-decoration:none;">www.pixelpulseplay.ca</a>
             </div>
           </div>
         </div>
