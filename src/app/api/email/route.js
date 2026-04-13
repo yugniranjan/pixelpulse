@@ -17,6 +17,10 @@ function getRequiredEnv(name) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function getAuthenticatedSender(gmailUser) {
+  return getRequiredEnv("GMAIL_FROM_EMAIL") || gmailUser;
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -42,6 +46,8 @@ export async function POST(request) {
         { status: 500 },
       );
     }
+
+    const authenticatedSender = getAuthenticatedSender(gmailUser);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -91,59 +97,52 @@ export async function POST(request) {
         : "Book Now";
 
     const html = `
-      <div style="margin:0;padding:24px 14px;background:#050810;font-family:Arial,sans-serif;color:#f8fafc;">
-        <div style="max-width:760px;margin:0 auto;border:1px solid rgba(251,174,123,0.16);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#121923 0%,#090e16 100%);box-shadow:0 18px 42px rgba(0,0,0,0.28);">
-          <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(251,174,123,0.16),rgba(164,207,95,0.1));">
-            <img src="${LOGO_URL}" alt="Pixel Pulse Play" style="display:block;width:170px;max-width:100%;height:auto;margin:0 0 14px;" />
-            <div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;font-weight:800;color:#fbae7b;">Pixel Pulse Play</div>
-            <div style="margin-top:10px;font-size:34px;line-height:1;color:#ffffff;font-weight:800;">New Inquiry</div>
-          </div>
+      <div>
+        <div>
+          
+            
+            <div>New Inquiry</div>
+        
 
-          <div style="padding:18px 22px 22px;">
+          <div>
             <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:separate;border-spacing:10px 10px;">
               <tr>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Location</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(from || "Pixel Pulse Play")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-                </td>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Inquiry Type</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(selectedEvent || "Not provided")
+                
+                <td>
+                  <div>Inquiry Type</div>
+                  <div ">${String(selectedEvent || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
                 </td>
               </tr>
               <tr>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Email</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(email || "Not provided")
+                <td>
+                  <div>Email</div>
+                  <div ${String(email || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
                 </td>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Phone</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(phone || "Not provided")
+                <td>
+                  <div>Phone</div>
+                  <div>${String(phone || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
                 </td>
               </tr>
               <tr>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Preferred Date</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(date || "Not provided")
+                <td>
+                  <div>Preferred Date</div>
+                  <div${String(date || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
                 </td>
-                <td style="width:50%;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);vertical-align:top;">
-                  <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Preferred Time</div>
-                  <div style="margin-top:6px;font-size:16px;line-height:1.45;color:#ffffff;">${String(time || "Not provided")
+                <td>
+                  <div>Preferred Time</div>
+                  <div>${String(time || "Not provided")
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")}</div>
@@ -151,9 +150,9 @@ export async function POST(request) {
               </tr>
             </table>
 
-            <div style="margin-top:10px;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(251,174,123,0.12);">
-              <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#fbae7b;font-weight:800;">Message</div>
-              <div style="margin-top:8px;font-size:16px;line-height:1.7;color:#e2e8f0;white-space:pre-wrap;">${String(
+            <div>
+              <div>Message</div>
+              <div>${String(
                 message || "No message provided",
               )
                 .replace(/&/g, "&amp;")
@@ -166,7 +165,8 @@ export async function POST(request) {
     `;
 
     await transporter.sendMail({
-      from: `"Pixel Pulse Play" <${gmailUser}>`,
+      from: `"Pixel Pulse Play" <${authenticatedSender}>`,
+      sender: authenticatedSender,
       to: CONTACT_EMAIL,
       replyTo: email || gmailUser,
       subject: safeSubject,
@@ -201,35 +201,24 @@ export async function POST(request) {
             <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(164,207,95,0.14),rgba(251,174,123,0.12));">
               <img src="${LOGO_URL}" alt="Pixel Pulse Play" style="display:block;width:170px;max-width:100%;height:auto;margin:0 0 14px;" />
               <div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;font-weight:800;color:#fbae7b;">Pixel Pulse Play</div>
-              <div style="margin-top:10px;font-size:34px;line-height:1;color:#ffffff;font-weight:800;">Thanks for reaching out</div>
-              <p style="margin:12px 0 0;font-size:16px;line-height:1.7;color:#d6dee9;">
-                We received your message and our team will follow up as soon as possible.
-              </p>
-            </div>
+             
 
             <div style="padding:22px;">
               <p style="margin:0 0 14px;font-size:17px;line-height:1.7;color:#f8fafc;">
                 Hi ${safeName},
               </p>
               <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
-                Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play</strong>. We have received your inquiry about
-                <strong style="color:#ffffff;"> ${safeEvent}</strong> and will get back to you soon.
+                Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play</strong>.
               </p>
 
-              <div style="margin:18px 0;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
-                <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">What happens next</div>
-                <ul style="margin:12px 0 0;padding-left:18px;color:#e2e8f0;line-height:1.9;">
-                  <li>We review your message and details</li>
-                  <li>We follow up with the right information or booking guidance</li>
-                  <li>We help you plan the best next step for your visit</li>
-                </ul>
-              </div>
+             
 
               <div style="margin-top:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
                 <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Explore the experience</div>
                 <div style="margin-top:8px;">
                   <a href="${ATTRACTIONS_URL}" style="color:#fbae7b;text-decoration:none;font-size:15px;font-weight:700;">View Attractions</a>
                 </div>
+                <p> Thank you Pixel Pulse Play </>
               </div>
 
               ${primaryCtaHref ? `
@@ -252,7 +241,8 @@ export async function POST(request) {
       `;
 
       await transporter.sendMail({
-        from: `"Pixel Pulse Play" <${gmailUser}>`,
+        from: `"Pixel Pulse Play" <${authenticatedSender}>`,
+        sender: authenticatedSender,
         to: email,
         replyTo: CONTACT_EMAIL,
         subject: autoReplySubject,
