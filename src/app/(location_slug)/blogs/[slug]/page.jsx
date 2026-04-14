@@ -9,7 +9,10 @@ import { db } from "@/lib/firestore";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params, searchParams }) {
-  const id = searchParams?.uid;
+  const [{ slug }, { uid: id } = {}] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const BASE_URL = process.env.SITE_URL;
 
   if (!id || !db) return {};
@@ -32,7 +35,7 @@ export async function generateMetadata({ params, searchParams }) {
     data?.featuredImage ||
     "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 
-  const url = `${BASE_URL}/blogs/${params.slug}?uid=${id}`;
+  const url = `${BASE_URL}/blogs/${slug}?uid=${id}`;
 
   return {
     title,
@@ -173,7 +176,7 @@ function renderEditorBlocks(blocks) {
 }
 
 export default async function BlogDetail({ searchParams }) {
-  const id = searchParams?.uid;
+  const { uid: id } = (await searchParams) || {};
 
   const data = await getBlogById(id);
 

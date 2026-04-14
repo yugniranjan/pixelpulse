@@ -25,61 +25,66 @@ function stripHtml(html = "") {
     .trim();
 }
 
-const ABOUT_US_THEME_HTML = `
-<div class="container">
-  <h2>Redefining How Vaughan Plays</h2>
-  <p>Welcome to Pixel Pulse Playzone, Vaughan’s newest immersive entertainment destination — where physical energy meets digital innovation.</p>
-  <p>Backed by the proven success of Aerosports Parks, Pixel Play is built for the next generation of play. We’re not just an indoor park. We’re a live-action gaming adventure designed to challenge the body, sharpen the mind, and ignite competitive spirit.</p>
-  <p>Located in the heart of Vaughan at 960 Edgely Blvd, our 8,000+ sq. ft. arena delivers a high-energy, tech-driven experience for kids, teens, and families who want more than just screen time.</p>
-  <h3>What Makes Pixel Pulse Playzone Different?</h3>
-  <h4>Immersive. Interactive. Intelligent.</h4>
-  <p>At Pixel Pulse Playzone, you don’t just play games — you step inside them.</p>
-  <ul>
-    <li>Interactive Pixel Tile Games.</li>
-    <li>Virtual Reality Gaming Rooms.</li>
-    <li>Ninja &amp; Agility Challenges.</li>
-    <li>Competitive Arcade Battles.</li>
-    <li>Private Party &amp; Event Rooms.</li>
-  </ul>
-  <p>Every experience is designed to build <strong>physical strength, cognitive skills, teamwork, and reflexes</strong> — all inside a safe, premium environment.</p>
-  <h3>Built for the Digital Generation</h3>
-  <p>Today’s kids don’t just want entertainment — they want engagement.</p>
-  <p>That’s why Pixel Play integrates:</p>
-  <ul>
-    <li>Smart game tracking.</li>
-    <li>Competitive leaderboards.</li>
-    <li>High-energy sound &amp; LED environments.</li>
-    <li>Skill-based progression systems.</li>
-  </ul>
-  <p>It feels like stepping inside a real-life console game — but you’re the controller.</p>
-  <h3>Designed for Families</h3>
-  <p>We’ve created a space where:</p>
-  <ul>
-    <li>Interactive Pixel Tile Games.</li>
-    <li>Virtual Reality Gaming Rooms.</li>
-    <li>Ninja &amp; Agility Challenges.</li>
-    <li>Competitive Arcade Battles.</li>
-    <li>Private Party &amp; Event Rooms.</li>
-  </ul>
-  <h3>Accessibility Commitment</h3>
-  <p>We’re committed to providing an inclusive environment for all guests. Our facility is designed to be accessible, and we continually update our accessibility measures to meet the needs of our community.</p>
-  <h3>Plan Your Visit</h3>
-  <p>PixelPulsePlay vaughan invites you to experience the excitement firsthand. As a family-owned business, we take pride in creating a welcoming, safe space for all. For more information on hours, pricing, and bookings, please visit our <a href="https://www.PixelPulsePlayparks.ca/vaughan" target="_blank" rel="noreferrer">website</a> or contact us directly.</p>
-  <h3>Location</h3>
-  <p>Find us at:</p>
-  <p><strong>960 Edgeley Blvd #2, Vaughan, ON L4K 4V4, Canada</strong></p>
-  <p>To help you find us easily, here’s our location on the map:</p>
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4066.013405274047!2d-79.53984758440566!3d43.81804602292468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b2f6ce0e223b7%3A0x18311b4ed1f2c40c!2sPixel%20Pulse%20Playzone%20(formerly%20Koala%20Kidz%20Park)!5e0!3m2!1sen!2sin!4v1772556140952!5m2!1sen!2sin"
-    width="600"
-    height="450"
-    style="border:0; width:100%"
-    allowfullscreen=""
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-</div>
-`;
+function decodeHtmlEntities(text = "") {
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function extractListItems(html = "") {
+  return [...html.matchAll(/<li[^>]*>(.*?)<\/li>/gis)]
+    .map((match) => decodeHtmlEntities(stripHtml(match[1])))
+    .filter(Boolean);
+}
+
+function extractHeroHeading(html = "") {
+  const headingMatch = html.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/is);
+  if (headingMatch?.[1]) {
+    return decodeHtmlEntities(stripHtml(headingMatch[1]));
+  }
+
+  const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/is);
+  if (paragraphMatch?.[1]) {
+    return decodeHtmlEntities(stripHtml(paragraphMatch[1]));
+  }
+
+  const [firstLine = ""] = decodeHtmlEntities(
+    html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/p>/gi, "\n")
+  )
+    .split("\n")
+    .map((line) => stripHtml(line))
+    .filter(Boolean);
+
+  return firstLine;
+}
+
+function parseHeroTextBlock(content = "") {
+  const normalizedContent = typeof content === "string" ? content.trim() : "";
+  if (!normalizedContent) {
+    return { heading: "", bullets: [] };
+  }
+
+  const htmlBullets = extractListItems(normalizedContent);
+  const htmlHeading = extractHeroHeading(normalizedContent);
+  if (htmlHeading || htmlBullets.length > 0) {
+    return { heading: htmlHeading, bullets: htmlBullets };
+  }
+
+  const lines = decodeHtmlEntities(normalizedContent)
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
+    .filter(Boolean);
+
+  return {
+    heading: lines[0] || "",
+    bullets: lines.slice(1),
+  };
+}
 
 export async function generateMetadata({ params }) {
   const { category_slug } = await params;
@@ -118,7 +123,19 @@ const Category = async ({ params }) => {
     stripHtml(pageData?.seosection || "") ||
     stripHtml(pageData?.section1 || "") ||
     "Step into immersive digital game rooms built for movement, reaction, teamwork, and all-out fun.";
-  const aboutContentHtml = isAboutPage ? ABOUT_US_THEME_HTML : pageData?.seosection || "";
+  const aboutContentHtml = pageData?.seosection || "";
+  const attractionHeroContent = parseHeroTextBlock(pageData?.section2 || "");
+  const attractionHeroLabelHtml = pageData?.section3 || "";
+  const attractionHeroHeading = attractionHeroContent.heading;
+  const attractionHeroBullets = attractionHeroContent.bullets;
+  const groupsHeroContent = parseHeroTextBlock(pageData?.section2 || "");
+  const groupsHeroLabelHtml = pageData?.section3 || "";
+  const groupsHeroHeading = groupsHeroContent.heading;
+  const groupsHeroBullets = groupsHeroContent.bullets;
+  const aboutHeroContent = parseHeroTextBlock(pageData?.section2 || "");
+  const aboutHeroLabelHtml = pageData?.section3 || "";
+  const aboutHeroHeading = aboutHeroContent.heading;
+  const aboutHeroBullets = aboutHeroContent.bullets;
 
   const jsonLDschema = await generateSchema(
     pageData,
@@ -141,15 +158,17 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-attractions-hero__inner">
                 <div className="ppp-attractions-hero__panel">
                   <div className="ppp-about-hero-card">
-                   <SectionHeading className="section-heading-white">
-                      Featured <span>Experiences</span>
-                    </SectionHeading>
-                    <h2>Each room combines movement, speed, lights, and score chasing in a way that keeps every visit fresh.</h2>
-                    <ul>
-                      <li>Fast rounds that are easy to jump into</li>
-                      <li>Great mix of solo, sibling, and team play</li>
-                      <li>Perfect for drop-ins, parties, and group visits</li>
-                    </ul>
+                    {attractionHeroLabelHtml && (
+                      <div dangerouslySetInnerHTML={{ __html: attractionHeroLabelHtml }} />
+                    )}
+                    {attractionHeroHeading && <h2>{attractionHeroHeading}</h2>}
+                    {attractionHeroBullets.length > 0 && (
+                      <ul>
+                        {attractionHeroBullets.map((item, index) => (
+                          <li key={`${item}-${index}`}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>
@@ -212,15 +231,17 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-groups-hero__inner">
                 <div className="ppp-groups-hero__panel">
                   <div className="ppp-about-hero-card">
-                    <SectionHeading className="section-heading-white">
-                      Group <span>Experiences</span>
-                    </SectionHeading>
-                    <h2>Plan a visit that feels organized for adults, exciting for kids, and easy for coordinators.</h2>
-                    <ul>
-                      <li>Great for school trips, camps, teams, and company outings</li>
-                      <li>Flexible experiences built around energy, movement, and fun</li>
-                      <li>Clear next steps for booking, planning, and group coordination</li>
-                    </ul>
+                    {groupsHeroLabelHtml && (
+                      <div dangerouslySetInnerHTML={{ __html: groupsHeroLabelHtml }} />
+                    )}
+                    {groupsHeroHeading && <h2>{groupsHeroHeading}</h2>}
+                    {groupsHeroBullets.length > 0 && (
+                      <ul>
+                        {groupsHeroBullets.map((item, index) => (
+                          <li key={`${item}-${index}`}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>
@@ -283,16 +304,17 @@ const Category = async ({ params }) => {
               <div className="aero-max-container ppp-about-hero__inner">
                 <div className="ppp-about-hero__panel">
                   <div className="ppp-about-hero-card">
-                    
-                    <SectionHeading className="section-heading-white">
-                     What we <span>stand for</span>
-                    </SectionHeading>
-                    <h2>A modern indoor play concept designed to feel active, social, and easy to come back to.</h2>
-                    <ul>
-                      <li>Digital-first game play that keeps kids moving and engaged</li>
-                      <li>Welcoming for families, schools, teams, and celebrations</li>
-                      <li>Clear information, easy planning, and a smoother visit flow</li>
-                    </ul>
+                    {aboutHeroLabelHtml && (
+                      <div dangerouslySetInnerHTML={{ __html: aboutHeroLabelHtml }} />
+                    )}
+                    {aboutHeroHeading && <h2>{aboutHeroHeading}</h2>}
+                    {aboutHeroBullets.length > 0 && (
+                      <ul>
+                        {aboutHeroBullets.map((item, index) => (
+                          <li key={`${item}-${index}`}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>

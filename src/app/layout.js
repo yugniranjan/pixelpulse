@@ -1,4 +1,3 @@
-import { Poppins, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
 const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
@@ -14,26 +13,17 @@ import Breadcrumbs from "./components/Breadcrumb";
 
 
 const BASE_URL = process.env.SITE_URL;
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["100","200","300","400","500","600","700","800","900"],
-});
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300","400","500","600"],
-});
-
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME;
   try {
     const configdata = await fetchsheetdata("config", location_slug);
     const dynamicMeta = Object.fromEntries(
       configdata
-        .filter((item) => item.key.startsWith("meta_"))
-        .map((item) => [item.key.replace("meta_", ""), item.value])
+        .filter((item) => typeof item.key === "string" && item.key.startsWith("meta_"))
+        .map((item) => [item.key.replace("meta_", ""), item.value || ""])
     );
+    const siteUrl = BASE_URL || "https://www.pixelpulseplay.ca";
+
     return {
       title: "Pixel Pulse Play Vaughan – Ultimate Indoor Arcade & Challenge Rooms",
       description:
@@ -42,14 +32,14 @@ export async function generateMetadata() {
         index: true,
       },
       alternates: {
-        canonical: BASE_URL + "/",
+        canonical: siteUrl + "/",
       },
       other: {
         ...dynamicMeta,
       },
       openGraph: {
         type: "website",
-        url: BASE_URL,
+        url: siteUrl,
         title:
           "Pixel Pulse Play Vaughan – Arcade Games & Interactive Challenge Rooms",
         description:
@@ -93,10 +83,7 @@ export default async function RootLayout({ children }) {
   // const reviewdata = await getReviewsData(locationid)
   return (
     <html lang="en">
-      <body
-        className={`${poppins.className} ${jakarta.className}`}
-        suppressHydrationWarning
-      >
+      <body suppressHydrationWarning>
         <Toaster position="top-right" />
         <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}

@@ -24,6 +24,67 @@ function stripHtml(html = "") {
     .trim();
 }
 
+function decodeHtmlEntities(text = "") {
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function extractListItems(html = "") {
+  return [...html.matchAll(/<li[^>]*>(.*?)<\/li>/gis)]
+    .map((match) => decodeHtmlEntities(stripHtml(match[1])))
+    .filter(Boolean);
+}
+
+function extractHeroHeading(html = "") {
+  const headingMatch = html.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/is);
+  if (headingMatch?.[1]) {
+    return decodeHtmlEntities(stripHtml(headingMatch[1]));
+  }
+
+  const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/is);
+  if (paragraphMatch?.[1]) {
+    return decodeHtmlEntities(stripHtml(paragraphMatch[1]));
+  }
+
+  const [firstLine = ""] = decodeHtmlEntities(
+    html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/p>/gi, "\n")
+  )
+    .split("\n")
+    .map((line) => stripHtml(line))
+    .filter(Boolean);
+
+  return firstLine;
+}
+
+function parseHeroTextBlock(content = "") {
+  const normalizedContent = typeof content === "string" ? content.trim() : "";
+  if (!normalizedContent) {
+    return { heading: "", bullets: [] };
+  }
+
+  const htmlBullets = extractListItems(normalizedContent);
+  const htmlHeading = extractHeroHeading(normalizedContent);
+  if (htmlHeading || htmlBullets.length > 0) {
+    return { heading: htmlHeading, bullets: htmlBullets };
+  }
+
+  const lines = decodeHtmlEntities(normalizedContent)
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
+    .filter(Boolean);
+
+  return {
+    heading: lines[0] || "",
+    bullets: lines.slice(1),
+  };
+}
+
 export async function generateMetadata({ params }) {
   const metadata = await generateMetadataLib({
     location: params.location_slug || "vaughan",
@@ -41,7 +102,11 @@ const PricingComparison = ({ birthdaydata }) => {
       const raw = birthdaydata?.[0]?.value;
       if (!raw) return null;
 
-      const cleaned = raw.replace(/<br\/>/g, "").replace(/\n/g, "").trim();
+      const cleaned = raw
+        .replace(/<br\/>/g, "")
+        .replace(/\n/g, "")
+        .replace(/,\s*([}\]])/g, "$1")
+        .trim();
       return JSON.parse(cleaned);
     } catch (err) {
       console.error("JSON parse error:", err);
@@ -77,7 +142,7 @@ const PricingComparison = ({ birthdaydata }) => {
                 >
                   <div className="ppp-party-plan">
                     <span className="ppp-party-plan__eyebrow">
-                      {index === spotlightIndex ? "Most Popular" : ""}
+                      {index === spotlightIndex ? "Most Popular" : "Package"}
                     </span>
                     <h3>{plan.name}</h3>
                     <p>{plan["Package Price"]}</p>
@@ -184,6 +249,10 @@ const Page = async ({ params }) => {
   const introText =
     stripHtml(data?.seosection || "") ||
     "Plan a high-energy birthday party packed with digital games, active play, and a celebration setup that feels easy from booking to cake time.";
+  const partyHeroContent = parseHeroTextBlock(data?.section2 || "");
+  const partyHeroLabelHtml = data?.section3 || "";
+  const partyHeroHeading = partyHeroContent.heading;
+  const partyHeroBullets = partyHeroContent.bullets;
 
   return (
     <main className="ppp-party-page">
@@ -191,15 +260,17 @@ const Page = async ({ params }) => {
         <div className="aero-max-container ppp-party-hero__inner">
           <div className="ppp-party-hero__panel">
             <div className="ppp-about-hero-card">
-              <SectionHeading className="section-heading-white" mainHeading={true}>
-              Birthday Party <span>Packages & Pricing</span>
-            </SectionHeading>
-              <h2>All the energy of an active party, with less planning stress and more memorable moments.</h2> 
-              <ul>
-                <li>Interactive play that keeps the whole group engaged</li>
-                <li>Structured package options that simplify decision-making</li>
-                <li>Great fit for birthdays that need movement, excitement, and space</li>
-              </ul>
+              {partyHeroLabelHtml && (
+                <div dangerouslySetInnerHTML={{ __html: partyHeroLabelHtml }} />
+              )}
+              {partyHeroHeading && <h2>{partyHeroHeading}</h2>}
+              {partyHeroBullets.length > 0 && (
+                <ul>
+                  {partyHeroBullets.map((item, index) => (
+                    <li key={`${item}-${index}`}>{item}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

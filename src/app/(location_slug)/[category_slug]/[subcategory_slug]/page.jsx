@@ -92,6 +92,7 @@ const Subcategory = async ({ params }) => {
   if (!pagedata) return;
   const isAttractionDetailPage = category_slug === "attractions";
   const isGroupsDetailPage = category_slug === "group-events";
+  const detailContentHtml = pagedata?.seosection || "";
   const introText =
     stripHtml(pagedata?.seosection || "") ||
     pagedata?.metadescription ||
@@ -105,10 +106,13 @@ const Subcategory = async ({ params }) => {
           <section className="ppp-subcategory-hero">
             <div className="aero-max-container ppp-subcategory-hero__inner">
               <div className="ppp-subcategory-hero__copy">
-                <span className="ppp-subcategory-hero__eyebrow">Attraction Spotlight</span>
-                <h1 className="ppp-subcategory-hero__title">{pagedata?.title}</h1>
-                <p className="ppp-subcategory-hero__text">{introText}</p>
-
+                <article className="ppp-subcategory-overview">
+                <SectionHeading className="section-heading-white" mainHeading="true">
+                  <span>{pagedata?.title}</span>
+                </SectionHeading>
+                <h2>{pagedata?.metatitle}</h2>
+                <p>{pagedata?.metadescription}</p>
+              </article>
                 <div className="ppp-subcategory-hero__actions">
                   <div className="aero-btn-booknow">
                     <BookingButton title="Book Now" />
@@ -144,15 +148,9 @@ const Subcategory = async ({ params }) => {
 
           <section className="subcategory_main_section-bg">
             <section className="aero-max-container ppp-subcategory-layout">
-              <article className="ppp-subcategory-overview">
-                <SectionHeading className="section-heading-white" mainHeading="true">
-                  <span>{pagedata?.title}</span>
-                </SectionHeading>
-                <h2>{pagedata?.metatitle}</h2>
-                <p>{pagedata?.metadescription}</p>
-              </article>
+             
 
-              {pagedata?.seosection && (
+              {detailContentHtml && (
                 <article className="ppp-subcategory-content">
                   <SectionHeading className="section-heading-white">
                     Experience <span>{pagedata?.title}</span>
@@ -160,7 +158,7 @@ const Subcategory = async ({ params }) => {
                   <div
                     className="ppp-subcategory-richtext"
                     dangerouslySetInnerHTML={{
-                      __html: pagedata.seosection || "",
+                      __html: detailContentHtml,
                     }}
                   />
                 </article>

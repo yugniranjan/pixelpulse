@@ -7,80 +7,92 @@ const sheetCache = new Map();
 const CACHE_TTL = 1000 * 60 * 15; // 15 min
 const waiverLinkCache = new Map();
 const reviewesData = new Map();
+let workbookLoadPromise = null;
 
+async function loadWorkbook() {
+  const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
+  return XLSX.read(response.data, { type: 'buffer' });
+}
+
+async function populateSheetCache() {
+  const now = Date.now();
+  const workbook = await loadWorkbook();
+
+  const worksheetLocationsData = workbook.Sheets['locations'];
+  const jsonLocationsData = XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' });
+  sheetCache.set('locations:all', {
+    data: jsonLocationsData,
+    timestamp: now,
+  });
+
+  const locationSet = new Set();
+  jsonLocationsData.forEach((row) => {
+    if (row.location) {
+      locationSet.add(row.location);
+    }
+  });
+  const distinctLocations = Array.from(locationSet);
+
+  workbook.SheetNames.forEach((name) => {
+    const worksheet = workbook.Sheets[name];
+    let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+    if (name === 'config') {
+      sheetData = sheetData.map((m) => ({
+        ...m,
+        value:
+          typeof m.value === 'string'
+            ? m.value.replace(/\r?\n|\r/g, "<br/>")
+            : m.value || "",
+      }));
+    }
+
+    distinctLocations.forEach((loc) => {
+      const filteredData = sheetData.filter(
+        (m) => m.location?.includes(loc) || m.location === ""
+      );
+      const cacheKeyLocal = `${name}:${loc}`;
+      sheetCache.set(cacheKeyLocal, {
+        data: filteredData,
+        timestamp: now,
+      });
+    });
+  });
+}
+
+async function ensureSheetCache(cacheKey) {
+  const now = Date.now();
+  const cached = sheetCache.get(cacheKey);
+  if (cached && now - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  if (!workbookLoadPromise) {
+    workbookLoadPromise = populateSheetCache().finally(() => {
+      workbookLoadPromise = null;
+    });
+  }
+
+  await workbookLoadPromise;
+  return sheetCache.get(cacheKey)?.data || [];
+}
 
 async function fetchsheetdata(sheetName, location) {
   const cacheKey = `${sheetName}:${location || 'all'}`;
   if(sheetName === 'refresh'){
     console.log('refreshing data');
     sheetCache.clear();
+    waiverLinkCache.clear();
+    workbookLoadPromise = null;
   }
-  const now = Date.now();
-
-  const cached = sheetCache.get(cacheKey);
-  if(cached)
+  if(location=='.well-known')
   {
-    // console.log('cache found');
-    
-   
+    // console.log('unknown location', location);
+    return [];
   }
-    if(location=='.well-known')
-    {
-      // console.log('unknown location', location);
-      return [];
-    }
-  if (cached && now - cached.timestamp < CACHE_TTL) {
-    // console.log("✅ from cache " + cacheKey);
-    return cached.data;
-  }
-
-  // console.log("🚀 fetching fresh sheet data " + cacheKey);
 
   try {
-    const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
-    const workbook = XLSX.read(response.data, { type: 'buffer' });
-
-    const worksheetLocationsData = workbook.Sheets['locations'];
-    const jsonLocationsData = XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' });
-    sheetCache.set('locations:all', {
-      data: jsonLocationsData,
-      timestamp: now,
-    });
-    const locationSet = new Set();
-    jsonLocationsData.forEach(row => {
-      if (row.location) {
-        locationSet.add(row.location);
-      }
-    });
-    const distinctLocations = Array.from(locationSet);
-    
-    workbook.SheetNames.forEach((name) => {
-      const worksheet = workbook.Sheets[name];
-      let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-
-      if (name === 'config') {
-        sheetData = sheetData.map(m => ({
-          ...m,
-          value: m.value.replace(/\r?\n|\r/g, "<br/>"),
-        }));
-      }
-
-
-      
-      distinctLocations.forEach((loc) => {
-        const filteredData = sheetData.filter(
-          m => m.location?.includes(loc) || m.location === ""
-        );
-        const cacheKeyLocal = `${name}:${loc}`;
-        sheetCache.set(cacheKeyLocal, {
-          data: filteredData,
-          timestamp: now,
-        });
-      });
-    });
-      const result = sheetCache.get(cacheKey);
-      return result ? result.data : [];
-    
+    return await ensureSheetCache(cacheKey);
   } catch (error) {
     console.error(`❌ Error in fetchsheetdata("${sheetName}"):`, error.message);
     throw error;
@@ -89,8 +101,7 @@ async function fetchsheetdata(sheetName, location) {
 
 async function fetchsheetdataNoCache(sheetName) {
    
-    const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
-    const workbook = XLSX.read(response.data, { type: 'buffer' });
+    const workbook = await loadWorkbook();
 
     const worksheetLocationsData = workbook.Sheets[sheetName];
     const jsonLocationsData = XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' });
@@ -127,10 +138,17 @@ async function fetchPageData(location, page) {
   if (!normalizedPage) {
     return null;
   }
-  const filtered = jsonData.filter(
+  const exactMatch = jsonData.find(
+    (m) => typeof m.path === "string" && m.path.toUpperCase() === normalizedPage
+  );
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  const partialMatch = jsonData.find(
     (m) => typeof m.path === "string" && m.path.toUpperCase().includes(normalizedPage)
   );
-  return filtered[0];
+  return partialMatch || null;
 }
 async function fetchFaqData(location, page) {
   const jsonData = await fetchsheetdata("faq", location);
