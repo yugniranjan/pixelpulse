@@ -3,6 +3,25 @@ import '../../styles/contactus.css'
 import ContactForm from '@/components/smallComponents/ContactForm';
 import SectionHeading from '@/components/home/SectionHeading';
 
+const contactDetails = [
+  {
+    label: "Location",
+    value: "Get directions to Pixel Pulse Play",
+    href: "https://maps.app.goo.gl/bgn42mFnV5Woxz8Q8",
+    external: true,
+  },
+  {
+    label: "Phone",
+    value: "+1 (905) 760-2922",
+    href: "tel:+19057602922",
+  },
+  {
+    label: "Email",
+    value: "connect@pixelpulseplay.ca",
+    href: "mailto:connect@pixelpulseplay.ca",
+  },
+];
+
 const page = () => {
   return (
     <main className="ppp-contact-page">
@@ -12,9 +31,24 @@ const page = () => {
             <span className="ppp-contact-hero__eyebrow">Contact Pixel Pulse Play</span>
             <h1 className="aero_contact-mainheading">Let&apos;s Plan Your Visit</h1>
             <p className="ppp-contact-hero__text">
-              Reach out for admissions, birthday parties, group events, camp questions,
+              Reach out for birthday parties, group bookings, fundraisers,
               or anything else you want to plan with the Pixel Pulse Play team.
             </p>
+            <div className="ppp-contact-details" aria-label="Pixel Pulse Play contact details">
+              <p className="ppp-contact-details__intro">Prefer to reach us directly?</p>
+              {contactDetails.map((item) => (
+                <a
+                  key={item.label}
+                  className="ppp-contact-detail"
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
+                >
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </a>
+              ))}
+            </div>
           </div>
 
           <div className="ppp-contact-hero__panel">
