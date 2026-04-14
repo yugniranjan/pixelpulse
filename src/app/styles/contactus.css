@@ -123,17 +123,21 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 0.9rem;
-  border: 1px solid rgba(164, 207, 95, 0.28);
+  border: 1px solid transparent;
   border-radius: 999px;
   color: var(--white-color);
   text-decoration: none;
-  background: rgba(164, 207, 95, 0.08);
+  background:
+    linear-gradient(#09111b, #09111b) padding-box,
+    linear-gradient(135deg, var(--primary-color), var(--secondary-color)) border-box;
   transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
 .ppp-contact-detail:hover {
-  border-color: rgba(251, 174, 123, 0.62);
-  background: rgba(251, 174, 123, 0.12);
+  border-color: var(--primary-color);
+  background:
+    linear-gradient(rgba(251, 174, 123, 0.12), rgba(251, 174, 123, 0.12)) padding-box,
+    linear-gradient(135deg, var(--primary-color), var(--secondary-color)) border-box;
   transform: translateY(-2px);
 }
 
