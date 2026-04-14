@@ -99,6 +99,59 @@
   line-height: 1.8;
 }
 
+.ppp-contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ppp-contact-details__intro {
+  flex: 1 1 100%;
+  margin: 0 0 0.1rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.ppp-contact-detail {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(164, 207, 95, 0.28);
+  border-radius: 999px;
+  color: var(--white-color);
+  text-decoration: none;
+  background: rgba(164, 207, 95, 0.08);
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+
+.ppp-contact-detail:hover {
+  border-color: rgba(251, 174, 123, 0.62);
+  background: rgba(251, 174, 123, 0.12);
+  transform: translateY(-2px);
+}
+
+.ppp-contact-detail span {
+  color: #a4cf5f;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ppp-contact-detail strong {
+  color: var(--white-color);
+  font-size: 0.95rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
 .ppp-about-hero-card h2,
 .ppp-contact-hero-card h2 {
   margin: 0.8rem 0 1rem;
@@ -264,5 +317,11 @@
   .ppp-contact-hero-card,
   .ppp-contact-card {
     border-radius: 22px;
+  }
+
+  .ppp-contact-detail {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 8px;
   }
 }
