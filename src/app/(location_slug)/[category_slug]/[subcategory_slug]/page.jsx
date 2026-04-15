@@ -22,10 +22,10 @@ import BookingButton from "@/components/smallComponents/BookingButton";
 
 function stripHtml(html = "") {
   return html
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 }
 
 function looksLikeRenderableImage(url = "") {

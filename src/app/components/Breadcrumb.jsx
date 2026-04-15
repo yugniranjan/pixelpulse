@@ -21,8 +21,8 @@ export default function Breadcrumbs() {
 
   function formatLabel(slug) {
     return slug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+      ?.replace(/-/g, " ")
+      ?.replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   const jsonLd = {

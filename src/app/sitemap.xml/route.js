@@ -42,9 +42,9 @@ export async function GET() {
       if (blog?.status === "published") {
 
         const slug = blog?.title
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, "")
-          .replace(/\s+/g, "-");
+          ?.toLowerCase()
+          ?.replace(/[^\w\s-]/g, "")
+          ?.replace(/\s+/g, "-");
 
         dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`); 
       }

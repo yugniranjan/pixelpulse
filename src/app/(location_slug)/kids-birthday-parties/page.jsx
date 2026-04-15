@@ -18,10 +18,10 @@ import Loading from "@/loading";
 
 function stripHtml(html = "") {
   return html
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 }
 
 function decodeHtmlEntities(text = "") {

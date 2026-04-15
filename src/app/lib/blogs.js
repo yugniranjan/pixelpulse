@@ -92,10 +92,10 @@ function getExcerptFromContent(content) {
 
   const rawText = paragraphBlock?.data?.text || "";
   const cleanText = rawText
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 
   return cleanText;
 }

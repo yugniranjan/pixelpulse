@@ -40,8 +40,8 @@
 .ppp-contact-hero__inner {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  /* display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); */
   gap: 1.75rem;
   align-items: stretch;
 }
@@ -133,13 +133,13 @@
   transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
-.ppp-contact-detail:hover {
+/* .ppp-contact-detail:hover {
   border-color: var(--primary-color);
   background:
     linear-gradient(rgba(251, 174, 123, 0.12), rgba(251, 174, 123, 0.12)) padding-box,
     linear-gradient(135deg, var(--primary-color), var(--secondary-color)) border-box;
   transform: translateY(-2px);
-}
+} */
 
 .ppp-contact-detail span {
   color: #a4cf5f;

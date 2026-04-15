@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-import "../styles/waiver.css";
+// import "../styles/waiver.css";
 import Link from "next/link";
 import SectionHeading from "@/components/home/SectionHeading";
 

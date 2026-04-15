@@ -44,7 +44,7 @@ function ContactForm() {
         from: currentLocation || LOCATION_NAME,
         fullName: `${formData.firstName} ${formData.lastName}`.trim(),
         locationEmail: CONTACT_EMAIL,
-        subject: `New Inquiry: ${formData.selectedEvent} at ${currentLocation || LOCATION_NAME}`.trim(),
+        subject: `${formData.firstName} ${formData.lastName} - Pixel Pulse Play Zone (Inquiry)`.trim(),
       };
 
       const response = await fetch("/api/email", {

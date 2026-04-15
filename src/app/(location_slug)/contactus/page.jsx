@@ -51,7 +51,7 @@ const page = () => {
             </div>
           </div>
 
-          <div className="ppp-contact-hero__panel">
+          {/* <div className="ppp-contact-hero__panel">
             <div className="ppp-about-hero-card">
               <span className="ppp-about-hero-card__label">Fastest way to connect</span>
               <h2>Send us the key details and we&apos;ll help you sort out the best next step.</h2>
@@ -61,7 +61,7 @@ const page = () => {
                 <li>Get a response with the right info for your inquiry</li>
               </ul>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 

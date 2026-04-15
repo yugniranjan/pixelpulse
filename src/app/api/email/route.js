@@ -4,12 +4,8 @@ import nodemailer from "nodemailer";
 export const runtime = "nodejs";
 
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
-const SITE_URL = process.env.SITE_URL || "https://www.pixelpulseplay.ca";
+const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
-const PARTY_BOOKING_URL =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php";
-const TICKET_BOOKING_URL =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php";
 const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
 
 function getRequiredEnv(name) {
@@ -19,6 +15,20 @@ function getRequiredEnv(name) {
 
 function getAuthenticatedSender(gmailUser) {
   return getRequiredEnv("GMAIL_FROM_EMAIL") || gmailUser;
+}
+
+function cleanHeaderValue(value, fallback) {
+  const cleaned = String(value || "")
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned || fallback;
+}
+
+function cleanEmailAddress(value, fallback) {
+  const cleaned = cleanHeaderValue(value, "");
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned) ? cleaned : fallback;
 }
 
 export async function POST(request) {
@@ -33,7 +43,6 @@ export async function POST(request) {
       time,
       message,
       selectedEvent,
-      subject,
       from,
     } = body || {};
 
@@ -57,9 +66,18 @@ export async function POST(request) {
       },
     });
 
-    const safeSubject =
-      subject ||
-      `New Inquiry: ${selectedEvent || "General"} - ${fullName || "Unknown contact"}`;
+    const visitorName = cleanHeaderValue(fullName, "Website Inquiry");
+    const visitorDisplayName = visitorName.toLowerCase();
+    const visitorEmail = cleanEmailAddress(email, "");
+
+    if (!visitorEmail) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address." },
+        { status: 400 },
+      );
+    }
+
+    const safeSubject = `${visitorDisplayName} - ${BUSINESS_NAME} (Inquiry)`;
 
     const text = [
       `From Location: ${from || "Pixel Pulse Play"}`,
@@ -78,83 +96,51 @@ export async function POST(request) {
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-    const safeEvent = String(selectedEvent || "your inquiry")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    const normalizedEvent = String(selectedEvent || "").toLowerCase();
-    const isGroupBooking = normalizedEvent === "group booking";
-    const isBirthdayParty = normalizedEvent === "birthday";
-    const primaryCtaHref = isGroupBooking
-      ? null
-      : isBirthdayParty
-        ? PARTY_BOOKING_URL
-        : TICKET_BOOKING_URL;
-    const primaryCtaLabel = isGroupBooking
-      ? ""
-      : isBirthdayParty
-        ? "Book Birthday Party"
-        : "Book Now";
 
     const html = `
       <div>
-        <div>
-          
-            
-            <div>New Inquiry</div>
-        
-
-          
-            
-                  <div>Inquiry Type</div>
-                  <div>${String(selectedEvent || "Not provided")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-               
-                  <div>Email</div>
-                  <div${String(email || "Not provided")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-               
-                  <div>Phone</div>
-                  <div>${String(phone || "Not provided")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-               
-                  <div>Preferred Date</div>
-                  <div${String(date || "Not provided")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-                
-                  <div>Preferred Time</div>
-                  <div>${String(time || "Not provided")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")}</div>
-              
-
-            
-              <div>Message</div>
-              <div>${String(
-                message || "No message provided",
-              )
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")}</div>
-            
-          
-      
+        <p><strong>Inquiry Type:</strong> ${String(selectedEvent || "Not provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+        <p><strong>Email:</strong> ${String(email || "Not provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+        <p><strong>Phone:</strong> ${String(phone || "Not provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+        <p><strong>Preferred Date:</strong> ${String(date || "Not provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+        <p><strong>Preferred Time:</strong> ${String(time || "Not provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+        <p><strong>Message:</strong></p>
+        <p>${String(message || "No message provided")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</p>
+      </div>
     `;
 
     await transporter.sendMail({
-      from: `"Pixel Pulse Play" <${authenticatedSender}>`,
-      sender: authenticatedSender,
+      from: {
+        name: visitorEmail,
+        address: authenticatedSender,
+      },
       to: CONTACT_EMAIL,
-      replyTo: email || gmailUser,
+      replyTo: {
+        name: visitorDisplayName,
+        address: visitorEmail,
+      },
+      envelope: {
+        from: authenticatedSender,
+        to: CONTACT_EMAIL,
+      },
       subject: safeSubject,
       text,
       html,
@@ -186,7 +172,7 @@ export async function POST(request) {
           <div style="max-width:720px;margin:0 auto;border:1px solid rgba(164,207,95,0.16);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#121923 0%,#090e16 100%);box-shadow:0 18px 42px rgba(0,0,0,0.28);">
             <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(164,207,95,0.14),rgba(251,174,123,0.12));">
               <img src="${LOGO_URL}" alt="Pixel Pulse Play" style="display:block;width:170px;max-width:100%;height:auto;margin:0 0 14px;" />
-              <div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;font-weight:800;color:#fbae7b;">Pixel Pulse Play</div>
+              
              
 
             <div style="padding:22px;">
@@ -194,7 +180,7 @@ export async function POST(request) {
                 Hi ${safeName},
               </p>
               <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
-                Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play</strong>.
+                Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play Zone</strong>.
               </p>
 
              
@@ -207,30 +193,29 @@ export async function POST(request) {
                
               </div>
 
-              ${primaryCtaHref ? `
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;">
-                  <a href="${primaryCtaHref}" style="display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 18px;border-radius:999px;background:linear-gradient(135deg,#fbae7b,#ffbf96);color:#111827;text-decoration:none;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;font-size:12px;">${primaryCtaLabel}</a>
-                </div>
-              ` : ""}
+              
 
              
             </div>
 
             <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:14px;line-height:1.7;color:#94a3b8;">
-              <p style="margin:22px 0 0;font-size:15px;line-height:1.8;color:#cbd5e1;">
-               Thank you Pixel Pulse Play 
-              </p><br />
-              <a href="https://www.pixelpulseplay.ca/" style="color:#fbae7b;text-decoration:none;">www.pixelpulseplay.ca</a>
+              
+              <a href="https://www.pixelpulseplay.ca/" style="color:#fbae7b;text-decoration:none;">Visit us at: www.pixelpulseplay.ca</a>
             </div>
           </div>
         </div>
       `;
 
       await transporter.sendMail({
-        from: `"Pixel Pulse Play" <${authenticatedSender}>`,
-        sender: authenticatedSender,
+        from: {
+          name: BUSINESS_NAME,
+          address: authenticatedSender,
+        },
         to: email,
-        replyTo: CONTACT_EMAIL,
+        replyTo: {
+          name: BUSINESS_NAME,
+          address: CONTACT_EMAIL,
+        },
         subject: autoReplySubject,
         text: autoReplyText,
         html: autoReplyHtml,

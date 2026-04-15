@@ -263,9 +263,9 @@ async function generateSchema(pagedata, locationData, category, page ) {
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
 
   const filled = locationData?.[0]?.schema
-  .replace('"{{metadesc}}"', JSON.stringify(metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!"))
-  .replace('"{{image}}"', JSON.stringify(imageUrl))
-  .replace('"{{url}}"', JSON.stringify(fullUrl));
+  ?.replace('"{{metadesc}}"', JSON.stringify(metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!"))
+  ?.replace('"{{image}}"', JSON.stringify(imageUrl))
+  ?.replace('"{{url}}"', JSON.stringify(fullUrl));
 
   return     filled;
 

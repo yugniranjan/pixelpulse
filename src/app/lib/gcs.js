@@ -5,7 +5,7 @@ const credentials =
   process.env.GCP_CLIENT_EMAIL && privateKey
     ? {
         client_email: process.env.GCP_CLIENT_EMAIL,
-        private_key: privateKey.replace(/\\n/g, "\n"),
+        private_key: privateKey?.replace(/\\n/g, "\n"),
       }
     : null;
 

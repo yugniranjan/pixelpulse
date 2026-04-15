@@ -253,6 +253,64 @@ const PricingPromosPage = async ({ params }) => {
 
   const pricingCards = buildPricingCards(pricingRows, detailKeys, pricingHeaders, cardMeta);
 
+  // =============================
+function sanitizeHTMLJsonString(str) {
+  if (!str || typeof str !== "string") return null;
+
+  let clean = str
+    ?.replace(/<[^>]*>/g, "") // remove HTML
+    ?.replace(/&quot;/g, '"')
+    ?.replace(/&amp;/g, "&")
+    ?.replace(/&lt;/g, "<")
+    ?.replace(/&gt;/g, ">")
+    ?.trim()
+    ?.replace(/,\s*}/g, "}")
+    ?.replace(/,\s*]/g, "]");
+
+  try {
+    return JSON.parse(clean);
+  } catch {
+    return null;
+  }
+}
+
+function validateValue(val) {
+  if (!val || typeof val !== "object") return null;
+
+  return {
+    img: val.img || "",
+    title: val.title || "",
+    is_book: val.is_book ?? false,
+    details: Array.isArray(val.details)
+      ? val.details.map((d) => ({
+          duration: d.duration || "",
+          price: d.price || ""
+        }))
+      : []
+  };
+}
+
+const pricingheader_data = Array.isArray(configData)
+  ? configData.filter((item) => item.key === "pricingheader")
+  : [];
+
+// ✅ FINAL RESULT
+const pricingCardss = pricingheader_data.map((item) => {
+  const parsed = sanitizeHTMLJsonString(item.value);
+
+  return {
+    location: item.location,
+    key: item.key,
+    icon: item.icon || "",
+    value: validateValue(parsed)
+  };
+});
+
+console.log(pricingCardss);
+
+
+// ===============================
+
   const introText =
     stripHtml(pageData?.section1 || "") ||
     pageData?.metadescription ||
@@ -294,12 +352,13 @@ const PricingPromosPage = async ({ params }) => {
       <section className="subcategory_main_section-bg">
         <div className="aero-max-container">
           <section className="subcategory_main_section ppp-pricing-layout">
-            <article className="ppp-pricing-block">
+            {/* <article className="ppp-pricing-block">
              
 
               {hasPricingCards ? (
                 <div className="ppp-pricing-grid">
                   {pricingCards.map((card, index) => (
+                    // console.log("Rendering card:", card),
                     <article className="ppp-pricing-card" key={`${card.title}-${index}`}>
                       <div className="ppp-pricing-card__media">
                         <img src={card.image} alt={card.imageAlt} />
@@ -343,7 +402,82 @@ const PricingPromosPage = async ({ params }) => {
                   </div>
                 </div>
               )}
-            </article>
+            </article> */}
+
+<article className="ppp-pricing-block">
+  {Array.isArray(pricingCardss) && pricingCardss.length > 0 ? (
+    <div className="ppp-pricing-grid">
+      {pricingCardss.map((card, index) => {
+        const val = card.value;
+
+        return (
+          <article
+            className="ppp-pricing-card"
+            key={`${val?.title || "card"}-${index}`}
+          >
+            {/* IMAGE */}
+            <div className="ppp-pricing-card__media">
+              <img
+                src={val?.img || "/default.jpg"}
+                alt={val?.title || "pricing"}
+              />
+            </div>
+
+            {/* CONTENT */}
+            <div className="ppp-pricing-card__content">
+              <div className="ppp-pricing-card__top">
+                {/* Location as eyebrow */}
+                {card.location && (
+                  <span className="ppp-pricing-card__eyebrow">
+                    {card.location}
+                  </span>
+                )}
+
+                <h3>{val?.title || "Untitled"}</h3>
+              </div>
+
+              {/* DETAILS */}
+              <div className="ppp-pricing-card__details">
+                {Array.isArray(val?.details) && val.details.length > 0 ? (
+                  val.details.map((detail, i) => (
+                    <div
+                      className="ppp-pricing-card__detail"
+                      key={`${index}-${i}`}
+                    >
+                      <span>{detail?.duration || "Duration"}</span>
+                      <strong>{detail?.price || "—"}</strong>
+                    </div>
+                  ))
+                ) : (
+                  <div className="ppp-pricing-card__detail">
+                    <span>No details available</span>
+                  </div>
+                )}
+              </div>
+
+              {/* CTA */}
+              {val?.is_book && (
+                <div className="aero-btn-booknow ppp-pricing-card__cta">
+                  <BookingButton title="Book Now" />
+                </div>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  ) : (
+    <div className="ppp-empty-state">
+      <p>
+        Pricing details are being updated. Please use booking for the latest
+        availability.
+      </p>
+      <div className="aero-btn-booknow ppp-pricing-card__cta">
+        <BookingButton title="Book Now" />
+      </div>
+    </div>
+  )}
+</article>
 
             <article className="ppp-inline-cta">
               <div>
