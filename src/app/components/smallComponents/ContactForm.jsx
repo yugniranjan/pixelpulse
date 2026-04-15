@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "../../styles/contactus.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { toast } from "sonner";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 
 function ContactForm() {
-  const location_slug = LOCATION_NAME;
+  const router = useRouter();
   const [currentLocation, setCurrentLocation] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -59,17 +60,7 @@ function ContactForm() {
       }
 
       toast.success("Your message has been sent successfully.");
-      setFormData({
-        from: LOCATION_NAME,
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        date: "",
-        time: "",
-        message: "",
-        selectedEvent: "",
-      });
+      router.push("/contactus/thank-you");
     } catch (error) {
       toast.error("We could not send your inquiry. Please try again later.");
     } finally {
