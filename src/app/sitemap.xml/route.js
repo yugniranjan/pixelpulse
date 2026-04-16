@@ -45,8 +45,9 @@ export async function GET() {
 
 
     extractBlogData?.forEach(blog => {
+      const status = typeof blog?.status === "string" ? blog.status.toLowerCase() : "";
 
-      if (blog?.status === "published") {
+      if (status !== "draft") {
         dynamicPaths.add(`${siteUrl}${getBlogHref(blog)}`);
       }
     });
