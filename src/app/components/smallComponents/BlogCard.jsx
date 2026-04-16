@@ -1,5 +1,5 @@
 import { db } from '@/lib/firestore';
-import { slugify } from '@/utils/slugify';
+import { getBlogHref } from '@/lib/blogs';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
@@ -32,9 +32,8 @@ const BlogCard = async ({ blogsData, location_slug }) => {
     <section className="aero_home_article_card-wrapper">
       {extractBlogData &&
         extractBlogData.slice(0, 4).map((item, i) => {
-           const slug = slugify(item.title);
           return (
-          <Link href={`blogs/${slug}?uid=${item.id}`} prefetch key={item.id}>
+          <Link href={getBlogHref(item)} prefetch key={item.id}>
               <article className="aero_home_article_card">
                 <Image
                   src={item?.featuredImage || 'https://storage.googleapis.com/aerosports/common/gallery-thummbnail-wall-climbwall.jpg'}

@@ -17,6 +17,7 @@ import {
 } from "@/lib/sheets";
 import Link from "next/link";
 import { LOCATION_NAME } from "@/lib/constant";
+import { notFound } from "next/navigation";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 
@@ -80,8 +81,8 @@ const Subcategory = async ({ params }) => {
     const jsonLDschema = await generateSchema(
     data,
     '',
-    subcategory_slug,
-    category_slug
+    category_slug,
+    subcategory_slug
   );
 
 
@@ -89,7 +90,7 @@ const Subcategory = async ({ params }) => {
   const safeWaiverLink = JSON.parse(JSON.stringify(waiverLink));
 
   const pagedata = attractionsData?.[0];
-  if (!pagedata) return;
+  if (!pagedata) notFound();
   const isAttractionDetailPage = category_slug === "attractions";
   const isGroupsDetailPage = category_slug === "group-events";
   const detailContentHtml = pagedata?.seosection || "";
@@ -226,7 +227,7 @@ const Subcategory = async ({ params }) => {
               </article>}
  <a
   className="aero-header-contactus-btn aero-header-cta aero-header-cta--solid aero-d-changelocation"
-  href="/vaughan/contactus"
+  href="/contactus"
 >
   <span>Inquire</span>
 </a>

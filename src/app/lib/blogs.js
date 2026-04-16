@@ -1,4 +1,5 @@
 import { db } from "@/lib/firestore";
+import { slugify } from "@/utils/slugify";
 
 const fallbackImage =
   "https://storage.googleapis.com/aerosports/common/gallery-thummbnail-wall-climbwall.jpg";
@@ -124,6 +125,12 @@ function normalizeBlog(doc) {
       data.description ||
       derivedMetaDescription,
   };
+}
+
+export function getBlogHref(blog) {
+  if (blog?.href) return blog.href;
+  const slug = slugify(blog?.title || "");
+  return slug ? `/blogs/${slug}` : "/blogs";
 }
 
 export async function fetchBlogs() {

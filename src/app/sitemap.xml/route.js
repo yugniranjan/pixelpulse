@@ -1,52 +1,53 @@
 export const dynamic = "force-dynamic";
 import { format } from 'date-fns';
 import { fetchsheetdataNoCache } from "@/lib/sheets";
-import { fetchBlogs } from "@/lib/blogs";
+import { fetchBlogs, getBlogHref } from "@/lib/blogs";
+
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 export async function GET() {
-  const siteUrl = (process.env.SITE_URL || "https://www.pixelpulseplay.ca").replace(/\/$/, "");
+  const siteUrl = (
+    process.env.SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://www.pixelpulseplay.ca"
+  ).replace(/\/$/, "");
   const dynamicPaths = new Set();
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
     const extractBlogData = await fetchBlogs();
 
+    dynamicPaths.add(siteUrl);
+    dynamicPaths.add(`${siteUrl}/blogs`);
+
     rows.forEach(row => {
-      const location = typeof row?.location === "string" ? row.location : "";
       const parentid = typeof row?.parentid === "string" ? row.parentid.trim().toLowerCase() : "";
       const path = typeof row?.path === "string" ? row.path.trim().toLowerCase() : "";
-      const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+      const isActive = String(row?.isactive ?? "1") === "1";
 
-      if (!path) {
+      if (!path || path === "home" || !isActive) {
         return;
       }
 
-      dynamicPaths.add(`${siteUrl}`);
-      locations.forEach(loc => {
-        // Homepage for location
-        dynamicPaths.add(`${siteUrl}/${loc}`);
-        if (path != 'home') {
-          // Construct path
-          const basePath = (!parentid || parentid === path)
-            ? `/${loc}/${path}`
-            : `/${loc}/${parentid}/${path}`;
+      const basePath = (!parentid || parentid === path)
+        ? `/${path}`
+        : `/${parentid}/${path}`;
 
-
-          dynamicPaths.add(`${siteUrl}${basePath}`);
-        }
-      });
+      dynamicPaths.add(`${siteUrl}${basePath}`);
     });
 
 
     extractBlogData?.forEach(blog => {
 
       if (blog?.status === "published") {
-
-        const slug = blog?.title
-          ?.toLowerCase()
-          ?.replace(/[^\w\s-]/g, "")
-          ?.replace(/\s+/g, "-");
-
-        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`); 
+        dynamicPaths.add(`${siteUrl}${getBlogHref(blog)}`);
       }
     });
 
@@ -58,7 +59,7 @@ export async function GET() {
   const lastmod = format(new Date(), 'yyyy-MM-dd');
   const urls = [...dynamicPaths].map(url => `
     <url>
-      <loc>${url}</loc>
+      <loc>${escapeXml(url)}</loc>
       <lastmod>${lastmod}</lastmod>
       <changefreq>daily</changefreq>
       <priority>0.7</priority>

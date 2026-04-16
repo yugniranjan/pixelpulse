@@ -178,24 +178,32 @@ async function getWaiverLink(location){
 }
  
 
+function getSiteUrl() {
+  return (
+    process.env.SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "https://www.pixelpulseplay.ca"
+  ).replace(/\/$/, "");
+}
+
+function buildCanonicalPath({ category, page } = {}) {
+  const parts = [category, page]
+    .filter(Boolean)
+    .map((part) => String(part).replace(/^\/+|\/+$/g, ""));
+
+  return parts.length ? `/${parts.join("/")}` : "/";
+}
+
 async function generateMetadataLib({ location, category, page }) {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = getSiteUrl();
   const pagefordata = page?page:'home';
   const data = await fetchPageData(location, pagefordata);
 
   const metadataItem = data;//?.find((item) => item.path === pagefordata);
 //// console.log(pagefordata);
-  // Construct canonical path
-  let canonicalPath = location;
-  if (category && page) {
-    canonicalPath += `/${category}/${page}`;
-  } else if (page) {
-     canonicalPath += `/${page}`;
-  } else if (category) {
-    canonicalPath += `/${category}`;
-  }
-
-  const fullUrl = `${BASE_URL}/${canonicalPath}`;
+  const canonicalPath = buildCanonicalPath({ category, page });
+  const fullUrl = `${BASE_URL}${canonicalPath}`;
   const imageUrl = metadataItem?.headerimage?.startsWith("http")
     ? metadataItem.headerimage
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
@@ -203,6 +211,10 @@ async function generateMetadataLib({ location, category, page }) {
   return {
     title: metadataItem?.metatitle || "pixelpulseplay Trampoline Park",
     description: metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!",
+    robots: {
+      index: true,
+      follow: true,
+    },
     alternates: {
       canonical: fullUrl,
     },
@@ -243,21 +255,12 @@ async function generateMetadataLib({ location, category, page }) {
 // }
    
 async function generateSchema(pagedata, locationData, category, page ) {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = getSiteUrl();
 
   const metadataItem = pagedata;//?.find((item) => item.path === pagefordata);
 //console.log('pagedata', pagedata);
-  let canonicalPath = pagedata?.location;
-  if (category && page) {
-    canonicalPath += `/${category}/${page}`;
-  } else if (page) {
-     canonicalPath += `/${page}`;
-  } else if (category) {
-    canonicalPath += `/${category}`;
-  }
-
-
-  const fullUrl = `${BASE_URL}/${canonicalPath}`;
+  const canonicalPath = buildCanonicalPath({ category, page });
+  const fullUrl = `${BASE_URL}${canonicalPath}`;
   const imageUrl = metadataItem?.headerimage?.startsWith("http")
     ? metadataItem.headerimage
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;

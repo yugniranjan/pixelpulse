@@ -36,7 +36,7 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_API_URL: "https://websitebackend-439220.ue.r.appspot.com",
-    NEXT_PUBLIC_BASE_URL: "https://pixelpulseplay.ca",
+    NEXT_PUBLIC_BASE_URL: "https://www.pixelpulseplay.ca",
   },
 };
 

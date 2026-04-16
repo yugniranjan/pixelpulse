@@ -14,8 +14,7 @@ import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
 import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import logo from '@public/assets/images/logo.png'
 import Script from "next/script";
-import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
-import { slugify } from "@/utils/slugify";
+import { fetchBlogs, getBlogHref, getFallbackBlogs } from "@/lib/blogs";
 
 
 const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
@@ -60,9 +59,9 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
           />
           <article className="aero-max-container aero_home_BPJ_wrapper">
             {[
-              { icon: event_icon, text: "Birthday Parties", url: `/${location_slug}/${birthDaypartyData?.[0]?.path}` },
+              { icon: event_icon, text: "Birthday Parties", url: `/${birthDaypartyData?.[0]?.path}` },
              
-              { icon: jump_icon, text: "Group Events", url: `/${location_slug}/${groupsData?.[0]?.path}` },
+              { icon: jump_icon, text: "Group Events", url: `/${groupsData?.[0]?.path}` },
             ].map((item, index) => (
               <div className="d-flex-center" key={index}>
                 <a href={item.url} >
@@ -127,7 +126,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             <li>Attractions</li>
             {attractionsData?.[0]?.children?.map((item, i) => (
               <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                   {item?.desc}
                 </Link>
               </li>
@@ -150,7 +149,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                   {companyData[0].children.map((item, i) => (
                     item?.isactive == 1 && (
                       <li key={i}>
-                        <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                        <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                           {item?.desc}
                         </Link>
                       </li>
@@ -158,7 +157,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                   ))}
                   {!hasFooterContactLink && (
                     <li>
-                      <Link href={`/${location_slug}/contactus`} prefetch>
+                      <Link href="/contactus" prefetch>
                         Contact Us
                       </Link>
                     </li>
@@ -173,7 +172,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             <li>Groups</li>
             {groupsData?.[0]?.children?.map((item, i) => (
               <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                   {item?.desc}
                 </Link>
               </li>
@@ -189,7 +188,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             {blogChildren.map((item, i) => (
               item?.isactive == 1 && (
                 <li key={i}>
-                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                  <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
                     {item?.desc}
                   </Link>
                 </li>
@@ -200,10 +199,9 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             <li>Latest News</li>
             {hasLatestNews ? (
               extractBlogData.slice(0, 4).map((item, i) => {
-                const slug = slugify(item.title);
                 return (
                   <li key={i}>
-                    <Link href={`/blogs/${slug}?uid=${item.id}`} prefetch>
+                    <Link href={getBlogHref(item)} prefetch>
                       <article className="d-flex-center aero_footer_article-card">
                         <Image
                           src={

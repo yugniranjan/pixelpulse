@@ -1,10 +1,6 @@
 export const dynamic = "force-dynamic";
 import "../../../styles/blogs.css";
-import {
-  fetchPageData,
-  fetchMenuData,
-  generateMetadataLib,
-} from "@/lib/sheets";
+import { fetchBlogs, getBlogHref } from "@/lib/blogs";
 import { db } from "@/lib/firestore";
 import { notFound } from "next/navigation";
 
@@ -13,17 +9,12 @@ export async function generateMetadata({ params, searchParams }) {
     params,
     searchParams,
   ]);
-  const BASE_URL = process.env.SITE_URL;
+  const BASE_URL = (process.env.SITE_URL || "https://www.pixelpulseplay.ca").replace(/\/$/, "");
+  const data = await getBlogBySlugOrId(slug, id);
 
-  if (!id || !db) return {};
-
-  const doc = await db.collection("blogs").doc(id).get();
-
-  if (!doc.exists) {
+  if (!data) {
     return {};
   }
-
-  const data = doc.data();
 
   const title = data?.title || "Blog";
   const description =
@@ -35,7 +26,7 @@ export async function generateMetadata({ params, searchParams }) {
     data?.featuredImage ||
     "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 
-  const url = `${BASE_URL}/blogs/${slug}?uid=${id}`;
+  const url = `${BASE_URL}${getBlogHref(data)}`;
 
   return {
     title,
@@ -95,6 +86,14 @@ async function getBlogById(id) {
     ...data,
     content,
   };
+}
+
+async function getBlogBySlugOrId(slug, id) {
+  const directBlog = await getBlogById(id);
+  if (directBlog) return directBlog;
+
+  const blogs = await fetchBlogs();
+  return blogs.find((blog) => getBlogHref(blog) === `/blogs/${slug}`) || null;
 }
 
 function renderEditorBlocks(blocks) {
@@ -175,10 +174,12 @@ function renderEditorBlocks(blocks) {
   });
 }
 
-export default async function BlogDetail({ searchParams }) {
-  const { uid: id } = (await searchParams) || {};
-
-  const data = await getBlogById(id);
+export default async function BlogDetail({ params, searchParams }) {
+  const [{ slug }, { uid: id } = {}] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const data = await getBlogBySlugOrId(slug, id);
 
   if (!data) {
     notFound();

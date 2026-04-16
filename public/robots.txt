@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://pixelpulse.com
+Host: https://www.pixelpulseplay.ca
 
 # Sitemaps
-Sitemap: https://pixelpulse.com/sitemap.xml
+Sitemap: https://www.pixelpulseplay.ca/sitemap.xml

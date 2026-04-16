@@ -33,6 +33,13 @@ export async function generateMetadata() {
     return {
       title: "Pixel Pulse Play Vaughan",
       description: "Indoor arcade games, challenge rooms, and family fun in Vaughan.",
+      robots: {
+        index: true,
+        follow: true,
+      },
+      alternates: {
+        canonical: `${process.env.SITE_URL || "https://www.pixelpulseplay.ca"}/`,
+      },
     };
   }
 }
