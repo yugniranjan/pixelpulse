@@ -9,7 +9,8 @@ export default async function NotFound() {
 
   return (
     <div className="not-found-container">
-      <h1 className="not-found-title">404</h1>
+      <h1 className="not-found-title">This page isn’t part of the game map.
+Let’s teleport you back to the fun!</h1>
       <p className="not-found-message">
         Sorry&apos; we couldn&apos;t find the{' '}
         <span className="highlight">&quot; {keyword} &quot;</span> you were
