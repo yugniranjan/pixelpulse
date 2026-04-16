@@ -17,7 +17,7 @@ Let’s teleport you back to the fun!</h1>
         looking for.
       </p>
       <p className="suggestion">
-        Try checking the URL or go back to the homepage.
+        But we’ve got plenty of fun waiting for you. Go back to homepage.
       </p>
       <a href="/" className="not-found-link">
         Return to Home
