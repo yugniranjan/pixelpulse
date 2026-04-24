@@ -38,6 +38,13 @@ function ContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.phone.trim()) {
+      toast.error("Please enter your phone number.");
+      setSubmitStatus("Please enter your phone number.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitStatus("Sending your inquiry...");
     try {
@@ -119,7 +126,7 @@ function ContactForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phone">Phone Number</label>
+            <label htmlFor="phone">Phone Number <span>*</span></label>
             <input
               type="tel"
               id="phone"
@@ -128,6 +135,7 @@ function ContactForm() {
               onChange={handleChange}
               autoComplete="tel"
               inputMode="tel"
+              required
             />
           </div>
 

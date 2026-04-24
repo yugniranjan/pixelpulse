@@ -69,10 +69,18 @@ export async function POST(request) {
     const visitorName = cleanHeaderValue(fullName, "Website Inquiry");
     const visitorDisplayName = visitorName.toLowerCase();
     const visitorEmail = cleanEmailAddress(email, "");
+    const visitorPhone = cleanHeaderValue(phone, "");
 
     if (!visitorEmail) {
       return NextResponse.json(
         { error: "Please enter a valid email address." },
+        { status: 400 },
+      );
+    }
+
+    if (!visitorPhone) {
+      return NextResponse.json(
+        { error: "Please enter your phone number." },
         { status: 400 },
       );
     }
@@ -84,7 +92,7 @@ export async function POST(request) {
       `Inquiry Type: ${selectedEvent || "Not provided"}`,
       `Name: ${fullName || "Not provided"}`,
       `Email: ${email || "Not provided"}`,
-      `Phone: ${phone || "Not provided"}`,
+      `Phone: ${visitorPhone}`,
       `Preferred Date: ${date || "Not provided"}`,
       `Preferred Time: ${time || "Not provided"}`,
       "",
@@ -107,7 +115,7 @@ export async function POST(request) {
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")}</p>
-        <p><strong>Phone:</strong> ${String(phone || "Not provided")
+        <p><strong>Phone:</strong> ${String(visitorPhone)
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")}</p>

@@ -114,6 +114,13 @@ function findMatchingGameSheetRow(item, games = []) {
   );
 }
 
+function formatHomepageAttractionTitle(title = "") {
+  return String(title || "").replace(
+    /\b(interactive|immersive)\b/gi,
+    (word) => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
+  );
+}
+
 const emptySiteData = {
   hero: {
     headline: "",
@@ -677,7 +684,7 @@ const Home = async () => {
 
     return {
       item,
-      title: matchedGame?.name || item?.desc || "Game Room",
+      title: formatHomepageAttractionTitle(matchedGame?.name || item?.desc || "Game Room"),
       body: matchedGame?.tag || item?.metatitle || "",
       meta: matchedGame?.bestFor || "",
     };

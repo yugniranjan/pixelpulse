@@ -3,7 +3,15 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
 import BookingButton from "./smallComponents/BookingButton";
+
+function formatHeroTrustItem(item = "") {
+  return String(item || "").replace(
+    /\b(interactive|immersive)\b/gi,
+    (word) => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
+  );
+}
 
 const MotionImage = ({ pageData, heroData = {} }) => {
   const videoRef = useRef(null);
@@ -42,7 +50,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
               <span className="ppp-hero-copy__trust-star" aria-hidden="true">
                 *
               </span>
-              {String(item).toLowerCase()}
+              {formatHeroTrustItem(item)}
             </span>
           ))}
         </div>
@@ -82,7 +90,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
             aria-label={isMuted ? "Unmute hero video" : "Mute hero video"}
             aria-pressed={!isMuted}
           >
-            {isMuted ? "Unmute" : "Mute"}
+            {isMuted ? <IoVolumeMute aria-hidden="true" /> : <IoVolumeHigh aria-hidden="true" />}
           </button>
         </section>
       ) : (
