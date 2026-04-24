@@ -115,8 +115,8 @@ export default async function InvitePage() {
     contactLinksLabel: configText(configData, ["inviteContactLinksLabel"]),
     logoAlt: configText(configData, ["inviteLogoAlt"]),
     footer: configText(configData, ["inviteFooter"]),
-    websiteText: configText(configData, ["inviteWebsiteText", "inviteWebsite"]),
-    websiteLink: configText(configData, ["inviteWebsiteLink", "inviteWebsiteUrl"]),
+    websiteText: configText(configData, ["inviteWebsiteText", "inviteWebsite"]) || "www.pixelpulseplay.ca",
+    websiteLink: configText(configData, ["inviteWebsiteLink", "inviteWebsiteUrl"]) || "https://www.pixelpulseplay.ca",
   };
 
   const telHref = `tel:${invite.phone.replace(/[^\d+]/g, "")}`;
