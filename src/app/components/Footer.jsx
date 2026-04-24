@@ -225,6 +225,4 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
       </noscript>
     </footer>
   );
-};
-
 export default Footer;
