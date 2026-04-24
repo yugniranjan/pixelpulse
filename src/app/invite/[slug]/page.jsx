@@ -1,8 +1,9 @@
 import "../../styles/invite.css";
 import { notFound } from "next/navigation";
-import { fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
+import { fetchsheetdata } from "@/lib/sheets";
 import { getConfigValue, getRowValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
+import { getInviteBySlug } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -52,27 +53,6 @@ function formatInviteTime(value) {
   }).format(date);
 }
 
-function normalizeSlug(value = "") {
-  return String(value || "").trim().toLowerCase();
-}
-
-function isActiveInvite(row = {}) {
-  const activeValue = String(getRowValue(row, ["active", "isactive"]) || "1")
-    .trim()
-    .toLowerCase();
-  return !["0", "false", "no", "inactive"].includes(activeValue);
-}
-
-async function getInviteRow(slug) {
-  const invites = await fetchsheetdataNoCache("invites");
-  const normalizedSlug = normalizeSlug(slug);
-
-  return invites.find((row) => {
-    const rowSlug = normalizeSlug(getRowValue(row, ["slug", "inviteSlug", "path"]));
-    return rowSlug === normalizedSlug && isActiveInvite(row);
-  });
-}
-
 function TextLines({ text, as: Tag = "p", className = "" }) {
   const parts = String(text || "")
     .split(/<br\s*\/?>|\n/gi)
@@ -109,7 +89,7 @@ export async function generateMetadata({ params }) {
   const locationSlug = LOCATION_NAME || "vaughan";
   const [configData, inviteRow] = await Promise.all([
     fetchsheetdata("config", locationSlug),
-    getInviteRow(slug),
+    getInviteBySlug(slug),
   ]);
 
   return {
@@ -129,7 +109,7 @@ export default async function InviteSlugPage({ params }) {
   const locationSlug = LOCATION_NAME || "vaughan";
   const [configData, inviteRow] = await Promise.all([
     fetchsheetdata("config", locationSlug),
-    getInviteRow(slug),
+    getInviteBySlug(slug),
   ]);
 
   if (!inviteRow) {

@@ -1,0 +1,130 @@
+.invite-admin-page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 32px auto;
+  color: #101828;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.invite-admin-header {
+  margin-bottom: 22px;
+}
+
+.invite-admin-header h1,
+.invite-admin-form h2,
+.invite-admin-result h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.invite-admin-header p {
+  margin: 6px 0 0;
+  color: #667085;
+}
+
+.invite-admin-form,
+.invite-admin-result {
+  display: grid;
+  gap: 20px;
+  padding: 22px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.invite-admin-form section {
+  display: grid;
+  gap: 14px;
+}
+
+.invite-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.invite-admin-field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.invite-admin-field input,
+.invite-admin-field textarea,
+.invite-admin-output textarea {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font: inherit;
+}
+
+.invite-admin-field textarea,
+.invite-admin-output textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.invite-admin-form button,
+.invite-admin-output button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  background: #a4cf5f;
+  color: #050810;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.invite-admin-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.invite-admin-error {
+  margin: 0;
+  color: #b42318;
+  font-weight: 800;
+}
+
+.invite-admin-result {
+  margin-top: 22px;
+}
+
+.invite-admin-output {
+  display: grid;
+  gap: 16px;
+}
+
+.invite-admin-output > div {
+  display: grid;
+  gap: 8px;
+}
+
+.invite-admin-output span {
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.invite-admin-output a {
+  color: #175cd3;
+  overflow-wrap: anywhere;
+}
+
+.invite-admin-qr img {
+  width: 220px;
+  height: 220px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .invite-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
