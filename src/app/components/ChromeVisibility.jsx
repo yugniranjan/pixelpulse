@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-const STANDALONE_PATHS = new Set(["/birthday-party-landing", "/invite"]);
+const STANDALONE_PATHS = new Set(["/birthday-party-landing"]);
 
 function normalizePath(path = "/") {
   if (!path) return "/";
@@ -12,7 +12,7 @@ function normalizePath(path = "/") {
 export default function ChromeVisibility({ children }) {
   const pathname = normalizePath(usePathname() || "/");
 
-  if (STANDALONE_PATHS.has(pathname)) {
+  if (STANDALONE_PATHS.has(pathname) || pathname.startsWith("/invite")) {
     return null;
   }
 

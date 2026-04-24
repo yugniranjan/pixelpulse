@@ -89,7 +89,7 @@ export default async function InvitePage() {
     guestName: configText(configData, ["inviteGuestName"]),
     childName: configText(configData, ["inviteChildName"]),
     title: configText(configData, ["inviteTitle"]),
-    titleSuffix: configText(configData, ["inviteTitleSuffix"]),
+    titleSuffix: configText(configData, ["inviteTitleSuffix", "inviteTilesuffix"]),
     intro: configText(configData, ["inviteIntro", "inviteMessage"]),
     dateLabel: configText(configData, ["inviteDateLabel"]),
     date: formatInviteDate(configText(configData, ["inviteDate"])),

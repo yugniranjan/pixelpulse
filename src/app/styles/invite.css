@@ -82,9 +82,12 @@
 }
 
 .ppp-invite-greeting {
+  justify-self: center;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: clamp(1.25rem, 4.5vw, 1.7rem);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
 }
 
 .ppp-invite-hero-copy {
