@@ -214,15 +214,6 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
           strategy="afterInteractive"
         />
       )} */}
-      <noscript>
-        <iframe
-          src="https://www.googletagmanager.com/ns.html?id=GTM-5GQ99ZBR"
-          height="0"
-          width="0"
-          title="Google Tag Manager"
-          style={{ display: "none", visibility: "hidden" }}
-        />
-      </noscript>
     </footer>
   );
 };

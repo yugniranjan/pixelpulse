@@ -7,6 +7,10 @@ export async function GET() {
   const siteUrl = (process.env.SITE_URL || "https://www.pixelpulseplay.ca").replace(/\/$/, "");
   const dynamicPaths = new Set();
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
+  const getLocationPath = (location = "") => {
+    const normalizedLocation = location.trim().toLowerCase();
+    return normalizedLocation && normalizedLocation !== locationName ? `/${normalizedLocation}` : "";
+  };
 
   try {
     const rows = await fetchsheetdataNoCache("Data");
@@ -31,11 +35,11 @@ export async function GET() {
       }
 
       locations.forEach(loc => {
-        // Homepage for location
-        dynamicPaths.add(`${siteUrl}/${loc}`);
+        const locationPath = getLocationPath(loc);
+        dynamicPaths.add(`${siteUrl}${locationPath}`);
         const basePath = (!parentid || parentid === path)
-          ? `/${loc}/${path}`
-          : `/${loc}/${parentid}/${path}`;
+          ? `${locationPath}/${path}`
+          : `${locationPath}/${parentid}/${path}`;
 
         dynamicPaths.add(`${siteUrl}${basePath}`);
       });

@@ -1,6 +1,4 @@
 import "./globals.css";
-import dynamic from "next/dynamic";
-const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
 import Script from "next/script";
 import { Suspense } from "react";
 import Loading from "./loading";
@@ -104,8 +102,6 @@ export default async function RootLayout({ children }) {
           }}
         />
         <Toaster position="top-right" />
-        <GoogleAnalytics />{" "}
-        {/* Render the client-side Google Analytics component */}
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
