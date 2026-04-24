@@ -9,6 +9,42 @@ function configText(configData, keys) {
   return getConfigValue(configData, keys);
 }
 
+function asNumber(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return null;
+
+  const numberValue = Number(normalized);
+  return Number.isFinite(numberValue) ? numberValue : null;
+}
+
+function formatInviteDate(value) {
+  const serialDate = asNumber(value);
+  if (serialDate === null || serialDate < 1) return value;
+
+  const date = new Date(Date.UTC(1899, 11, 30) + serialDate * 24 * 60 * 60 * 1000);
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function formatInviteTime(value) {
+  const serialTime = asNumber(value);
+  if (serialTime === null || serialTime < 0 || serialTime >= 1) return value;
+
+  const totalMinutes = Math.round(serialTime * 24 * 60);
+  const date = new Date(Date.UTC(1970, 0, 1, 0, totalMinutes));
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  }).format(date);
+}
+
 function TextLines({ text, as: Tag = "p", className = "" }) {
   const parts = String(text || "")
     .split(/<br\s*\/?>|\n/gi)
@@ -55,9 +91,9 @@ export default async function InvitePage() {
     titleSuffix: configText(configData, ["inviteTitleSuffix"]),
     intro: configText(configData, ["inviteIntro", "inviteMessage"]),
     dateLabel: configText(configData, ["inviteDateLabel"]),
-    date: configText(configData, ["inviteDate"]),
+    date: formatInviteDate(configText(configData, ["inviteDate"])),
     timeLabel: configText(configData, ["inviteTimeLabel"]),
-    time: configText(configData, ["inviteTime"]),
+    time: formatInviteTime(configText(configData, ["inviteTime"])),
     venueLabel: configText(configData, ["inviteVenueLabel"]),
     venue: configText(configData, ["inviteVenue"]),
     addressLabel: configText(configData, ["inviteAddressLabel"]),
