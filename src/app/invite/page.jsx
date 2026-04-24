@@ -4,8 +4,6 @@ import { getConfigValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
 
 export const dynamic = "force-dynamic";
-const INVITE_WAIVER_URL =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinewaiver/waiver.php";
 const GOOGLE_MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=";
 
 function configText(configData, keys) {
@@ -104,6 +102,7 @@ export default async function InvitePage() {
     waiverLabel: configText(configData, ["inviteWaiverLabel"]),
     waiverText: configText(configData, ["inviteWaiverText"]),
     waiverButton: configText(configData, ["inviteWaiverButton"]),
+    waiverLink: configText(configData, ["inviteWaiverLink"]),
     rsvpLabel: configText(configData, ["inviteRsvpLabel"]),
     rsvpText: configText(configData, ["inviteRsvpText"]),
     phone: configText(configData, ["invitePhone", "footerPhone", "contactPhone"]),
@@ -175,7 +174,7 @@ export default async function InvitePage() {
               <TextLines text={invite.waiverText} />
             </div>
             <a
-              href={INVITE_WAIVER_URL}
+              href={invite.waiverLink}
               className="ppp-invite-waiver__button"
               target="_blank"
               rel="noopener noreferrer"
