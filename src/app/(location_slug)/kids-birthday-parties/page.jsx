@@ -302,11 +302,11 @@ const Page = async ({ params }) => {
         <div className="aero-max-container ppp-party-hero__inner">
           <div className="ppp-party-hero__panel">
             <div className="ppp-about-hero-card">
-              <p className="ppp-party-hero__offer">
-                Weekday Special: Save $50 on Birthday Parties (Mon-Thu)
-              </p>
               {partyHeroLabelHtml && (
-                <div dangerouslySetInnerHTML={{ __html: partyHeroLabelHtml }} />
+                <div
+                  className="ppp-party-hero__mobile-hidden-label"
+                  dangerouslySetInnerHTML={{ __html: partyHeroLabelHtml }}
+                />
               )}
               {partyHeroHeading && <h2>{partyHeroHeading}</h2>}
               {partyHeroTrustBullets.length > 0 && (
@@ -316,6 +316,9 @@ const Page = async ({ params }) => {
                   ))}
                 </ul>
               )}
+              <p className="ppp-party-hero__offer">
+                Weekday Special: Save $50 on Birthday Parties (Mon-Thu)
+              </p>
             </div>
           </div>
         </div>

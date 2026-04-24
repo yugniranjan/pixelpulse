@@ -642,7 +642,6 @@ header:first-child + * {
 
 /* breadcrumb */
 .breadcrumb-container {
-  padding-top: 105px;
   background: #050810;
   border-bottom: 1px solid var(--border-soft);
 }
@@ -690,10 +689,6 @@ header:first-child + * {
 }
 
 @media (max-width: 768px) {
-  .breadcrumb-container {
-    padding-top: 92px;
-  }
-
   .breadcrumb {
     padding: 10px 0;
     font-size: 13px;
