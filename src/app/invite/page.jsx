@@ -4,6 +4,9 @@ import { getConfigValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
 
 export const dynamic = "force-dynamic";
+const INVITE_WAIVER_URL =
+  "https://pixelpulseplayzone.lilypadpos.app/public/onlinewaiver/waiver.php";
+const GOOGLE_MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=";
 
 function configText(configData, keys) {
   return getConfigValue(configData, keys);
@@ -116,7 +119,10 @@ export default async function InvitePage() {
 
   const telHref = `tel:${invite.phone.replace(/[^\d+]/g, "")}`;
   const businessTelHref = `tel:${invite.businessPhone.replace(/[^\d+]/g, "")}`;
-  const finalWaiverLink = configText(configData, ["inviteWaiverLink"]);
+  const configuredDirectionsLink = invite.directionsLink.trim();
+  const finalDirectionsLink = configuredDirectionsLink.startsWith("https://www.google.com/maps")
+    ? configuredDirectionsLink
+    : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`;
   const titleRemainder =
     invite.title
       .replace(invite.childName, "")
@@ -166,7 +172,12 @@ export default async function InvitePage() {
               <strong>{invite.waiverLabel}</strong>
               <TextLines text={invite.waiverText} />
             </div>
-            <a href={finalWaiverLink} className="ppp-invite-waiver__button">
+            <a
+              href={INVITE_WAIVER_URL}
+              className="ppp-invite-waiver__button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {invite.waiverButton}
             </a>
           </div>
@@ -183,7 +194,7 @@ export default async function InvitePage() {
               <span>{invite.businessPhoneLabel}</span>
               {invite.businessPhone}
             </a>
-            <a href={invite.directionsLink}>
+            <a href={finalDirectionsLink} target="_blank" rel="noopener noreferrer">
               <span>{invite.directionsLabel}</span>
               {invite.directionsText}
             </a>
