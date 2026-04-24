@@ -236,6 +236,15 @@
   font-weight: 700;
 }
 
+.ppp-invite-website {
+  justify-self: center;
+  color: #c7ef77;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
 @media (max-width: 520px) {
   .ppp-invite-page {
     padding: 14px;

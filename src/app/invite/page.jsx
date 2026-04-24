@@ -115,6 +115,8 @@ export default async function InvitePage() {
     contactLinksLabel: configText(configData, ["inviteContactLinksLabel"]),
     logoAlt: configText(configData, ["inviteLogoAlt"]),
     footer: configText(configData, ["inviteFooter"]),
+    websiteText: configText(configData, ["inviteWebsiteText", "inviteWebsite"]),
+    websiteLink: configText(configData, ["inviteWebsiteLink", "inviteWebsiteUrl"]),
   };
 
   const telHref = `tel:${invite.phone.replace(/[^\d+]/g, "")}`;
@@ -201,6 +203,11 @@ export default async function InvitePage() {
           </div>
 
           <TextLines text={invite.footer} className="ppp-invite-footer" />
+          {invite.websiteLink || invite.websiteText ? (
+            <a href={invite.websiteLink || invite.websiteText} className="ppp-invite-website">
+              {invite.websiteText || invite.websiteLink}
+            </a>
+          ) : null}
         </div>
       </section>
     </div>
