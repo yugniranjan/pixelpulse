@@ -757,14 +757,20 @@
     padding-top: 1.5rem;
   }
 
+  .ppp-party-hero__inner {
+    width: calc(100% - 40px);
+    margin-inline: auto;
+  }
+
   .ppp-party-hero .ppp-about-hero-card {
-    padding: 1.55rem 1.15rem 1.45rem;
+    padding: 1.55rem 1.25rem 1.45rem;
   }
 
   .ppp-party-hero__offer {
+    max-width: calc(100% - 0.5rem);
     margin-top: 0.95rem;
-    padding: 0.42rem 0.6rem;
-    font-size: clamp(0.62rem, 2.9vw, 0.82rem);
+    padding: 0.42rem 0.48rem;
+    font-size: clamp(0.5rem, 2.45vw, 0.74rem);
     line-height: 1.28;
   }
 
@@ -815,6 +821,46 @@
   letter-spacing: 0 !important;
   line-height: 1.18 !important;
   text-transform: none !important;
+}
+
+/* Final override: birthday hero background image treatment */
+.ppp-party-hero .ppp-about-hero-card {
+  min-height: clamp(320px, 32vw, 460px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(90deg, rgba(5, 8, 16, 0.94) 0%, rgba(5, 8, 16, 0.82) 44%, rgba(5, 8, 16, 0.42) 100%),
+    radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
+    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center / cover no-repeat,
+    var(--ppp-card);
+}
+
+@media (max-width: 768px) {
+  .ppp-party-hero .ppp-about-hero-card {
+    min-height: 430px;
+    background:
+      linear-gradient(180deg, rgba(5, 8, 16, 0.76) 0%, rgba(5, 8, 16, 0.54) 48%, rgba(5, 8, 16, 0.86) 100%),
+      radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
+      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center center / cover no-repeat,
+      var(--ppp-card);
+  }
+}
+
+@media (max-width: 480px) {
+  .ppp-party-hero__inner {
+    width: calc(100% - 48px);
+  }
+
+  .ppp-party-hero .ppp-about-hero-card {
+    min-height: 470px;
+    background:
+      linear-gradient(180deg, rgba(5, 8, 16, 0.76) 0%, rgba(5, 8, 16, 0.54) 46%, rgba(5, 8, 16, 0.88) 100%),
+      radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
+      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center center / cover no-repeat,
+      var(--ppp-card);
+  }
 }
 
 /* Match birthday CTA strip spacing and alignment to pricing CTA cards. */
