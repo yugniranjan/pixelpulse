@@ -56,6 +56,19 @@
   margin: 0;
 }
 
+.ppp-invite-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ppp-invite-logo {
+  width: 52px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
 .ppp-invite-eyebrow {
   width: fit-content;
   padding: 7px 10px;
@@ -72,6 +85,13 @@
   color: rgba(255, 255, 255, 0.78);
   font-size: 1rem;
   font-weight: 700;
+}
+
+.ppp-invite-hero-copy {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
 }
 
 .ppp-invite-card h1 {
@@ -93,6 +113,7 @@
 
 .ppp-invite-guest,
 .ppp-invite-intro {
+  max-width: 34ch;
   color: rgba(255, 255, 255, 0.88);
   font-size: 1.03rem;
   font-weight: 600;
@@ -227,6 +248,10 @@
 
   .ppp-invite-card h1 {
     font-size: clamp(2.35rem, 13vw, 3.45rem);
+  }
+
+  .ppp-invite-logo {
+    width: 46px;
   }
 
   .ppp-invite-details {

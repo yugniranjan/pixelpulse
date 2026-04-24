@@ -1,12 +1,12 @@
 import "../styles/invite.css";
-import { fetchsheetdata, getWaiverLink } from "@/lib/sheets";
+import { fetchsheetdata } from "@/lib/sheets";
 import { getConfigValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
 
 export const dynamic = "force-dynamic";
 
-function configText(configData, keys, fallback = "") {
-  return getConfigValue(configData, keys) || fallback;
+function configText(configData, keys) {
+  return getConfigValue(configData, keys);
 }
 
 function TextLines({ text, as: Tag = "p", className = "" }) {
@@ -34,7 +34,7 @@ export async function generateMetadata() {
   const configData = await fetchsheetdata("config", locationSlug);
 
   return {
-    title: configText(configData, ["inviteMetaTitle"], "Birthday Invite | Pixel Pulse Play"),
+    title: configText(configData, ["inviteMetaTitle"]),
     robots: {
       index: false,
       follow: false,
@@ -44,78 +44,67 @@ export async function generateMetadata() {
 
 export default async function InvitePage() {
   const locationSlug = LOCATION_NAME || "vaughan";
-  const [configData, waiverLink] = await Promise.all([
-    fetchsheetdata("config", locationSlug),
-    getWaiverLink(locationSlug),
-  ]);
+  const configData = await fetchsheetdata("config", locationSlug);
 
   const invite = {
-    eyebrow: configText(configData, ["inviteEyebrow"], "Birthday Invite"),
-    greeting: configText(configData, ["inviteGreeting"], "Hi,"),
-    guestName: configText(configData, ["inviteGuestName"], "You are invited!"),
-    childName: configText(configData, ["inviteChildName"], "Ariana"),
-    title: configText(configData, ["inviteTitle"], "Ariana's Birthday Party"),
-    titleSuffix: configText(configData, ["inviteTitleSuffix"], "Birthday Party"),
-    intro: configText(
-      configData,
-      ["inviteIntro", "inviteMessage"],
-      "Join us for a high-energy birthday celebration at Pixel Pulse Playzone.",
-    ),
-    dateLabel: configText(configData, ["inviteDateLabel"], "Date"),
-    date: configText(configData, ["inviteDate"], "Saturday, April 26, 2026"),
-    timeLabel: configText(configData, ["inviteTimeLabel"], "Time"),
-    time: configText(configData, ["inviteTime"], "4:00 PM"),
-    venueLabel: configText(configData, ["inviteVenueLabel"], "Place"),
-    venue: configText(configData, ["inviteVenue"], "Pixel Pulse Playzone"),
-    addressLabel: configText(configData, ["inviteAddressLabel"], "Address"),
-    address: configText(configData, ["inviteAddress"], "Vaughan, ON"),
-    waiverLabel: configText(configData, ["inviteWaiverLabel"], "Waiver"),
-    waiverText: configText(
-      configData,
-      ["inviteWaiverText"],
-      "Please complete the waiver before the party.",
-    ),
-    waiverButton: configText(configData, ["inviteWaiverButton"], "Complete waiver"),
-    rsvpLabel: configText(configData, ["inviteRsvpLabel"], "RSVP"),
-    rsvpText: configText(configData, ["inviteRsvpText"], "Please text or call"),
-    phone: configText(configData, ["invitePhone", "footerPhone", "contactPhone"], "416-561-5667"),
-    businessPhoneLabel: configText(configData, ["inviteBusinessPhoneLabel"], "Pixel Pulse Phone"),
-    businessPhone: configText(
-      configData,
-      ["inviteBusinessPhone", "locationPhone", "pixelPulsePhone"],
-      "905-553-7444",
-    ),
-    directionsLabel: configText(configData, ["inviteDirectionsLabel"], "Directions"),
-    directionsText: configText(configData, ["inviteDirectionsText"], "Open map"),
-    directionsLink: configText(
-      configData,
-      ["inviteDirectionsLink", "footerMapLink", "mapsLink", "googleMapsLink"],
-      "https://www.google.com/maps/search/?api=1&query=Pixel%20Pulse%20Playzone%20Vaughan",
-    ),
-    contactLinksLabel: configText(configData, ["inviteContactLinksLabel"], "Pixel Pulse contact links"),
-    footer: configText(configData, ["inviteFooter"], "We can't wait to celebrate with you!"),
+    eyebrow: configText(configData, ["inviteEyebrow"]),
+    greeting: configText(configData, ["inviteGreeting"]),
+    guestName: configText(configData, ["inviteGuestName"]),
+    childName: configText(configData, ["inviteChildName"]),
+    title: configText(configData, ["inviteTitle"]),
+    titleSuffix: configText(configData, ["inviteTitleSuffix"]),
+    intro: configText(configData, ["inviteIntro", "inviteMessage"]),
+    dateLabel: configText(configData, ["inviteDateLabel"]),
+    date: configText(configData, ["inviteDate"]),
+    timeLabel: configText(configData, ["inviteTimeLabel"]),
+    time: configText(configData, ["inviteTime"]),
+    venueLabel: configText(configData, ["inviteVenueLabel"]),
+    venue: configText(configData, ["inviteVenue"]),
+    addressLabel: configText(configData, ["inviteAddressLabel"]),
+    address: configText(configData, ["inviteAddress"]),
+    waiverLabel: configText(configData, ["inviteWaiverLabel"]),
+    waiverText: configText(configData, ["inviteWaiverText"]),
+    waiverButton: configText(configData, ["inviteWaiverButton"]),
+    rsvpLabel: configText(configData, ["inviteRsvpLabel"]),
+    rsvpText: configText(configData, ["inviteRsvpText"]),
+    phone: configText(configData, ["invitePhone", "footerPhone", "contactPhone"]),
+    businessPhoneLabel: configText(configData, ["inviteBusinessPhoneLabel"]),
+    businessPhone: configText(configData, ["inviteBusinessPhone", "locationPhone", "pixelPulsePhone"]),
+    directionsLabel: configText(configData, ["inviteDirectionsLabel"]),
+    directionsText: configText(configData, ["inviteDirectionsText"]),
+    directionsLink: configText(configData, ["inviteDirectionsLink", "footerMapLink", "mapsLink", "googleMapsLink"]),
+    contactLinksLabel: configText(configData, ["inviteContactLinksLabel"]),
+    logoAlt: configText(configData, ["inviteLogoAlt"]),
+    footer: configText(configData, ["inviteFooter"]),
   };
 
   const telHref = `tel:${invite.phone.replace(/[^\d+]/g, "")}`;
   const businessTelHref = `tel:${invite.businessPhone.replace(/[^\d+]/g, "")}`;
-  const finalWaiverLink = configText(configData, ["inviteWaiverLink"], waiverLink || "/waiver");
+  const finalWaiverLink = configText(configData, ["inviteWaiverLink"]);
+  const titleRemainder =
+    invite.title
+      .replace(invite.childName, "")
+      .replace(/^['’]s\s*/i, "")
+      .trim() || invite.titleSuffix;
 
   return (
     <div className="ppp-invite-page">
       <section className="ppp-invite-card" aria-labelledby="invite-title">
         <div className="ppp-invite-card__shine" aria-hidden="true" />
         <div className="ppp-invite-card__content">
-          <p className="ppp-invite-eyebrow">{invite.eyebrow}</p>
+          <div className="ppp-invite-topline">
+            <img src="/assets/images/logo.png" alt={invite.logoAlt} className="ppp-invite-logo" />
+            <p className="ppp-invite-eyebrow">{invite.eyebrow}</p>
+          </div>
           <TextLines text={invite.greeting} className="ppp-invite-greeting" />
-          <h1 id="invite-title">
-            <span>{`${invite.childName}'s`}</span>
-            {invite.title
-              .replace(invite.childName, "")
-              .replace(/^['’]s\s*/i, "")
-              .trim() || invite.titleSuffix}
-          </h1>
-          <TextLines text={invite.guestName} className="ppp-invite-guest" />
-          <TextLines text={invite.intro} className="ppp-invite-intro" />
+          <div className="ppp-invite-hero-copy">
+            <h1 id="invite-title">
+              {invite.childName ? <span>{`${invite.childName}'s`}</span> : null}
+              {titleRemainder}
+            </h1>
+            <TextLines text={invite.guestName} className="ppp-invite-guest" />
+            <TextLines text={invite.intro} className="ppp-invite-intro" />
+          </div>
 
           <dl className="ppp-invite-details">
             <div>
