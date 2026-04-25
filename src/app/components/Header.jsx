@@ -117,6 +117,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                 href={contactHref}
                 prefetch
                 className="aero-header-contactus-btn aero-header-cta aero-header-inquire-btn"
+                style={{zIndex:"-1"}}
               >
                 <span>{ctaContent.inquireText}</span>
               </Link>

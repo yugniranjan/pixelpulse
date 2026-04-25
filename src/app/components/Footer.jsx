@@ -38,22 +38,22 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const latestNews =
     Array.isArray(latestBlogData) && latestBlogData.length > 0
       ? latestBlogData.slice(0, 2).map((item, index) => ({
-          id: item.id || `latest-${index}`,
-          title: item.title || "Latest Update",
-          href: `/blogs/${slugify(item.title || "latest-update")}?uid=${item.id}`,
-          image: item.featuredImage || blogFallbacks[0].featuredImage,
-        }))
+        id: item.id || `latest-${index}`,
+        title: item.title || "Latest Update",
+        href: `/blogs/${slugify(item.title || "latest-update")}?uid=${item.id}`,
+        image: item.featuredImage || blogFallbacks[0].featuredImage,
+      }))
       : blogChildren
-          .filter((item) => item?.isactive == 1)
-          .slice(0, 2)
-          .map((item, index) => ({
-            id: `menu-${item?.path || index}`,
-            title: item?.desc || blogFallbacks[index]?.title || "Latest Update",
-            href: item?.parentid && item?.path
-              ? `/${location_slug}/${item.parentid}/${item.path}`
-              : "/blogs",
-            image: blogFallbacks[index]?.featuredImage || blogFallbacks[0].featuredImage,
-          }));
+        .filter((item) => item?.isactive == 1)
+        .slice(0, 2)
+        .map((item, index) => ({
+          id: `menu-${item?.path || index}`,
+          title: item?.desc || blogFallbacks[index]?.title || "Latest Update",
+          href: item?.parentid && item?.path
+            ? `/${location_slug}/${item.parentid}/${item.path}`
+            : "/blogs",
+          image: blogFallbacks[index]?.featuredImage || blogFallbacks[0].featuredImage,
+        }));
   const socialLinks = [
     {
       href: "/facebook",
@@ -101,24 +101,24 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                   </Link>
                 </li>
               ))} */}
-              <ul>
-              {companyData?.[0]?.children?.length > 0 && (
-                <>
-                  <li>Company</li>
-                  {companyData[0].children.map((item, i) => (
-                    item?.isactive == 1 &&
-                    !["contactus", "contact-us"].includes(item?.path?.toLowerCase()) && (
-                      <li key={i}>
-                        <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                          {item?.desc}
-                        </Link>
-                      </li>
-                    )
-                  ))}
-                </>
-              )}
-            </ul>
-            {/* )
+          <ul>
+            {companyData?.[0]?.children?.length > 0 && (
+              <>
+                <li>Company</li>
+                {companyData[0].children.map((item, i) => (
+                  item?.isactive == 1 &&
+                  !["contactus", "contact-us"].includes(item?.path?.toLowerCase()) && (
+                    <li key={i}>
+                      <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                        {item?.desc}
+                      </Link>
+                    </li>
+                  )
+                ))}
+              </>
+            )}
+          </ul>
+          {/* )
           } */}
 
           <ul>
@@ -147,29 +147,30 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                 </li>
               )
             ))}
+            {latestNews.length > 0 && (
+              <ul style={{ padding: "0", border: "none" , paddingTop: "1em"}}>
+                <li>Latest News</li>
+                {latestNews.map((item) => (
+                  <li key={item.id}>
+                    <Link href={item.href} className="aero_footer_article-card" prefetch>
+                      <Image
+                        src={item.image}
+                        alt=""
+                        width={40}
+                        height={40}
+                        unoptimized
+                      />
+                      <div>
+                        <h6>Latest News</h6>
+                        <p>{item.title}</p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </ul>
-          {latestNews.length > 0 && (
-            <ul>
-              <li>Latest News</li>
-              {latestNews.map((item) => (
-                <li key={item.id}>
-                  <Link href={item.href} className="aero_footer_article-card" prefetch>
-                    <Image
-                      src={item.image}
-                      alt=""
-                      width={40}
-                      height={40}
-                      unoptimized
-                    />
-                    <div>
-                      <h6>Latest News</h6>
-                      <p>{item.title}</p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+
           <ul>
             <li>Follow Us</li>
             <li>
