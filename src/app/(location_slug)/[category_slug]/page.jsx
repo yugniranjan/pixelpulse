@@ -15,7 +15,7 @@ import { LOCATION_NAME } from "@/lib/constant";
 import { notFound } from "next/navigation";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { getCtaContent, resolveConfiguredValue } from "@/lib/ctaContent";
+import { getConfigValue, getCtaContent, resolveConfiguredValue } from "@/lib/ctaContent";
 
 const ABOUT_BUILDING_IMAGE_FALLBACK =
   "https://storage.googleapis.com/pixel-pulse-play/web/pixelmainbuilding.jpg";
@@ -224,6 +224,9 @@ const Category = async ({ params }) => {
     ),
   };
   const contactHref = ctaContent.contactHref || "/contactus";
+  const aboutReadMoreText =
+    getConfigValue(configData, ["aboutReadMoreText", "aboutCardReadMoreText"]) ||
+    "Read More";
   const attractionsFinalCtaTitle = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: ["attractionsFinalCtaTitle", "attractionFinalCtaTitle"],
@@ -617,13 +620,13 @@ const Category = async ({ params }) => {
                               <h2>{item.desc}</h2>
                               <p>{item.metatitle}</p>
                             </Link>
-                            {ctaContent.readMoreText && (
+                            {aboutReadMoreText && (
                               <Link
                                 href={`${category_slug}/${item?.path}`}
                                 prefetch
                                 className="ppp-about-card-modern__link"
                               >
-                                {ctaContent.readMoreText}
+                                {aboutReadMoreText}
                               </Link>
                             )}
                           </div>
