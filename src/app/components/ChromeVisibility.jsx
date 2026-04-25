@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-const STANDALONE_PATHS = new Set(["/birthday-party-landing"]);
+const STANDALONE_PATHS = new Set(["/birthday-party-landing", "/waiver"]);
 
 function normalizePath(path = "/") {
   if (!path) return "/";

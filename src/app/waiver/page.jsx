@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import "../styles/waiver.css";
+import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "@/components/home/SectionHeading";
 
@@ -24,7 +25,16 @@ export const metadata = {
 export default function WaiverPage() {
   return (
     <main className="ppp-waiver-page">
-      
+      <Link href="/" className="ppp-waiver-logo-link" aria-label="Pixel Pulse Play home">
+        <Image
+          src="/assets/images/logo.png"
+          alt="Pixel Pulse Play"
+          width={140}
+          height={140}
+          priority
+          style={{ height: "auto" }}
+        />
+      </Link>
 
       <section className="aero-max-container ppp-waiver-layout">
         <div className="ppp-waiver-section-intro">

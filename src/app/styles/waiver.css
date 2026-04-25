@@ -6,6 +6,16 @@
     linear-gradient(180deg, #050810 0%, #09111b 24%, #000000 100%);
 }
 
+.ppp-waiver-logo-link {
+  display: inline-flex;
+  padding: 1.25rem 1.5rem 0;
+}
+
+.ppp-waiver-logo-link img {
+  width: 96px;
+  height: auto;
+}
+
 .ppp-waiver-hero {
   position: relative;
   overflow: hidden;
