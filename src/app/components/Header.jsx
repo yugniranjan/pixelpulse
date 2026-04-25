@@ -9,6 +9,7 @@ import MenuButton from "./smallComponents/MenuButton";
 import LogoutButton from "./LogoutButton";
 import BookingButton from "./smallComponents/BookingButton";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { getCtaContent } from "@/lib/ctaContent";
 
 
@@ -22,6 +23,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
   const normalizedPathname = normalizePath(pathname || "/");
   const ctaContent = getCtaContent(configdata);
   const contactHref = ctaContent.contactHref || `/${location_slug}/contactus`;
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const navItems = [
     { navName: "Home", navUrl: "", href: "/" },
@@ -48,7 +50,13 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
         <div className="aero-header-inner">
           <section className="aero-header-bar" aria-label="Primary navigation">
             <div className="aero-header-menu-slot">
-              <MenuButton navList={visibleNavItems} location_slug={location_slug} />
+              <MenuButton
+                navList={visibleNavItems}
+                location_slug={location_slug}
+                isOpen={mobileNavOpen}
+                onToggle={() => setMobileNavOpen((open) => !open)}
+                onClose={() => setMobileNavOpen(false)}
+              />
             </div>
 
             <Link
@@ -111,13 +119,16 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
             </div>
           </section>
 
-          <section className="aero-header-mobile-actions" aria-label="Quick actions">
+          <section
+            className="aero-header-mobile-actions"
+            aria-label="Quick actions"
+            style={mobileNavOpen ? { display: "none" } : undefined}
+          >
             {ctaContent.inquireText && (
               <Link
                 href={contactHref}
                 prefetch
                 className="aero-header-contactus-btn aero-header-cta aero-header-inquire-btn"
-                style={{zIndex:"-1"}}
               >
                 <span>{ctaContent.inquireText}</span>
               </Link>

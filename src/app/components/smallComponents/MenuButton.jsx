@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
 import { usePathname } from "next/navigation";
 
@@ -10,8 +10,7 @@ function normalizePath(path = "/") {
   return path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
 }
 
-const MenuButton = ({ navList, location_slug }) => {
-  const [mobile_nav, setMobile_nav] = useState(false);
+const MenuButton = ({ navList, location_slug, isOpen, onToggle, onClose }) => {
   const pathname = usePathname();
   const menuId = `mobile-nav-${location_slug || "site"}`;
 
@@ -20,14 +19,14 @@ const MenuButton = ({ navList, location_slug }) => {
       <button
         type="button"
         className="aero-mobile-menu-btn"
-        aria-expanded={mobile_nav}
+        aria-expanded={isOpen}
         aria-controls={menuId}
-        aria-label={mobile_nav ? "Close menu" : "Open menu"}
-        onClick={() => setMobile_nav(!mobile_nav)}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        onClick={onToggle}
       >
-        {mobile_nav ? <IoClose fontSize={30} color="#fff" aria-hidden="true" /> : <IoMenu fontSize={30} color="#fff" aria-hidden="true" />}
+        {isOpen ? <IoClose fontSize={30} color="#fff" aria-hidden="true" /> : <IoMenu fontSize={30} color="#fff" aria-hidden="true" />}
       </button>
-      {mobile_nav && (
+      {isOpen && (
         <nav
           id={menuId}
           className="d-flex-center aero-list-7-1 navbar"
@@ -51,7 +50,7 @@ const MenuButton = ({ navList, location_slug }) => {
                   href={href}
                   key={item.navName}
                   className={`aero-app-changelocation nav-link ${isActive ? "active" : ""}`}
-                  onClick={() => setMobile_nav(false)}
+                  onClick={onClose}
                 >
                   {item.navName}
                 </Link>
