@@ -1,7 +1,8 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import dynamic from "next/dynamic";
-const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
+// import dynamic from "next/dynamic";
+// const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
@@ -62,29 +63,35 @@ const token = cookies().get("admin_token")?.value;
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
-  const [menudata, configdata, sheetdata] = await Promise.all([
-    fetchMenuData(location_slug),
-    fetchsheetdata('config', location_slug),
-    fetchsheetdata('locations', location_slug),
-
-  ]);
-
+  let menudata = [];
+  let configdata = [];
+  let sheetdata = [];
+  try {
+    [menudata, configdata, sheetdata] = await Promise.all([
+      fetchMenuData(location_slug),
+      fetchsheetdata('config', location_slug),
+      fetchsheetdata('locations', location_slug),
+    ]);
+  } catch (error) {
+    console.error("layout data failed:", error);
+  }
   const locationid = sheetdata?.[0]?.locationid || null;
-  // const reviewdata = await getReviewsData(locationid)
+  const gtmId = sheetdata?.find((item) => item?.gtm_id)?.gtm_id || "GTM-99ZBR";
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body suppressHydrationWarning>
+        <GoogleTagManager gtmId={gtmId} />
+        {/* <GoogleAnalytics />{" "} */}
         <Toaster position="top-right" />
-        <GoogleAnalytics />{" "}
         {/* Render the client-side Google Analytics component */}
         <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
-        <Breadcrumbs/>
+        <Breadcrumbs />
         <Suspense fallback={<Loading />}>{children}</Suspense>
         <Footer
           location_slug={location_slug}
           configdata={configdata}
           menudata={menudata}
-          // reviewdata={reviewdata}
+        // reviewdata={reviewdata}
         />
         <div id="modal-root"></div>
       </body>

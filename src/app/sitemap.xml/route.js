@@ -4,7 +4,8 @@ import { fetchsheetdata } from "@/lib/sheets";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { getBlogs } from '@/(location_slug)/blogs/page';
 export async function GET() {
-  const siteUrl = process.env.SITE_URL;
+  const siteUrl =
+    process.env.SITE_URL?.replace(/\/$/, "") || "https://www.pixelpulseplay.ca";
   const dynamicPaths = new Set();
 
   try {
@@ -41,7 +42,7 @@ export async function GET() {
           .replace(/[^\w\s-]/g, "")
           .replace(/\s+/g, "-");
 
-        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`); 
+        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`);
       }
     });
 
