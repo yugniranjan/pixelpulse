@@ -21,7 +21,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const footerPhone =
     getConfigValue(configdata, ["footerPhone", "contactPhone", "locationPhone"]) ||
     "+1 (905) 760-2922";
-  const footerPhoneHref = footerPhone.replace(/[^\d+]/g, "");
+  const footerPhoneHref = footerPhone?.replace(/[^\d+]/g, "");
   const footerEmail =
     getConfigValue(configdata, ["footerEmail", "contactEmail", "locationEmail"]) ||
     "connect@pixelpulseplay.ca";

@@ -19,20 +19,20 @@ import { getConfigValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
 function stripHtml(html = "") {
   return html
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 }
 
 function decodeHtmlEntities(text = "") {
   return text
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">");
+    ?.replace(/&nbsp;/gi, " ")
+    ?.replace(/&amp;/gi, "&")
+    ?.replace(/&quot;/gi, '"')
+    ?.replace(/&#39;|&apos;/gi, "'")
+    ?.replace(/&lt;/gi, "<")
+    ?.replace(/&gt;/gi, ">");
 }
 
 function extractListItems(html = "") {
@@ -75,10 +75,10 @@ function parseHeroTextBlock(content = "") {
   }
 
   const lines = decodeHtmlEntities(normalizedContent)
-    .replace(/\r/g, "")
-    .split("\n")
-    .map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
-    .filter(Boolean);
+    ?.replace(/\r/g, "")
+    ?.split("\n")
+    ?.map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
+    ?.filter(Boolean);
 
   return {
     heading: lines[0] || "",
@@ -104,10 +104,10 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
       if (!raw) return null;
 
       const cleaned = raw
-        .replace(/<br\/>/g, "")
-        .replace(/\n/g, "")
-        .replace(/,\s*([}\]])/g, "$1")
-        .trim();
+        ?.replace(/<br\/>/g, "")
+        ?.replace(/\n/g, "")
+        ?.replace(/,\s*([}\]])/g, "$1")
+        ?.trim();
       return JSON.parse(cleaned);
     } catch (err) {
       console.error("JSON parse error:", err);

@@ -118,16 +118,16 @@ export default async function InvitePage() {
     websiteLink: configText(configData, ["inviteWebsiteLink", "inviteWebsiteUrl"]) || "https://www.pixelpulseplay.ca",
   };
 
-  const telHref = `tel:${invite.phone.replace(/[^\d+]/g, "")}`;
-  const businessTelHref = `tel:${invite.businessPhone.replace(/[^\d+]/g, "")}`;
+  const telHref = `tel:${invite.phone?.replace(/[^\d+]/g, "")}`;
+  const businessTelHref = `tel:${invite.businessPhone?.replace(/[^\d+]/g, "")}`;
   const configuredDirectionsLink = invite.directionsLink.trim();
   const finalDirectionsLink = configuredDirectionsLink.startsWith("https://www.google.com/maps")
     ? configuredDirectionsLink
     : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`;
   const titleRemainder =
     invite.title
-      .replace(invite.childName, "")
-      .replace(/^['’]s\s*/i, "")
+      ?.replace(invite.childName, "")
+      ?.replace(/^['’]s\s*/i, "")
       .trim() || invite.titleSuffix;
 
   return (

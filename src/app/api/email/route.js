@@ -19,8 +19,8 @@ function getAuthenticatedSender(gmailUser) {
 
 function cleanHeaderValue(value, fallback) {
   const cleaned = String(value || "")
-    .replace(/[\r\n]+/g, " ")
-    .replace(/\s+/g, " ")
+    ?.replace(/[\r\n]+/g, " ")
+    ?.replace(/\s+/g, " ")
     .trim();
 
   return cleaned || fallback;
@@ -101,37 +101,37 @@ export async function POST(request) {
     ].join("\n");
 
     const safeName = String(fullName || "there")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+      ?.replace(/&/g, "&amp;")
+      ?.replace(/</g, "&lt;")
+      ?.replace(/>/g, "&gt;");
 
     const html = `
       <div>
         <p><strong>Inquiry Type:</strong> ${String(selectedEvent || "Not provided")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
         <p><strong>Email:</strong> ${String(email || "Not provided")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
         <p><strong>Phone:</strong> ${String(visitorPhone)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
         <p><strong>Preferred Date:</strong> ${String(date || "Not provided")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
         <p><strong>Preferred Time:</strong> ${String(time || "Not provided")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
         <p><strong>Message:</strong></p>
         <p>${String(message || "No message provided")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")}</p>
+          ?.replace(/&/g, "&amp;")
+          ?.replace(/</g, "&lt;")
+          ?.replace(/>/g, "&gt;")}</p>
       </div>
     `;
 

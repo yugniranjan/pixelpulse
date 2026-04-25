@@ -19,7 +19,7 @@ export default function LogoutButton() {
       toast.success(data.message);
       setLoading(false);
     }
-    router.replace("/admin/login");
+    router?.replace("/admin/login");
     router.refresh();
   }
 

@@ -7,7 +7,7 @@ import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
 import BookingButton from "./smallComponents/BookingButton";
 
 function formatHeroTrustItem(item = "") {
-  return String(item || "").replace(
+  return String(item || "")?.replace(
     /\b(interactive|immersive)\b/gi,
     (word) => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
   );

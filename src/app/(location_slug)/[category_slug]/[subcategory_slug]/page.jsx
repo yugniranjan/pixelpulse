@@ -19,7 +19,7 @@ import { getCtaContent } from "@/lib/ctaContent";
 
 function stripHtml(html = "") {
   return html
-    .replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<br\s*\/?>/gi, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();

@@ -1,11 +1,10 @@
 import "./globals.css";
-import dynamic from "next/dynamic";
-const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChromeVisibility from "./components/ChromeVisibility";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
@@ -27,7 +26,7 @@ export async function generateMetadata() {
             item.key.startsWith("meta_") &&
             !["meta_robots", "meta_googlebot"].includes(item.key)
         )
-        .map((item) => [item.key.replace("meta_", ""), normalizeValue(item.value)])
+        .map((item) => [item.key?.replace("meta_", ""), normalizeValue(item.value)])
     );
     const siteUrl = BASE_URL || "https://www.pixelpulseplay.ca";
 
@@ -88,9 +87,8 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body suppressHydrationWarning>
+        <GoogleTagManager gtmId={gtmId} />
         <Toaster position="top-right" />
-        <GoogleAnalytics />{" "}
-        {/* Render the client-side Google Analytics component */}
         <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
         <Breadcrumbs/>
         <Suspense fallback={<Loading />}>{children}</Suspense>

@@ -64,9 +64,9 @@ function normalizeAttractionKey(value = "") {
   return String(value || "")
     .trim()
     .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    ?.replace(/&/g, "and")
+    ?.replace(/[^a-z0-9]+/g, "-")
+    ?.replace(/^-+|-+$/g, "");
 }
 
 function findHomepageAttractionItem(game, attractionChildren = []) {

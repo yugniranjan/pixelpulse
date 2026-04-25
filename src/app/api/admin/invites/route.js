@@ -23,7 +23,7 @@ async function getAvailableSlug(baseSlug) {
 
 function getOrigin(req) {
   const configured = process.env.SITE_URL || process.env.NEXT_PUBLIC_BASE_URL;
-  if (configured) return configured.replace(/\/$/, "");
+  if (configured) return configured?.replace(/\/$/, "");
   return new URL(req.url).origin;
 }
 
@@ -56,7 +56,7 @@ export async function POST(req) {
   const title = cleanText(body.title) || `${childName}'s Birthday Party`;
   const directionsLink = cleanText(body.directionsLink) || cleanText(body.address);
   const websiteLink = cleanText(body.websiteLink);
-  const websiteText = cleanText(body.websiteText) || websiteLink.replace(/^https?:\/\//, "");
+  const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
 
   const invite = {
     active: "1",

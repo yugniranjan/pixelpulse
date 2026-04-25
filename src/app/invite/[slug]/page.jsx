@@ -151,9 +151,9 @@ export default async function InviteSlugPage({ params }) {
     websiteLink: inviteText(inviteRow, configData, ["websiteLink", "websiteUrl", "inviteWebsiteLink", "inviteWebsiteUrl"]),
   };
 
-  const telHref = invite.phone ? `tel:${invite.phone.replace(/[^\d+]/g, "")}` : "";
+  const telHref = invite.phone ? `tel:${invite.phone?.replace(/[^\d+]/g, "")}` : "";
   const businessTelHref = invite.businessPhone
-    ? `tel:${invite.businessPhone.replace(/[^\d+]/g, "")}`
+    ? `tel:${invite.businessPhone?.replace(/[^\d+]/g, "")}`
     : "";
   const configuredDirectionsLink = invite.directionsLink.trim();
   const finalDirectionsLink =
@@ -164,8 +164,8 @@ export default async function InviteSlugPage({ params }) {
       : "";
   const titleRemainder =
     invite.title
-      .replace(invite.childName, "")
-      .replace(/^['’]s\s*/i, "")
+      ?.replace(invite.childName, "")
+      ?.replace(/^['’]s\s*/i, "")
       .trim() || invite.titleSuffix;
 
   return (

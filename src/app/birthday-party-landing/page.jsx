@@ -51,9 +51,9 @@ function parseBirthdayPackages(rows = []) {
   try {
     return JSON.parse(
       raw
-        .replace(/<br\/>/g, "")
-        .replace(/\n/g, "")
-        .replace(/,\s*([}\]])/g, "$1")
+        ?.replace(/<br\/>/g, "")
+        ?.replace(/\n/g, "")
+        ?.replace(/,\s*([}\]])/g, "$1")
         .trim(),
     );
   } catch (error) {

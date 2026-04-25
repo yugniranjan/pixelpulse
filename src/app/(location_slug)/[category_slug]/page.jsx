@@ -23,20 +23,20 @@ const ABOUT_BUILDING_IMAGE_REDIRECT_SOURCE = "/about-building-image";
 
 function stripHtml(html = "") {
   return html
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<br\s*\/?>/gi, " ")
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 }
 
 function decodeHtmlEntities(text = "") {
   return text
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">");
+    ?.replace(/&nbsp;/gi, " ")
+    ?.replace(/&amp;/gi, "&")
+    ?.replace(/&quot;/gi, '"')
+    ?.replace(/&#39;|&apos;/gi, "'")
+    ?.replace(/&lt;/gi, "<")
+    ?.replace(/&gt;/gi, ">");
 }
 
 function extractListItems(html = "") {
@@ -57,7 +57,7 @@ function extractHeroHeading(html = "") {
   }
 
   const [firstLine = ""] = decodeHtmlEntities(
-    html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/p>/gi, "\n")
+    html?.replace(/<br\s*\/?>/gi, "\n")?.replace(/<\/p>/gi, "\n")
   )
     .split("\n")
     .map((line) => stripHtml(line))
@@ -96,10 +96,10 @@ function parseHeroTextBlock(content = "") {
   }
 
   const lines = decodeHtmlEntities(normalizedContent)
-    .replace(/\r/g, "")
-    .split("\n")
-    .map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
-    .filter(Boolean);
+    ?.replace(/\r/g, "")
+    ?.split("\n")
+    ?.map((line) => line.replace(/^[\-\*\u2022]\s*/, "").trim())
+    ?.filter(Boolean);
 
   return {
     heading: lines[0] || "",
