@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import "../../styles/subcategory.css";
 import "../../styles/promotions.css";
@@ -597,7 +598,13 @@ const PricingPromosPage = async ({ params }) => {
                   {pricingCards.map((card, index) => (
                     <article className="ppp-pricing-card" key={`${card.title}-${index}`}>
                       <div className="ppp-pricing-card__media">
-                        <img src={card.image} alt={card.imageAlt} />
+                        <Image
+                          src={card.image}
+                          alt={card.imageAlt}
+                          width={800}
+                          height={600}
+                          style={{ width: "100%", height: "auto" }}
+                        />
                       </div>
 
                       <div className="ppp-pricing-card__content">
@@ -690,10 +697,13 @@ const PricingPromosPage = async ({ params }) => {
 
                           {promoImage && (
                             <div className="promotion-card__image-wrap">
-                              <img
+                              <Image
                                 src={promoImage.src}
                                 alt={promoImage.alt}
                                 className="promotion-card__image"
+                                width={1200}
+                                height={800}
+                                style={{ width: "100%", height: "auto" }}
                               />
                             </div>
                           )}

@@ -1,4 +1,5 @@
 import "../../styles/invite.css";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { fetchsheetdata } from "@/lib/sheets";
 import { getConfigValue, getRowValue } from "@/lib/ctaContent";
@@ -174,7 +175,14 @@ export default async function InviteSlugPage({ params }) {
         <div className="ppp-invite-card__shine" aria-hidden="true" />
         <div className="ppp-invite-card__content">
           <div className="ppp-invite-topline">
-            <img src="/assets/images/logo.png" alt={invite.logoAlt} className="ppp-invite-logo" />
+            <Image
+              src="/assets/images/logo.png"
+              alt={invite.logoAlt}
+              width={200}
+              height={200}
+              className="ppp-invite-logo"
+              style={{ height: "auto" }}
+            />
             <p className="ppp-invite-eyebrow">{invite.eyebrow}</p>
           </div>
           <TextLines text={invite.greeting} className="ppp-invite-greeting" />

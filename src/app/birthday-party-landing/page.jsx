@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import "../styles/birthday-landing.css";
+import Image from "next/image";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { getConfigValue } from "@/lib/ctaContent";
@@ -127,11 +128,14 @@ export default async function BirthdayPartyLandingPage() {
   return (
     <main className="ppp-birthday-landing">
       <section className="ppp-birthday-hero" aria-labelledby="birthday-landing-title">
-        <img
+        <Image
           className="ppp-birthday-hero__background"
           src={heroImage}
           alt=""
           aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
         />
         <div className="ppp-birthday-shell ppp-birthday-hero__grid">
           <div className="ppp-birthday-hero__copy">
@@ -182,7 +186,13 @@ export default async function BirthdayPartyLandingPage() {
           <div className="ppp-birthday-attraction-carousel" aria-label="Pixel Pulse attractions">
             {attractions.map((item) => (
               <article className="ppp-birthday-attraction-card" key={item.title}>
-                <img src={item.image} alt="" loading="lazy" />
+                <Image
+                  src={item.image}
+                  alt=""
+                  width={800}
+                  height={600}
+                  style={{ width: "100%", height: "auto" }}
+                />
                 <div>
                   <h3>{item.title}</h3>
                   <p>{item.text}</p>

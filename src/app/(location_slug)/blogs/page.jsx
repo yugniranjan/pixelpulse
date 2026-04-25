@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 
 import "../../styles/blogs.css";
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { fetchsheetdata, generateMetadataLib } from "@/lib/sheets";
 import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
@@ -159,9 +160,12 @@ const schema = {
               <article className="ppp-blog-card" key={item.id}>
                 <div className="ppp-blog-card__media">
                   <Link href={href} prefetch>
-                    <img
+                    <Image
                       src={item?.featuredImage || "/assets/images/logo.png"}
                       alt={item?.title || "Blog article image"}
+                      width={800}
+                      height={600}
+                      style={{ width: "100%", height: "auto" }}
                     />
                   </Link>
                 </div>

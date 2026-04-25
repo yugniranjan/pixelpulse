@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import "../../../styles/blogs.css";
+import Image from "next/image";
 import {
   fetchPageData,
   fetchMenuData,
@@ -152,10 +153,12 @@ function renderEditorBlocks(blocks) {
       case "image":
         return (
           <figure key={index}>
-            <img
+            <Image
               src={block.data.file?.url}
               alt={block.data.caption || ""}
-              style={{ maxWidth: "100%" }}
+              width={1200}
+              height={800}
+              style={{ maxWidth: "100%", height: "auto" }}
             />
             {block.data.caption && (
               <figcaption>{block.data.caption}</figcaption>
@@ -194,7 +197,13 @@ export default async function BlogDetail({ searchParams }) {
         {/* Featured Image */}
         {data?.featuredImage && (
           <div className="aero_blog_featured_image">
-            <img src={data.featuredImage} alt={data.title} />
+            <Image
+              src={data.featuredImage}
+              alt={data.title}
+              width={1200}
+              height={800}
+              style={{ width: "100%", height: "auto" }}
+            />
           </div>
         )}
 

@@ -954,10 +954,13 @@ const Home = async () => {
 
                   {promoImage && (
                     <div className="promotion-card__image-wrap">
-                      <img
+                      <Image
                         src={promoImage.src}
                         alt={promoImage.alt}
+                        width={1200}
+                        height={800}
                         className="promotion-card__image"
+                        style={{ width: "100%", height: "auto" }}
                       />
                     </div>
                   )}
@@ -1208,9 +1211,12 @@ const Home = async () => {
             </div>
           </div>
           <figure className="ppp-cta-band__media">
-            <img
+            <Image
               src="https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.png"
               alt="Pixel Pulse Play reception area"
+              width={1200}
+              height={800}
+              style={{ width: "100%", height: "auto" }}
             />
           </figure>
           </div>

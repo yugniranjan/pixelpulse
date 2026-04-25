@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import React from "react";
+import Image from "next/image";
 import "../../../styles/subcategory.css";
 import "../../../styles/category.css";
 import "../../../styles/kidsparty.css";
@@ -140,9 +141,12 @@ const Subcategory = async ({ params }) => {
 
                 <div className="ppp-subcategory-hero__panel">
                   <div className="ppp-subcategory-hero-card">
-                    <img
-                    src={heroImage}
-                    alt={pagedata?.imagetitle || pagedata?.title || "Attraction image"}
+                    <Image
+                      src={heroImage}
+                      alt={pagedata?.imagetitle || pagedata?.title || "Attraction image"}
+                      width={1200}
+                      height={800}
+                      style={{ width: "100%", height: "auto" }}
                     />
                   </div>
                 </div>
@@ -186,9 +190,12 @@ const Subcategory = async ({ params }) => {
                           prefetch
                           className="ppp-subcategory-card__media"
                         >
-                          <img
+                          <Image
                             src={item?.smallimage || "/assets/images/logo.png"}
                             alt={item?.metatitle || item?.desc || "Attraction image"}
+                            width={800}
+                            height={600}
+                            style={{ width: "100%", height: "auto" }}
                           />
                         </Link>
 
@@ -241,9 +248,12 @@ const Subcategory = async ({ params }) => {
 
               <div className="ppp-groupdetail-hero__panel">
                 <div className="ppp-groupdetail-hero-card__image">
-                  <img
+                  <Image
                     src={heroImage}
                     alt={pagedata?.imagetitle || pagedata?.title || "Private party image"}
+                    width={1200}
+                    height={800}
+                    style={{ width: "100%", height: "auto" }}
                   />
                 </div>
               </div>
@@ -286,9 +296,12 @@ const Subcategory = async ({ params }) => {
                           prefetch
                           className="ppp-groupdetail-card__media"
                         >
-                          <img
+                          <Image
                             src={item?.smallimage || "/assets/images/logo.png"}
                             alt={item?.metatitle || item?.desc || "Group event image"}
+                            width={800}
+                            height={600}
+                            style={{ width: "100%", height: "auto" }}
                           />
                         </Link>
 
@@ -340,9 +353,12 @@ const Subcategory = async ({ params }) => {
               </div>
 
               <div className="ppp-detail-hero__media">
-                <img
+                <Image
                   src={heroImage}
                   alt={pagedata?.imagetitle || pagedata?.title || "Pixel Pulse Play"}
+                  width={1200}
+                  height={800}
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
             </div>
@@ -377,9 +393,12 @@ const Subcategory = async ({ params }) => {
                           prefetch
                           className="ppp-detail-card__media"
                         >
-                          <img
+                          <Image
                             src={item?.smallimage || "/assets/images/logo.png"}
                             alt={item?.imagetitle || item?.desc || "Pixel Pulse Play"}
+                            width={800}
+                            height={600}
+                            style={{ width: "100%", height: "auto" }}
                           />
                         </Link>
 

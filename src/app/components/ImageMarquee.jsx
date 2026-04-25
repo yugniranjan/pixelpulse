@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import PropTypes from 'prop-types';
 import styles from '../styles/ImageMarquee.module.css';
 
@@ -27,26 +28,24 @@ if (imagesString) {
       <div className={styles.marqueeContent}>
         {isDefault ? (
           <div className={styles.imageContainer}>
-            <img 
+            <Image
               src={DEFAULT_IMAGE}
               alt="pixelpulseplay Fun"
               title="pixelpulseplay"
               width={400}
               height={267}
-              loading='lazy'
             />
             <p className={styles.title}>pixelpulseplay Trampoline Fun</p>
           </div>
         ) : (
           images.map((image, index) => (
             <div key={index} className={styles.imageContainer}>
-              <img 
+              <Image
                 src={image.src}
                 alt={image.title}
                 title={image.title}
                 width={400}
                 height={267}
-                loading='lazy'
               />
               {image.title && <p className={styles.title}>{image.title}</p>}
             </div>
@@ -58,13 +57,12 @@ if (imagesString) {
         <div className={styles.marqueeContentDuplicated}>
           {images.map((image, index) => (
             <div key={`${index}-duplicate`} className={styles.imageContainer}>
-              <img 
+              <Image
                 src={image.src}
                 alt={image.title}
                 title={image.title}
                 width={400}
                 height={267}
-                loading='lazy'
               />
               {image.title && <p className={styles.title}>{image.title}</p>}
             </div>

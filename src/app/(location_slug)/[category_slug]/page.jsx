@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import "../../styles/category.css";
@@ -363,9 +364,12 @@ const Category = async ({ params }) => {
                           prefetch
                           className="ppp-attraction-card-modern__media"
                         >
-                          <img
+                          <Image
                             src={item?.smallimage || "/assets/images/logo.png"}
                             alt={item?.desc || "Attraction image"}
+                            width={800}
+                            height={600}
+                            style={{ width: "100%", height: "auto" }}
                           />
                         </Link>
 
@@ -503,9 +507,12 @@ const Category = async ({ params }) => {
                           prefetch
                           className="ppp-group-card-modern__media"
                         >
-                          <img
+                          <Image
                             src={item?.smallimage || "/assets/images/logo.png"}
                             alt={item?.desc || "Group event image"}
+                            width={800}
+                            height={600}
+                            style={{ width: "100%", height: "auto" }}
                           />
                         </Link>
 
@@ -609,9 +616,12 @@ const Category = async ({ params }) => {
                             prefetch
                             className="ppp-about-card-modern__media"
                           >
-                            <img
+                            <Image
                               src={item?.smallimage || "/assets/images/logo.png"}
                               alt={item?.desc || "About page image"}
+                              width={800}
+                              height={600}
+                              style={{ width: "100%", height: "auto" }}
                             />
                           </Link>
 
@@ -677,9 +687,12 @@ const Category = async ({ params }) => {
                 </div>
 
                 <div className="ppp-dynamic-hero__media">
-                  <img
+                  <Image
                     src={pageHeroImage}
                     alt={pageData?.imagetitle || attractionsData[0]?.desc || "Pixel Pulse Play"}
+                    width={1200}
+                    height={800}
+                    style={{ width: "100%", height: "auto" }}
                   />
                 </div>
               </div>
@@ -709,9 +722,12 @@ const Category = async ({ params }) => {
                             prefetch
                             className="ppp-dynamic-card__media"
                           >
-                            <img
+                            <Image
                               src={item?.smallimage || "/assets/images/logo.png"}
                               alt={item?.imagetitle || item?.desc || "Pixel Pulse Play"}
+                              width={800}
+                              height={600}
+                              style={{ width: "100%", height: "auto" }}
                             />
                           </Link>
                           <div className="ppp-dynamic-card__body">

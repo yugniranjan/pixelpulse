@@ -1,5 +1,6 @@
 import React from "react";
 import "../../styles/subcategory.css";
+import Image from "next/image";
 import Link from "next/link";
 import { fetchPageData, fetchsheetdata, generateMetadataLib } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
@@ -76,7 +77,13 @@ const page = async ({ params }) => {
           </div>
 
           <div className="ppp-detail-hero__media">
-            <img src={heroImage} alt={memberData?.imagetitle || "Pixel Pulse Play membership"} />
+            <Image
+              src={heroImage}
+              alt={memberData?.imagetitle || "Pixel Pulse Play membership"}
+              width={1200}
+              height={800}
+              style={{ width: "100%", height: "auto" }}
+            />
           </div>
         </div>
       </section>

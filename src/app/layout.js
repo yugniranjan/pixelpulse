@@ -89,15 +89,18 @@ export default async function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <GoogleTagManager gtmId={gtmId} />
         <Toaster position="top-right" />
-        <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
-        <Breadcrumbs/>
+        <ChromeVisibility>
+          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
+          <Breadcrumbs />
+        </ChromeVisibility>
         <Suspense fallback={<Loading />}>{children}</Suspense>
-        <Footer
-          location_slug={location_slug}
-          configdata={configdata}
-          menudata={menudata}
-          // reviewdata={reviewdata}
-        />
+        <ChromeVisibility>
+          <Footer
+            location_slug={location_slug}
+            configdata={configdata}
+            menudata={menudata}
+          />
+        </ChromeVisibility>
         <div id="modal-root"></div>
       </body>
     </html>
