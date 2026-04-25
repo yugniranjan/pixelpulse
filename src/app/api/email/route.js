@@ -190,12 +190,15 @@ export async function POST(request) {
               <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
                 Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play Zone</strong>.
               </p>
+                   <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
+               We will get back to you within 24 hours.
+              </p>
 
              
 
               <div style="margin-top:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
                 <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Explore the experience</div>
-                <div style="margin-top:8px;">
+                <div style="margin-top:12px;">
                   <a href="${ATTRACTIONS_URL}" style="color:#fbae7b;text-decoration:none;font-size:15px;font-weight:700;">View Attractions</a>
                 </div>
                

@@ -4,7 +4,8 @@ import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { fetchBlogs } from "@/lib/blogs";
 import { LOCATION_NAME } from "@/lib/constant";
 export async function GET() {
-  const siteUrl = (process.env.SITE_URL || "https://www.pixelpulseplay.ca").replace(/\/$/, "");
+  const siteUrl =
+    process.env.SITE_URL?.replace(/\/$/, "") || "https://www.pixelpulseplay.ca";
   const dynamicPaths = new Set();
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
   const getLocationPath = (location = "") => {
@@ -55,7 +56,7 @@ export async function GET() {
           .replace(/[^\w\s-]/g, "")
           .replace(/\s+/g, "-");
 
-        dynamicPaths.add(`${siteUrl}/${locationName}/blogs/${slug}?uid=${blog.id}`);
+        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`);
       }
     });
 

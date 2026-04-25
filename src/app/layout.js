@@ -1,5 +1,6 @@
 import "./globals.css";
-import Script from "next/script";
+import dynamic from "next/dynamic";
+const GoogleAnalytics = dynamic(() => import('./components/GoogleAnalytics'));
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
@@ -82,54 +83,23 @@ export default async function RootLayout({ children }) {
   } catch (error) {
     console.error("layout data failed:", error);
   }
-
   const locationid = sheetdata?.[0]?.locationid || null;
-  // const reviewdata = await getReviewsData(locationid)
+  const gtmId = sheetdata?.find((item) => item?.gtm_id)?.gtm_id || "GTM-99ZBR";
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <Script
-          id="google-tag-manager"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-5GQ99ZBR');
-            `,
-          }}
-        />
         <Toaster position="top-right" />
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <ChromeVisibility>
-          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
-        </ChromeVisibility>
-        <main id="main-content" tabIndex="-1">
-          <ChromeVisibility>
-            <Breadcrumbs />
-          </ChromeVisibility>
-          <Suspense fallback={<Loading />}>{children}</Suspense>
-        </main>
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-5GQ99ZBR"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
-        <ChromeVisibility>
-          <Footer
-            location_slug={location_slug}
-            configdata={configdata}
-            menudata={menudata}
-            // reviewdata={reviewdata}
-          />
-        </ChromeVisibility>
+        <GoogleAnalytics />{" "}
+        {/* Render the client-side Google Analytics component */}
+        <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
+        <Breadcrumbs/>
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+        <Footer
+          location_slug={location_slug}
+          configdata={configdata}
+          menudata={menudata}
+          // reviewdata={reviewdata}
+        />
         <div id="modal-root"></div>
       </body>
     </html>
