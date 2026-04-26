@@ -117,6 +117,9 @@ export default function AdminWaiversPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [partyOnly, setPartyOnly] = useState(false);
 
   useEffect(() => {
     async function loadWaivers() {
@@ -145,10 +148,9 @@ export default function AdminWaiversPage() {
 
   const filteredWaivers = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return waivers;
 
-    return waivers.filter((waiver) =>
-      [
+    return waivers.filter((waiver) => {
+      const matchesSearch = !needle || [
         waiver.primaryName,
         waiver.primary?.email,
         waiver.primary?.phone,
@@ -157,9 +159,35 @@ export default function AdminWaiversPage() {
         waiver.visit?.passType,
       ]
         .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(needle)),
-    );
-  }, [query, waivers]);
+        .some((value) => String(value).toLowerCase().includes(needle));
+
+      const waiverVisitDate = waiver.visit?.visitDate || "";
+      const matchesFrom = !dateFrom || waiverVisitDate >= dateFrom;
+      const matchesTo = !dateTo || waiverVisitDate <= dateTo;
+      const matchesParty = !partyOnly || Boolean(waiver.visit?.partyId);
+
+      return matchesSearch && matchesFrom && matchesTo && matchesParty;
+    });
+  }, [dateFrom, dateTo, partyOnly, query, waivers]);
+  const searchSuggestions = useMemo(() => {
+    const values = new Set();
+
+    waivers.forEach((waiver) => {
+      [
+        waiver.primaryName,
+        participantName(waiver.primary),
+        waiver.primary?.email,
+        waiver.primary?.phone,
+        waiver.visit?.partyId,
+        waiver.visit?.passType,
+        waiver.visit?.visitDate,
+      ]
+        .filter(Boolean)
+        .forEach((value) => values.add(String(value)));
+    });
+
+    return Array.from(values).sort((a, b) => a.localeCompare(b)).slice(0, 80);
+  }, [waivers]);
   const totalParticipants = useMemo(
     () =>
       waivers.reduce(
@@ -173,6 +201,13 @@ export default function AdminWaiversPage() {
     return waivers.filter((waiver) => waiver.visit?.visitDate === today).length;
   }, [waivers]);
   const latestWaiver = waivers[0];
+
+  function clearFilters() {
+    setQuery("");
+    setDateFrom("");
+    setDateTo("");
+    setPartyOnly(false);
+  }
 
   return (
     <main className="waiver-dashboard-shell">
@@ -196,10 +231,6 @@ export default function AdminWaiversPage() {
             <h1>Waiver Dashboard</h1>
             <p>Review submitted Pixel Pulse Play waivers and family participants.</p>
           </div>
-          <label>
-            <span>Search</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, email, phone, date" />
-          </label>
         </div>
 
         <div className="waiver-admin-stats" aria-label="Waiver summary">
@@ -226,9 +257,40 @@ export default function AdminWaiversPage() {
 
         {!loading && !error ? (
           <div className="waiver-admin-list waiver-admin-list--dashboard">
-            <div className="waiver-admin-count">
-              Recent Waiver Submissions
-              <span>{filteredWaivers.length} record{filteredWaivers.length === 1 ? "" : "s"}</span>
+            <div className="waiver-data-toolbar">
+              <div>
+                <h2>Recent Waiver Submissions</h2>
+                <p>{filteredWaivers.length} of {waivers.length} records shown</p>
+              </div>
+              <div className="waiver-data-filters">
+                <label>
+                  <span>Search</span>
+                  <input
+                    list="admin-waiver-search-suggestions"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Name, phone, email, party ID"
+                  />
+                  <datalist id="admin-waiver-search-suggestions">
+                    {searchSuggestions.map((suggestion) => (
+                      <option value={suggestion} key={suggestion} />
+                    ))}
+                  </datalist>
+                </label>
+                <label>
+                  <span>From</span>
+                  <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
+                </label>
+                <label>
+                  <span>To</span>
+                  <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+                </label>
+                <label className="waiver-data-checkbox">
+                  <input type="checkbox" checked={partyOnly} onChange={(event) => setPartyOnly(event.target.checked)} />
+                  <span>Has party ID</span>
+                </label>
+                <button type="button" onClick={clearFilters}>Clear</button>
+              </div>
             </div>
             {filteredWaivers.length ? (
               filteredWaivers.map((waiver) => <WaiverCard waiver={waiver} key={waiver.id} />)

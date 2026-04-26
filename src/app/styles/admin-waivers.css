@@ -141,6 +141,92 @@
   margin-top: 18px;
 }
 
+.waiver-data-toolbar {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(16, 24, 40, 0.05);
+}
+
+.waiver-data-toolbar h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.waiver-data-toolbar p {
+  margin: 5px 0 0;
+  color: #667085;
+}
+
+.waiver-data-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.waiver-data-filters label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.waiver-data-filters input:not([type="checkbox"]) {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font: inherit;
+  text-transform: none;
+}
+
+.waiver-data-checkbox {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #f9fafb;
+}
+
+.waiver-data-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: #a4cf5f;
+}
+
+.waiver-data-filters button {
+  min-height: 42px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #344054;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.waiver-data-filters button:hover {
+  border-color: #a4cf5f;
+  color: #3f6212;
+}
+
+.waiver-admin-card--intuitive[open] {
+  border-color: rgba(164, 207, 95, 0.48);
+  box-shadow: 0 14px 34px rgba(16, 24, 40, 0.08);
+}
+
 .waiver-admin-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -427,6 +513,10 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
 
   .waiver-admin-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .waiver-data-filters {
+    grid-template-columns: 1fr;
   }
 
   .admin-home-grid {

@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import "../styles/admin-waivers.css";
 import { db } from "@/lib/firestore";
+import LocalWaiverDashboard from "@/components/LocalWaiverDashboard";
 
 function serializeDate(value) {
   if (!value) return "";
@@ -19,10 +20,6 @@ function formatDateTime(value) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function participantName(person = {}) {
-  return [person.firstName, person.lastName].filter(Boolean).join(" ") || "Unnamed";
 }
 
 function isLocalRequest(host = "") {
@@ -136,117 +133,11 @@ export default async function LocalWaiverDataPage() {
 
         {error ? <p className="waiver-admin-error">{error}</p> : null}
 
-        <div className="waiver-admin-list waiver-admin-list--dashboard">
-          <div className="waiver-admin-count">
-            Recent Waiver Submissions
-            <span>{waivers.length} record{waivers.length === 1 ? "" : "s"}</span>
-          </div>
-
-          {waivers.length ? (
-            waivers.map((waiver) => {
-              const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
-              const attractions = Array.isArray(waiver.attractions) ? waiver.attractions : [];
-
-              return (
-                <details className="waiver-admin-card" key={waiver.id}>
-                  <summary className="waiver-admin-card__summary">
-                    <span>
-                      <strong>{waiver.primaryName || participantName(waiver.primary)}</strong>
-                      <em>{waiver.primary?.email || "No email"}</em>
-                    </span>
-                    <span>
-                      <strong>{waiver.visit?.partyId || "No party ID"}</strong>
-                      <em>{waiver.visit?.visitDate || "No visit date"}</em>
-                    </span>
-                    <span>
-                      <strong>{waiver.participantCount || 1}</strong>
-                      <em>Participants</em>
-                    </span>
-                    <span>
-                      <strong>{formatDateTime(waiver.submittedAt)}</strong>
-                      <em>Submitted</em>
-                    </span>
-                  </summary>
-
-                  <div className="waiver-admin-card__details">
-                    <section>
-                      <h2>Primary Participant</h2>
-                      <dl>
-                        <div><dt>Name</dt><dd>{participantName(waiver.primary)}</dd></div>
-                        <div><dt>DOB</dt><dd>{waiver.primary?.dob || "Not provided"}</dd></div>
-                        <div><dt>Gender</dt><dd>{waiver.primary?.gender || "Not provided"}</dd></div>
-                        <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
-                        <div><dt>Phone</dt><dd>{waiver.primary?.phone || "Not provided"}</dd></div>
-                        <div><dt>City</dt><dd>{waiver.primary?.city || "Not provided"}</dd></div>
-                        <div><dt>Medical notes</dt><dd>{waiver.primary?.medicalNotes || "None"}</dd></div>
-                      </dl>
-                    </section>
-
-                    <section>
-                      <h2>Visit</h2>
-                      <dl>
-                        <div><dt>Pass</dt><dd>{waiver.visit?.passType || "Not provided"}</dd></div>
-                        <div><dt>Party ID</dt><dd>{waiver.visit?.partyId || "Not provided"}</dd></div>
-                        <div><dt>Visit date</dt><dd>{waiver.visit?.visitDate || "Not provided"}</dd></div>
-                        <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
-                        <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
-                        <div><dt>Emergency phone</dt><dd>{waiver.visit?.emergencyPhone || "Not provided"}</dd></div>
-                        <div><dt>Printed name</dt><dd>{waiver.visit?.printName || "Not provided"}</dd></div>
-                        <div><dt>Signed date</dt><dd>{waiver.visit?.signDate || "Not provided"}</dd></div>
-                      </dl>
-                    </section>
-
-                    <section className="waiver-admin-card__wide">
-                      <h2>Family Members</h2>
-                      {familyMembers.length ? (
-                        <div className="waiver-admin-members">
-                          {familyMembers.map((member, index) => (
-                            <div key={`${member.firstName}-${member.lastName}-${index}`}>
-                              <strong>{participantName(member)}</strong>
-                              <span>{member.type === "minor" ? "Minor under 18" : "Adult 18+"}</span>
-                              <span>DOB: {member.dob || "Not provided"}</span>
-                              <span>Gender: {member.gender || "Not provided"}</span>
-                              {member.email ? <span>Email: {member.email}</span> : null}
-                              <span>Medical: {member.medicalNotes || "None"}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p>No additional family members.</p>
-                      )}
-                    </section>
-
-                    <section className="waiver-admin-card__wide">
-                      <h2>Attractions</h2>
-                      <div className="waiver-admin-pills">
-                        {attractions.length ? (
-                          attractions.map((attraction) => <span key={attraction}>{attraction}</span>)
-                        ) : (
-                          <span>None selected</span>
-                        )}
-                      </div>
-                    </section>
-
-                    <section className="waiver-admin-card__wide">
-                      <h2>Signature</h2>
-                      {waiver.signatureDataUrl ? (
-                        <img
-                          className="waiver-admin-signature"
-                          src={waiver.signatureDataUrl}
-                          alt={`Signature for ${waiver.primaryName || "waiver"}`}
-                        />
-                      ) : (
-                        <p>No signature image saved.</p>
-                      )}
-                    </section>
-                  </div>
-                </details>
-              );
-            })
-          ) : (
-            <p className="waiver-admin-state">No waivers found.</p>
-          )}
-        </div>
+        {waivers.length ? (
+          <LocalWaiverDashboard waivers={waivers} />
+        ) : (
+          <p className="waiver-admin-state">No waivers found.</p>
+        )}
       </section>
     </main>
   );
