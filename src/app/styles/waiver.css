@@ -252,6 +252,10 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.ppp-waiver-field-grid select {
+  font-size: 0.86rem;
+}
+
 .ppp-waiver-field-grid textarea {
   min-height: 76px;
   resize: vertical;
