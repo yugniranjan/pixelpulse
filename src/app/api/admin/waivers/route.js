@@ -25,6 +25,10 @@ function cleanText(value = "") {
   return String(value || "").trim();
 }
 
+function fullLegalName(person = {}) {
+  return [person.firstName, person.lastName].map(cleanText).filter(Boolean).join(" ");
+}
+
 function getWaiverId(req) {
   return new URL(req.url).searchParams.get("id")?.trim();
 }
@@ -64,17 +68,21 @@ export async function PUT(req) {
   const body = await req.json();
   const primary = body.primary || {};
   const visit = body.visit || {};
+  const cleanedPrimary = {
+    firstName: cleanText(primary.firstName),
+    lastName: cleanText(primary.lastName),
+    dob: cleanText(primary.dob),
+    gender: cleanText(primary.gender),
+    email: cleanText(primary.email),
+    phone: cleanText(primary.phone),
+    city: cleanText(primary.city),
+    healthCondition: cleanText(primary.healthCondition) || "Not Applicable",
+    medicalNotes: cleanText(primary.medicalNotes),
+  };
   const updateData = {
     primary: {
-      firstName: cleanText(primary.firstName),
-      lastName: cleanText(primary.lastName),
-      dob: cleanText(primary.dob),
-      gender: cleanText(primary.gender),
-      email: cleanText(primary.email),
-      phone: cleanText(primary.phone),
-      city: cleanText(primary.city),
-      healthCondition: cleanText(primary.healthCondition) || "Not Applicable",
-      medicalNotes: cleanText(primary.medicalNotes),
+      ...cleanedPrimary,
+      fullLegalName: fullLegalName(cleanedPrimary),
     },
     visit: {
       partyId: cleanText(visit.partyId),
@@ -86,7 +94,7 @@ export async function PUT(req) {
       printName: cleanText(visit.printName),
       signDate: cleanText(visit.signDate),
     },
-    primaryName: [primary.firstName, primary.lastName].map(cleanText).filter(Boolean).join(" "),
+    primaryName: fullLegalName(cleanedPrimary),
     updatedAt: new Date(),
   };
 

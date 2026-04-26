@@ -18,8 +18,12 @@ function cleanText(value = "") {
   return String(value || "").trim();
 }
 
+function fullLegalName(person = {}) {
+  return [person.firstName, person.lastName].filter(Boolean).join(" ");
+}
+
 function cleanParticipant(participant = {}) {
-  return {
+  const cleaned = {
     type: participant.type === "minor" ? "minor" : participant.type === "adult" ? "adult" : "primary",
     firstName: cleanText(participant.firstName),
     lastName: cleanText(participant.lastName),
@@ -30,6 +34,10 @@ function cleanParticipant(participant = {}) {
     city: cleanText(participant.city),
     healthCondition: cleanText(participant.healthCondition) || "Not Applicable",
     medicalNotes: cleanText(participant.medicalNotes),
+  };
+  return {
+    ...cleaned,
+    fullLegalName: fullLegalName(cleaned),
   };
 }
 
@@ -129,7 +137,7 @@ export async function POST(req) {
     attractions,
     signatureDataUrl,
     participantCount: 1 + familyMembers.length,
-    primaryName: [primary.firstName, primary.lastName].filter(Boolean).join(" "),
+    primaryName: primary.fullLegalName,
     submittedAt: now,
     updatedAt: now,
     source: "pixelpulse-web-waiver",

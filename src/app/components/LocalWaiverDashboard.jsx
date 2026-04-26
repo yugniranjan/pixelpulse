@@ -13,7 +13,7 @@ function formatDateTime(value) {
 }
 
 function participantName(person = {}) {
-  return [person.firstName, person.lastName].filter(Boolean).join(" ") || "Unnamed";
+  return person.fullLegalName || [person.firstName, person.lastName].filter(Boolean).join(" ") || "Unnamed";
 }
 
 function WaiverRecord({ waiver }) {
@@ -45,7 +45,7 @@ function WaiverRecord({ waiver }) {
         <section>
           <h2>Primary Participant</h2>
           <dl>
-            <div><dt>Name</dt><dd>{participantName(waiver.primary)}</dd></div>
+            <div><dt>Full legal name</dt><dd>{participantName(waiver.primary)}</dd></div>
             <div><dt>DOB</dt><dd>{waiver.primary?.dob || "Not provided"}</dd></div>
             <div><dt>Gender</dt><dd>{waiver.primary?.gender || "Not provided"}</dd></div>
             <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
