@@ -131,6 +131,11 @@ function isPublishedBlog(blog) {
   return status === "published" || status === "";
 }
 
+function logFirestoreBlogWarning(label, error) {
+  const message = error?.message || "Unknown Firestore error";
+  console.warn(`${label}: ${message}. Falling back to static blog cards.`);
+}
+
 export async function fetchBlogs() {
   if (!db) {
     console.warn(
@@ -149,7 +154,7 @@ export async function fetchBlogs() {
       .map(normalizeBlog)
       .filter((blog) => isPublishedBlog(blog));
   } catch (error) {
-    console.error("Firestore ordered blog query failed:", error);
+    logFirestoreBlogWarning("Firestore ordered blog query failed", error);
   }
 
   try {
@@ -167,7 +172,7 @@ export async function fetchBlogs() {
       })
       .filter((blog) => isPublishedBlog(blog));
   } catch (error) {
-    console.error("Firestore fallback blog query failed:", error);
+    logFirestoreBlogWarning("Firestore fallback blog query failed", error);
     return [];
   }
 }

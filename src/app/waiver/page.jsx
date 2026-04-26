@@ -3,11 +3,8 @@ export const runtime = "nodejs";
 
 import "../styles/waiver.css";
 import Image from "next/image";
-import Link from "next/link";
 import SectionHeading from "@/components/home/SectionHeading";
-
-const WAIVER_URL =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinewaiver/waiver.php";
+import WaiverForm from "@/components/WaiverForm";
 
 export const metadata = {
   title: "Waiver | Pixel Pulse Play Vaughan",
@@ -25,52 +22,27 @@ export const metadata = {
 export default function WaiverPage() {
   return (
     <main className="ppp-waiver-page">
-      <Link href="/" className="ppp-waiver-logo-link" aria-label="Pixel Pulse Play home">
-        <Image
-          src="/assets/images/logo.png"
-          alt="Pixel Pulse Play"
-          width={140}
-          height={140}
-          priority
-          style={{ height: "auto" }}
-        />
-      </Link>
-
       <section className="aero-max-container ppp-waiver-layout">
         <div className="ppp-waiver-section-intro">
+          <Image
+            src="/assets/images/logo.png"
+            alt="Pixel Pulse Play"
+            width={96}
+            height={96}
+            priority
+            className="ppp-waiver-heading-logo"
+          />
           <SectionHeading mainHeading={true}>
-            Online <span>Waiver</span>
+            Pixel Pulse <span>Waiver</span>
           </SectionHeading>
           <p>
-            Use the secure form below to complete your waiver. If the form does not
-            load on your device, you can open it in a separate tab.
+            Add every player before you arrive, including adults and minors. This
+            Vaughan waiver experience is designed for Pixel Pulse Play families,
+            parties, and groups.
           </p>
         </div>
 
-        <section className="ppp-waiver-frame-shell">
-          <div className="ppp-waiver-frame-toolbar">
-            <span className="ppp-waiver-frame-toolbar__status">Secure form</span>
-            <Link
-              href={WAIVER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ppp-waiver-frame-toolbar__link"
-              prefetch={false}
-            >
-              Open in New Tab
-            </Link>
-          </div>
-
-          <div className="ppp-waiver-frame-wrap">
-            <iframe
-              src={WAIVER_URL}
-              title="Pixel Pulse Play Online Waiver"
-              className="ppp-waiver-frame"
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-          </div>
-        </section>
+        <WaiverForm />
       </section>
     </main>
   );

@@ -1,10 +1,10 @@
 import "./globals.css";
+import Script from "next/script";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChromeVisibility from "./components/ChromeVisibility";
-import { GoogleTagManager } from "@next/third-parties/google";
 import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
@@ -87,7 +87,21 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <GoogleTagManager gtmId={gtmId} />
+        {gtmId && (
+          <Script
+            id="google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${gtmId}');
+              `,
+            }}
+          />
+        )}
         <Toaster position="top-right" />
         <ChromeVisibility>
           <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />

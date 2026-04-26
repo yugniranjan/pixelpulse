@@ -19,7 +19,13 @@ export async function generateMetadata({ params, searchParams }) {
 
   if (!id || !db) return {};
 
-  const doc = await db.collection("blogs").doc(id).get();
+  let doc;
+  try {
+    doc = await db.collection("blogs").doc(id).get();
+  } catch (error) {
+    console.warn(`Firestore blog metadata unavailable: ${error?.message || error}`);
+    return {};
+  }
 
   if (!doc.exists) {
     return {};
@@ -79,7 +85,13 @@ export async function generateMetadata({ params, searchParams }) {
 async function getBlogById(id) {
   if (!id || !db) return null;
 
-  const doc = await db.collection("blogs").doc(id).get();
+  let doc;
+  try {
+    doc = await db.collection("blogs").doc(id).get();
+  } catch (error) {
+    console.warn(`Firestore blog detail unavailable: ${error?.message || error}`);
+    return null;
+  }
 
   if (!doc.exists) return null;
   const data = doc.data();

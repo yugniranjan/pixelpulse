@@ -8,10 +8,18 @@ const serviceAccount = {
   privateKey: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 };
 
-if (!getApps().length) {
+const hasFirestoreCredentials = Boolean(
+  serviceAccount.projectId &&
+    serviceAccount.clientEmail &&
+    serviceAccount.privateKey?.startsWith("-----BEGIN PRIVATE KEY-----"),
+);
+
+if (hasFirestoreCredentials && !getApps().length) {
   initializeApp({
     credential: cert(serviceAccount),
   });
 }
 
-export const db = getFirestore( undefined , 'pixelpulse');
+export const db = hasFirestoreCredentials
+  ? getFirestore(undefined, process.env.FIRESTORE_DATABASE_ID || "pixelpulse")
+  : null;
