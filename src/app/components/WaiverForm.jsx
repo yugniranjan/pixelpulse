@@ -60,6 +60,7 @@ const EMPTY_PRIMARY = {
 };
 
 const EMPTY_VISIT = {
+  partyId: "",
   passType: "",
   visitDate: "",
   emergencyName: "",
@@ -546,6 +547,10 @@ export default function WaiverForm() {
           <h2>Visit Details</h2>
         </div>
         <div className="ppp-waiver-field-grid">
+          <label>
+            <span>Party ID</span>
+            <input value={visit.partyId} onChange={(event) => updateVisit("partyId", event.target.value)} placeholder="Optional booking or party ID" />
+          </label>
           <label>
             <span>Pass / Visit type *</span>
             <select required value={visit.passType} onChange={(event) => updateVisit("passType", event.target.value)}>

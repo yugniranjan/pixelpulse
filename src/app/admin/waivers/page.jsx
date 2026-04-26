@@ -29,8 +29,8 @@ function WaiverCard({ waiver }) {
           <em>{waiver.primary?.email || "No email"}</em>
         </span>
         <span>
-          <strong>{waiver.visit?.visitDate || "No visit date"}</strong>
-          <em>{waiver.visit?.passType || "No pass type"}</em>
+          <strong>{waiver.visit?.partyId || "No party ID"}</strong>
+          <em>{waiver.visit?.visitDate || "No visit date"}</em>
         </span>
         <span>
           <strong>{waiver.participantCount || 1}</strong>
@@ -61,6 +61,7 @@ function WaiverCard({ waiver }) {
             <h2>Visit</h2>
             <dl>
               <div><dt>Pass</dt><dd>{waiver.visit?.passType || "Not provided"}</dd></div>
+              <div><dt>Party ID</dt><dd>{waiver.visit?.partyId || "Not provided"}</dd></div>
               <div><dt>Visit date</dt><dd>{waiver.visit?.visitDate || "Not provided"}</dd></div>
               <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
               <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
@@ -151,6 +152,7 @@ export default function AdminWaiversPage() {
         waiver.primaryName,
         waiver.primary?.email,
         waiver.primary?.phone,
+        waiver.visit?.partyId,
         waiver.visit?.visitDate,
         waiver.visit?.passType,
       ]

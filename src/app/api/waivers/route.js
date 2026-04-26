@@ -40,6 +40,7 @@ function cleanFamilyMember(member = {}) {
 
 function cleanVisit(visit = {}) {
   return {
+    partyId: cleanText(visit.partyId),
     passType: cleanText(visit.passType),
     visitDate: cleanText(visit.visitDate),
     emergencyName: cleanText(visit.emergencyName),
