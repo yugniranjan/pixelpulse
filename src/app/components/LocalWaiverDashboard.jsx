@@ -51,6 +51,7 @@ function WaiverRecord({ waiver }) {
             <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
             <div><dt>Phone</dt><dd>{waiver.primary?.phone || "Not provided"}</dd></div>
             <div><dt>City</dt><dd>{waiver.primary?.city || "Not provided"}</dd></div>
+            <div><dt>Health condition</dt><dd>{waiver.primary?.healthCondition || "Not Applicable"}</dd></div>
             <div><dt>Medical notes</dt><dd>{waiver.primary?.medicalNotes || "None"}</dd></div>
           </dl>
         </section>
@@ -80,6 +81,7 @@ function WaiverRecord({ waiver }) {
                   <span>DOB: {member.dob || "Not provided"}</span>
                   <span>Gender: {member.gender || "Not provided"}</span>
                   {member.email ? <span>Email: {member.email}</span> : null}
+                  <span>Health: {member.healthCondition || "Not Applicable"}</span>
                   <span>Medical: {member.medicalNotes || "None"}</span>
                 </div>
               ))}

@@ -13,6 +13,19 @@ const PASS_TYPES = [
   "University Student Special",
 ];
 
+const HEALTH_CONDITIONS = [
+  "Not Applicable",
+  "Asthma",
+  "Allergies",
+  "Heart condition",
+  "Epilepsy / seizures",
+  "Diabetes",
+  "Mobility limitation",
+  "Recent injury or surgery",
+  "Pregnancy",
+  "Other",
+];
+
 const MONTHS = [
   ["01", "January"],
   ["02", "February"],
@@ -41,6 +54,7 @@ const EMPTY_PRIMARY = {
   email: "",
   phone: "",
   city: "",
+  healthCondition: "Not Applicable",
   medicalNotes: "",
 };
 
@@ -75,6 +89,7 @@ function createFamilyMember(type) {
     dob: "",
     gender: "",
     email: "",
+    healthCondition: "Not Applicable",
     medicalNotes: "",
   };
 }
@@ -190,7 +205,7 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   return (
     <label>
       <span>{label}</span>
-      <div className="ppp-waiver-dob-row">
+      <div className="ppp-waiver-dob-row ppp-waiver-date-row">
         <select required aria-label={`${label} month`} value={dateParts.month} onChange={(event) => updateDate("month", event.target.value)}>
           <option value="">Month</option>
           {MONTHS.map(([value, name]) => <option value={value} key={value}>{name}</option>)}
@@ -203,10 +218,10 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
           <option value="">Year</option>
           {yearOptions.map((year) => <option value={year} key={year}>{year}</option>)}
         </select>
+        <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
+          Today
+        </button>
       </div>
-      <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
-        Today
-      </button>
     </label>
   );
 }
@@ -431,10 +446,18 @@ export default function WaiverForm() {
             <span>City / Town *</span>
             <input required value={primary.city} onChange={(event) => updatePrimary("city", event.target.value)} />
           </label>
-          <label className="ppp-waiver-wide">
-            <span>Medical conditions, injuries, or physical limitations</span>
-            <textarea value={primary.medicalNotes} onChange={(event) => updatePrimary("medicalNotes", event.target.value)} />
-          </label>
+          <div className="ppp-waiver-wide ppp-waiver-medical-row">
+            <label>
+              <span>Common health condition</span>
+              <select value={primary.healthCondition} onChange={(event) => updatePrimary("healthCondition", event.target.value)}>
+                {HEALTH_CONDITIONS.map((condition) => <option key={condition}>{condition}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Medical notes</span>
+              <textarea value={primary.medicalNotes} onChange={(event) => updatePrimary("medicalNotes", event.target.value)} />
+            </label>
+          </div>
         </div>
       </section>
 
@@ -484,10 +507,18 @@ export default function WaiverForm() {
                     <input type="email" value={member.email} onChange={(event) => updateFamilyMember(member.id, "email", event.target.value)} />
                   </label>
                 )}
-                <label className="ppp-waiver-wide">
-                  <span>Medical notes</span>
-                  <textarea value={member.medicalNotes} onChange={(event) => updateFamilyMember(member.id, "medicalNotes", event.target.value)} />
-                </label>
+                <div className="ppp-waiver-wide ppp-waiver-medical-row">
+                  <label>
+                    <span>Common health condition</span>
+                    <select value={member.healthCondition} onChange={(event) => updateFamilyMember(member.id, "healthCondition", event.target.value)}>
+                      {HEALTH_CONDITIONS.map((condition) => <option key={condition}>{condition}</option>)}
+                    </select>
+                  </label>
+                  <label>
+                    <span>Medical notes</span>
+                    <textarea value={member.medicalNotes} onChange={(event) => updateFamilyMember(member.id, "medicalNotes", event.target.value)} />
+                  </label>
+                </div>
               </div>
             </article>
           ))}

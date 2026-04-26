@@ -28,6 +28,7 @@ function makeEditForm(waiver) {
       email: waiver.primary?.email || "",
       phone: waiver.primary?.phone || "",
       city: waiver.primary?.city || "",
+      healthCondition: waiver.primary?.healthCondition || "Not Applicable",
       medicalNotes: waiver.primary?.medicalNotes || "",
     },
     visit: {
@@ -75,6 +76,7 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
             <label><span>Email</span><input type="email" value={form.primary.email} onChange={(event) => update("primary", "email", event.target.value)} /></label>
             <label><span>Phone</span><input value={form.primary.phone} onChange={(event) => update("primary", "phone", event.target.value)} /></label>
             <label><span>City</span><input value={form.primary.city} onChange={(event) => update("primary", "city", event.target.value)} /></label>
+            <label><span>Health condition</span><input value={form.primary.healthCondition} onChange={(event) => update("primary", "healthCondition", event.target.value)} /></label>
             <label className="waiver-edit-wide"><span>Medical notes</span><textarea value={form.primary.medicalNotes} onChange={(event) => update("primary", "medicalNotes", event.target.value)} /></label>
           </div>
         </section>
@@ -141,6 +143,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
               <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
               <div><dt>Phone</dt><dd>{waiver.primary?.phone || "Not provided"}</dd></div>
               <div><dt>City</dt><dd>{waiver.primary?.city || "Not provided"}</dd></div>
+              <div><dt>Health condition</dt><dd>{waiver.primary?.healthCondition || "Not Applicable"}</dd></div>
               <div><dt>Medical notes</dt><dd>{waiver.primary?.medicalNotes || "None"}</dd></div>
             </dl>
           </section>
@@ -170,6 +173,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
                     <span>DOB: {member.dob || "Not provided"}</span>
                     <span>Gender: {member.gender || "Not provided"}</span>
                     {member.email ? <span>Email: {member.email}</span> : null}
+                    <span>Health: {member.healthCondition || "Not Applicable"}</span>
                     <span>Medical: {member.medicalNotes || "None"}</span>
                   </div>
                 ))}

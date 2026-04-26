@@ -73,6 +73,7 @@ export async function PUT(req) {
       email: cleanText(primary.email),
       phone: cleanText(primary.phone),
       city: cleanText(primary.city),
+      healthCondition: cleanText(primary.healthCondition) || "Not Applicable",
       medicalNotes: cleanText(primary.medicalNotes),
     },
     visit: {

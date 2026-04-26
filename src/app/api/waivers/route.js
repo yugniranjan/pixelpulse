@@ -28,6 +28,7 @@ function cleanParticipant(participant = {}) {
     email: cleanText(participant.email),
     phone: cleanText(participant.phone),
     city: cleanText(participant.city),
+    healthCondition: cleanText(participant.healthCondition) || "Not Applicable",
     medicalNotes: cleanText(participant.medicalNotes),
   };
 }
