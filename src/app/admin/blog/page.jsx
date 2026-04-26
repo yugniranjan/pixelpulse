@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
+import AdminShell from "@/components/AdminShell";
+import "../../styles/admin-waivers.css";
 
 const BlogEditor = dynamic(() => import("@/components/Editor"), {
   ssr: false,
@@ -81,8 +83,15 @@ export default function CreateBlog() {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "40px auto" }}>
-      <h1>Admin Blog Editor</h1>
+    <AdminShell>
+    <div className="admin-editor-shell">
+      <div className="waiver-admin-header waiver-admin-header--dashboard">
+        <div>
+          <span className="waiver-admin-kicker">Admin dashboard</span>
+          <h1>Admin Blog Editor</h1>
+          <p>Create a new Pixel Pulse blog post.</p>
+        </div>
+      </div>
 
       {/* Title */}
       <input
@@ -164,5 +173,6 @@ export default function CreateBlog() {
         </button>
       </div>
     </div>
+    </AdminShell>
   );
 }

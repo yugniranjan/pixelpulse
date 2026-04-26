@@ -5,6 +5,11 @@
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.invite-admin-page--shell {
+  width: 100%;
+  margin: 0;
+}
+
 .invite-admin-header {
   margin-bottom: 22px;
 }
@@ -127,4 +132,3 @@
     grid-template-columns: 1fr;
   }
 }
-

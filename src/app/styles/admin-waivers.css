@@ -172,6 +172,66 @@
   line-height: 1.1;
 }
 
+.admin-home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.admin-home-card {
+  display: grid;
+  gap: 24px;
+  min-height: 230px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  padding: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(16, 24, 40, 0.05);
+}
+
+.admin-home-card span {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border: 1px solid rgba(164, 207, 95, 0.34);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(164, 207, 95, 0.1);
+  color: #3f6212;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-home-card h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.admin-home-card p {
+  margin: 8px 0 0;
+  color: #667085;
+  line-height: 1.65;
+}
+
+.admin-home-card a {
+  align-self: end;
+  justify-self: start;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #a4cf5f;
+  color: #050810;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.admin-home-card a:hover {
+  background: #93bd4f;
+}
+
 .waiver-admin-count,
 .waiver-admin-state,
 .waiver-admin-error {
@@ -367,6 +427,10 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
 
   .waiver-admin-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-home-grid {
+    grid-template-columns: 1fr;
   }
 
   .waiver-admin-card__summary,

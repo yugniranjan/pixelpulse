@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import "../../styles/blogs-table.css";
+import "../../styles/admin-waivers.css";
+import AdminShell from "@/components/AdminShell";
 
 export default function AllBlogs() {
   const [blogs, setBlogs] = useState([]);
@@ -59,14 +61,23 @@ export default function AllBlogs() {
   };
 
   if (loading) {
-    return <div className="table-wrapper">Loading blogs...</div>;
+    return (
+      <AdminShell>
+        <div className="table-wrapper table-wrapper--shell">Loading blogs...</div>
+      </AdminShell>
+    );
   }
 
   return (
-    <div className="table-wrapper">
+    <AdminShell>
+    <div className="table-wrapper table-wrapper--shell">
       {/* HEADER */}
-      <div className="table-header">
-        <h2>Blogs</h2>
+      <div className="table-header waiver-admin-header--dashboard">
+        <div>
+          <span className="waiver-admin-kicker">Admin dashboard</span>
+          <h2>Blogs</h2>
+          <p>Manage Pixel Pulse blog posts and updates.</p>
+        </div>
         <div>
         <Link
           href="/admin/blog"
@@ -184,5 +195,6 @@ export default function AllBlogs() {
         </button>
       </div> */}
     </div>
+    </AdminShell>
   );
 }

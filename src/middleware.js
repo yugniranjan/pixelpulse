@@ -22,7 +22,7 @@ export function middleware(request) {
   // 🔁 Logged-in admin should not see login page
   if (pathname === "/admin/login") {
     return token
-      ? NextResponse.redirect(new URL("/admin/blogs", request.url))
+      ? NextResponse.redirect(new URL("/admin", request.url))
       : NextResponse.next();
   }
 

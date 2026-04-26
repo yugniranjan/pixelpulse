@@ -5,6 +5,12 @@
     padding-top: 80px;
 }
 
+.table-wrapper--shell {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+}
+
 /* Header */
 .table-header {
   display: flex;
@@ -13,10 +19,27 @@
   margin-bottom: 16px;
 }
 
+.table-header p {
+  margin: 6px 0 0;
+  color: #667085;
+}
+
 .table-header h2 {
   font-size: 22px;
   font-weight: 600;
   color: #111827;
+}
+
+.admin-editor-shell {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.admin-editor-shell > input {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  color: #101828;
+  font: inherit;
 }
 
 .table-header input {

@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import "../../styles/admin-invites.css";
+import "../../styles/admin-waivers.css";
+import AdminShell from "@/components/AdminShell";
 
 function slugify(value = "") {
   return String(value || "")
@@ -85,13 +87,17 @@ export default function AdminInvitesPage() {
   }
 
   return (
-    <div className="invite-admin-page">
-      <div className="invite-admin-header">
-        <h1>Invite Builder</h1>
-        <p>Create birthday invite links, waiver links, SMS text, and QR codes.</p>
-      </div>
+    <AdminShell>
+      <div className="invite-admin-page invite-admin-page--shell">
+        <div className="invite-admin-header waiver-admin-header--dashboard">
+          <div>
+            <span className="waiver-admin-kicker">Admin dashboard</span>
+            <h1>Invite Builder</h1>
+            <p>Create birthday invite links, waiver links, SMS text, and QR codes.</p>
+          </div>
+        </div>
 
-      <form className="invite-admin-form" onSubmit={createInvite}>
+        <form className="invite-admin-form" onSubmit={createInvite}>
         <section>
           <h2>Party Details</h2>
           <div className="invite-admin-grid">
@@ -169,35 +175,35 @@ export default function AdminInvitesPage() {
         <button type="submit" disabled={loading}>
           {loading ? "Creating..." : "Create Invite"}
         </button>
-      </form>
+        </form>
 
-      {result ? (
-        <section className="invite-admin-result">
-          <h2>Invite Ready</h2>
-          <div className="invite-admin-output">
-            <div>
-              <span>Invite URL</span>
-              <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">{result.inviteUrl}</a>
-              <button type="button" onClick={() => copyText(result.inviteUrl)}>Copy</button>
+        {result ? (
+          <section className="invite-admin-result">
+            <h2>Invite Ready</h2>
+            <div className="invite-admin-output">
+              <div>
+                <span>Invite URL</span>
+                <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">{result.inviteUrl}</a>
+                <button type="button" onClick={() => copyText(result.inviteUrl)}>Copy</button>
+              </div>
+              <div>
+                <span>Waiver URL</span>
+                <a href={result.waiverUrl} target="_blank" rel="noopener noreferrer">{result.waiverUrl}</a>
+                <button type="button" onClick={() => copyText(result.waiverUrl)}>Copy</button>
+              </div>
+              <div>
+                <span>SMS Text</span>
+                <textarea readOnly value={result.smsText} />
+                <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
+              </div>
+              <div className="invite-admin-qr">
+                <span>QR Code</span>
+                <img src={result.qrCodeUrl} alt="Invite QR code" />
+              </div>
             </div>
-            <div>
-              <span>Waiver URL</span>
-              <a href={result.waiverUrl} target="_blank" rel="noopener noreferrer">{result.waiverUrl}</a>
-              <button type="button" onClick={() => copyText(result.waiverUrl)}>Copy</button>
-            </div>
-            <div>
-              <span>SMS Text</span>
-              <textarea readOnly value={result.smsText} />
-              <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
-            </div>
-            <div className="invite-admin-qr">
-              <span>QR Code</span>
-              <img src={result.qrCodeUrl} alt="Invite QR code" />
-            </div>
-          </div>
-        </section>
-      ) : null}
-    </div>
+          </section>
+        ) : null}
+      </div>
+    </AdminShell>
   );
 }
-

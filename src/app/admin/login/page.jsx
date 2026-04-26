@@ -29,7 +29,7 @@ export default function AdminLogin() {
 
     if (res.ok) {
       toast.success(data.message);
-      router.push("/admin/blogs");
+      router.push("/admin");
       router.refresh();
     } else {
       alert("Invalid credentials");
