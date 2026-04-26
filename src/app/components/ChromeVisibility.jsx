@@ -12,7 +12,12 @@ function normalizePath(path = "/") {
 export default function ChromeVisibility({ children }) {
   const pathname = normalizePath(usePathname() || "/");
 
-  if (STANDALONE_PATHS.has(pathname) || pathname.startsWith("/invite")) {
+  if (
+    STANDALONE_PATHS.has(pathname) ||
+    pathname.startsWith("/invite") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/")
+  ) {
     return null;
   }
 

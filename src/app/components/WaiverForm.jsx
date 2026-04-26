@@ -2,21 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const ATTRACTIONS = [
-  "Laser Maze",
-  "Edge Climb",
-  "Hexa Quest",
-  "Shoot It Out",
-  "Tile Hunt",
-  "Basket Ball",
-  "Maze Gate",
-  "Soccer Challenge",
-  "T-Rex Heist",
-  "Ball Toss",
-  "Seashells",
-  "Pizza Delivery",
-];
-
 const PASS_TYPES = [
   "Walk-in / General Admission",
   "Explorer Pass - 30 min",
@@ -234,7 +219,6 @@ export default function WaiverForm() {
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [selectedAttractions, setSelectedAttractions] = useState([]);
   const [primary, setPrimary] = useState(EMPTY_PRIMARY);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [visit, setVisit] = useState(EMPTY_VISIT);
@@ -340,14 +324,6 @@ export default function WaiverForm() {
     setFamilyMembers((current) => current.filter((member) => member.id !== id));
   }
 
-  function toggleAttraction(attraction) {
-    setSelectedAttractions((current) =>
-      current.includes(attraction)
-        ? current.filter((item) => item !== attraction)
-        : [...current, attraction],
-    );
-  }
-
   function toggleCheck(name) {
     setChecks((current) => ({ ...current, [name]: !current[name] }));
   }
@@ -357,7 +333,6 @@ export default function WaiverForm() {
     setFamilyMembers([]);
     setVisit({ ...EMPTY_VISIT, signDate: today() });
     setChecks({ ...EMPTY_CHECKS });
-    setSelectedAttractions([]);
     setError("");
     setToast("");
     clearSignature();
@@ -384,7 +359,6 @@ export default function WaiverForm() {
           familyMembers,
           visit,
           checks,
-          attractions: selectedAttractions,
           signatureDataUrl: canvasRef.current?.toDataURL("image/png"),
         }),
       });
@@ -559,21 +533,6 @@ export default function WaiverForm() {
             </select>
           </label>
           <DatePartsField label="Visit date *" value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
-          <div className="ppp-waiver-wide">
-            <span className="ppp-waiver-label">Attractions you intend to use</span>
-            <div className="ppp-waiver-chips">
-              {ATTRACTIONS.map((attraction) => (
-                <button
-                  type="button"
-                  className={selectedAttractions.includes(attraction) ? "is-selected" : ""}
-                  key={attraction}
-                  onClick={() => toggleAttraction(attraction)}
-                >
-                  {attraction}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
