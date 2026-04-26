@@ -268,6 +268,136 @@
   opacity: 0.45;
 }
 
+.waiver-record-actions div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.waiver-record-actions button,
+.waiver-edit-actions button,
+.waiver-edit-modal__head button {
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #344054;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.waiver-record-actions button:hover,
+.waiver-edit-actions button:hover,
+.waiver-edit-modal__head button:hover {
+  border-color: #a4cf5f;
+  color: #3f6212;
+}
+
+.waiver-record-actions button.is-danger {
+  border-color: #fecdca;
+  color: #b42318;
+  background: #fffbfa;
+}
+
+.waiver-record-actions button.is-danger:hover {
+  border-color: #f04438;
+  color: #912018;
+}
+
+.waiver-edit-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 8, 16, 0.62);
+}
+
+.waiver-edit-modal {
+  display: grid;
+  gap: 18px;
+  width: min(860px, 100%);
+  max-height: min(86vh, 900px);
+  overflow: auto;
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  padding: 20px;
+  background: #ffffff;
+  color: #101828;
+  box-shadow: 0 24px 70px rgba(16, 24, 40, 0.24);
+}
+
+.waiver-edit-modal__head,
+.waiver-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.waiver-edit-modal__head h2,
+.waiver-edit-modal h3 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.waiver-edit-modal section {
+  display: grid;
+  gap: 12px;
+}
+
+.waiver-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.waiver-edit-grid label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.waiver-edit-grid input,
+.waiver-edit-grid textarea {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font: inherit;
+  text-transform: none;
+}
+
+.waiver-edit-grid textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.waiver-edit-wide {
+  grid-column: 1 / -1;
+}
+
+.waiver-edit-actions {
+  justify-content: flex-end;
+}
+
+.waiver-edit-actions button[type="submit"] {
+  border-color: #a4cf5f;
+  background: #a4cf5f;
+  color: #050810;
+}
+
+.waiver-edit-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .waiver-admin-card--intuitive[open] {
   border-color: rgba(164, 207, 95, 0.48);
   box-shadow: 0 14px 34px rgba(16, 24, 40, 0.08);
@@ -566,6 +696,16 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
   }
 
   .waiver-data-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .waiver-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .waiver-edit-modal__head,
+  .waiver-edit-actions {
     align-items: stretch;
     flex-direction: column;
   }

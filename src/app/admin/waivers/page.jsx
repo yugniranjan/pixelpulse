@@ -18,7 +18,93 @@ function participantName(person = {}) {
   return [person.firstName, person.lastName].filter(Boolean).join(" ") || "Unnamed";
 }
 
-function WaiverCard({ waiver }) {
+function makeEditForm(waiver) {
+  return {
+    primary: {
+      firstName: waiver.primary?.firstName || "",
+      lastName: waiver.primary?.lastName || "",
+      dob: waiver.primary?.dob || "",
+      gender: waiver.primary?.gender || "",
+      email: waiver.primary?.email || "",
+      phone: waiver.primary?.phone || "",
+      city: waiver.primary?.city || "",
+      medicalNotes: waiver.primary?.medicalNotes || "",
+    },
+    visit: {
+      partyId: waiver.visit?.partyId || "",
+      passType: waiver.visit?.passType || "",
+      visitDate: waiver.visit?.visitDate || "",
+      emergencyName: waiver.visit?.emergencyName || "",
+      emergencyRelation: waiver.visit?.emergencyRelation || "",
+      emergencyPhone: waiver.visit?.emergencyPhone || "",
+      printName: waiver.visit?.printName || "",
+      signDate: waiver.visit?.signDate || "",
+    },
+  };
+}
+
+function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
+  function update(section, field, value) {
+    onChange((current) => ({
+      ...current,
+      [section]: {
+        ...current[section],
+        [field]: value,
+      },
+    }));
+  }
+
+  return (
+    <div className="waiver-edit-backdrop" role="presentation">
+      <form className="waiver-edit-modal" onSubmit={onSave}>
+        <div className="waiver-edit-modal__head">
+          <div>
+            <span className="waiver-admin-kicker">Edit record</span>
+            <h2>Update Waiver</h2>
+          </div>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
+
+        <section>
+          <h3>Primary Participant</h3>
+          <div className="waiver-edit-grid">
+            <label><span>First name</span><input required value={form.primary.firstName} onChange={(event) => update("primary", "firstName", event.target.value)} /></label>
+            <label><span>Last name</span><input required value={form.primary.lastName} onChange={(event) => update("primary", "lastName", event.target.value)} /></label>
+            <label><span>DOB</span><input type="date" value={form.primary.dob} onChange={(event) => update("primary", "dob", event.target.value)} /></label>
+            <label><span>Gender</span><input value={form.primary.gender} onChange={(event) => update("primary", "gender", event.target.value)} /></label>
+            <label><span>Email</span><input type="email" value={form.primary.email} onChange={(event) => update("primary", "email", event.target.value)} /></label>
+            <label><span>Phone</span><input value={form.primary.phone} onChange={(event) => update("primary", "phone", event.target.value)} /></label>
+            <label><span>City</span><input value={form.primary.city} onChange={(event) => update("primary", "city", event.target.value)} /></label>
+            <label className="waiver-edit-wide"><span>Medical notes</span><textarea value={form.primary.medicalNotes} onChange={(event) => update("primary", "medicalNotes", event.target.value)} /></label>
+          </div>
+        </section>
+
+        <section>
+          <h3>Visit</h3>
+          <div className="waiver-edit-grid">
+            <label><span>Party ID</span><input value={form.visit.partyId} onChange={(event) => update("visit", "partyId", event.target.value)} /></label>
+            <label><span>Pass type</span><input value={form.visit.passType} onChange={(event) => update("visit", "passType", event.target.value)} /></label>
+            <label><span>Visit date</span><input type="date" value={form.visit.visitDate} onChange={(event) => update("visit", "visitDate", event.target.value)} /></label>
+            <label><span>Emergency name</span><input value={form.visit.emergencyName} onChange={(event) => update("visit", "emergencyName", event.target.value)} /></label>
+            <label><span>Relationship</span><input value={form.visit.emergencyRelation} onChange={(event) => update("visit", "emergencyRelation", event.target.value)} /></label>
+            <label><span>Emergency phone</span><input value={form.visit.emergencyPhone} onChange={(event) => update("visit", "emergencyPhone", event.target.value)} /></label>
+            <label><span>Printed name</span><input value={form.visit.printName} onChange={(event) => update("visit", "printName", event.target.value)} /></label>
+            <label><span>Signed date</span><input type="date" value={form.visit.signDate} onChange={(event) => update("visit", "signDate", event.target.value)} /></label>
+          </div>
+        </section>
+
+        {error ? <p className="waiver-admin-error">{error}</p> : null}
+
+        <div className="waiver-edit-actions">
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function WaiverCard({ waiver, onDelete, onEdit }) {
   const [open, setOpen] = useState(false);
   const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
   const attractions = Array.isArray(waiver.attractions) ? waiver.attractions : [];
@@ -108,6 +194,14 @@ function WaiverCard({ waiver }) {
               <p>No signature image saved.</p>
             )}
           </section>
+
+          <section className="waiver-admin-card__wide waiver-record-actions">
+            <h2>Record Actions</h2>
+            <div>
+              <button type="button" onClick={() => onEdit(waiver)}>Edit Record</button>
+              <button type="button" className="is-danger" onClick={() => onDelete(waiver)}>Delete Record</button>
+            </div>
+          </section>
         </div>
       ) : null}
     </article>
@@ -124,6 +218,10 @@ export default function AdminWaiversPage() {
   const [partyOnly, setPartyOnly] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
+  const [editingWaiver, setEditingWaiver] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState("");
 
   useEffect(() => {
     async function loadWaivers() {
@@ -224,6 +322,70 @@ export default function AdminWaiversPage() {
     setPartyOnly(false);
   }
 
+  function startEditWaiver(waiver) {
+    setEditingWaiver(waiver);
+    setEditForm(makeEditForm(waiver));
+    setEditError("");
+  }
+
+  function closeEditWaiver() {
+    setEditingWaiver(null);
+    setEditForm(null);
+    setEditError("");
+  }
+
+  async function saveWaiverEdit(event) {
+    event.preventDefault();
+    if (!editingWaiver || !editForm) return;
+
+    setSavingEdit(true);
+    setEditError("");
+
+    try {
+      const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(editingWaiver.id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEditError(data.error || "Unable to update waiver.");
+        return;
+      }
+
+      setWaivers((current) =>
+        current.map((waiver) => (waiver.id === data.waiver.id ? data.waiver : waiver)),
+      );
+      closeEditWaiver();
+    } catch (saveError) {
+      setEditError("Unable to update waiver.");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
+  async function deleteWaiver(waiver) {
+    const confirmed = window.confirm(`Delete waiver for ${waiver.primaryName || participantName(waiver.primary)}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(waiver.id)}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to delete waiver.");
+        return;
+      }
+
+      setWaivers((current) => current.filter((item) => item.id !== waiver.id));
+    } catch (deleteError) {
+      setError("Unable to delete waiver.");
+    }
+  }
+
   return (
     <main className="waiver-dashboard-shell">
       <aside className="waiver-dashboard-sidebar" aria-label="Dashboard navigation">
@@ -320,7 +482,14 @@ export default function AdminWaiversPage() {
             </div>
             {visibleWaivers.length ? (
               <>
-                {visibleWaivers.map((waiver) => <WaiverCard waiver={waiver} key={waiver.id} />)}
+                {visibleWaivers.map((waiver) => (
+                  <WaiverCard
+                    waiver={waiver}
+                    key={waiver.id}
+                    onDelete={deleteWaiver}
+                    onEdit={startEditWaiver}
+                  />
+                ))}
                 <div className="waiver-data-pagination">
                   <span>Page {currentPage} of {totalPages}</span>
                   <div>
@@ -337,6 +506,17 @@ export default function AdminWaiversPage() {
           </div>
         ) : null}
       </section>
+
+      {editingWaiver && editForm ? (
+        <WaiverEditModal
+          error={editError}
+          form={editForm}
+          onChange={setEditForm}
+          onClose={closeEditWaiver}
+          onSave={saveWaiverEdit}
+          saving={savingEdit}
+        />
+      ) : null}
     </main>
   );
 }
