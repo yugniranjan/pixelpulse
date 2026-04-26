@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 function formatDateTime(value) {
   if (!value) return "Not recorded";
@@ -112,6 +114,8 @@ export default function LocalWaiverDashboard({ waivers }) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [partyOnly, setPartyOnly] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(1);
 
   const filteredWaivers = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -155,6 +159,17 @@ export default function LocalWaiverDashboard({ waivers }) {
 
     return Array.from(values).sort((a, b) => a.localeCompare(b)).slice(0, 80);
   }, [waivers]);
+  const totalPages = Math.max(1, Math.ceil(filteredWaivers.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * pageSize;
+  const pageEnd = pageStart + pageSize;
+  const visibleWaivers = filteredWaivers.slice(pageStart, pageEnd);
+  const firstVisibleRecord = filteredWaivers.length ? pageStart + 1 : 0;
+  const lastVisibleRecord = Math.min(pageEnd, filteredWaivers.length);
+
+  useEffect(() => {
+    setPage(1);
+  }, [dateFrom, dateTo, pageSize, partyOnly, query]);
 
   function clearFilters() {
     setQuery("");
@@ -168,7 +183,10 @@ export default function LocalWaiverDashboard({ waivers }) {
       <div className="waiver-data-toolbar">
         <div>
           <h2>Recent Waiver Submissions</h2>
-          <p>{filteredWaivers.length} of {waivers.length} records shown</p>
+          <p>
+            Showing {firstVisibleRecord}-{lastVisibleRecord} of {filteredWaivers.length}
+            {filteredWaivers.length === waivers.length ? " records" : ` filtered records from ${waivers.length} total`}
+          </p>
         </div>
         <div className="waiver-data-filters">
           <label>
@@ -197,12 +215,31 @@ export default function LocalWaiverDashboard({ waivers }) {
             <input type="checkbox" checked={partyOnly} onChange={(event) => setPartyOnly(event.target.checked)} />
             <span>Has party ID</span>
           </label>
+          <label>
+            <span>Show</span>
+            <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
+              {PAGE_SIZE_OPTIONS.map((option) => (
+                <option value={option} key={option}>{option}</option>
+              ))}
+            </select>
+          </label>
           <button type="button" onClick={clearFilters}>Clear</button>
         </div>
       </div>
 
-      {filteredWaivers.length ? (
-        filteredWaivers.map((waiver) => <WaiverRecord waiver={waiver} key={waiver.id} />)
+      {visibleWaivers.length ? (
+        <>
+          {visibleWaivers.map((waiver) => <WaiverRecord waiver={waiver} key={waiver.id} />)}
+          <div className="waiver-data-pagination">
+            <span>Page {currentPage} of {totalPages}</span>
+            <div>
+              <button type="button" disabled={currentPage === 1} onClick={() => setPage(1)}>First</button>
+              <button type="button" disabled={currentPage === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+              <button type="button" disabled={currentPage === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>Next</button>
+              <button type="button" disabled={currentPage === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+            </div>
+          </div>
+        </>
       ) : (
         <p className="waiver-admin-state">No waivers match the current filters.</p>
       )}

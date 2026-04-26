@@ -165,7 +165,7 @@
 
 .waiver-data-filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1.5fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto auto;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto minmax(92px, 0.45fr) auto;
   gap: 10px;
   align-items: end;
 }
@@ -179,7 +179,8 @@
   text-transform: uppercase;
 }
 
-.waiver-data-filters input:not([type="checkbox"]) {
+.waiver-data-filters input:not([type="checkbox"]),
+.waiver-data-filters select {
   width: 100%;
   border: 1px solid #d0d5dd;
   border-radius: 8px;
@@ -187,6 +188,11 @@
   color: #101828;
   font: inherit;
   text-transform: none;
+}
+
+.waiver-data-filters select {
+  min-height: 42px;
+  background: #ffffff;
 }
 
 .waiver-data-checkbox {
@@ -220,6 +226,46 @@
 .waiver-data-filters button:hover {
   border-color: #a4cf5f;
   color: #3f6212;
+}
+
+.waiver-data-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  color: #667085;
+  font-weight: 800;
+}
+
+.waiver-data-pagination > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.waiver-data-pagination button {
+  min-height: 36px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #344054;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.waiver-data-pagination button:hover:not(:disabled) {
+  border-color: #a4cf5f;
+  color: #3f6212;
+}
+
+.waiver-data-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .waiver-admin-card--intuitive[open] {
@@ -517,6 +563,11 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
 
   .waiver-data-filters {
     grid-template-columns: 1fr;
+  }
+
+  .waiver-data-pagination {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .admin-home-grid {
