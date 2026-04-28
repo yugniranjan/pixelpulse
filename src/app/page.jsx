@@ -93,27 +93,6 @@ function findHomepageAttractionItem(game, attractionChildren = []) {
   );
 }
 
-function findMatchingGameSheetRow(item, games = []) {
-  const itemKeys = [
-    item?.path,
-    item?.pageid,
-    item?.metatitle,
-    item?.desc,
-  ]
-    .map(normalizeAttractionKey)
-    .filter(Boolean);
-
-  return (
-    games.find((game) => {
-      const gameKeys = [game?.id, game?.name]
-        .map(normalizeAttractionKey)
-        .filter(Boolean);
-
-      return gameKeys.some((key) => itemKeys.includes(key));
-    }) || null
-  );
-}
-
 function formatHomepageAttractionTitle(title = "") {
   return String(title || "").replace(
     /\b(interactive|immersive)\b/gi,
@@ -354,6 +333,9 @@ function parseSiteDataSheets(sheets) {
       bestFor: String(row.bestFor || ""),
       color: String(row.color || ""),
       emoji: String(row.emoji || ""),
+      image: String(row.image || row.imageUrl || row.imageurl || row.image_url || row.smallimage || row.headerimage || ""),
+      imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || ""),
+      link: String(row.link || row.url || row.href || ""),
     })).filter((row) => row.name || row.tag),
     gamesMeta: {
       title: sheetValue(gamesMeta, "title"),
@@ -692,14 +674,20 @@ const Home = async () => {
   };
   const pricingHref = ctaContent.pricingHref || "/pricing-promos";
   const articlesHref = ctaContent.articlesHref || "/blogs";
-  const homepageGames = attractionChildren.map((item) => {
-    const matchedGame = findMatchingGameSheetRow(item, siteData.games);
+  const homepageGames = siteData.games.map((game) => {
+    const matchedAttraction = findHomepageAttractionItem(game, attractionChildren);
+    const attractionHref =
+      matchedAttraction?.parentid && matchedAttraction?.path
+        ? `/${matchedAttraction.parentid}/${matchedAttraction.path}`
+        : "";
 
     return {
-      item,
-      title: formatHomepageAttractionTitle(matchedGame?.name || item?.desc || "Game Room"),
-      body: matchedGame?.tag || item?.metatitle || "",
-      meta: matchedGame?.bestFor || "",
+      title: formatHomepageAttractionTitle(game.name || matchedAttraction?.desc || "Game Room"),
+      body: game.tag || matchedAttraction?.metatitle || "",
+      meta: game.bestFor || "",
+      image: game.image || getPreferredImage(matchedAttraction),
+      imageAlt: game.imageAlt || matchedAttraction?.iconalttextforhomepage || game.name || "Pixel Pulse game room",
+      href: game.link || attractionHref || "#",
     };
   });
 
@@ -821,19 +809,23 @@ const Home = async () => {
               <p className="ppp-section__sub">{gamesHeading.subtitle}</p>
             )}
             <ul className="ppp-attractions__grid ppp-attractions__carousel" aria-label="All game rooms">
-              {homepageGames.map(({ item, title, body, meta }, i) => {
-                const attractionImage = getPreferredImage(item);
+              {homepageGames.map(({ title, body, meta, image, imageAlt, href }, i) => {
                 return (
                 <li key={i} className="ppp-attractions__item">
-                  <Link href={item?.parentid && item?.path ? `/${item.parentid}/${item.path}` : "#"} prefetch>
+                  <Link
+                    href={href}
+                    target={href.startsWith("http") ? "_blank" : undefined}
+                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    prefetch={!href.startsWith("http")}
+                  >
                     <article className="ppp-attraction-card">
                       <figure className="ppp-attraction-card__fig">
-                        {attractionImage && (
+                        {image && (
                           <Image
-                            src={attractionImage}
+                            src={image}
                             width={400}
                             height={260}
-                            alt={item?.iconalttextforhomepage || title}
+                            alt={imageAlt || title}
                             unoptimized
                             className="ppp-attraction-card__img"
                           />

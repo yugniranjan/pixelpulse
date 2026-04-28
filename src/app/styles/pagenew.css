@@ -801,13 +801,14 @@
 .ppp-use-case-card--school-trips,
 .ppp-use-case-card--friends-date {
   display: grid;
-  grid-template-columns: minmax(210px, 0.95fr) minmax(0, 1.05fr);
-  align-content: center;
+  grid-template-columns: minmax(210px, 54%) minmax(0, 46%);
+  align-items: center;
+  align-content: stretch;
   justify-items: center;
   row-gap: 0.65rem;
-  column-gap: clamp(1rem, 2vw, 1.5rem);
+  column-gap: 0;
   min-height: 240px;
-  padding: 28px clamp(1.25rem, 2vw, 2rem) 28px 0;
+  padding: 28px 0;
 }
 
 .ppp-use-case-card--birthday::before,
@@ -856,7 +857,7 @@
   z-index: 1;
   width: 100%;
   max-width: 360px;
-  margin-inline: 0;
+  margin-inline: auto;
   text-align: center;
   overflow-wrap: anywhere;
 }
