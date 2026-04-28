@@ -5,6 +5,13 @@ import Link from "next/link";
 import "../../styles/admin-waivers.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+const DEFAULT_PARTY_FORM = {
+  partyId: "",
+  partyName: "",
+  visitDate: "",
+  visitTime: "",
+  passType: "Birthday Party Package",
+};
 
 function formatDateTime(value) {
   if (!value) return "Not recorded";
@@ -33,8 +40,10 @@ function makeEditForm(waiver) {
     },
     visit: {
       partyId: waiver.visit?.partyId || "",
+      partyName: waiver.visit?.partyName || "",
       passType: waiver.visit?.passType || "",
       visitDate: waiver.visit?.visitDate || "",
+      visitTime: waiver.visit?.visitTime || "",
       emergencyName: waiver.visit?.emergencyName || "",
       emergencyRelation: waiver.visit?.emergencyRelation || "",
       emergencyPhone: waiver.visit?.emergencyPhone || "",
@@ -85,8 +94,10 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
           <h3>Visit</h3>
           <div className="waiver-edit-grid">
             <label><span>Party ID</span><input value={form.visit.partyId} onChange={(event) => update("visit", "partyId", event.target.value)} /></label>
+            <label><span>Party name</span><input value={form.visit.partyName} onChange={(event) => update("visit", "partyName", event.target.value)} /></label>
             <label><span>Pass type</span><input value={form.visit.passType} onChange={(event) => update("visit", "passType", event.target.value)} /></label>
             <label><span>Visit date</span><input type="date" value={form.visit.visitDate} onChange={(event) => update("visit", "visitDate", event.target.value)} /></label>
+            <label><span>Party time</span><input type="time" value={form.visit.visitTime} onChange={(event) => update("visit", "visitTime", event.target.value)} /></label>
             <label><span>Emergency name</span><input value={form.visit.emergencyName} onChange={(event) => update("visit", "emergencyName", event.target.value)} /></label>
             <label><span>Relationship</span><input value={form.visit.emergencyRelation} onChange={(event) => update("visit", "emergencyRelation", event.target.value)} /></label>
             <label><span>Emergency phone</span><input value={form.visit.emergencyPhone} onChange={(event) => update("visit", "emergencyPhone", event.target.value)} /></label>
@@ -103,6 +114,75 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
         </div>
       </form>
     </div>
+  );
+}
+
+function PartyWaiverLinkBuilder() {
+  const [form, setForm] = useState(DEFAULT_PARTY_FORM);
+  const [copied, setCopied] = useState("");
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const waiverUrl = useMemo(() => {
+    if (!origin) return "";
+    const params = new URLSearchParams();
+    Object.entries(form).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+    const query = params.toString();
+    return `${origin}/waiver${query ? `?${query}` : ""}`;
+  }, [form, origin]);
+
+  function update(field, value) {
+    setCopied("");
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function copyLink() {
+    if (!waiverUrl) return;
+    await navigator.clipboard.writeText(waiverUrl);
+    setCopied("Waiver link copied.");
+  }
+
+  return (
+    <section className="party-link-builder">
+      <div>
+        <span className="waiver-admin-kicker">Party waiver setup</span>
+        <h2>Create a Party Waiver Link</h2>
+        <p>Enter the Party ID once, then share this link so every guest waiver is attached to the same party.</p>
+      </div>
+      <div className="party-link-grid">
+        <label>
+          <span>Party ID</span>
+          <input required value={form.partyId} onChange={(event) => update("partyId", event.target.value)} placeholder="PP-0428-01" />
+        </label>
+        <label>
+          <span>Party / guest of honor</span>
+          <input value={form.partyName} onChange={(event) => update("partyName", event.target.value)} placeholder="Ariana's Birthday Party" />
+        </label>
+        <label>
+          <span>Visit date</span>
+          <input type="date" value={form.visitDate} onChange={(event) => update("visitDate", event.target.value)} />
+        </label>
+        <label>
+          <span>Party time</span>
+          <input type="time" value={form.visitTime} onChange={(event) => update("visitTime", event.target.value)} />
+        </label>
+        <label>
+          <span>Pass / visit type</span>
+          <input value={form.passType} onChange={(event) => update("passType", event.target.value)} />
+        </label>
+      </div>
+      <div className="party-link-output">
+        <span>Prefilled waiver URL</span>
+        <a href={waiverUrl} target="_blank" rel="noopener noreferrer">{waiverUrl}</a>
+        <button type="button" onClick={copyLink}>Copy Link</button>
+      </div>
+      {copied ? <p className="party-link-copied">{copied}</p> : null}
+    </section>
   );
 }
 
@@ -153,7 +233,9 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
             <dl>
               <div><dt>Pass</dt><dd>{waiver.visit?.passType || "Not provided"}</dd></div>
               <div><dt>Party ID</dt><dd>{waiver.visit?.partyId || "Not provided"}</dd></div>
+              <div><dt>Party name</dt><dd>{waiver.visit?.partyName || "Not provided"}</dd></div>
               <div><dt>Visit date</dt><dd>{waiver.visit?.visitDate || "Not provided"}</dd></div>
+              <div><dt>Party time</dt><dd>{waiver.visit?.visitTime || "Not provided"}</dd></div>
               <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
               <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
               <div><dt>Emergency phone</dt><dd>{waiver.visit?.emergencyPhone || "Not provided"}</dd></div>
@@ -261,6 +343,7 @@ export default function AdminWaiversPage() {
         waiver.primary?.email,
         waiver.primary?.phone,
         waiver.visit?.partyId,
+        waiver.visit?.partyName,
         waiver.visit?.visitDate,
         waiver.visit?.passType,
       ]
@@ -285,6 +368,7 @@ export default function AdminWaiversPage() {
         waiver.primary?.email,
         waiver.primary?.phone,
         waiver.visit?.partyId,
+        waiver.visit?.partyName,
         waiver.visit?.passType,
         waiver.visit?.visitDate,
       ]
@@ -432,6 +516,8 @@ export default function AdminWaiversPage() {
             <strong>{latestWaiver ? formatDateTime(latestWaiver.submittedAt) : "None"}</strong>
           </article>
         </div>
+
+        <PartyWaiverLinkBuilder />
 
         {loading ? <p className="waiver-admin-state">Loading waivers...</p> : null}
         {error ? <p className="waiver-admin-error">{error}</p> : null}

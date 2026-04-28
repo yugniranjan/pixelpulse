@@ -60,8 +60,10 @@ const EMPTY_PRIMARY = {
 
 const EMPTY_VISIT = {
   partyId: "",
+  partyName: "",
   passType: "",
   visitDate: "",
+  visitTime: "",
   emergencyName: "",
   emergencyRelation: "",
   emergencyPhone: "",
@@ -226,7 +228,7 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   );
 }
 
-export default function WaiverForm() {
+export default function WaiverForm({ initialVisit = {} }) {
   const canvasRef = useRef(null);
   const boxRef = useRef(null);
   const drawingRef = useRef(false);
@@ -236,7 +238,7 @@ export default function WaiverForm() {
   const [submitting, setSubmitting] = useState(false);
   const [primary, setPrimary] = useState(EMPTY_PRIMARY);
   const [familyMembers, setFamilyMembers] = useState([]);
-  const [visit, setVisit] = useState(EMPTY_VISIT);
+  const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
 
   const namedFamily = useMemo(
@@ -346,7 +348,7 @@ export default function WaiverForm() {
   function resetWaiverForm() {
     setPrimary({ ...EMPTY_PRIMARY });
     setFamilyMembers([]);
-    setVisit({ ...EMPTY_VISIT, signDate: today() });
+    setVisit({ ...EMPTY_VISIT, ...initialVisit, signDate: today() });
     setChecks({ ...EMPTY_CHECKS });
     setError("");
     setToast("");
@@ -551,10 +553,20 @@ export default function WaiverForm() {
           <span>03</span>
           <h2>Visit Details</h2>
         </div>
+        {visit.partyId || visit.partyName ? (
+          <p className="ppp-waiver-section-note ppp-waiver-party-note">
+            This waiver is linked to {visit.partyName ? <strong>{visit.partyName}</strong> : "your party"}
+            {visit.partyId ? <> with Party ID <strong>{visit.partyId}</strong></> : null}.
+          </p>
+        ) : null}
         <div className="ppp-waiver-field-grid">
           <label>
             <span>Party ID</span>
             <input value={visit.partyId} onChange={(event) => updateVisit("partyId", event.target.value)} placeholder="Optional booking or party ID" />
+          </label>
+          <label>
+            <span>Party / guest of honor</span>
+            <input value={visit.partyName} onChange={(event) => updateVisit("partyName", event.target.value)} placeholder="Optional party name" />
           </label>
           <label>
             <span>Pass / Visit type *</span>
@@ -564,6 +576,10 @@ export default function WaiverForm() {
             </select>
           </label>
           <DatePartsField label="Visit date *" value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
+          <label>
+            <span>Party time</span>
+            <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
+          </label>
         </div>
       </section>
 

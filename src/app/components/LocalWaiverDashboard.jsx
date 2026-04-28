@@ -60,8 +60,10 @@ function WaiverRecord({ waiver }) {
           <h2>Visit</h2>
           <dl>
             <div><dt>Party ID</dt><dd>{waiver.visit?.partyId || "Not provided"}</dd></div>
+            <div><dt>Party name</dt><dd>{waiver.visit?.partyName || "Not provided"}</dd></div>
             <div><dt>Pass</dt><dd>{waiver.visit?.passType || "Not provided"}</dd></div>
             <div><dt>Visit date</dt><dd>{waiver.visit?.visitDate || "Not provided"}</dd></div>
+            <div><dt>Party time</dt><dd>{waiver.visit?.visitTime || "Not provided"}</dd></div>
             <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
             <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
             <div><dt>Emergency phone</dt><dd>{waiver.visit?.emergencyPhone || "Not provided"}</dd></div>
@@ -128,6 +130,7 @@ export default function LocalWaiverDashboard({ waivers }) {
         waiver.primary?.email,
         waiver.primary?.phone,
         waiver.visit?.partyId,
+        waiver.visit?.partyName,
         waiver.visit?.passType,
         waiver.visit?.visitDate,
       ]
@@ -152,6 +155,7 @@ export default function LocalWaiverDashboard({ waivers }) {
         waiver.primary?.email,
         waiver.primary?.phone,
         waiver.visit?.partyId,
+        waiver.visit?.partyName,
         waiver.visit?.passType,
         waiver.visit?.visitDate,
       ]

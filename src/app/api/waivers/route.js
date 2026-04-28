@@ -50,8 +50,10 @@ function cleanFamilyMember(member = {}) {
 function cleanVisit(visit = {}) {
   return {
     partyId: cleanText(visit.partyId),
+    partyName: cleanText(visit.partyName),
     passType: cleanText(visit.passType),
     visitDate: cleanText(visit.visitDate),
+    visitTime: cleanText(visit.visitTime),
     emergencyName: cleanText(visit.emergencyName),
     emergencyRelation: cleanText(visit.emergencyRelation),
     emergencyPhone: cleanText(visit.emergencyPhone),

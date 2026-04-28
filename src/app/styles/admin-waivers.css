@@ -434,6 +434,96 @@
   line-height: 1.1;
 }
 
+.party-link-builder {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+  border: 1px solid #d7e7bd;
+  border-radius: 12px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(164, 207, 95, 0.16), rgba(251, 174, 123, 0.08)),
+    #ffffff;
+  box-shadow: 0 10px 26px rgba(16, 24, 40, 0.05);
+}
+
+.party-link-builder h2 {
+  margin: 4px 0 0;
+  color: #101828;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.party-link-builder p {
+  margin: 5px 0 0;
+  color: #667085;
+}
+
+.party-link-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.party-link-grid label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.party-link-grid input,
+.party-link-output a {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #101828;
+  font: inherit;
+  text-transform: none;
+}
+
+.party-link-output {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.party-link-output span {
+  grid-column: 1 / -1;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.party-link-output a {
+  display: block;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.party-link-output button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  background: #a4cf5f;
+  color: #050810;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.party-link-copied {
+  margin: 0;
+  color: #3f6212;
+  font-weight: 800;
+}
+
 .admin-home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -689,6 +779,11 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
 
   .waiver-admin-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .party-link-grid,
+  .party-link-output {
+    grid-template-columns: 1fr;
   }
 
   .waiver-data-filters {

@@ -19,7 +19,21 @@ export const metadata = {
   },
 };
 
-export default function WaiverPage() {
+function searchValue(searchParams, key) {
+  const value = searchParams?.[key];
+  return Array.isArray(value) ? value[0] || "" : value || "";
+}
+
+export default async function WaiverPage({ searchParams }) {
+  const params = await searchParams;
+  const initialVisit = {
+    partyId: searchValue(params, "partyId"),
+    partyName: searchValue(params, "partyName"),
+    passType: searchValue(params, "passType"),
+    visitDate: searchValue(params, "visitDate"),
+    visitTime: searchValue(params, "visitTime"),
+  };
+
   return (
     <main className="ppp-waiver-page">
       <section className="aero-max-container ppp-waiver-layout">
@@ -42,7 +56,7 @@ export default function WaiverPage() {
           </p>
         </div>
 
-        <WaiverForm />
+        <WaiverForm initialVisit={initialVisit} />
       </section>
     </main>
   );
