@@ -109,6 +109,10 @@ function isPastDate(value = "") {
   return Boolean(value && value < today());
 }
 
+function isBeforeToday(parts = {}) {
+  return isCompleteDate(parts) && isPastDate(formatDob(parts));
+}
+
 function datePartsFromDate(date = new Date()) {
   return {
     year: String(date.getFullYear()),
@@ -186,6 +190,7 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   const days = Array.from({ length: dayCount }, (_, index) =>
     String(index + 1).padStart(2, "0"),
   );
+  const todayParts = datePartsFromDate();
 
   useEffect(() => {
     const nextValue = isPastDate(value) ? today() : value;
@@ -222,21 +227,53 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
     onChange(formatDob(nextDate));
   }
 
+  function isMonthDisabled(month) {
+    return Boolean(
+      dateParts.year &&
+        dateParts.year === todayParts.year &&
+        Number(month) < Number(todayParts.month),
+    );
+  }
+
+  function isDayDisabled(day) {
+    return isBeforeToday({
+      year: dateParts.year,
+      month: dateParts.month,
+      day,
+    });
+  }
+
+  function isYearDisabled(year) {
+    return Number(year) < Number(todayParts.year);
+  }
+
   return (
     <label>
       <span>{label}</span>
       <div className="ppp-waiver-dob-row ppp-waiver-date-row">
         <select required aria-label={`${label} month`} value={dateParts.month} onChange={(event) => updateDate("month", event.target.value)}>
           <option value="">Month</option>
-          {MONTHS.map(([value, name]) => <option value={value} key={value}>{name}</option>)}
+          {MONTHS.map(([value, name]) => (
+            <option value={value} key={value} disabled={isMonthDisabled(value)}>
+              {name}
+            </option>
+          ))}
         </select>
         <select required aria-label={`${label} day`} value={dateParts.day} onChange={(event) => updateDate("day", event.target.value)}>
           <option value="">Day</option>
-          {days.map((day) => <option value={day} key={day}>{Number(day)}</option>)}
+          {days.map((day) => (
+            <option value={day} key={day} disabled={isDayDisabled(day)}>
+              {Number(day)}
+            </option>
+          ))}
         </select>
         <select required aria-label={`${label} year`} value={dateParts.year} onChange={(event) => updateDate("year", event.target.value)}>
           <option value="">Year</option>
-          {yearOptions.map((year) => <option value={year} key={year}>{year}</option>)}
+          {yearOptions.map((year) => (
+            <option value={year} key={year} disabled={isYearDisabled(year)}>
+              {year}
+            </option>
+          ))}
         </select>
         <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
           Today
