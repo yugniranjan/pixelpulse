@@ -15,7 +15,7 @@ import {
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
-import { getConfigValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
+import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
 function stripHtml(html = "") {
   return html
@@ -123,6 +123,30 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
     );
   }
 
+  const ctaSources = ctaContent?._sources || [];
+  const ctaTitle = getConfiguredValue(
+    ctaSources,
+    ["birthdayFinalCtaTitle", "partyFinalCtaTitle"],
+    "Weekday Special: Save $50 on Birthday Parties (Mon-Thu)",
+  );
+  const ctaSubtitle = getConfiguredValue(
+    ctaSources,
+    ["birthdayFinalCtaSubtitle", "partyFinalCtaSubtitle"],
+  );
+  const ctaPrimaryText = getConfiguredValue(
+    ctaSources,
+    ["birthdayFinalCtaPrimaryText", "partyFinalCtaPrimaryText"],
+  );
+  const ctaSecondaryText = getConfiguredValue(
+    ctaSources,
+    ["birthdayFinalCtaSecondaryText", "partyFinalCtaSecondaryText"],
+    "Book Your Date",
+  );
+  const ctaSecondaryHref = getConfiguredValue(
+    ctaSources,
+    ["birthdayFinalCtaSecondaryHref", "partyFinalCtaSecondaryHref"],
+  );
+
   const packages = parsedData.packages;
   const features = Object.keys(packages[0]).filter((key) => key !== "name");
   const spotlightIndex = packages.length > 1 ? 1 : 0;
@@ -205,24 +229,34 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
         <section className="ppp-party-cta-band">
           <div className="aero-max-container ppp-party-cta-band__inner">
             <div className="ppp-party-cta-band__content">
-              <p className="ppp-party-cta-band__text">
-                {ctaContent?.birthdayFinalCtaTitle || "Weekday Special: Save $50 on Birthday Parties (Mon-Thu)"}
-              </p>
-              {ctaContent?.birthdayFinalCtaSubtitle && (
-                <p className="ppp-party-cta-band__subtext">{ctaContent.birthdayFinalCtaSubtitle}</p>
+              {ctaTitle && (
+                <p className="ppp-party-cta-band__text">
+                  {ctaTitle}
+                </p>
+              )}
+              {ctaSubtitle && (
+                <p className="ppp-party-cta-band__subtext">{ctaSubtitle}</p>
               )}
             </div>
             <div className="ppp-party-cta-band__actions">
-              <Link href="#party-packages" className="ppp-party-cta-band__btn" prefetch={false}>
-                {ctaContent?.birthdayFinalCtaPrimaryText}
-              </Link>
-              <div className="aero-btn-booknow">
-                <BookingButton
-                  title={ctaContent?.birthdayFinalCtaSecondaryText || "Book Your Date"}
-                  className="ppp-party-cta-band__btn"
-                  bookingType={ctaContent?.birthdayFinalCtaSecondaryBookingType || "party"}
-                />
-              </div>
+              {ctaPrimaryText && (
+                <Link href="#party-packages" className="ppp-party-cta-band__btn" prefetch={false}>
+                  {ctaPrimaryText}
+                </Link>
+              )}
+              {ctaSecondaryText && ctaSecondaryHref ? (
+                <Link href={ctaSecondaryHref} className="ppp-party-cta-band__btn" prefetch>
+                  {ctaSecondaryText}
+                </Link>
+              ) : ctaSecondaryText ? (
+                <div className="aero-btn-booknow">
+                  <BookingButton
+                    title={ctaSecondaryText}
+                    className="ppp-party-cta-band__btn"
+                    bookingType={ctaContent?.birthdayFinalCtaSecondaryBookingType || "party"}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
@@ -287,6 +321,7 @@ const Page = async ({ params }) => {
     ...Object.fromEntries(
       Object.entries(pageCta).filter(([, value]) => Boolean(value)),
     ),
+    _sources: [data || {}, dataconfig || []],
   };
   const partyHeroTrustBullets = Array.from(
     new Set([

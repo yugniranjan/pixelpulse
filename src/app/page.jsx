@@ -16,7 +16,7 @@ import { LOCATION_NAME } from "./lib/constant";
 import SectionHeading from "./components/home/SectionHeading";
 import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
-import { getConfigValue, getCtaContent } from "@/lib/ctaContent";
+import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
 
 export const dynamic = "force-dynamic";
 
@@ -598,18 +598,24 @@ const Home = async () => {
       siteData.gamesMeta.subtitle ||
       getConfigValue(dataconfig, ["gamesSubtitle"]),
   };
+  const homepageConfigSources = [dataconfig];
   const heroData = {
     ...siteData.hero,
     ctaPrimary:
       siteData.hero.ctaPrimary ||
-      getConfigValue(dataconfig, ["heroCtaPrimary", "heroCtaButton", "homeHeroCtaPrimary"]) ||
-      ctaContent.bookNowText,
+      getConfiguredValue(
+        homepageConfigSources,
+        ["heroCtaPrimary", "heroCtaButton", "homeHeroCtaPrimary"],
+        ctaContent.bookNowText,
+      ),
     ctaSecondary:
       siteData.hero.ctaSecondary ||
       getConfigValue(dataconfig, ["heroCtaSecondary", "homeHeroCtaSecondary"]),
-    ctaSecondaryHref:
-      getConfigValue(dataconfig, ["heroCtaSecondaryHref", "homeHeroCtaSecondaryHref"]) ||
+    ctaSecondaryHref: getConfiguredValue(
+      homepageConfigSources,
+      ["heroCtaSecondaryHref", "homeHeroCtaSecondaryHref"],
       "/attractions",
+    ),
     urgencyStrip:
       siteData.hero.urgencyStrip ||
       getConfigValue(dataconfig, ["heroUrgencyStrip", "homeHeroUrgencyStrip"]),
@@ -621,7 +627,11 @@ const Home = async () => {
     button:
       siteData.howItWorks.ctaButton ||
       getConfigValue(dataconfig, ["howItWorksCtaButton", "howItWorksButton"]),
-    bookingType: getConfigValue(dataconfig, ["howItWorksCtaBookingType"]) || "ticket",
+    bookingType: getConfiguredValue(
+      homepageConfigSources,
+      ["howItWorksCtaBookingType"],
+      "ticket",
+    ),
   };
   const howItWorksHeading = {
     title:
@@ -643,8 +653,7 @@ const Home = async () => {
       getConfigValue(dataconfig, ["pricingCtaButton", "pricingTipButton"]),
     bookingType:
       siteData.pricingCta.bookingType ||
-      getConfigValue(dataconfig, ["pricingCtaBookingType"]) ||
-      "ticket",
+      getConfiguredValue(homepageConfigSources, ["pricingCtaBookingType"], "ticket"),
   };
   const pricingHeading = {
     title: getConfigValue(dataconfig, ["pricingTitle", "pricingHeadingTitle"]),
@@ -664,18 +673,22 @@ const Home = async () => {
     subtitle: getConfigValue(dataconfig, ["useCasesSubtitle"]),
   };
   const leaderboardHeading = {
-    title:
-      getConfigValue(dataconfig, ["leaderboardTitle", "leaderboardHeadingTitle"]) ||
+    title: getConfiguredValue(
+      homepageConfigSources,
+      ["leaderboardTitle", "leaderboardHeadingTitle"],
       "Top Players",
-    accent:
-      getConfigValue(dataconfig, ["leaderboardAccent", "leaderboardHeadingAccent"]) ||
+    ),
+    accent: getConfiguredValue(
+      homepageConfigSources,
+      ["leaderboardAccent", "leaderboardHeadingAccent"],
       "This Week",
+    ),
     subtitle: getConfigValue(dataconfig, ["leaderboardSubtitle"]),
   };
   const whyUsCta = {
     text: getConfigValue(dataconfig, ["whyUsCtaText"]),
     button: getConfigValue(dataconfig, ["whyUsCtaButton"]),
-    bookingType: getConfigValue(dataconfig, ["whyUsCtaBookingType"]) || "ticket",
+    bookingType: getConfiguredValue(homepageConfigSources, ["whyUsCtaBookingType"], "ticket"),
   };
   const pricingHref = ctaContent.pricingHref || "/pricing-promos";
   const articlesHref = ctaContent.articlesHref || "/blogs";

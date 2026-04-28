@@ -4,7 +4,7 @@ import Image from "next/image";
 import "../styles/home.css";
 import Link from "next/link";
 import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
-import { getConfigValue } from "@/lib/ctaContent";
+import { getConfiguredValue } from "@/lib/ctaContent";
 import { getDataByParentId } from "@/utils/customFunctions";
 import { slugify } from "@/utils/slugify";
 import facebookicon from "@public/assets/images/social_icon/facebook.png";
@@ -18,13 +18,17 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   if (!configdata?.length || !menudata?.length) return null;
 
   const { chatid } = configdata[0] || {};
-  const footerPhone =
-    getConfigValue(configdata, ["footerPhone", "contactPhone", "locationPhone"]) ||
-    "+1 (905) 760-2922";
+  const footerPhone = getConfiguredValue(
+    configdata,
+    ["footerPhone", "contactPhone", "locationPhone"],
+    "+1 (905) 760-2922",
+  );
   const footerPhoneHref = footerPhone?.replace(/[^\d+]/g, "");
-  const footerEmail =
-    getConfigValue(configdata, ["footerEmail", "contactEmail", "locationEmail"]) ||
-    "connect@pixelpulseplay.ca";
+  const footerEmail = getConfiguredValue(
+    configdata,
+    ["footerEmail", "contactEmail", "locationEmail"],
+    "connect@pixelpulseplay.ca",
+  );
 
   const attractionsData = getDataByParentId(menudata, "attractions");
   const programsData = getDataByParentId(menudata, "programs");

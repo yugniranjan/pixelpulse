@@ -16,7 +16,7 @@ import { LOCATION_NAME } from "@/lib/constant";
 import { notFound } from "next/navigation";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { getConfigValue, getCtaContent, resolveConfiguredValue } from "@/lib/ctaContent";
+import { getConfigValue, getConfiguredValue, getCtaContent } from "@/lib/ctaContent";
 
 const ABOUT_BUILDING_IMAGE_FALLBACK =
   "https://storage.googleapis.com/pixel-pulse-play/web/pixelmainbuilding.jpg";
@@ -224,64 +224,58 @@ const Category = async ({ params }) => {
       Object.entries(pageCta).filter(([, value]) => Boolean(value)),
     ),
   };
-  const contactHref = ctaContent.contactHref || "/contactus";
-  const aboutReadMoreText =
-    getConfigValue(configData, ["aboutReadMoreText", "aboutCardReadMoreText"]) ||
-    "Read More";
-  const attractionsFinalCtaTitle = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["attractionsFinalCtaTitle", "attractionFinalCtaTitle"],
-    value: ctaContent.attractionsFinalCtaTitle,
-    fallback: "One place. Multiple challenges.",
-  });
-  const attractionsFinalCtaSubtitle = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["attractionsFinalCtaSubtitle", "attractionFinalCtaSubtitle"],
-    value: ctaContent.attractionsFinalCtaSubtitle,
-    fallback: "Who are you bringing?",
-  });
-  const attractionsFinalCtaPrimaryText = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["attractionsFinalCtaPrimaryText", "attractionFinalCtaPrimaryText"],
-    value: ctaContent.attractionsFinalCtaPrimaryText,
-    fallback: "Book Now",
-  });
-  const attractionsFinalCtaSecondaryText = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["attractionsFinalCtaSecondaryText", "attractionFinalCtaSecondaryText"],
-    value: ctaContent.attractionsFinalCtaSecondaryText,
-    fallback: "Plan a Party",
-  });
-  const groupsCardsHeading = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["groupsCardsHeading", "groupCardsHeading"],
-    value: ctaContent.groupsCardsHeading,
-    fallback: "What Are You Planning?",
-  });
-  const groupsFinalCtaTitle = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["groupsFinalCtaTitle", "groupFinalCtaTitle"],
-    value: ctaContent.groupsFinalCtaTitle,
-    fallback: "Let’s Plan Something Your Group Will Actually Enjoy",
-  });
-  const groupsFinalCtaSubtitle = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["groupsFinalCtaSubtitle", "groupFinalCtaSubtitle"],
-    value: ctaContent.groupsFinalCtaSubtitle,
-    fallback: "Tell us your group size and we’ll handle the rest.",
-  });
-  const groupsFinalCtaPrimaryText = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["groupsFinalCtaPrimaryText", "groupFinalCtaPrimaryText"],
-    value: ctaContent.groupsFinalCtaPrimaryText,
-    fallback: "Plan Your Event",
-  });
-  const groupsFinalCtaSecondaryText = resolveConfiguredValue({
-    sources: [configData, pageData || {}],
-    keys: ["groupsFinalCtaSecondaryText", "groupFinalCtaSecondaryText"],
-    value: ctaContent.groupsFinalCtaSecondaryText,
-    fallback: "Talk To Us",
-  });
+  const ctaSources = [pageData || {}, configData];
+  const contactHref = getConfiguredValue(ctaSources, ["cta_contact_href", "contactHref", "inquireHref"], "/contactus");
+  const aboutReadMoreText = getConfiguredValue(
+    ctaSources,
+    ["aboutReadMoreText", "aboutCardReadMoreText"],
+    "Read More",
+  );
+  const attractionsFinalCtaTitle = getConfiguredValue(
+    ctaSources,
+    ["attractionsFinalCtaTitle", "attractionFinalCtaTitle"],
+    "One place. Multiple challenges.",
+  );
+  const attractionsFinalCtaSubtitle = getConfiguredValue(
+    ctaSources,
+    ["attractionsFinalCtaSubtitle", "attractionFinalCtaSubtitle"],
+    "Who are you bringing?",
+  );
+  const attractionsFinalCtaPrimaryText = getConfiguredValue(
+    ctaSources,
+    ["attractionsFinalCtaPrimaryText", "attractionFinalCtaPrimaryText"],
+    "Book Now",
+  );
+  const attractionsFinalCtaSecondaryText = getConfiguredValue(
+    ctaSources,
+    ["attractionsFinalCtaSecondaryText", "attractionFinalCtaSecondaryText"],
+    "Plan a Party",
+  );
+  const groupsCardsHeading = getConfiguredValue(
+    ctaSources,
+    ["groupsCardsHeading", "groupCardsHeading"],
+    "What Are You Planning?",
+  );
+  const groupsFinalCtaTitle = getConfiguredValue(
+    ctaSources,
+    ["groupsFinalCtaTitle", "groupFinalCtaTitle"],
+    "Let’s Plan Something Your Group Will Actually Enjoy",
+  );
+  const groupsFinalCtaSubtitle = getConfiguredValue(
+    ctaSources,
+    ["groupsFinalCtaSubtitle", "groupFinalCtaSubtitle"],
+    "Tell us your group size and we’ll handle the rest.",
+  );
+  const groupsFinalCtaPrimaryText = getConfiguredValue(
+    ctaSources,
+    ["groupsFinalCtaPrimaryText", "groupFinalCtaPrimaryText"],
+    "Plan Your Event",
+  );
+  const groupsFinalCtaSecondaryText = getConfiguredValue(
+    ctaSources,
+    ["groupsFinalCtaSecondaryText", "groupFinalCtaSecondaryText"],
+    "Talk To Us",
+  );
 
   const jsonLDschema = await generateSchema(
     pageData,

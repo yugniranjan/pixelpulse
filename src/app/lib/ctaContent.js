@@ -77,6 +77,22 @@ export function getRowValue(row = {}, keys = []) {
     : "";
 }
 
+export function getConfiguredValue(sources = [], keys = [], fallback = "") {
+  const sourceList = Array.isArray(sources) ? sources : [sources];
+
+  for (const source of sourceList) {
+    if (!hasConfiguredKey(source, keys)) {
+      continue;
+    }
+
+    return Array.isArray(source)
+      ? getConfigValue(source, keys)
+      : getRowValue(source, keys);
+  }
+
+  return fallback;
+}
+
 export function getCtaContent(configData = {}) {
   const fromConfig = Array.isArray(configData)
     ? (keys) => getConfigValue(configData, keys)
@@ -132,9 +148,11 @@ export function getCtaContent(configData = {}) {
       "pricingSecondaryButton",
       "pricingCtaBookButton",
     ]),
-    pricingSecondaryBookingType:
-      getValue(["pricingCtaSecondaryBookingType", "pricingSecondaryBookingType"]) ||
+    pricingSecondaryBookingType: getConfiguredValue(
+      configData,
+      ["pricingCtaSecondaryBookingType", "pricingSecondaryBookingType"],
       "ticket",
+    ),
     attractionsFinalCtaTitle: getValue([
       "attractionsFinalCtaTitle",
       "attractionFinalCtaTitle",
@@ -147,20 +165,26 @@ export function getCtaContent(configData = {}) {
       "attractionsFinalCtaPrimaryText",
       "attractionFinalCtaPrimaryText",
     ]),
-    attractionsFinalCtaPrimaryBookingType:
-      getValue([
+    attractionsFinalCtaPrimaryBookingType: getConfiguredValue(
+      configData,
+      [
         "attractionsFinalCtaPrimaryBookingType",
         "attractionFinalCtaPrimaryBookingType",
-      ]) || "ticket",
+      ],
+      "ticket",
+    ),
     attractionsFinalCtaSecondaryText: getValue([
       "attractionsFinalCtaSecondaryText",
       "attractionFinalCtaSecondaryText",
     ]),
-    attractionsFinalCtaSecondaryBookingType:
-      getValue([
+    attractionsFinalCtaSecondaryBookingType: getConfiguredValue(
+      configData,
+      [
         "attractionsFinalCtaSecondaryBookingType",
         "attractionFinalCtaSecondaryBookingType",
-      ]) || "party",
+      ],
+      "party",
+    ),
     groupsHeroSubtitle: getValue([
       "groupsHeroSubtitle",
       "groupHeroSubtitle",
@@ -169,11 +193,14 @@ export function getCtaContent(configData = {}) {
       "groupsHeroPrimaryText",
       "groupHeroPrimaryText",
     ]),
-    groupsHeroPrimaryBookingType:
-      getValue([
+    groupsHeroPrimaryBookingType: getConfiguredValue(
+      configData,
+      [
         "groupsHeroPrimaryBookingType",
         "groupHeroPrimaryBookingType",
-      ]) || "party",
+      ],
+      "party",
+    ),
     groupsHeroSecondaryText: getValue([
       "groupsHeroSecondaryText",
       "groupHeroSecondaryText",
@@ -198,11 +225,14 @@ export function getCtaContent(configData = {}) {
       "groupsFinalCtaPrimaryText",
       "groupFinalCtaPrimaryText",
     ]),
-    groupsFinalCtaPrimaryBookingType:
-      getValue([
+    groupsFinalCtaPrimaryBookingType: getConfiguredValue(
+      configData,
+      [
         "groupsFinalCtaPrimaryBookingType",
         "groupFinalCtaPrimaryBookingType",
-      ]) || "party",
+      ],
+      "party",
+    ),
     groupsFinalCtaSecondaryText: getValue([
       "groupsFinalCtaSecondaryText",
       "groupFinalCtaSecondaryText",
@@ -227,11 +257,18 @@ export function getCtaContent(configData = {}) {
       "birthdayFinalCtaSecondaryText",
       "partyFinalCtaSecondaryText",
     ]),
-    birthdayFinalCtaSecondaryBookingType:
-      getValue([
+    birthdayFinalCtaSecondaryHref: getValue([
+      "birthdayFinalCtaSecondaryHref",
+      "partyFinalCtaSecondaryHref",
+    ]),
+    birthdayFinalCtaSecondaryBookingType: getConfiguredValue(
+      configData,
+      [
         "birthdayFinalCtaSecondaryBookingType",
         "partyFinalCtaSecondaryBookingType",
-      ]) || "party",
+      ],
+      "party",
+    ),
     pricingPromoInlineCtaTitle: getValue([
       "pricingPromoInlineCtaTitle",
       "pricingPromosInlineCtaTitle",
@@ -250,11 +287,14 @@ export function getCtaContent(configData = {}) {
       "pricingPromoHeroSecondaryText",
       "pricingPromosHeroSecondaryText",
     ]),
-    pricingPromoInlineCtaBookingType:
-      getValue([
+    pricingPromoInlineCtaBookingType: getConfiguredValue(
+      configData,
+      [
         "pricingPromoInlineCtaBookingType",
         "pricingPromosInlineCtaBookingType",
-      ]) || "party",
+      ],
+      "party",
+    ),
     pricingPromoFinalCtaTitle: getValue([
       "pricingPromoFinalCtaTitle",
       "pricingPromosFinalCtaTitle",
@@ -275,20 +315,26 @@ export function getCtaContent(configData = {}) {
       "pricingPromoFinalCtaPrimaryText",
       "pricingPromosFinalCtaPrimaryText",
     ]),
-    pricingPromoFinalCtaPrimaryBookingType:
-      getValue([
+    pricingPromoFinalCtaPrimaryBookingType: getConfiguredValue(
+      configData,
+      [
         "pricingPromoFinalCtaPrimaryBookingType",
         "pricingPromosFinalCtaPrimaryBookingType",
-      ]) || "ticket",
+      ],
+      "ticket",
+    ),
     pricingPromoFinalCtaSecondaryText: getValue([
       "pricingPromoFinalCtaSecondaryText",
       "pricingPromosFinalCtaSecondaryText",
     ]),
-    pricingPromoFinalCtaSecondaryBookingType:
-      getValue([
+    pricingPromoFinalCtaSecondaryBookingType: getConfiguredValue(
+      configData,
+      [
         "pricingPromoFinalCtaSecondaryBookingType",
         "pricingPromosFinalCtaSecondaryBookingType",
-      ]) || "ticket",
+      ],
+      "ticket",
+    ),
     backHomeText: getValue(["cta_back_home", "backHomeText"]),
     sendAnotherText: getValue(["cta_send_another", "sendAnotherText"]),
     promotionsHeading: getValue(["promotionsHeading", "promoHeading"]),

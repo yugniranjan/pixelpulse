@@ -4,7 +4,7 @@ import "../styles/birthday-landing.css";
 import Image from "next/image";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
-import { getConfigValue } from "@/lib/ctaContent";
+import { getConfiguredValue } from "@/lib/ctaContent";
 
 const LOCATION_SLUG = "vaughan";
 const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png";
@@ -110,20 +110,31 @@ export default async function BirthdayPartyLandingPage() {
   const packagesData = parseBirthdayPackages(configData);
   const packageHighlights = getPackageHighlights(packagesData);
   const attractions = getAttractions(menuData);
-  const heroImage =
-    getConfigValue(configData, ["birthdayLandingImage", "partyLandingImage"]) || HERO_IMAGE;
-  const headline =
-    getConfigValue(configData, ["birthdayLandingHeadline", "partyLandingHeadline"]) ||
-    "Book Your Birthday Today & Get Up to $50 OFF";
-  const subheadline =
-    getConfigValue(configData, ["birthdayLandingSubheadline", "partyLandingSubheadline"]) ||
-    "High-energy games. Non-stop excitement. Zero stress for you. We handle everything while you enjoy the celebration.";
-  const ctaText =
-    getConfigValue(configData, ["birthdayLandingCtaText", "partyLandingCtaText"]) ||
-    "Claim My $50 OFF Slot NOW";
-  const urgency =
-    getConfigValue(configData, ["birthdayLandingUrgency", "partyLandingUrgency"]) ||
-    "Limited discounted slots available.";
+  const heroImage = getConfiguredValue(
+    configData,
+    ["birthdayLandingImage", "partyLandingImage"],
+    HERO_IMAGE,
+  );
+  const headline = getConfiguredValue(
+    configData,
+    ["birthdayLandingHeadline", "partyLandingHeadline"],
+    "Book Your Birthday Today & Get Up to $50 OFF",
+  );
+  const subheadline = getConfiguredValue(
+    configData,
+    ["birthdayLandingSubheadline", "partyLandingSubheadline"],
+    "High-energy games. Non-stop excitement. Zero stress for you. We handle everything while you enjoy the celebration.",
+  );
+  const ctaText = getConfiguredValue(
+    configData,
+    ["birthdayLandingCtaText", "partyLandingCtaText"],
+    "Claim My $50 OFF Slot NOW",
+  );
+  const urgency = getConfiguredValue(
+    configData,
+    ["birthdayLandingUrgency", "partyLandingUrgency"],
+    "Limited discounted slots available.",
+  );
 
   return (
     <main className="ppp-birthday-landing">
