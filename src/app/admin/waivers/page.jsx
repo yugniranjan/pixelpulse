@@ -7,7 +7,7 @@ import "../../styles/admin-waivers.css";
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_PARTY_FORM = {
   partyId: "",
-  partyName: "",
+  primaryParticipant: "",
   visitDate: "",
   visitTime: "",
 };
@@ -120,6 +120,8 @@ function PartyWaiverLinkBuilder() {
   const [form, setForm] = useState(DEFAULT_PARTY_FORM);
   const [copied, setCopied] = useState("");
   const [origin, setOrigin] = useState("");
+  const [savingParty, setSavingParty] = useState(false);
+  const [partyMessage, setPartyMessage] = useState("");
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -128,20 +130,49 @@ function PartyWaiverLinkBuilder() {
   const waiverUrl = useMemo(() => {
     if (!origin) return "";
     const params = new URLSearchParams();
-    Object.entries(form).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+    if (form.partyId) params.set("partyId", form.partyId);
     const query = params.toString();
     return `${origin}/waiver${query ? `?${query}` : ""}`;
-  }, [form, origin]);
+  }, [form.partyId, origin]);
 
   function update(field, value) {
     setCopied("");
+    setPartyMessage("");
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function savePartyWaiver() {
+    setSavingParty(true);
+    setCopied("");
+    setPartyMessage("");
+
+    try {
+      const response = await fetch("/api/admin/party-waivers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPartyMessage(data.error || "Unable to save party waiver details.");
+        return false;
+      }
+
+      setPartyMessage("Party waiver details saved.");
+      return true;
+    } catch (saveError) {
+      setPartyMessage("Unable to save party waiver details.");
+      return false;
+    } finally {
+      setSavingParty(false);
+    }
   }
 
   async function copyLink() {
     if (!waiverUrl) return;
+    const saved = await savePartyWaiver();
+    if (!saved) return;
     await navigator.clipboard.writeText(waiverUrl);
     setCopied("Waiver link copied.");
   }
@@ -159,8 +190,8 @@ function PartyWaiverLinkBuilder() {
           <input required value={form.partyId} onChange={(event) => update("partyId", event.target.value)} placeholder="PP-0428-01" />
         </label>
         <label>
-          <span>Party / guest of honor</span>
-          <input value={form.partyName} onChange={(event) => update("partyName", event.target.value)} placeholder="Ariana's Birthday Party" />
+          <span>Primary Participant</span>
+          <input value={form.primaryParticipant} onChange={(event) => update("primaryParticipant", event.target.value)} placeholder="Vijayant Verma" />
         </label>
         <label>
           <span>Visit date</span>
@@ -174,8 +205,11 @@ function PartyWaiverLinkBuilder() {
       <div className="party-link-output">
         <span>Prefilled waiver URL</span>
         <a href={waiverUrl} target="_blank" rel="noopener noreferrer">{waiverUrl}</a>
-        <button type="button" onClick={copyLink}>Copy Link</button>
+        <button type="button" onClick={copyLink} disabled={savingParty}>
+          {savingParty ? "Saving..." : "Save & Copy Link"}
+        </button>
       </div>
+      {partyMessage ? <p className="party-link-copied">{partyMessage}</p> : null}
       {copied ? <p className="party-link-copied">{copied}</p> : null}
     </section>
   );

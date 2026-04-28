@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const PUBLIC_FILES = ["/favicon.ico", "/robots.txt"];
 const VERCEL_PUBLIC_PATHS = ["/waiver"];
 const VERCEL_ADMIN_PATHS = ["/admin/login", "/admin/waivers"];
-const VERCEL_API_PATHS = ["/api/waivers", "/api/auth/login", "/api/auth/logout", "/api/admin/waivers"];
+const VERCEL_API_PATHS = ["/api/waivers", "/api/auth/login", "/api/auth/logout", "/api/admin/waivers", "/api/admin/party-waivers"];
 
 function isAssetPath(pathname) {
   return (

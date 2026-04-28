@@ -246,7 +246,7 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   );
 }
 
-export default function WaiverForm({ initialVisit = {} }) {
+export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
   const canvasRef = useRef(null);
   const boxRef = useRef(null);
   const drawingRef = useRef(false);
@@ -254,7 +254,7 @@ export default function WaiverForm({ initialVisit = {} }) {
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [primary, setPrimary] = useState(EMPTY_PRIMARY);
+  const [primary, setPrimary] = useState({ ...EMPTY_PRIMARY, ...initialPrimary });
   const [familyMembers, setFamilyMembers] = useState([]);
   const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
@@ -364,7 +364,7 @@ export default function WaiverForm({ initialVisit = {} }) {
   }
 
   function resetWaiverForm() {
-    setPrimary({ ...EMPTY_PRIMARY });
+    setPrimary({ ...EMPTY_PRIMARY, ...initialPrimary });
     setFamilyMembers([]);
     setVisit({ ...EMPTY_VISIT, ...initialVisit, signDate: today() });
     setChecks({ ...EMPTY_CHECKS });

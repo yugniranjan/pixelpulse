@@ -5,6 +5,8 @@ import "../styles/waiver.css";
 import Image from "next/image";
 import SectionHeading from "@/components/home/SectionHeading";
 import WaiverForm from "@/components/WaiverForm";
+import { db } from "@/lib/firestore";
+import { partyWaiverDocId, splitParticipantName } from "@/lib/partyWaivers";
 
 export const metadata = {
   title: "Waiver | Pixel Pulse Play Vaughan",
@@ -24,14 +26,28 @@ function searchValue(searchParams, key) {
   return Array.isArray(value) ? value[0] || "" : value || "";
 }
 
+async function getPartyWaiverDetails(partyId) {
+  if (!db || !partyId) return null;
+
+  const snapshot = await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get();
+  return snapshot.exists ? snapshot.data() : null;
+}
+
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
+  const partyId = searchValue(params, "partyId");
+  const partyDetails = await getPartyWaiverDetails(partyId);
+  const primaryName = splitParticipantName(partyDetails?.primaryParticipant);
   const initialVisit = {
-    partyId: searchValue(params, "partyId"),
-    partyName: searchValue(params, "partyName"),
-    passType: searchValue(params, "passType") || (searchValue(params, "partyId") ? "Birthday Party Package" : ""),
-    visitDate: searchValue(params, "visitDate"),
-    visitTime: searchValue(params, "visitTime"),
+    partyId,
+    partyName: partyDetails?.primaryParticipant || "",
+    passType: partyDetails?.passType || (partyId ? "Birthday Party Package" : ""),
+    visitDate: partyDetails?.visitDate || "",
+    visitTime: partyDetails?.visitTime || "",
+  };
+  const initialPrimary = {
+    firstName: primaryName.firstName,
+    lastName: primaryName.lastName,
   };
 
   return (
@@ -56,7 +72,7 @@ export default async function WaiverPage({ searchParams }) {
           </p>
         </div>
 
-        <WaiverForm initialVisit={initialVisit} />
+        <WaiverForm initialPrimary={initialPrimary} initialVisit={initialVisit} />
       </section>
     </main>
   );
