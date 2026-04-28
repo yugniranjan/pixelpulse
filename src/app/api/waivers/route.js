@@ -18,6 +18,19 @@ function cleanText(value = "") {
   return String(value || "").trim();
 }
 
+function todayInToronto() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Toronto",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function isPastDate(value = "") {
+  return Boolean(value && value < todayInToronto());
+}
+
 function fullLegalName(person = {}) {
   return [person.firstName, person.lastName].filter(Boolean).join(" ");
 }
@@ -80,6 +93,9 @@ export async function POST(req) {
     ? body.familyMembers.map(cleanFamilyMember)
     : [];
   const visit = cleanVisit(body.visit);
+  if (visit.partyId && !visit.passType) {
+    visit.passType = "Birthday Party Package";
+  }
   const checks = body.checks || {};
   const attractions = Array.isArray(body.attractions)
     ? body.attractions.map(cleanText).filter(Boolean)
@@ -100,9 +116,16 @@ export async function POST(req) {
     );
   }
 
-  if (!visit.passType || !visit.visitDate || !visit.emergencyName || !visit.emergencyRelation || !visit.emergencyPhone || !visit.printName || !visit.signDate) {
+  if (!visit.passType || !visit.emergencyName || !visit.emergencyRelation || !visit.emergencyPhone || !visit.printName || !visit.signDate) {
     return NextResponse.json(
       { error: "Visit, emergency contact, printed name, and signed date are required." },
+      { status: 400 },
+    );
+  }
+
+  if (visit.visitDate && isPastDate(visit.visitDate)) {
+    return NextResponse.json(
+      { error: "Visit date cannot be in the past." },
       { status: 400 },
     );
   }

@@ -101,7 +101,12 @@ function memberLabel(type) {
 }
 
 function today() {
-  return new Date().toISOString().split("T")[0];
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function isPastDate(value = "") {
+  return Boolean(value && value < today());
 }
 
 function datePartsFromDate(date = new Date()) {
@@ -183,7 +188,11 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   );
 
   useEffect(() => {
-    setDateParts(parseDob(value));
+    const nextValue = isPastDate(value) ? today() : value;
+    setDateParts(parseDob(nextValue));
+    if (value && nextValue !== value) {
+      onChange(nextValue);
+    }
   }, [value]);
 
   function updateDate(field, nextValue) {
@@ -194,8 +203,17 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
       nextDate.day = String(nextDayCount).padStart(2, "0");
     }
 
+    const formattedDate = isCompleteDate(nextDate) ? formatDob(nextDate) : "";
+
+    if (formattedDate && isPastDate(formattedDate)) {
+      const todayParts = datePartsFromDate();
+      setDateParts(todayParts);
+      onChange(formatDob(todayParts));
+      return;
+    }
+
     setDateParts(nextDate);
-    onChange(isCompleteDate(nextDate) ? formatDob(nextDate) : "");
+    onChange(formattedDate);
   }
 
   function setToday() {
@@ -362,6 +380,11 @@ export default function WaiverForm({ initialVisit = {} }) {
 
     if (!hasSignature) {
       setError("Please draw your signature before submitting.");
+      return;
+    }
+
+    if (isPastDate(visit.visitDate)) {
+      setError("Visit date cannot be in the past.");
       return;
     }
 

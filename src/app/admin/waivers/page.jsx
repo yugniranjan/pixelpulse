@@ -7,10 +7,6 @@ import "../../styles/admin-waivers.css";
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_PARTY_FORM = {
   partyId: "",
-  partyName: "",
-  visitDate: "",
-  visitTime: "",
-  passType: "Birthday Party Package",
 };
 
 function formatDateTime(value) {
@@ -129,12 +125,10 @@ function PartyWaiverLinkBuilder() {
   const waiverUrl = useMemo(() => {
     if (!origin) return "";
     const params = new URLSearchParams();
-    Object.entries(form).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+    if (form.partyId) params.set("partyId", form.partyId);
     const query = params.toString();
     return `${origin}/waiver${query ? `?${query}` : ""}`;
-  }, [form, origin]);
+  }, [form.partyId, origin]);
 
   function update(field, value) {
     setCopied("");
@@ -158,22 +152,6 @@ function PartyWaiverLinkBuilder() {
         <label>
           <span>Party ID</span>
           <input required value={form.partyId} onChange={(event) => update("partyId", event.target.value)} placeholder="PP-0428-01" />
-        </label>
-        <label>
-          <span>Party / guest of honor</span>
-          <input value={form.partyName} onChange={(event) => update("partyName", event.target.value)} placeholder="Ariana's Birthday Party" />
-        </label>
-        <label>
-          <span>Visit date</span>
-          <input type="date" value={form.visitDate} onChange={(event) => update("visitDate", event.target.value)} />
-        </label>
-        <label>
-          <span>Party time</span>
-          <input type="time" value={form.visitTime} onChange={(event) => update("visitTime", event.target.value)} />
-        </label>
-        <label>
-          <span>Pass / visit type</span>
-          <input value={form.passType} onChange={(event) => update("passType", event.target.value)} />
         </label>
       </div>
       <div className="party-link-output">
