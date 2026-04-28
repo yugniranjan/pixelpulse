@@ -26,10 +26,12 @@ function searchValue(searchParams, key) {
 
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
-  const partyId = searchValue(params, "partyId");
   const initialVisit = {
-    partyId,
-    passType: partyId ? "Birthday Party Package" : "",
+    partyId: searchValue(params, "partyId"),
+    partyName: searchValue(params, "partyName"),
+    passType: searchValue(params, "passType") || (searchValue(params, "partyId") ? "Birthday Party Package" : ""),
+    visitDate: searchValue(params, "visitDate"),
+    visitTime: searchValue(params, "visitTime"),
   };
 
   return (
