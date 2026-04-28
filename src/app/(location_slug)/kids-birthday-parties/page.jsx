@@ -214,7 +214,7 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
             </div>
             <div className="ppp-party-cta-band__actions">
               <Link href="#party-packages" className="ppp-party-cta-band__btn" prefetch={false}>
-                {ctaContent?.birthdayFinalCtaPrimaryText || "Check Packages"}
+                {ctaContent?.birthdayFinalCtaPrimaryText}
               </Link>
               <div className="aero-btn-booknow">
                 <BookingButton
