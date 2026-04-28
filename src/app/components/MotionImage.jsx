@@ -13,12 +13,24 @@ function formatHeroTrustItem(item = "") {
   );
 }
 
+function getVideoPoster(item = {}) {
+  return (
+    item?.videoThumbnail ||
+    item?.video_thumbnail ||
+    item?.thumbnail ||
+    item?.smallimage ||
+    item?.headerimage ||
+    ""
+  );
+}
+
 const MotionImage = ({ pageData, heroData = {} }) => {
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
 
   const item = Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : pageData;
   const hasVideo = Boolean(item?.video);
+  const videoPoster = getVideoPoster(item);
   const heroTitle = [heroData.headline, heroData.headlineSub].filter(Boolean).join(" ");
   const heroText = heroData.subheadline || "";
   const heroTrustItems = Array.isArray(heroData.trust)
@@ -79,7 +91,15 @@ const MotionImage = ({ pageData, heroData = {} }) => {
     <section className="aero_home-headerimg-wrapper">
       {hasVideo ? (
         <section className="aero_home_video-container">
-          <video ref={videoRef} autoPlay muted={isMuted} loop playsInline width="100%">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted={isMuted}
+            loop
+            playsInline
+            poster={videoPoster || undefined}
+            width="100%"
+          >
             <source src={item.video} type="video/mp4" />
           </video>
           {heroCopy}
