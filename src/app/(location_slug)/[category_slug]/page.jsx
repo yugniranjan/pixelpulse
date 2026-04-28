@@ -215,7 +215,34 @@ const Category = async ({ params }) => {
   const pageHeroHeading = pageHeroContent.heading || attractionsData?.[0]?.desc || "";
   const pageHeroBullets = pageHeroContent.bullets;
   const pageHeroImage = getPreferredImage(pageData || attractionsData?.[0]);
-  const pageChildren = attractionsData?.[0]?.children?.filter((item) => item?.isactive == 1) || [];
+  const hiddenAboutChildSlugs = new Set(["safety-information", "safety-info"]);
+  const pageChildren =
+    attractionsData?.[0]?.children?.filter((item) => {
+      if (item?.isactive != 1) {
+        return false;
+      }
+
+      if (!isAboutPage) {
+        return true;
+      }
+
+      const childPath = String(item?.path || "").toLowerCase();
+      const childSearchText = [
+        item?.desc,
+        item?.metatitle,
+        item?.metadescription,
+        item?.imagetitle,
+        item?.iconalttextforhomepage,
+        item?.smallimage,
+        item?.headerimage,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return (
+        !hiddenAboutChildSlugs.has(childPath) &&
+        !childSearchText.includes("safety information")
+      );
+    }) || [];
   const configCta = getCtaContent(configData);
   const pageCta = getCtaContent(pageData || {});
   const ctaContent = {

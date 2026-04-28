@@ -1593,7 +1593,24 @@
   transition: color 0.15s ease, padding-left 0.15s ease;
 }
 
+.aero_footer_link_button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  transition: color 0.15s ease, padding-left 0.15s ease;
+}
+
 .aero_footer_col-4-wrapper ul li a:hover {
+  color: var(--footer-lime);
+  padding-left: 4px;
+}
+
+.aero_footer_link_button:hover {
   color: var(--footer-lime);
   padding-left: 4px;
 }

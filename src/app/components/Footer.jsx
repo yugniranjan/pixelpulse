@@ -5,6 +5,7 @@ import "../styles/home.css";
 import Link from "next/link";
 import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
 import { getConfiguredValue } from "@/lib/ctaContent";
+import BookingButton from "@/components/smallComponents/BookingButton";
 import { getDataByParentId } from "@/utils/customFunctions";
 import { slugify } from "@/utils/slugify";
 import facebookicon from "@public/assets/images/social_icon/facebook.png";
@@ -35,6 +36,13 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const groupsData = getDataByParentId(menudata, "group-events");
   const companyData = getDataByParentId(menudata, "about-us");
   const blogsData = getDataByParentId(menudata, "blogs");
+  const hiddenCompanySlugs = new Set(["safety-information", "safety-info"]);
+  const companyStaticLinks = [
+    { label: "About Us", href: "/about-us" },
+    { label: "Attractions", href: "/attractions" },
+    { label: "Birthday Parties", href: "/kids-birthday-parties" },
+    { label: "Pricing Promos", href: "/pricing-promos" },
+  ];
   const companyChildren = companyData?.[0]?.children || [];
   const blogChildren = blogsData?.[0]?.children || [];
   const blogFallbacks = getFallbackBlogs();
@@ -106,19 +114,35 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                 </li>
               ))} */}
           <ul>
+            <li>Company</li>
+            {companyStaticLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} prefetch>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <BookingButton title="Book Now" className="aero_footer_link_button" />
+            </li>
             {companyData?.[0]?.children?.length > 0 && (
               <>
-                <li>Company</li>
-                {companyData[0].children.map((item, i) => (
+                {companyData[0].children.map((item, i) => {
+                  const itemPath = String(item?.path || "").toLowerCase();
+                  const itemTitle = String(item?.desc || "").toLowerCase();
+                  return (
                   item?.isactive == 1 &&
-                  !["contactus", "contact-us"].includes(item?.path?.toLowerCase()) && (
+                  !["contactus", "contact-us"].includes(itemPath) &&
+                  !hiddenCompanySlugs.has(itemPath) &&
+                  !itemTitle.includes("safety information") && (
                     <li key={i}>
                       <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
                         {item?.desc}
                       </Link>
                     </li>
                   )
-                ))}
+                  );
+                })}
               </>
             )}
           </ul>
