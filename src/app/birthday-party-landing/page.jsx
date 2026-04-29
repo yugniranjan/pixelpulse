@@ -10,7 +10,7 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 const LOCATION_SLUG = "vaughan";
 const LANDING_PAGES_SHEET = "landing pages";
 const LEGACY_LANDING_PAGES_SHEET = "landin pages";
-const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png";
+const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png";
 const ATTRACTION_FALLBACK_IMAGE =
   "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
 
@@ -83,7 +83,7 @@ export async function generateMetadata() {
   );
   const image = getConfiguredValue(
     landingData,
-    ["birthdayLandingImage", "partyLandingImage"],
+    ["birthdayLandingHeroImage", "partyLandingHeroImage"],
     HERO_IMAGE,
   );
   const imageAlt = getConfiguredValue(
@@ -200,7 +200,7 @@ export default async function BirthdayPartyLandingPage() {
   const attractions = getAttractions(menuData);
   const heroImage = getConfiguredValue(
     landingData,
-    ["birthdayLandingImage", "partyLandingImage"],
+    ["birthdayLandingHeroImage", "partyLandingHeroImage"],
     HERO_IMAGE,
   );
   const headline = getConfiguredValue(
