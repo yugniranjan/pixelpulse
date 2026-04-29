@@ -1,25 +1,238 @@
 .ppp-invite-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 100vh;
   padding: 24px;
   display: grid;
   place-items: center;
   background:
-    linear-gradient(140deg, rgba(164, 207, 95, 0.18), transparent 30%),
-    linear-gradient(320deg, rgba(251, 174, 123, 0.22), transparent 36%),
+    linear-gradient(180deg, rgba(5, 8, 16, 0.12), rgba(5, 8, 16, 0.86)),
+    linear-gradient(90deg, rgba(5, 8, 16, 0.84), rgba(5, 8, 16, 0.36) 52%, rgba(5, 8, 16, 0.9)),
+    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png") 62% center / cover no-repeat,
     #050810;
   color: #ffffff;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.ppp-invite-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255, 45, 120, 0.2), transparent 28%),
+    radial-gradient(circle at 86% 8%, rgba(164, 207, 95, 0.18), transparent 26%),
+    linear-gradient(180deg, rgba(5, 8, 16, 0), rgba(5, 8, 16, 0.58));
+  pointer-events: none;
+}
+
+.ppp-invite-balloons {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ppp-invite-stars {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ppp-invite-balloon {
+  position: absolute;
+  display: block;
+  width: var(--balloon-size, 58px);
+  height: calc(var(--balloon-size, 58px) * 1.25);
+  border-radius: 50% 50% 46% 46%;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.72) 0 8%, transparent 9%),
+    linear-gradient(160deg, var(--balloon-light), var(--balloon-color));
+  box-shadow:
+    inset -10px -12px 18px rgba(0, 0, 0, 0.16),
+    0 14px 28px rgba(0, 0, 0, 0.16);
+  opacity: 0.82;
+  transform: translate3d(0, 115vh, 0) rotate(-4deg);
+  animation: ppp-invite-balloon-float var(--balloon-duration, 16s) linear infinite;
+}
+
+.ppp-invite-balloon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 12px;
+  height: 10px;
+  border-radius: 0 0 4px 4px;
+  background: var(--balloon-color);
+  transform: translateX(-50%);
+}
+
+.ppp-invite-balloon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 2px);
+  width: 1px;
+  height: 90px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent);
+  transform: translateX(-50%);
+}
+
+.ppp-invite-balloon--one {
+  --balloon-color: #ff2d78;
+  --balloon-light: #ff8fbd;
+  --balloon-size: 58px;
+  --balloon-duration: 17s;
+  left: 7%;
+  animation-delay: -6s;
+}
+
+.ppp-invite-balloon--two {
+  --balloon-color: #a4cf5f;
+  --balloon-light: #d6f493;
+  --balloon-size: 46px;
+  --balloon-duration: 14s;
+  left: 22%;
+  animation-delay: -11s;
+}
+
+.ppp-invite-balloon--three {
+  --balloon-color: #fbae7b;
+  --balloon-light: #ffd2aa;
+  --balloon-size: 64px;
+  --balloon-duration: 19s;
+  right: 10%;
+  animation-delay: -3s;
+}
+
+.ppp-invite-balloon--four {
+  --balloon-color: #29c4b2;
+  --balloon-light: #8be7db;
+  --balloon-size: 50px;
+  --balloon-duration: 15s;
+  right: 24%;
+  animation-delay: -9s;
+}
+
+.ppp-invite-balloon--five {
+  --balloon-color: #7c5cff;
+  --balloon-light: #b3a2ff;
+  --balloon-size: 42px;
+  --balloon-duration: 18s;
+  left: 48%;
+  animation-delay: -14s;
+}
+
+@keyframes ppp-invite-balloon-float {
+  0% {
+    transform: translate3d(0, 115vh, 0) rotate(-5deg);
+  }
+
+  25% {
+    transform: translate3d(16px, 72vh, 0) rotate(5deg);
+  }
+
+  50% {
+    transform: translate3d(-10px, 36vh, 0) rotate(-3deg);
+  }
+
+  75% {
+    transform: translate3d(18px, 0, 0) rotate(4deg);
+  }
+
+  100% {
+    transform: translate3d(-8px, -36vh, 0) rotate(-4deg);
+  }
+}
+
+.ppp-invite-star {
+  position: absolute;
+  top: var(--star-top, 16%);
+  left: var(--star-left, 82%);
+  display: block;
+  width: var(--star-width, 118px);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+  opacity: 0;
+  transform: translate3d(0, 0, 0) rotate(-28deg);
+  animation: ppp-invite-star-shoot var(--star-duration, 3.8s) ease-in-out infinite;
+}
+
+.ppp-invite-star::before {
+  content: "";
+  position: absolute;
+  right: 18%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
+  transform: translateY(-50%);
+}
+
+.ppp-invite-star--one {
+  --star-top: 15%;
+  --star-left: 76%;
+  --star-width: 120px;
+  --star-duration: 4.4s;
+  animation-delay: -0.8s;
+}
+
+.ppp-invite-star--two {
+  --star-top: 34%;
+  --star-left: 88%;
+  --star-width: 92px;
+  --star-duration: 5.2s;
+  animation-delay: -2.4s;
+}
+
+.ppp-invite-star--three {
+  --star-top: 58%;
+  --star-left: 80%;
+  --star-width: 108px;
+  --star-duration: 4.8s;
+  animation-delay: -3.1s;
+}
+
+@keyframes ppp-invite-star-shoot {
+  0%,
+  54% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-28deg);
+  }
+
+  60% {
+    opacity: 0.95;
+  }
+
+  76% {
+    opacity: 0.92;
+    transform: translate3d(-220px, 128px, 0) rotate(-28deg);
+  }
+
+  86%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-300px, 174px, 0) rotate(-28deg);
+  }
+}
+
 .ppp-invite-card {
   position: relative;
+  z-index: 1;
   width: min(520px, 100%);
   overflow: hidden;
   border: 1px solid rgba(164, 207, 95, 0.42);
   border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(5, 8, 16, 0.62), rgba(5, 8, 16, 0.95)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center / cover;
+  background: #050810;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
 }
 
@@ -44,6 +257,15 @@
   display: grid;
   gap: 16px;
   padding: 34px;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 16, 0.62), rgba(5, 8, 16, 0.95)),
+    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png") 62% center / cover no-repeat;
+  overflow: hidden;
+}
+
+.ppp-invite-card__content > :not(.ppp-invite-balloons):not(.ppp-invite-stars) {
+  position: relative;
+  z-index: 1;
 }
 
 .ppp-invite-eyebrow,
@@ -260,6 +482,20 @@
 
   .ppp-invite-card h1 {
     font-size: clamp(2.35rem, 13vw, 3.45rem);
+  }
+
+  .ppp-invite-balloon {
+    --balloon-size: 42px;
+    opacity: 0.68;
+  }
+
+  .ppp-invite-balloon--two,
+  .ppp-invite-balloon--five {
+    display: none;
+  }
+
+  .ppp-invite-star {
+    --star-width: 78px;
   }
 
   .ppp-invite-logo {

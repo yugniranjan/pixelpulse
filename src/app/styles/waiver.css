@@ -1,70 +1,42 @@
 .ppp-waiver-page {
-  --void: #050810;
-  --panel: #101521;
-  --panel-2: #161d2b;
-  --rim: rgba(164, 207, 95, 0.24);
-  --rim-2: rgba(251, 174, 123, 0.34);
-  --brand-lime: #a4cf5f;
-  --brand-peach: #fbae7b;
-  --brand-pink: #ff2d78;
-  --text: #f4f7fb;
-  --text-dim: rgba(244, 247, 251, 0.72);
-  --text-ghost: rgba(244, 247, 251, 0.48);
+  --void: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f7f9fc;
+  --rim: #cbd5e1;
+  --rim-2: #94a3b8;
+  --brand-lime: #14532d;
+  --brand-peach: #0f172a;
+  --brand-pink: #7f1d1d;
+  --text: #0f172a;
+  --text-dim: #334155;
+  --text-ghost: #64748b;
   position: relative;
   isolation: isolate;
   overflow: hidden;
   min-height: 100vh;
   color: var(--text);
-  background:
-    linear-gradient(180deg, rgba(5, 8, 16, 0.68), rgba(5, 8, 16, 0.94) 42%, rgba(5, 8, 16, 0.98)),
-    linear-gradient(rgba(164, 207, 95, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(164, 207, 95, 0.045) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(164, 207, 95, 0.14), transparent 34%, rgba(251, 174, 123, 0.1) 68%, rgba(255, 45, 120, 0.08)),
-    var(--void);
-  background-size: auto, 40px 40px, 40px 40px, auto;
-  font-family: "Exo 2", Inter, system-ui, sans-serif;
+  background: #ffffff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.ppp-waiver-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(164, 207, 95, 0.18), transparent 34%),
-    radial-gradient(circle at 82% 8%, rgba(251, 174, 123, 0.16), transparent 30%),
-    linear-gradient(90deg, rgba(5, 8, 16, 0.92), rgba(5, 8, 16, 0.5) 46%, rgba(5, 8, 16, 0.96));
-  opacity: 0.52;
-  transform: scale(1.02);
-}
-
+.ppp-waiver-page::before,
 .ppp-waiver-page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.08) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(251, 174, 123, 0.06) 1px, transparent 1px),
-    repeating-linear-gradient(135deg, rgba(244, 247, 251, 0.028) 0 1px, transparent 1px 18px);
-  background-size: 96px 96px, 96px 96px, auto;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent 76%);
-  pointer-events: none;
+  display: none;
 }
 
 .ppp-waiver-layout {
   position: relative;
   width: min(980px, calc(100% - 32px));
   display: grid;
-  gap: 2rem;
+  gap: 1.5rem;
   margin: 0 auto;
   padding: 0 0 4rem;
 }
 
 .ppp-waiver-section-intro {
-  max-width: 650px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 2rem 0 0.5rem;
+  padding: 2.5rem 0 0.35rem;
   text-align: center;
 }
 
@@ -76,7 +48,19 @@
 
 .ppp-waiver-section-intro h1,
 .ppp-waiver-section-intro h2 {
-  text-shadow: 0 0 28px rgba(164, 207, 95, 0.22);
+  color: #0f172a;
+  font-family: inherit;
+  font-size: clamp(2rem, 4vw, 3rem) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: none;
+  filter: none;
+  user-select: auto;
+}
+
+.ppp-waiver-section-intro h1 span,
+.ppp-waiver-section-intro h2 span {
+  color: #0f172a;
 }
 
 .ppp-waiver-section-intro p {
@@ -88,34 +72,32 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  gap: 2.35rem;
+  gap: 1.5rem;
   width: 100%;
+  border: 1px solid #d6dee9;
+  border-radius: 12px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  background: #ffffff;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
 }
 
 .ppp-waiver-form::before {
-  content: "";
-  position: absolute;
-  inset: -1.25rem;
-  z-index: -1;
-  border: 1px solid rgba(164, 207, 95, 0.12);
-  border-radius: 14px;
-  background: var(--waiver-form-background-image, url("https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png")) center top / cover no-repeat;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  display: none;
 }
 
 .ppp-waiver-legal {
-  border: 1px solid rgba(164, 207, 95, 0.2);
-  border-left: 4px solid var(--brand-lime);
-  border-radius: 0 8px 8px 0;
+  border: 1px solid #b6c2cf;
+  border-left: 4px solid #0f172a;
+  border-radius: 8px;
   padding: 1.25rem 1.5rem;
-  background: rgba(164, 207, 95, 0.07);
+  background: #f8fafc;
   color: var(--text-dim);
   font-size: 0.88rem;
   line-height: 1.75;
 }
 
 .ppp-waiver-legal strong {
-  color: var(--brand-lime);
+  color: #0f172a;
 }
 
 .ppp-waiver-legal p + p {
@@ -128,22 +110,15 @@
   gap: 1.2rem;
   width: 100%;
   padding: clamp(1rem, 2vw, 1.35rem);
-  border: 1px solid rgba(164, 207, 95, 0.16);
+  border: 1px solid #d6dee9;
   border-radius: 8px;
-  background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.055), transparent 11rem),
-    linear-gradient(180deg, rgba(16, 21, 33, 0.94), rgba(9, 13, 22, 0.97));
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
   overflow: hidden;
 }
 
 .ppp-waiver-section::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, var(--brand-lime), var(--brand-peach), var(--brand-pink));
-  opacity: 0.78;
+  display: none;
 }
 
 .ppp-waiver-section-head {
@@ -153,34 +128,24 @@
   gap: 0.75rem;
   margin: calc(clamp(1rem, 2vw, 1.35rem) * -1) calc(clamp(1rem, 2vw, 1.35rem) * -1) 0;
   padding: 0.82rem clamp(1rem, 2vw, 1.35rem);
-  border-bottom: 1px solid var(--rim);
-  background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.18), rgba(251, 174, 123, 0.1) 48%, rgba(255, 45, 120, 0.09)),
-    linear-gradient(180deg, rgba(244, 247, 251, 0.055), rgba(244, 247, 251, 0.015));
-  box-shadow: inset 0 -1px 0 rgba(244, 247, 251, 0.035);
+  border-bottom: 1px solid #d6dee9;
+  background: #f8fafc;
+  box-shadow: none;
 }
 
 .ppp-waiver-section-head::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--brand-lime), var(--brand-peach), var(--brand-pink));
-  opacity: 0.76;
-  box-shadow: 0 0 14px rgba(164, 207, 95, 0.35);
+  display: none;
 }
 
 .ppp-waiver-section-head span {
   min-width: 2.5rem;
   padding: 0.25rem 0.62rem;
-  border: 1px solid rgba(164, 207, 95, 0.48);
+  border: 1px solid #0f172a;
   border-radius: 4px;
-  background: rgba(5, 8, 16, 0.72);
-  color: var(--brand-lime);
-  box-shadow: inset 0 0 14px rgba(164, 207, 95, 0.08), 0 0 16px rgba(164, 207, 95, 0.1);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: none;
+  font-family: inherit;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -190,11 +155,11 @@
 .ppp-waiver-section-head h2 {
   margin: 0;
   color: var(--text);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-family: inherit;
   font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-section-note {
@@ -230,12 +195,12 @@
 
 .ppp-waiver-field-grid label > span,
 .ppp-waiver-label {
-  color: var(--text-dim);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-field-grid input,
@@ -246,11 +211,16 @@
   border: 1px solid var(--rim);
   border-radius: 6px;
   padding: 0.72rem 0.9rem;
-  background: rgba(16, 21, 33, 0.92);
-  color: var(--text);
+  background: #ffffff;
+  color: #0f172a;
   font: inherit;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ppp-waiver-field-grid input::placeholder,
+.ppp-waiver-field-grid textarea::placeholder {
+  color: #64748b;
 }
 
 .ppp-waiver-field-grid select {
@@ -266,7 +236,7 @@
 .ppp-waiver-field-grid select:focus,
 .ppp-waiver-field-grid textarea:focus {
   border-color: var(--brand-lime);
-  box-shadow: 0 0 0 3px rgba(164, 207, 95, 0.12), inset 0 0 12px rgba(164, 207, 95, 0.04);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
 }
 
 .ppp-waiver-dob-row {
@@ -287,23 +257,23 @@
 
 .ppp-waiver-date-today {
   justify-self: start;
-  border: 1px solid rgba(164, 207, 95, 0.35);
-  border-radius: 999px;
+  border: 1px solid #64748b;
+  border-radius: 6px;
   padding: 0.72rem 0.9rem;
-  background: rgba(164, 207, 95, 0.08);
-  color: var(--brand-lime);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 0.74rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .ppp-waiver-date-today:hover {
-  border-color: var(--brand-lime);
-  background: rgba(164, 207, 95, 0.14);
+  border-color: #0f172a;
+  background: #f1f5f9;
 }
 
 .ppp-waiver-medical-row {
@@ -320,10 +290,9 @@
 .ppp-waiver-family-card {
   overflow: hidden;
   border: 1px solid var(--rim);
-  border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgba(22, 29, 43, 0.86), rgba(16, 21, 33, 0.94));
-  box-shadow: inset 0 1px 0 rgba(244, 247, 251, 0.035);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
 }
 
 .ppp-waiver-family-card__head {
@@ -337,18 +306,18 @@
 }
 
 .ppp-waiver-family-card--adult .ppp-waiver-family-card__head {
-  border-left: 4px solid var(--brand-lime);
+  border-left: 4px solid #14532d;
 }
 
 .ppp-waiver-family-card--minor .ppp-waiver-family-card__head {
-  border-left: 4px solid var(--brand-pink);
+  border-left: 4px solid #7f1d1d;
 }
 
 .ppp-waiver-family-card__head strong {
   color: var(--text);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: inherit;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-family-card__head div {
@@ -358,22 +327,22 @@
 }
 
 .ppp-waiver-family-card__head span {
-  border: 1px solid rgba(164, 207, 95, 0.32);
+  border: 1px solid #94a3b8;
   border-radius: 4px;
   padding: 0.18rem 0.6rem;
-  color: var(--brand-lime);
-  background: rgba(164, 207, 95, 0.09);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  color: #0f172a;
+  background: #ffffff;
+  font-family: inherit;
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-family-card--minor .ppp-waiver-family-card__head span {
-  border-color: rgba(255, 45, 120, 0.28);
-  color: var(--brand-pink);
-  background: rgba(255, 45, 120, 0.08);
+  border-color: #94a3b8;
+  color: #0f172a;
+  background: #ffffff;
 }
 
 .ppp-waiver-family-card__head button,
@@ -381,20 +350,20 @@
   border: 1px solid var(--rim);
   border-radius: 4px;
   padding: 0.28rem 0.75rem;
-  background: transparent;
-  color: var(--text-dim);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  background: #ffffff;
+  color: #334155;
+  font-family: inherit;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   cursor: pointer;
 }
 
 .ppp-waiver-family-card__head button:hover,
 .ppp-waiver-signature-foot button:hover {
-  border-color: var(--brand-pink);
-  color: var(--brand-pink);
-  background: rgba(255, 45, 120, 0.08);
+  border-color: #7f1d1d;
+  color: #7f1d1d;
+  background: #fff1f2;
 }
 
 .ppp-waiver-family-card .ppp-waiver-field-grid {
@@ -415,22 +384,22 @@
 .ppp-waiver-add-row button {
   border-radius: 6px;
   padding: 0.58rem 1.15rem;
-  background: transparent;
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  background: #ffffff;
+  font-family: inherit;
   font-size: 0.86rem;
   font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-add-row__adult {
-  border: 1.5px dashed rgba(164, 207, 95, 0.5);
-  color: var(--brand-lime);
+  border: 1px solid #14532d;
+  color: #14532d;
 }
 
 .ppp-waiver-add-row__minor {
-  border: 1.5px dashed rgba(255, 45, 120, 0.45);
-  color: var(--brand-pink);
+  border: 1px solid #7f1d1d;
+  color: #7f1d1d;
 }
 
 .ppp-waiver-family-summary {
@@ -447,22 +416,22 @@
 }
 
 .ppp-waiver-family-summary small {
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-family: inherit;
   font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-family-summary span {
   display: inline-flex;
   gap: 0.45rem;
   align-items: center;
-  border: 1px solid rgba(251, 174, 123, 0.38);
-  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
   padding: 0.22rem 0.75rem;
   background: var(--panel-2);
   color: var(--brand-peach);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-family: inherit;
   font-weight: 800;
 }
 
@@ -477,20 +446,20 @@
   border: 1px solid var(--rim);
   border-radius: 5px;
   padding: 0.32rem 0.68rem;
-  background: var(--panel);
+  background: #ffffff;
   color: var(--text-dim);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-family: inherit;
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-chips button.is-selected {
-  border-color: var(--brand-lime);
-  color: var(--brand-lime);
-  background: rgba(164, 207, 95, 0.09);
-  box-shadow: 0 0 10px rgba(164, 207, 95, 0.2);
+  border-color: #0f172a;
+  color: #ffffff;
+  background: #0f172a;
+  box-shadow: none;
 }
 
 .ppp-waiver-checks {
@@ -506,7 +475,7 @@
   border: 1px solid var(--rim);
   border-radius: 8px;
   padding: 1rem 1.1rem;
-  background: var(--panel);
+  background: #ffffff;
   color: var(--text-dim);
   font-size: 0.9rem;
   line-height: 1.6;
@@ -514,8 +483,8 @@
 
 .ppp-waiver-checks label.is-checked,
 .ppp-waiver-final label.is-checked {
-  border-color: rgba(164, 207, 95, 0.36);
-  background: rgba(164, 207, 95, 0.06);
+  border-color: #14532d;
+  background: #f0fdf4;
   color: var(--text);
 }
 
@@ -536,7 +505,7 @@
   height: 136px;
   border: 1px dashed var(--rim-2);
   border-radius: 6px;
-  background: #080c14;
+  background: #ffffff;
   cursor: crosshair;
   overflow: hidden;
 }
@@ -555,11 +524,11 @@
   display: grid;
   place-items: center;
   color: var(--text-ghost);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-family: inherit;
   font-style: normal;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   pointer-events: none;
 }
 
@@ -572,10 +541,10 @@
 }
 
 .ppp-waiver-final {
-  border: 1px solid rgba(251, 174, 123, 0.24);
-  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   padding: 1.15rem;
-  background: rgba(251, 174, 123, 0.06);
+  background: #f8fafc;
 }
 
 .ppp-waiver-submit {
@@ -592,49 +561,41 @@
   gap: 0.75rem;
   width: 100%;
   padding: 0.85rem;
-  border: 1px solid rgba(5, 8, 16, 0.5);
-  border-radius: 12px;
-  background: rgba(5, 8, 16, 0.72);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(8px);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-shadow: none;
 }
 
 .ppp-waiver-submit button {
   position: relative;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid #0f172a;
   border-radius: 8px;
   padding: 1rem 2.5rem;
-  background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.94), rgba(251, 174, 123, 0.94), rgba(255, 45, 120, 0.94)),
-    #050810;
+  background: #0f172a;
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.58);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 14px 30px rgba(0, 0, 0, 0.3),
-    0 0 34px rgba(164, 207, 95, 0.16);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 1.08rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-shadow: none;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
   cursor: pointer;
 }
 
 .ppp-waiver-submit .ppp-waiver-reset {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(5, 8, 16, 0.82);
-  color: #ffffff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 12px 26px rgba(0, 0, 0, 0.26);
+  border-color: #64748b;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: none;
 }
 
 .ppp-waiver-submit .ppp-waiver-reset:hover {
-  border-color: var(--brand-peach);
-  color: #ffffff;
-  background: rgba(16, 21, 33, 0.96);
+  border-color: #0f172a;
+  color: #0f172a;
+  background: #f1f5f9;
 }
 
 .ppp-waiver-submit button:disabled {
@@ -643,11 +604,11 @@
 }
 
 .ppp-waiver-submit a {
-  color: var(--brand-lime);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  color: #0f172a;
+  font-family: inherit;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .ppp-waiver-submit p {
@@ -658,11 +619,11 @@
 
 .ppp-waiver-error {
   margin: 0;
-  border: 1px solid rgba(255, 45, 120, 0.38);
+  border: 1px solid #7f1d1d;
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  background: rgba(255, 45, 120, 0.1);
-  color: #ff8bb6;
+  background: #fef2f2;
+  color: #7f1d1d;
   font-weight: 800;
 }
 
@@ -671,29 +632,20 @@
   bottom: 1rem;
   z-index: 2;
   justify-self: center;
-  border: 1px solid rgba(164, 207, 95, 0.45);
+  border: 1px solid #14532d;
   border-radius: 8px;
   padding: 0.85rem 1.35rem;
-  background: rgba(164, 207, 95, 0.12);
-  color: var(--brand-lime);
-  backdrop-filter: blur(8px);
-  font-family: "Barlow Condensed", Impact, sans-serif;
+  background: #f0fdf4;
+  color: #14532d;
+  backdrop-filter: none;
+  font-family: inherit;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
 }
 
 @media (max-width: 640px) {
   .ppp-waiver-layout {
     width: min(100% - 24px, 860px);
-  }
-
-  .ppp-waiver-page::before {
-    background-position: center top;
-    opacity: 0.24;
-  }
-
-  .ppp-waiver-layout::before {
-    inset: 7.75rem -0.35rem 2rem;
   }
 
   .ppp-waiver-field-grid {

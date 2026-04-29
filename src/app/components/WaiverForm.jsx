@@ -83,8 +83,6 @@ const EMPTY_CHECKS = {
 };
 
 const DEFAULT_COPY = {
-  waiverBackgroundImage:
-    "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png",
   legalIntro:
     "<strong>Read carefully before signing.</strong> Pixel Pulse Play operates next-generation interactive physical gaming attractions in Vaughan, Ontario including Laser Maze, Edge Climb, Hexa Quest, Shoot It Out, T-Rex Heist, Tile Hunt, Maze Gate, Soccer Challenge, and more.",
   legalRelease:
@@ -183,11 +181,6 @@ function configuredBoolean(content = {}, key, fallback = true) {
   const raw = content[key];
   if (raw === undefined || raw === "") return fallback;
   return !["false", "0", "no", "hide", "hidden"].includes(String(raw).trim().toLowerCase());
-}
-
-function backgroundImageValue(value = "") {
-  const image = String(value || "").replace(/["\\]/g, "");
-  return image ? `url("${image}")` : "";
 }
 
 function HtmlText({ html }) {
@@ -443,7 +436,6 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   const showPartyFields = configuredBoolean(waiverContent, "showPartyFields", true);
   const showVisitTimeField = configuredBoolean(waiverContent, "showVisitTimeField", true);
   const showPhotoConsent = configuredBoolean(waiverContent, "showPhotoConsent", true);
-  const waiverBackgroundImage = configuredText(waiverContent, "waiverBackgroundImage");
 
   const namedFamily = useMemo(
     () => familyMembers.filter((member) => member.firstName || member.lastName),
@@ -471,7 +463,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       context.lineWidth = 2;
       context.lineCap = "round";
       context.lineJoin = "round";
-      context.strokeStyle = "#a4cf5f";
+      context.strokeStyle = "#0f172a";
     }
 
     resizeCanvas();
@@ -606,7 +598,6 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   return (
     <form
       className="ppp-waiver-form"
-      style={{ "--waiver-form-background-image": backgroundImageValue(waiverBackgroundImage) }}
       onSubmit={handleSubmit}
     >
       <div className="ppp-waiver-legal">

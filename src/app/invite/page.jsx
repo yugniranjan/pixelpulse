@@ -136,6 +136,18 @@ export default async function InvitePage() {
       <section className="ppp-invite-card" aria-labelledby="invite-title">
         <div className="ppp-invite-card__shine" aria-hidden="true" />
         <div className="ppp-invite-card__content">
+          <div className="ppp-invite-balloons" aria-hidden="true">
+            <span className="ppp-invite-balloon ppp-invite-balloon--one" />
+            <span className="ppp-invite-balloon ppp-invite-balloon--two" />
+            <span className="ppp-invite-balloon ppp-invite-balloon--three" />
+            <span className="ppp-invite-balloon ppp-invite-balloon--four" />
+            <span className="ppp-invite-balloon ppp-invite-balloon--five" />
+          </div>
+          <div className="ppp-invite-stars" aria-hidden="true">
+            <span className="ppp-invite-star ppp-invite-star--one" />
+            <span className="ppp-invite-star ppp-invite-star--two" />
+            <span className="ppp-invite-star ppp-invite-star--three" />
+          </div>
           <div className="ppp-invite-topline">
             <Image
               src="/assets/images/logo.png"
@@ -145,7 +157,7 @@ export default async function InvitePage() {
               className="ppp-invite-logo"
               style={{ height: "auto" }}
             />
-            <p className="ppp-invite-eyebrow">{invite.eyebrow}</p>
+            {invite.eyebrow ? <p className="ppp-invite-eyebrow">{invite.eyebrow}</p> : null}
           </div>
           <TextLines text={invite.greeting} className="ppp-invite-greeting" />
           <div className="ppp-invite-hero-copy">
