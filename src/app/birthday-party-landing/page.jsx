@@ -334,8 +334,6 @@ export default async function BirthdayPartyLandingPage() {
               </a>
             </div>
 
-            <p className="ppp-birthday-urgency">{urgency}</p>
-
             <div className="ppp-birthday-stats" aria-label="Birthday party highlights">
               {stats.map((item) => (
                 <div key={`${item.value || item.number}-${item.label || item.text}`}>
@@ -345,7 +343,7 @@ export default async function BirthdayPartyLandingPage() {
               ))}
             </div>
           </div>
-          <BirthdayHeroContactForm />
+          <BirthdayHeroContactForm urgency={urgency} />
         </div>
       </section>
 

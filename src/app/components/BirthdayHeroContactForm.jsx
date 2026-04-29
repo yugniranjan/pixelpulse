@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -10,11 +11,11 @@ const INITIAL_FORM = {
   message: "",
 };
 
-export default function BirthdayHeroContactForm() {
+export default function BirthdayHeroContactForm({ urgency = "" }) {
+  const router = useRouter();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
-  const [sent, setSent] = useState(false);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -25,7 +26,6 @@ export default function BirthdayHeroContactForm() {
     event.preventDefault();
     setSubmitting(true);
     setStatus("Sending your party request...");
-    setSent(false);
 
     try {
       const response = await fetch("/api/email", {
@@ -47,8 +47,9 @@ export default function BirthdayHeroContactForm() {
       }
 
       setFormData(INITIAL_FORM);
-      setSent(true);
       setStatus("Thanks. We received your birthday party request.");
+      window.sessionStorage.setItem("pppContactEmail", formData.email);
+      router.push("/contactus/thank-you");
     } catch (error) {
       setStatus("We could not send this request. Please try again.");
     } finally {
@@ -127,9 +128,11 @@ export default function BirthdayHeroContactForm() {
         {submitting ? "Sending..." : "Send Birthday Request"}
       </button>
 
-      <p className={sent ? "is-success" : ""} aria-live="polite">
+      <p aria-live="polite">
         {status || "We will follow up with birthday package availability."}
       </p>
+
+      {urgency ? <p className="ppp-birthday-urgency">{urgency}</p> : null}
     </form>
   );
 }
