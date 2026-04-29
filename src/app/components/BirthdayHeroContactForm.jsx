@@ -58,7 +58,12 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
   }
 
   return (
-    <form className="ppp-birthday-hero-form" onSubmit={handleSubmit} aria-busy={submitting}>
+    <form
+      className="ppp-birthday-hero-form"
+      id="birthday-party-form"
+      onSubmit={handleSubmit}
+      aria-busy={submitting}
+    >
       <div className="ppp-birthday-hero-form__head">
         <p>Plan the party</p>
         <h2>Get a birthday callback</h2>

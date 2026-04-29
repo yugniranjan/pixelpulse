@@ -4,7 +4,7 @@ import "../styles/birthday-landing.css";
 import Image from "next/image";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
+import { fetchMenuData, fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
 
 const LOCATION_SLUG = "vaughan";
@@ -17,28 +17,6 @@ const FALLBACK_META_TITLE = "Birthday Party Offer | Pixel Pulse Play Vaughan";
 const FALLBACK_META_DESCRIPTION =
   "Book a high-energy Pixel Pulse Play birthday party in Vaughan and claim up to $50 off limited discounted slots.";
 const FALLBACK_CANONICAL = "https://www.pixelpulseplay.ca/birthday-party-landing";
-const FALLBACK_STATS = [
-  { value: "100+", label: "Parties hosted" },
-  { value: "5-star", label: "Rated experience" },
-  { value: "Fully managed", label: "Events" },
-];
-const FALLBACK_PROOF_CARDS = [
-  {
-    number: "01",
-    title: "High-energy games",
-    text: "Interactive challenges keep the group moving, laughing, and playing together.",
-  },
-  {
-    number: "02",
-    title: "Hosted party flow",
-    text: "Game time and celebration time are structured so the day feels easy.",
-  },
-  {
-    number: "03",
-    title: "Party-room ready",
-    text: "Packages include the essentials families need for a smooth celebration.",
-  },
-];
 
 async function getBirthdayConfigData() {
   try {
@@ -51,6 +29,16 @@ async function getBirthdayConfigData() {
 
 async function getBirthdayLandingData() {
   try {
+    const freshRows = await fetchsheetdataNoCache(LANDING_PAGES_SHEET);
+    const filteredRows = freshRows.filter((row) => {
+      const location = String(row.location ?? "");
+      return location.includes(LOCATION_SLUG) || location === "";
+    });
+
+    if (filteredRows.length) {
+      return filteredRows;
+    }
+
     return await fetchsheetdata(LANDING_PAGES_SHEET, LOCATION_SLUG);
   } catch (error) {
     console.error("birthday landing sheet failed:", error);
@@ -77,7 +65,7 @@ export async function generateMetadata() {
   );
   const image = getConfiguredValue(
     landingData,
-    ["birthdayLandingHeroImage", "partyLandingHeroImage"],
+    ["birthdayLandingHeroImage", "birthdayLandingImage", "partyLandingHeroImage", "partyLandingImage"],
     HERO_IMAGE,
   );
   const imageAlt = getConfiguredValue(
@@ -149,17 +137,13 @@ function getPackageHighlights(packagesData) {
   const packages = Array.isArray(packagesData?.packages) ? packagesData.packages : [];
 
   if (!packages.length) {
-    return [
-      { name: "Pixel Punch", price: "$399", detail: "Up to 8 players" },
-      { name: "Pixel Ultra", price: "$499", detail: "Up to 12 players" },
-      { name: "Pixel Jumbo", price: "$799+", detail: "Up to 20 players" },
-    ];
+    return [];
   }
 
   return packages.slice(0, 3).map((item) => ({
     name: item.name,
     price: item["Package Price"],
-    detail: item["Number of Participants"] || item["Game Time Included"] || "Party package",
+    detail: item["Number of Participants"] || item["Game Time Included"] || "",
   }));
 }
 
@@ -171,7 +155,7 @@ function getAttractions(menuData = []) {
     .filter((item) => item?.isactive == 1)
     .map((item) => ({
       title: item.title || item.desc,
-      text: item.smalltext || item.metadescription || "A fast-paced Pixel Pulse challenge.",
+      text: item.smalltext || item.metadescription || "",
       image: item.smallimage || item.icon || item.headerimage || ATTRACTION_FALLBACK_IMAGE,
     }));
 }
@@ -194,118 +178,127 @@ export default async function BirthdayPartyLandingPage() {
   const attractions = getAttractions(menuData);
   const heroImage = getConfiguredValue(
     landingData,
-    ["birthdayLandingHeroImage", "partyLandingHeroImage"],
+    ["birthdayLandingHeroImage", "birthdayLandingImage", "partyLandingHeroImage", "partyLandingImage"],
     HERO_IMAGE,
   );
   const headline = getConfiguredValue(
     landingData,
     ["birthdayLandingHeadline", "partyLandingHeadline"],
-    "Book Your Birthday Today & Get Up to $50 OFF",
+    "",
   );
   const eyebrow = getConfiguredValue(
     landingData,
     ["birthdayLandingEyebrow", "partyLandingEyebrow"],
-    "Pixel Pulse Play Birthday Parties",
+    "",
   );
   const subheadline = getConfiguredValue(
     landingData,
     ["birthdayLandingSubheadline", "partyLandingSubheadline"],
-    "High-energy games. Non-stop excitement. Zero stress for you. We handle everything while you enjoy the celebration.",
+    "",
   );
   const ctaText = getConfiguredValue(
     landingData,
     ["birthdayLandingCtaText", "partyLandingCtaText"],
-    "Claim My $50 OFF Slot NOW",
+    "",
   );
   const urgency = getConfiguredValue(
     landingData,
     ["birthdayLandingUrgency", "partyLandingUrgency"],
-    "Limited discounted slots available.",
+    "",
   );
   const secondaryCtaText = getConfiguredValue(
     landingData,
     ["birthdayLandingSecondaryCtaText", "partyLandingSecondaryCtaText"],
-    "View Packages",
+    "",
   );
   const stats = getConfiguredItems(
     landingData,
     ["birthdayLandingStats", "partyLandingStats"],
-    FALLBACK_STATS,
+    [],
   );
   const attractionsEyebrow = getConfiguredValue(
     landingData,
     ["birthdayLandingAttractionsEyebrow", "partyLandingAttractionsEyebrow"],
-    "Birthday Game Arena",
+    "",
   );
   const attractionsTitle = getConfiguredValue(
     landingData,
     ["birthdayLandingAttractionsTitle", "partyLandingAttractionsTitle"],
-    "This Isn't a Party. It's a Playground of Challenges.",
+    "",
   );
   const attractionsText = getConfiguredValue(
     landingData,
     ["birthdayLandingAttractionsText", "partyLandingAttractionsText"],
-    "Interactive, competitive, and insanely fun experiences that keep everyone engaged from start to finish.",
+    "",
   );
   const attractionsCtaText = getConfiguredValue(
     landingData,
     ["birthdayLandingAttractionsCtaText", "partyLandingAttractionsCtaText"],
-    "See Available Slots & Unlock $50 OFF",
+    "",
   );
   const attractionsCtaButtonText = getConfiguredValue(
     landingData,
     ["birthdayLandingAttractionsCtaButtonText", "partyLandingAttractionsCtaButtonText"],
-    "See Available Slots",
+    "",
   );
   const proofEyebrow = getConfiguredValue(
     landingData,
     ["birthdayLandingProofEyebrow", "partyLandingProofEyebrow"],
-    "Why Parents Book",
+    "",
   );
   const proofTitle = getConfiguredValue(
     landingData,
     ["birthdayLandingProofTitle", "partyLandingProofTitle"],
-    "All the birthday energy. None of the party stress.",
+    "",
   );
   const proofCards = getConfiguredItems(
     landingData,
     ["birthdayLandingProofCards", "partyLandingProofCards"],
-    FALLBACK_PROOF_CARDS,
+    [],
   );
   const packagesEyebrow = getConfiguredValue(
     landingData,
     ["birthdayLandingPackagesEyebrow", "partyLandingPackagesEyebrow"],
-    "Birthday Packages",
+    "",
   );
   const packagesTitle = getConfiguredValue(
     landingData,
     ["birthdayLandingPackagesTitle", "partyLandingPackagesTitle"],
-    "Pick your party size and lock in the date.",
+    "",
   );
   const packageLabel = getConfiguredValue(
     landingData,
     ["birthdayLandingPackageLabel", "partyLandingPackageLabel"],
-    "Package",
+    "",
   );
   const featuredPackageLabel = getConfiguredValue(
     landingData,
     ["birthdayLandingFeaturedPackageLabel", "partyLandingFeaturedPackageLabel"],
-    "Most Popular",
+    "",
   );
   const finalEyebrow = getConfiguredValue(
     landingData,
     ["birthdayLandingFinalEyebrow", "partyLandingFinalEyebrow"],
-    "Ready to lock it in?",
+    "",
   );
   const finalTitle = getConfiguredValue(
     landingData,
     ["birthdayLandingFinalTitle", "partyLandingFinalTitle"],
-    "Claim your birthday slot before discounted times are gone.",
+    "",
   );
+  const finalButtonText = getConfiguredValue(
+    landingData,
+    ["birthdayLandingFinalButtonText", "partyLandingFinalAnchorText", "partyLandingFinalButtonText"],
+    "",
+  );
+  const hasFinalSection = finalEyebrow || finalTitle || finalButtonText;
 
   return (
     <main className="ppp-birthday-landing">
-      <section className="ppp-birthday-hero" aria-labelledby="birthday-landing-title">
+      <section
+        className="ppp-birthday-hero"
+        aria-labelledby={headline ? "birthday-landing-title" : undefined}
+      >
         <Image
           className="ppp-birthday-hero__background"
           src={heroImage}
@@ -324,25 +317,40 @@ export default async function BirthdayPartyLandingPage() {
         </div>
         <div className="ppp-birthday-shell ppp-birthday-hero__grid">
           <div className="ppp-birthday-hero__copy">
-            <p className="ppp-birthday-eyebrow">{eyebrow}</p>
-            <h1 id="birthday-landing-title">{headline}</h1>
-            <p className="ppp-birthday-hero__text">{subheadline}</p>
+            <Image
+              className="ppp-birthday-hero__logo"
+              src="/assets/images/logoD.png"
+              alt="Pixel Pulse Play"
+              width={220}
+              height={82}
+              style={{ height: "auto" }}
+              priority
+            />
+            {eyebrow ? <p className="ppp-birthday-eyebrow">{eyebrow}</p> : null}
+            {headline ? <h1 id="birthday-landing-title">{headline}</h1> : null}
+            {subheadline ? <p className="ppp-birthday-hero__text">{subheadline}</p> : null}
 
-            <div className="ppp-birthday-actions">
-              <BookingButton title={ctaText} bookingType="party" />
-              <a href="#packages" className="ppp-birthday-secondary-link">
-                {secondaryCtaText}
-              </a>
-            </div>
+            {ctaText || secondaryCtaText ? (
+              <div className="ppp-birthday-actions">
+                {ctaText ? <BookingButton title={ctaText} bookingType="party" /> : null}
+                {secondaryCtaText ? (
+                  <a href="#packages" className="ppp-birthday-secondary-link">
+                    {secondaryCtaText}
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
 
-            <div className="ppp-birthday-stats" aria-label="Birthday party highlights">
-              {stats.map((item) => (
-                <div key={`${item.value || item.number}-${item.label || item.text}`}>
-                  <strong>{item.value || item.number}</strong>
-                  <span>{item.label || item.text}</span>
-                </div>
-              ))}
-            </div>
+            {stats.length ? (
+              <div className="ppp-birthday-stats" aria-label="Birthday party highlights">
+                {stats.map((item) => (
+                  <div key={`${item.value || item.number}-${item.label || item.text}`}>
+                    {item.value || item.number ? <strong>{item.value || item.number}</strong> : null}
+                    {item.label || item.text ? <span>{item.label || item.text}</span> : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
           <BirthdayHeroContactForm urgency={urgency} />
         </div>
@@ -422,15 +430,21 @@ export default async function BirthdayPartyLandingPage() {
         </div>
       </section>
 
-      <section className="ppp-birthday-final">
-        <div className="ppp-birthday-shell ppp-birthday-final__inner">
-          <div>
-            <p className="ppp-birthday-eyebrow">{finalEyebrow}</p>
-            <h2>{finalTitle}</h2>
+      {hasFinalSection ? (
+        <section className="ppp-birthday-final">
+          <div className="ppp-birthday-shell ppp-birthday-final__inner">
+            <div>
+              {finalEyebrow ? <p className="ppp-birthday-eyebrow">{finalEyebrow}</p> : null}
+              {finalTitle ? <h2>{finalTitle}</h2> : null}
+            </div>
+            {finalButtonText ? (
+              <a className="ppp-birthday-final__button" href="#birthday-party-form">
+                {finalButtonText}
+              </a>
+            ) : null}
           </div>
-          <BookingButton title={ctaText} bookingType="party" />
-        </div>
-      </section>
+        </section>
+      ) : null}
     </main>
   );
 }

@@ -78,7 +78,20 @@ export function getRowValue(row = {}, keys = []) {
 }
 
 export function getConfiguredValue(sources = [], keys = [], fallback = "") {
-  const sourceList = Array.isArray(sources) ? sources : [sources];
+  const isConfigRowArray =
+    Array.isArray(sources) &&
+    sources.some(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        !Array.isArray(item) &&
+        Object.prototype.hasOwnProperty.call(item, "key"),
+    );
+  const sourceList = isConfigRowArray
+    ? [sources]
+    : Array.isArray(sources)
+      ? sources
+      : [sources];
 
   for (const source of sourceList) {
     if (!hasConfiguredKey(source, keys)) {
