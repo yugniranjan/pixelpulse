@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import "../styles/birthday-landing.css";
 import Image from "next/image";
+import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
@@ -344,6 +345,7 @@ export default async function BirthdayPartyLandingPage() {
               ))}
             </div>
           </div>
+          <BirthdayHeroContactForm />
         </div>
       </section>
 

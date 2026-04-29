@@ -5,24 +5,23 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 16% 10%, rgba(164, 207, 95, 0.24) 0, transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(255, 45, 120, 0.18) 0, transparent 32%),
-    radial-gradient(circle at 48% 52%, rgba(251, 174, 123, 0.13) 0, transparent 34%),
+    linear-gradient(120deg, rgba(164, 207, 95, 0.16) 0 18%, transparent 18% 52%, rgba(255, 45, 120, 0.12) 52% 72%, transparent 72%),
+    linear-gradient(238deg, rgba(251, 174, 123, 0.16) 0 22%, transparent 22% 58%, rgba(41, 196, 178, 0.14) 58% 78%, transparent 78%),
     repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.045) 0,
-      rgba(255, 255, 255, 0.045) 1px,
+      100deg,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 1px,
       transparent 1px,
-      transparent 92px
+      transparent 86px
     ),
     repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.034) 0,
-      rgba(255, 255, 255, 0.034) 1px,
+      10deg,
+      rgba(255, 255, 255, 0.026) 0,
+      rgba(255, 255, 255, 0.026) 1px,
       transparent 1px,
-      transparent 92px
+      transparent 72px
     ),
-    linear-gradient(180deg, #07101d 0%, #101a2a 42%, #070b14 100%);
+    linear-gradient(180deg, #18313a 0%, #27223f 36%, #381d32 68%, #17312d 100%);
   color: #ffffff;
   font-family: var(--birthday-font-body);
   text-rendering: geometricPrecision;
@@ -42,13 +41,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 720px;
+  min-height: 780px;
   padding: 56px 0;
   isolation: isolate;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 12%, rgba(164, 207, 95, 0.22) 0, transparent 34%),
-    linear-gradient(135deg, rgba(7, 16, 29, 0.92), rgba(18, 30, 46, 0.42));
 }
 
 .ppp-birthday-hero::before {
@@ -67,9 +63,8 @@
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 50% 42%, rgba(164, 207, 95, 0.18) 0, transparent 32%),
-    linear-gradient(90deg, rgba(5, 8, 16, 0.74) 0%, rgba(5, 8, 16, 0.56) 46%, rgba(5, 8, 16, 0.14) 100%),
-    linear-gradient(180deg, rgba(5, 8, 16, 0.04), rgba(5, 8, 16, 0.74));
+    linear-gradient(118deg, rgba(24, 49, 58, 0.86) 0%, rgba(39, 34, 63, 0.64) 48%, rgba(56, 29, 50, 0.28) 100%),
+    linear-gradient(180deg, rgba(24, 49, 58, 0.12), rgba(23, 49, 45, 0.72));
 }
 
 .ppp-birthday-hero__background {
@@ -88,26 +83,158 @@
 .ppp-birthday-hero__grid {
   position: relative;
   z-index: 1;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+  gap: clamp(1rem, 2vw, 1.6rem);
+  align-items: stretch;
 }
 
 .ppp-birthday-hero__copy {
   display: grid;
-  justify-items: center;
+  justify-items: flex-start;
   gap: 18px;
   width: 100%;
   padding: clamp(1.35rem, 3.4vw, 3rem);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(11, 19, 32, 0.82), rgba(17, 28, 44, 0.7)),
-    rgba(8, 13, 23, 0.72);
+    linear-gradient(145deg, rgba(24, 49, 58, 0.84), rgba(56, 29, 50, 0.66)),
+    rgba(28, 35, 52, 0.72);
   box-shadow:
     0 28px 70px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  text-align: center;
+  text-align: left;
   backdrop-filter: blur(10px);
+}
+
+.ppp-birthday-hero-form {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  padding: clamp(1.1rem, 2vw, 1.45rem);
+  border: 1px solid rgba(251, 174, 123, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(150deg, rgba(251, 174, 123, 0.18), rgba(41, 196, 178, 0.1) 48%, rgba(255, 45, 120, 0.13)),
+    rgba(245, 250, 246, 0.1);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.ppp-birthday-hero-form::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, #a4cf5f, #fbae7b, #ff2d78);
+}
+
+.ppp-birthday-hero-form__head {
+  position: relative;
+  z-index: 1;
+}
+
+.ppp-birthday-hero-form__head p {
+  margin: 0;
+  color: #a4cf5f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-birthday-hero-form__head h2 {
+  margin: 6px 0 0;
+  color: #ffffff;
+  font-family: var(--birthday-font-display);
+  font-size: 2rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-birthday-hero-form__fields {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ppp-birthday-hero-form label {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  color: rgba(240, 246, 255, 0.8);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ppp-birthday-hero-form__wide {
+  grid-column: 1 / -1;
+}
+
+.ppp-birthday-hero-form input,
+.ppp-birthday-hero-form textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(245, 250, 246, 0.12);
+  color: #ffffff;
+  font: inherit;
+  padding: 11px 12px;
+}
+
+.ppp-birthday-hero-form input:focus,
+.ppp-birthday-hero-form textarea:focus {
+  outline: none;
+  border-color: rgba(251, 174, 123, 0.72);
+  box-shadow: 0 0 0 3px rgba(251, 174, 123, 0.16);
+}
+
+.ppp-birthday-hero-form input::placeholder,
+.ppp-birthday-hero-form textarea::placeholder {
+  color: rgba(240, 246, 255, 0.52);
+}
+
+.ppp-birthday-hero-form textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.ppp-birthday-hero-form button {
+  position: relative;
+  z-index: 1;
+  min-height: 50px;
+  border: 2px solid #fbae7b;
+  border-radius: 8px;
+  background: #fbae7b;
+  color: #101828;
+  font-family: var(--birthday-font-body);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ppp-birthday-hero-form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.ppp-birthday-hero-form > p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: rgba(240, 246, 255, 0.72);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.ppp-birthday-hero-form > p.is-success {
+  color: #a4cf5f;
+  font-weight: 700;
 }
 
 .ppp-birthday-eyebrow {
@@ -202,7 +329,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  width: min(760px, 100%);
+  width: 100%;
 }
 
 .ppp-birthday-stats div,
@@ -529,7 +656,16 @@
   }
 
   .ppp-birthday-hero {
-    min-height: 680px;
+    min-height: 0;
+  }
+
+  .ppp-birthday-hero__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-birthday-hero__copy {
+    justify-items: center;
+    text-align: center;
   }
 
   .ppp-birthday-hero h1 {
@@ -555,9 +691,8 @@
 
   .ppp-birthday-hero::after {
     background:
-      radial-gradient(circle at 50% 20%, rgba(164, 207, 95, 0.16) 0, transparent 34%),
-      linear-gradient(180deg, rgba(5, 8, 16, 0.04) 0%, rgba(5, 8, 16, 0.46) 34%, rgba(5, 8, 16, 0.9) 100%),
-      linear-gradient(90deg, rgba(5, 8, 16, 0.48), rgba(5, 8, 16, 0.18));
+      linear-gradient(180deg, rgba(24, 49, 58, 0.08) 0%, rgba(39, 34, 63, 0.48) 34%, rgba(56, 29, 50, 0.84) 100%),
+      linear-gradient(90deg, rgba(24, 49, 58, 0.52), rgba(23, 49, 45, 0.18));
   }
 
   .ppp-birthday-hero__background {
@@ -582,10 +717,15 @@
   .ppp-birthday-actions,
   .ppp-birthday-actions button,
   .ppp-birthday-secondary-link,
+  .ppp-birthday-hero-form button,
   .ppp-birthday-attraction-cta__actions,
   .ppp-birthday-attraction-cta button,
   .ppp-birthday-final__inner button {
     width: 100%;
+  }
+
+  .ppp-birthday-hero-form__fields {
+    grid-template-columns: 1fr;
   }
 
   .ppp-birthday-urgency {
