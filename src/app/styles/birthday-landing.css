@@ -80,6 +80,121 @@
   transform: scale(1.02);
 }
 
+.ppp-birthday-balloons {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ppp-birthday-balloon {
+  position: absolute;
+  display: block;
+  width: var(--balloon-size, 58px);
+  height: calc(var(--balloon-size, 58px) * 1.25);
+  border-radius: 50% 50% 46% 46%;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.72) 0 8%, transparent 9%),
+    linear-gradient(160deg, var(--balloon-light), var(--balloon-color));
+  box-shadow:
+    inset -10px -12px 18px rgba(0, 0, 0, 0.16),
+    0 14px 28px rgba(0, 0, 0, 0.16);
+  opacity: 0.82;
+  transform: translate3d(0, 115vh, 0) rotate(-4deg);
+  animation: ppp-birthday-balloon-float var(--balloon-duration, 16s) linear infinite;
+}
+
+.ppp-birthday-balloon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 12px;
+  height: 10px;
+  border-radius: 0 0 4px 4px;
+  background: var(--balloon-color);
+  transform: translateX(-50%);
+}
+
+.ppp-birthday-balloon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 2px);
+  width: 1px;
+  height: 90px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent);
+  transform: translateX(-50%);
+}
+
+.ppp-birthday-balloon--one {
+  --balloon-color: #ff2d78;
+  --balloon-light: #ff8fbd;
+  --balloon-size: 58px;
+  --balloon-duration: 17s;
+  left: 7%;
+  animation-delay: -6s;
+}
+
+.ppp-birthday-balloon--two {
+  --balloon-color: #a4cf5f;
+  --balloon-light: #d6f493;
+  --balloon-size: 46px;
+  --balloon-duration: 14s;
+  left: 22%;
+  animation-delay: -11s;
+}
+
+.ppp-birthday-balloon--three {
+  --balloon-color: #fbae7b;
+  --balloon-light: #ffd2aa;
+  --balloon-size: 64px;
+  --balloon-duration: 19s;
+  right: 10%;
+  animation-delay: -3s;
+}
+
+.ppp-birthday-balloon--four {
+  --balloon-color: #29c4b2;
+  --balloon-light: #8be7db;
+  --balloon-size: 50px;
+  --balloon-duration: 15s;
+  right: 24%;
+  animation-delay: -9s;
+}
+
+.ppp-birthday-balloon--five {
+  --balloon-color: #7c5cff;
+  --balloon-light: #b3a2ff;
+  --balloon-size: 42px;
+  --balloon-duration: 18s;
+  left: 48%;
+  animation-delay: -14s;
+}
+
+@keyframes ppp-birthday-balloon-float {
+  0% {
+    transform: translate3d(0, 115vh, 0) rotate(-5deg);
+  }
+
+  25% {
+    transform: translate3d(16px, 72vh, 0) rotate(5deg);
+  }
+
+  50% {
+    transform: translate3d(-10px, 36vh, 0) rotate(-3deg);
+  }
+
+  75% {
+    transform: translate3d(18px, 0, 0) rotate(4deg);
+  }
+
+  100% {
+    transform: translate3d(-8px, -36vh, 0) rotate(-4deg);
+  }
+}
+
 .ppp-birthday-hero__grid {
   position: relative;
   z-index: 1;
@@ -683,6 +798,15 @@
 
   .ppp-birthday-hero__background {
     object-position: 64% center;
+  }
+
+  .ppp-birthday-balloon {
+    opacity: 0.58;
+  }
+
+  .ppp-birthday-balloon--two,
+  .ppp-birthday-balloon--five {
+    display: none;
   }
 
   .ppp-birthday-hero__copy {

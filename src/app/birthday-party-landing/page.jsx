@@ -321,6 +321,13 @@ export default async function BirthdayPartyLandingPage() {
           priority
           sizes="100vw"
         />
+        <div className="ppp-birthday-balloons" aria-hidden="true">
+          <span className="ppp-birthday-balloon ppp-birthday-balloon--one" />
+          <span className="ppp-birthday-balloon ppp-birthday-balloon--two" />
+          <span className="ppp-birthday-balloon ppp-birthday-balloon--three" />
+          <span className="ppp-birthday-balloon ppp-birthday-balloon--four" />
+          <span className="ppp-birthday-balloon ppp-birthday-balloon--five" />
+        </div>
         <div className="ppp-birthday-shell ppp-birthday-hero__grid">
           <div className="ppp-birthday-hero__copy">
             <p className="ppp-birthday-eyebrow">{eyebrow}</p>
