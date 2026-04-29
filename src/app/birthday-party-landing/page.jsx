@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import "../styles/birthday-landing.css";
 import Image from "next/image";
+import Script from "next/script";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
@@ -131,6 +132,82 @@ function parseBirthdayPackages(rows = []) {
 function getConfiguredItems(rows = [], keys = [], fallback = []) {
   const parsed = parseConfigJson(rows, keys);
   return Array.isArray(parsed) && parsed.length ? parsed : fallback;
+}
+
+function cleanGoogleTagId(value = "") {
+  const id = String(value || "").trim();
+  return /^[A-Za-z0-9_-]+$/.test(id) ? id : "";
+}
+
+function getConfiguredTagIds(rows = [], keys = []) {
+  const raw = getConfiguredValue(rows, keys, "");
+  return String(raw || "")
+    .split(/[\n,|]+/)
+    .map(cleanGoogleTagId)
+    .filter(Boolean);
+}
+
+function LandingGoogleTags({ gtmId = "", googleTagIds = [] }) {
+  const cleanGtmId = cleanGoogleTagId(gtmId);
+  const tagIds = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
+  const primaryGoogleTagId = tagIds[0] || "";
+
+  if (!cleanGtmId && !tagIds.length) {
+    return null;
+  }
+
+  return (
+    <>
+      {cleanGtmId ? (
+        <>
+          <Script
+            id="birthday-landing-google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${cleanGtmId}');
+              `,
+            }}
+          />
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${cleanGtmId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        </>
+      ) : null}
+
+      {primaryGoogleTagId ? (
+        <>
+          <Script
+            id="birthday-landing-google-tag-loader"
+            src={`https://www.googletagmanager.com/gtag/js?id=${primaryGoogleTagId}`}
+            strategy="afterInteractive"
+          />
+          <Script
+            id="birthday-landing-google-tag-config"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                ${tagIds.map((id) => `gtag('config', '${id}');`).join("\n")}
+              `,
+            }}
+          />
+        </>
+      ) : null}
+    </>
+  );
 }
 
 function getPackageHighlights(packagesData) {
@@ -291,10 +368,21 @@ export default async function BirthdayPartyLandingPage() {
     ["birthdayLandingFinalButtonText", "partyLandingFinalAnchorText", "partyLandingFinalButtonText"],
     "",
   );
+  const landingGtmId = getConfiguredValue(
+    landingData,
+    ["birthdayLandingGtmId", "birthdayLandingGoogleTagManagerId", "birthdayLandingGoogleTagManager"],
+    "",
+  );
+  const landingGoogleTagIds = getConfiguredTagIds(
+    landingData,
+    ["birthdayLandingGoogleTagId", "birthdayLandingGoogleTagIds", "birthdayLandingGtagId", "birthdayLandingGtagIds"],
+  );
   const hasFinalSection = finalEyebrow || finalTitle || finalButtonText;
 
   return (
-    <main className="ppp-birthday-landing">
+    <>
+      <LandingGoogleTags gtmId={landingGtmId} googleTagIds={landingGoogleTagIds} />
+      <main className="ppp-birthday-landing">
       <section
         className="ppp-birthday-hero"
         aria-labelledby={headline ? "birthday-landing-title" : undefined}
@@ -447,6 +535,7 @@ export default async function BirthdayPartyLandingPage() {
           </div>
         </section>
       ) : null}
-    </main>
+      </main>
+    </>
   );
 }
