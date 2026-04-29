@@ -385,7 +385,9 @@ export default async function BirthdayPartyLandingPage() {
           <div className="ppp-birthday-attraction-cta">
             <p>{attractionsCtaText}</p>
             <div className="ppp-birthday-attraction-cta__actions">
-              <BookingButton title={attractionsCtaButtonText} bookingType="party" />
+              {attractionsCtaButtonText ? (
+                <a href="#birthday-party-form">{attractionsCtaButtonText}</a>
+              ) : null}
             </div>
           </div>
         </div>

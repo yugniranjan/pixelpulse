@@ -672,18 +672,23 @@
   justify-content: flex-end;
 }
 
-.ppp-birthday-attraction-cta button {
+.ppp-birthday-attraction-cta a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 52px;
+  padding: 0 24px;
   border: 2px solid #050810;
   border-radius: 8px;
   background: #050810;
   color: #ffffff;
   font-family: var(--birthday-font-body);
   font-weight: 700;
+  text-decoration: none;
   box-shadow: none;
 }
 
-.ppp-birthday-attraction-cta button:hover {
+.ppp-birthday-attraction-cta a:hover {
   border-color: #111827;
   background: #111827;
   color: #ffffff;
@@ -878,7 +883,7 @@
   .ppp-birthday-secondary-link,
   .ppp-birthday-hero-form button,
   .ppp-birthday-attraction-cta__actions,
-  .ppp-birthday-attraction-cta button,
+  .ppp-birthday-attraction-cta a,
   .ppp-birthday-final__inner button {
     width: 100%;
   }
