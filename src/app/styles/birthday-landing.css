@@ -259,7 +259,7 @@
 }
 
 .ppp-birthday-section-heading {
-  max-width: 780px;
+  max-width: 100%;
   margin-bottom: 24px;
 }
 
@@ -281,6 +281,10 @@
   line-height: 0.98;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.ppp-birthday-attractions .ppp-birthday-section-heading h2 {
+  white-space: nowrap;
 }
 
 .ppp-birthday-card-grid,
@@ -595,6 +599,10 @@
   .ppp-birthday-section-heading h2,
   .ppp-birthday-final__inner h2 {
     font-size: 2.15rem;
+  }
+
+  .ppp-birthday-attractions .ppp-birthday-section-heading h2 {
+    white-space: normal;
   }
 
   .ppp-birthday-attraction-carousel {
