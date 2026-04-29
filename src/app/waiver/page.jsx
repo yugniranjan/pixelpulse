@@ -89,10 +89,13 @@ export default async function WaiverPage({ searchParams }) {
             className="ppp-waiver-heading-logo"
           />
           <SectionHeading mainHeading={true}>
-            {waiverContent.waiverHeroTitle || ""}{" "}
-            <span>{waiverContent.waiverHeroTitleAccent || ""}</span>
+            {waiverContent.waiverHeroTitle || "Pixel Pulse"}{" "}
+            <span>{waiverContent.waiverHeroTitleAccent || "Waiver"}</span>
           </SectionHeading>
-          {waiverContent.waiverHeroText ? <p>{waiverContent.waiverHeroText}</p> : null}
+          <p>
+            {waiverContent.waiverHeroText ||
+              "Add every player before you arrive, including adults and minors. This Vaughan waiver experience is designed for Pixel Pulse Play families, parties, and groups."}
+          </p>
         </div>
 
         <WaiverForm

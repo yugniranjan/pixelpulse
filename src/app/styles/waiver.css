@@ -99,7 +99,7 @@
   z-index: -1;
   border: 1px solid rgba(164, 207, 95, 0.12);
   border-radius: 14px;
-  background: var(--waiver-form-background-image, none) center top / cover no-repeat;
+  background: var(--waiver-form-background-image, url("https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png")) center top / cover no-repeat;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
 }
 

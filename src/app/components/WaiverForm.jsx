@@ -2,6 +2,30 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+const PASS_TYPES = [
+  "Walk-in / General Admission",
+  "Explorer Pass - 30 min",
+  "All-Access Pass - 60 min",
+  "Party Package - 90 min",
+  "Birthday Party Package",
+  "Corporate / Group Event",
+  "School Field Trip",
+  "University Student Special",
+];
+
+const HEALTH_CONDITIONS = [
+  "Not Applicable",
+  "Asthma",
+  "Allergies",
+  "Heart condition",
+  "Epilepsy / seizures",
+  "Diabetes",
+  "Mobility limitation",
+  "Recent injury or surgery",
+  "Pregnancy",
+  "Other",
+];
+
 const MONTHS = [
   ["01", "January"],
   ["02", "February"],
@@ -30,7 +54,7 @@ const EMPTY_PRIMARY = {
   email: "",
   phone: "",
   city: "",
-  healthCondition: "",
+  healthCondition: "Not Applicable",
   medicalNotes: "",
 };
 
@@ -58,17 +82,95 @@ const EMPTY_CHECKS = {
   final: false,
 };
 
+const DEFAULT_COPY = {
+  waiverBackgroundImage:
+    "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png",
+  legalIntro:
+    "<strong>Read carefully before signing.</strong> Pixel Pulse Play operates next-generation interactive physical gaming attractions in Vaughan, Ontario including Laser Maze, Edge Climb, Hexa Quest, Shoot It Out, T-Rex Heist, Tile Hunt, Maze Gate, Soccer Challenge, and more.",
+  legalRelease:
+    "All attractions involve active physical movement. This waiver is a release of liability, assumption of risk, indemnity, medical authorization, and consent agreement. Participants under 18 require a parent or legal guardian to complete this form on their behalf.",
+  primarySectionTitle: "Primary Participant",
+  familySectionTitle: "Additional Family Members",
+  familySectionNote:
+    "Your single signature covers everyone listed. Add every adult and minor entering the active play zones today.",
+  visitSectionTitle: "Visit Details",
+  emergencySectionTitle: "Emergency Contact",
+  termsSectionTitle: "Terms & Acknowledgements",
+  signatureSectionTitle: "Signature",
+  firstNameLabel: "First name *",
+  lastNameLabel: "Last name *",
+  dobLabel: "Date of birth *",
+  genderLabel: "Gender",
+  emailLabel: "Email address *",
+  memberEmailLabel: "Email optional",
+  phoneLabel: "Phone number *",
+  cityLabel: "City / Town *",
+  healthConditionLabel: "Common health condition",
+  medicalNotesLabel: "Medical notes",
+  partyIdLabel: "Party ID",
+  partyIdPlaceholder: "Optional booking or party ID",
+  partyNameLabel: "Party / guest of honor",
+  partyNamePlaceholder: "Optional party name",
+  passTypeLabel: "Pass / Visit type *",
+  passTypePlaceholder: "Select your pass",
+  visitDateLabel: "Visit date *",
+  visitTimeLabel: "Party time",
+  emergencyNameLabel: "Full name *",
+  emergencyRelationLabel: "Relationship *",
+  emergencyRelationPlaceholder: "Select",
+  emergencyPhoneLabel: "Phone number *",
+  signatureLabel: "Draw your signature *",
+  signaturePlaceholder: "Draw signature here",
+  signatureHelp: "Your signature legally covers yourself and all named family members.",
+  clearSignatureButton: "Clear",
+  printNameLabel: "Print full legal name *",
+  signDateLabel: "Date signed *",
+  addAdultButton: "+ Add adult (18+)",
+  addMinorButton: "+ Add minor (under 18)",
+  familySummaryLabel: "Party:",
+  emptyFamilySummary: "No additional family members added yet.",
+  memberTitle: "Member",
+  removeMemberButton: "Remove",
+  linkedPartyPrefix: "This waiver is linked to",
+  linkedPartyFallback: "your party",
+  linkedPartyIdText: "with Party ID",
+  resetButton: "Reset Form",
+  submitButton: "Submit Waiver & Start Playing",
+  submittingButton: "Saving Waiver...",
+  submitFootnote: "Securely recorded · Vaughan, Ontario · pixelpulseplay.ca",
+  signatureRequiredError: "Please draw your signature before submitting.",
+  pastVisitDateError: "Visit date cannot be in the past.",
+  submitError: "Unable to submit waiver. Please check your connection and try again.",
+  saveSuccessPrefix: "Waiver saved. Confirmation:",
+  riskAcknowledgement:
+    "I understand Pixel Pulse Play attractions involve inherent and other risks, including slips, trips, falls, collisions, equipment contact, fast movement, climbing, jumping, running, aiming, sensory stimulation, and the acts or omissions of other participants. I voluntarily assume these risks for myself and all named participants.",
+  liabilityAcknowledgement:
+    "To the fullest extent permitted by applicable law, I release, waive, and discharge Pixel Pulse Play, its owners, directors, officers, employees, contractors, landlords, agents, insurers, successors, and assigns from claims, losses, damages, costs, and expenses arising from participation, including ordinary negligence, on behalf of myself and all named participants.",
+  rulesAcknowledgement:
+    "I agree that all named participants will follow posted rules, attraction guidelines, staff instructions, age/height/weight restrictions, and safety directions. I confirm each participant is physically and medically fit for active gameplay and will stop participating if unsafe, unwell, or instructed by staff.",
+  medicalAcknowledgement:
+    "I authorize Pixel Pulse Play staff to seek emergency medical assistance for myself or any named participant if needed, and I accept responsibility for medical, ambulance, transportation, or related costs not covered by insurance or public health coverage.",
+  guardianAcknowledgement:
+    "I confirm I am the parent, legal guardian, or authorized adult for every participant under 18 listed in this form and have legal authority to sign this waiver, release, and consent on their behalf.",
+  privacyAcknowledgement:
+    "I consent to Pixel Pulse Play collecting, using, storing, and disclosing the information in this form as reasonably needed to administer waivers, operate the venue, manage safety incidents, contact guardians or emergency contacts, and comply with legal or insurance requirements.",
+  photoAcknowledgement:
+    "Optional - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.",
+  finalAcknowledgement:
+    "<strong>I have read, understood, and voluntarily agree</strong> to all terms in this waiver and release of liability, on behalf of myself and every family member listed above. I confirm I am 18 years of age or older, legally competent to enter this agreement, and signing of my own free will. I understand this agreement is intended to be governed by the laws of Ontario and applicable Canadian law.",
+};
+
 function configuredText(content = {}, key, fallback = "") {
-  return content[key] || fallback;
+  return content[key] || DEFAULT_COPY[key] || fallback;
 }
 
-function configuredList(content = {}, key) {
+function configuredList(content = {}, key, fallback = []) {
   const raw = content[key];
-  if (!raw) return [];
+  if (!raw) return fallback;
 
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(Boolean).map(String) : [];
+    return Array.isArray(parsed) ? parsed.filter(Boolean).map(String) : fallback;
   } catch {
     return raw
       .split(/\r?\n|\|/)
@@ -101,7 +203,7 @@ function createFamilyMember(type) {
     dob: "",
     gender: "",
     email: "",
-    healthCondition: "",
+    healthCondition: "Not Applicable",
     medicalNotes: "",
   };
 }
@@ -306,19 +408,33 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
   const passTypes = useMemo(
-    () => configuredList(waiverContent, "passTypes"),
+    () => configuredList(waiverContent, "passTypes", PASS_TYPES),
     [waiverContent],
   );
   const healthConditions = useMemo(
-    () => configuredList(waiverContent, "healthConditions"),
+    () => configuredList(waiverContent, "healthConditions", HEALTH_CONDITIONS),
     [waiverContent],
   );
   const genderOptions = useMemo(
-    () => configuredList(waiverContent, "genderOptions"),
+    () =>
+      configuredList(waiverContent, "genderOptions", [
+        "Prefer not to say",
+        "Male",
+        "Female",
+        "Non-binary",
+        "Other",
+      ]),
     [waiverContent],
   );
   const emergencyRelationOptions = useMemo(
-    () => configuredList(waiverContent, "emergencyRelationOptions"),
+    () =>
+      configuredList(waiverContent, "emergencyRelationOptions", [
+        "Spouse / Partner",
+        "Parent",
+        "Sibling",
+        "Friend",
+        "Other",
+      ]),
     [waiverContent],
   );
   const showFamilyMembers = configuredBoolean(waiverContent, "showFamilyMembers", true);
@@ -521,7 +637,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             <label>
               <span>{configuredText(waiverContent, "genderLabel")}</span>
               <select value={primary.gender} onChange={(event) => updatePrimary("gender", event.target.value)}>
-                <option value="">{genderOptions[0] || ""}</option>
+                <option value="">{genderOptions[0] || "Prefer not to say"}</option>
                 {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
               </select>
             </label>
@@ -588,7 +704,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
                   <label>
                     <span>{configuredText(waiverContent, "genderLabel")}</span>
                     <select value={member.gender} onChange={(event) => updateFamilyMember(member.id, "gender", event.target.value)}>
-                      <option value="">{genderOptions[0] || ""}</option>
+                      <option value="">{genderOptions[0] || "Prefer not to say"}</option>
                       {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
                     </select>
                   </label>
