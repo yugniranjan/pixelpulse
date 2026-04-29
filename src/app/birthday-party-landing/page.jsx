@@ -9,7 +9,6 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 
 const LOCATION_SLUG = "vaughan";
 const LANDING_PAGES_SHEET = "landing pages";
-const LEGACY_LANDING_PAGES_SHEET = "landin pages";
 const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png";
 const ATTRACTION_FALLBACK_IMAGE =
   "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
@@ -52,12 +51,7 @@ async function getBirthdayConfigData() {
 
 async function getBirthdayLandingData() {
   try {
-    const rows = await fetchsheetdata(LANDING_PAGES_SHEET, LOCATION_SLUG);
-    if (rows.length) {
-      return rows;
-    }
-
-    return await fetchsheetdata(LEGACY_LANDING_PAGES_SHEET, LOCATION_SLUG);
+    return await fetchsheetdata(LANDING_PAGES_SHEET, LOCATION_SLUG);
   } catch (error) {
     console.error("birthday landing sheet failed:", error);
     return [];
