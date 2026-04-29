@@ -6,6 +6,7 @@ import Image from "next/image";
 import SectionHeading from "@/components/home/SectionHeading";
 import WaiverForm from "@/components/WaiverForm";
 import { db } from "@/lib/firestore";
+import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { partyWaiverDocId, splitParticipantName } from "@/lib/partyWaivers";
 
 export const metadata = {
@@ -33,10 +34,35 @@ async function getPartyWaiverDetails(partyId) {
   return snapshot.exists ? snapshot.data() : null;
 }
 
+async function getWaiverContent() {
+  try {
+    const rows = await fetchsheetdataNoCache("waiver");
+    return rows
+      .filter((row) => {
+        const location = String(row.location ?? "");
+        return location.includes("vaughan") || location === "";
+      })
+      .reduce((content, row) => {
+        const key = String(row.key ?? "").trim();
+        if (!key) return content;
+        return {
+          ...content,
+          [key]: String(row.value ?? "").trim(),
+        };
+      }, {});
+  } catch (error) {
+    console.error("waiver sheet failed:", error);
+    return {};
+  }
+}
+
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
   const partyId = searchValue(params, "partyId");
-  const partyDetails = await getPartyWaiverDetails(partyId);
+  const [partyDetails, waiverContent] = await Promise.all([
+    getPartyWaiverDetails(partyId),
+    getWaiverContent(),
+  ]);
   const primaryName = splitParticipantName(partyDetails?.primaryParticipant);
   const initialVisit = {
     partyId,
@@ -63,16 +89,20 @@ export default async function WaiverPage({ searchParams }) {
             className="ppp-waiver-heading-logo"
           />
           <SectionHeading mainHeading={true}>
-            Pixel Pulse <span>Waiver</span>
+            {waiverContent.waiverHeroTitle || "Pixel Pulse"}{" "}
+            <span>{waiverContent.waiverHeroTitleAccent || "Waiver"}</span>
           </SectionHeading>
           <p>
-            Add every player before you arrive, including adults and minors. This
-            Vaughan waiver experience is designed for Pixel Pulse Play families,
-            parties, and groups.
+            {waiverContent.waiverHeroText ||
+              "Add every player before you arrive, including adults and minors. This Vaughan waiver experience is designed for Pixel Pulse Play families, parties, and groups."}
           </p>
         </div>
 
-        <WaiverForm initialPrimary={initialPrimary} initialVisit={initialVisit} />
+        <WaiverForm
+          initialPrimary={initialPrimary}
+          initialVisit={initialVisit}
+          waiverContent={waiverContent}
+        />
       </section>
     </main>
   );

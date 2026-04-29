@@ -82,6 +82,118 @@ const EMPTY_CHECKS = {
   final: false,
 };
 
+const DEFAULT_COPY = {
+  waiverBackgroundImage:
+    "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png",
+  legalIntro:
+    "<strong>Read carefully before signing.</strong> Pixel Pulse Play operates next-generation interactive physical gaming attractions in Vaughan, Ontario including Laser Maze, Edge Climb, Hexa Quest, Shoot It Out, T-Rex Heist, Tile Hunt, Maze Gate, Soccer Challenge, and more.",
+  legalRelease:
+    "All attractions involve active physical movement. This waiver is a release of liability, assumption of risk, indemnity, medical authorization, and consent agreement. Participants under 18 require a parent or legal guardian to complete this form on their behalf.",
+  primarySectionTitle: "Primary Participant",
+  familySectionTitle: "Additional Family Members",
+  familySectionNote:
+    "Your single signature covers everyone listed. Add every adult and minor entering the active play zones today.",
+  visitSectionTitle: "Visit Details",
+  emergencySectionTitle: "Emergency Contact",
+  termsSectionTitle: "Terms & Acknowledgements",
+  signatureSectionTitle: "Signature",
+  firstNameLabel: "First name *",
+  lastNameLabel: "Last name *",
+  dobLabel: "Date of birth *",
+  genderLabel: "Gender",
+  emailLabel: "Email address *",
+  memberEmailLabel: "Email optional",
+  phoneLabel: "Phone number *",
+  cityLabel: "City / Town *",
+  healthConditionLabel: "Common health condition",
+  medicalNotesLabel: "Medical notes",
+  partyIdLabel: "Party ID",
+  partyIdPlaceholder: "Optional booking or party ID",
+  partyNameLabel: "Party / guest of honor",
+  partyNamePlaceholder: "Optional party name",
+  passTypeLabel: "Pass / Visit type *",
+  passTypePlaceholder: "Select your pass",
+  visitDateLabel: "Visit date *",
+  visitTimeLabel: "Party time",
+  emergencyNameLabel: "Full name *",
+  emergencyRelationLabel: "Relationship *",
+  emergencyRelationPlaceholder: "Select",
+  emergencyPhoneLabel: "Phone number *",
+  signatureLabel: "Draw your signature *",
+  signaturePlaceholder: "Draw signature here",
+  signatureHelp: "Your signature legally covers yourself and all named family members.",
+  clearSignatureButton: "Clear",
+  printNameLabel: "Print full legal name *",
+  signDateLabel: "Date signed *",
+  addAdultButton: "+ Add adult (18+)",
+  addMinorButton: "+ Add minor (under 18)",
+  familySummaryLabel: "Party:",
+  emptyFamilySummary: "No additional family members added yet.",
+  memberTitle: "Member",
+  removeMemberButton: "Remove",
+  linkedPartyPrefix: "This waiver is linked to",
+  linkedPartyFallback: "your party",
+  linkedPartyIdText: "with Party ID",
+  resetButton: "Reset Form",
+  submitButton: "Submit Waiver & Start Playing",
+  submittingButton: "Saving Waiver...",
+  submitFootnote: "Securely recorded · Vaughan, Ontario · pixelpulseplay.ca",
+  signatureRequiredError: "Please draw your signature before submitting.",
+  pastVisitDateError: "Visit date cannot be in the past.",
+  submitError: "Unable to submit waiver. Please check your connection and try again.",
+  saveSuccessPrefix: "Waiver saved. Confirmation:",
+  riskAcknowledgement:
+    "I understand Pixel Pulse Play attractions involve inherent and other risks, including slips, trips, falls, collisions, equipment contact, fast movement, climbing, jumping, running, aiming, sensory stimulation, and the acts or omissions of other participants. I voluntarily assume these risks for myself and all named participants.",
+  liabilityAcknowledgement:
+    "To the fullest extent permitted by applicable law, I release, waive, and discharge Pixel Pulse Play, its owners, directors, officers, employees, contractors, landlords, agents, insurers, successors, and assigns from claims, losses, damages, costs, and expenses arising from participation, including ordinary negligence, on behalf of myself and all named participants.",
+  rulesAcknowledgement:
+    "I agree that all named participants will follow posted rules, attraction guidelines, staff instructions, age/height/weight restrictions, and safety directions. I confirm each participant is physically and medically fit for active gameplay and will stop participating if unsafe, unwell, or instructed by staff.",
+  medicalAcknowledgement:
+    "I authorize Pixel Pulse Play staff to seek emergency medical assistance for myself or any named participant if needed, and I accept responsibility for medical, ambulance, transportation, or related costs not covered by insurance or public health coverage.",
+  guardianAcknowledgement:
+    "I confirm I am the parent, legal guardian, or authorized adult for every participant under 18 listed in this form and have legal authority to sign this waiver, release, and consent on their behalf.",
+  privacyAcknowledgement:
+    "I consent to Pixel Pulse Play collecting, using, storing, and disclosing the information in this form as reasonably needed to administer waivers, operate the venue, manage safety incidents, contact guardians or emergency contacts, and comply with legal or insurance requirements.",
+  photoAcknowledgement:
+    "Optional - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.",
+  finalAcknowledgement:
+    "<strong>I have read, understood, and voluntarily agree</strong> to all terms in this waiver and release of liability, on behalf of myself and every family member listed above. I confirm I am 18 years of age or older, legally competent to enter this agreement, and signing of my own free will. I understand this agreement is intended to be governed by the laws of Ontario and applicable Canadian law.",
+};
+
+function configuredText(content = {}, key, fallback = "") {
+  return content[key] || DEFAULT_COPY[key] || fallback;
+}
+
+function configuredList(content = {}, key, fallback = []) {
+  const raw = content[key];
+  if (!raw) return fallback;
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(Boolean).map(String) : fallback;
+  } catch {
+    return raw
+      .split(/\r?\n|\|/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+}
+
+function configuredBoolean(content = {}, key, fallback = true) {
+  const raw = content[key];
+  if (raw === undefined || raw === "") return fallback;
+  return !["false", "0", "no", "hide", "hidden"].includes(String(raw).trim().toLowerCase());
+}
+
+function backgroundImageValue(value = "") {
+  const image = String(value || "").replace(/["\\]/g, "");
+  return image ? `url("${image}")` : "";
+}
+
+function HtmlText({ html }) {
+  return <span dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
 function createFamilyMember(type) {
   return {
     id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -283,7 +395,7 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
   );
 }
 
-export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
+export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, waiverContent = {} }) {
   const canvasRef = useRef(null);
   const boxRef = useRef(null);
   const drawingRef = useRef(false);
@@ -295,6 +407,43 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
+  const passTypes = useMemo(
+    () => configuredList(waiverContent, "passTypes", PASS_TYPES),
+    [waiverContent],
+  );
+  const healthConditions = useMemo(
+    () => configuredList(waiverContent, "healthConditions", HEALTH_CONDITIONS),
+    [waiverContent],
+  );
+  const genderOptions = useMemo(
+    () =>
+      configuredList(waiverContent, "genderOptions", [
+        "Prefer not to say",
+        "Male",
+        "Female",
+        "Non-binary",
+        "Other",
+      ]),
+    [waiverContent],
+  );
+  const emergencyRelationOptions = useMemo(
+    () =>
+      configuredList(waiverContent, "emergencyRelationOptions", [
+        "Spouse / Partner",
+        "Parent",
+        "Sibling",
+        "Friend",
+        "Other",
+      ]),
+    [waiverContent],
+  );
+  const showFamilyMembers = configuredBoolean(waiverContent, "showFamilyMembers", true);
+  const showGenderField = configuredBoolean(waiverContent, "showGenderField", true);
+  const showMedicalFields = configuredBoolean(waiverContent, "showMedicalFields", true);
+  const showPartyFields = configuredBoolean(waiverContent, "showPartyFields", true);
+  const showVisitTimeField = configuredBoolean(waiverContent, "showVisitTimeField", true);
+  const showPhotoConsent = configuredBoolean(waiverContent, "showPhotoConsent", true);
+  const waiverBackgroundImage = configuredText(waiverContent, "waiverBackgroundImage");
 
   const namedFamily = useMemo(
     () => familyMembers.filter((member) => member.firstName || member.lastName),
@@ -416,12 +565,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
     setToast("");
 
     if (!hasSignature) {
-      setError("Please draw your signature before submitting.");
+      setError(configuredText(waiverContent, "signatureRequiredError"));
       return;
     }
 
     if (isPastDate(visit.visitDate)) {
-      setError("Visit date cannot be in the past.");
+      setError(configuredText(waiverContent, "pastVisitDateError"));
       return;
     }
 
@@ -442,159 +591,160 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Unable to submit waiver. Please try again.");
+        setError(data.error || configuredText(waiverContent, "submitError"));
         return;
       }
 
-      setToast(`Waiver saved. Confirmation: ${data.waiverId}`);
+      setToast(`${configuredText(waiverContent, "saveSuccessPrefix")} ${data.waiverId}`);
     } catch (submitError) {
-      setError("Unable to submit waiver. Please check your connection and try again.");
+      setError(configuredText(waiverContent, "submitError"));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <form className="ppp-waiver-form" onSubmit={handleSubmit}>
+    <form
+      className="ppp-waiver-form"
+      style={{ "--waiver-form-background-image": backgroundImageValue(waiverBackgroundImage) }}
+      onSubmit={handleSubmit}
+    >
       <div className="ppp-waiver-legal">
         <p>
-          <strong>Read carefully before signing.</strong> Pixel Pulse Play
-          operates next-generation interactive physical gaming attractions in
-          Vaughan, Ontario including Laser Maze, Edge Climb, Hexa Quest, Shoot It
-          Out, T-Rex Heist, Tile Hunt, Maze Gate, Soccer Challenge, and more.
+          <HtmlText html={configuredText(waiverContent, "legalIntro")} />
         </p>
         <p>
-          All attractions involve active physical movement. This waiver is a
-          release of liability, assumption of risk, indemnity, medical
-          authorization, and consent agreement. Participants under 18 require a
-          parent or legal guardian to complete this form on their behalf.
+          <HtmlText html={configuredText(waiverContent, "legalRelease")} />
         </p>
       </div>
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>01</span>
-          <h2>Primary Participant</h2>
+          <h2>{configuredText(waiverContent, "primarySectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-field-grid">
           <label>
-            <span>First name *</span>
+            <span>{configuredText(waiverContent, "firstNameLabel")}</span>
             <input required value={primary.firstName} onChange={(event) => updatePrimary("firstName", event.target.value)} />
           </label>
           <label>
-            <span>Last name *</span>
+            <span>{configuredText(waiverContent, "lastNameLabel")}</span>
             <input required value={primary.lastName} onChange={(event) => updatePrimary("lastName", event.target.value)} />
           </label>
-          <DobField label="Date of birth *" value={primary.dob} onChange={(value) => updatePrimary("dob", value)} />
-          <label>
-            <span>Gender</span>
-            <select value={primary.gender} onChange={(event) => updatePrimary("gender", event.target.value)}>
-              <option value="">Prefer not to say</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Non-binary</option>
-              <option>Other</option>
-            </select>
-          </label>
+          <DobField label={configuredText(waiverContent, "dobLabel")} value={primary.dob} onChange={(value) => updatePrimary("dob", value)} />
+          {showGenderField ? (
+            <label>
+              <span>{configuredText(waiverContent, "genderLabel")}</span>
+              <select value={primary.gender} onChange={(event) => updatePrimary("gender", event.target.value)}>
+                <option value="">{genderOptions[0] || "Prefer not to say"}</option>
+                {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
+              </select>
+            </label>
+          ) : null}
           <label className="ppp-waiver-wide">
-            <span>Email address *</span>
+            <span>{configuredText(waiverContent, "emailLabel")}</span>
             <input required type="email" value={primary.email} onChange={(event) => updatePrimary("email", event.target.value)} />
           </label>
           <label>
-            <span>Phone number *</span>
+            <span>{configuredText(waiverContent, "phoneLabel")}</span>
             <input required type="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
           </label>
           <label>
-            <span>City / Town *</span>
+            <span>{configuredText(waiverContent, "cityLabel")}</span>
             <input required value={primary.city} onChange={(event) => updatePrimary("city", event.target.value)} />
           </label>
-          <div className="ppp-waiver-wide ppp-waiver-medical-row">
+          {showMedicalFields ? <div className="ppp-waiver-wide ppp-waiver-medical-row">
             <label>
-              <span>Common health condition</span>
+              <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
               <select value={primary.healthCondition} onChange={(event) => updatePrimary("healthCondition", event.target.value)}>
-                {HEALTH_CONDITIONS.map((condition) => <option key={condition}>{condition}</option>)}
+                {healthConditions.map((condition) => <option key={condition}>{condition}</option>)}
               </select>
             </label>
             <label>
-              <span>Medical notes</span>
+              <span>{configuredText(waiverContent, "medicalNotesLabel")}</span>
               <textarea value={primary.medicalNotes} onChange={(event) => updatePrimary("medicalNotes", event.target.value)} />
             </label>
-          </div>
+          </div> : null}
         </div>
       </section>
 
-      <section className="ppp-waiver-section">
+      {showFamilyMembers ? <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>02</span>
-          <h2>Additional Family Members</h2>
+          <h2>{configuredText(waiverContent, "familySectionTitle")}</h2>
         </div>
         <p className="ppp-waiver-section-note">
-          Your single signature covers everyone listed. Add every adult and
-          minor entering the active play zones today.
+          {configuredText(waiverContent, "familySectionNote")}
         </p>
 
         <div className="ppp-waiver-family-list">
           {familyMembers.map((member, index) => (
             <article className={`ppp-waiver-family-card ppp-waiver-family-card--${member.type}`} key={member.id}>
               <div className="ppp-waiver-family-card__head">
-                <strong>Member {index + 1}</strong>
+                <strong>{configuredText(waiverContent, "memberTitle")} {index + 1}</strong>
                 <div>
                   <span>{memberLabel(member.type)}</span>
-                  <button type="button" onClick={() => removeFamilyMember(member.id)}>Remove</button>
+                  <button type="button" onClick={() => removeFamilyMember(member.id)}>
+                    {configuredText(waiverContent, "removeMemberButton")}
+                  </button>
                 </div>
               </div>
               <div className="ppp-waiver-field-grid">
                 <label>
-                  <span>First name *</span>
+                  <span>{configuredText(waiverContent, "firstNameLabel")}</span>
                   <input required value={member.firstName} onChange={(event) => updateFamilyMember(member.id, "firstName", event.target.value)} />
                 </label>
                 <label>
-                  <span>Last name *</span>
+                  <span>{configuredText(waiverContent, "lastNameLabel")}</span>
                   <input required value={member.lastName} onChange={(event) => updateFamilyMember(member.id, "lastName", event.target.value)} />
                 </label>
-                <DobField label="Date of birth *" value={member.dob} onChange={(value) => updateFamilyMember(member.id, "dob", value)} />
-                <label>
-                  <span>Gender</span>
-                  <select value={member.gender} onChange={(event) => updateFamilyMember(member.id, "gender", event.target.value)}>
-                    <option value="">Prefer not to say</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Non-binary</option>
-                    <option>Other</option>
-                  </select>
-                </label>
+                <DobField label={configuredText(waiverContent, "dobLabel")} value={member.dob} onChange={(value) => updateFamilyMember(member.id, "dob", value)} />
+                {showGenderField ? (
+                  <label>
+                    <span>{configuredText(waiverContent, "genderLabel")}</span>
+                    <select value={member.gender} onChange={(event) => updateFamilyMember(member.id, "gender", event.target.value)}>
+                      <option value="">{genderOptions[0] || "Prefer not to say"}</option>
+                      {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
+                    </select>
+                  </label>
+                ) : null}
                 {member.type === "adult" && (
                   <label className="ppp-waiver-wide">
-                    <span>Email optional</span>
+                    <span>{configuredText(waiverContent, "memberEmailLabel")}</span>
                     <input type="email" value={member.email} onChange={(event) => updateFamilyMember(member.id, "email", event.target.value)} />
                   </label>
                 )}
-                <div className="ppp-waiver-wide ppp-waiver-medical-row">
+                {showMedicalFields ? <div className="ppp-waiver-wide ppp-waiver-medical-row">
                   <label>
-                    <span>Common health condition</span>
+                    <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
                     <select value={member.healthCondition} onChange={(event) => updateFamilyMember(member.id, "healthCondition", event.target.value)}>
-                      {HEALTH_CONDITIONS.map((condition) => <option key={condition}>{condition}</option>)}
+                      {healthConditions.map((condition) => <option key={condition}>{condition}</option>)}
                     </select>
                   </label>
                   <label>
-                    <span>Medical notes</span>
+                    <span>{configuredText(waiverContent, "medicalNotesLabel")}</span>
                     <textarea value={member.medicalNotes} onChange={(event) => updateFamilyMember(member.id, "medicalNotes", event.target.value)} />
                   </label>
-                </div>
+                </div> : null}
               </div>
             </article>
           ))}
         </div>
 
         <div className="ppp-waiver-add-row">
-          <button type="button" className="ppp-waiver-add-row__adult" onClick={() => addFamilyMember("adult")}>+ Add adult (18+)</button>
-          <button type="button" className="ppp-waiver-add-row__minor" onClick={() => addFamilyMember("minor")}>+ Add minor (under 18)</button>
+          <button type="button" className="ppp-waiver-add-row__adult" onClick={() => addFamilyMember("adult")}>
+            {configuredText(waiverContent, "addAdultButton")}
+          </button>
+          <button type="button" className="ppp-waiver-add-row__minor" onClick={() => addFamilyMember("minor")}>
+            {configuredText(waiverContent, "addMinorButton")}
+          </button>
         </div>
 
         <div className="ppp-waiver-family-summary" aria-live="polite">
           {namedFamily.length > 0 ? (
             <>
-              <small>Party:</small>
+              <small>{configuredText(waiverContent, "familySummaryLabel")}</small>
               {namedFamily.map((member) => (
                 <span key={member.id}>
                   {[member.firstName, member.lastName].filter(Boolean).join(" ")}
@@ -603,69 +753,70 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
               ))}
             </>
           ) : (
-            <small>No additional family members added yet.</small>
+            <small>{configuredText(waiverContent, "emptyFamilySummary")}</small>
           )}
         </div>
-      </section>
+      </section> : null}
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>03</span>
-          <h2>Visit Details</h2>
+          <h2>{configuredText(waiverContent, "visitSectionTitle")}</h2>
         </div>
         {visit.partyId || visit.partyName ? (
           <p className="ppp-waiver-section-note ppp-waiver-party-note">
-            This waiver is linked to {visit.partyName ? <strong>{visit.partyName}</strong> : "your party"}
-            {visit.partyId ? <> with Party ID <strong>{visit.partyId}</strong></> : null}.
+            {configuredText(waiverContent, "linkedPartyPrefix")}{" "}
+            {visit.partyName ? <strong>{visit.partyName}</strong> : configuredText(waiverContent, "linkedPartyFallback")}
+            {visit.partyId ? <> {configuredText(waiverContent, "linkedPartyIdText")} <strong>{visit.partyId}</strong></> : null}.
           </p>
         ) : null}
         <div className="ppp-waiver-field-grid">
+          {showPartyFields ? (
+            <>
+              <label>
+                <span>{configuredText(waiverContent, "partyIdLabel")}</span>
+                <input value={visit.partyId} onChange={(event) => updateVisit("partyId", event.target.value)} placeholder={configuredText(waiverContent, "partyIdPlaceholder")} />
+              </label>
+              <label>
+                <span>{configuredText(waiverContent, "partyNameLabel")}</span>
+                <input value={visit.partyName} onChange={(event) => updateVisit("partyName", event.target.value)} placeholder={configuredText(waiverContent, "partyNamePlaceholder")} />
+              </label>
+            </>
+          ) : null}
           <label>
-            <span>Party ID</span>
-            <input value={visit.partyId} onChange={(event) => updateVisit("partyId", event.target.value)} placeholder="Optional booking or party ID" />
-          </label>
-          <label>
-            <span>Party / guest of honor</span>
-            <input value={visit.partyName} onChange={(event) => updateVisit("partyName", event.target.value)} placeholder="Optional party name" />
-          </label>
-          <label>
-            <span>Pass / Visit type *</span>
+            <span>{configuredText(waiverContent, "passTypeLabel")}</span>
             <select required value={visit.passType} onChange={(event) => updateVisit("passType", event.target.value)}>
-              <option value="">Select your pass</option>
-              {PASS_TYPES.map((type) => <option key={type}>{type}</option>)}
+              <option value="">{configuredText(waiverContent, "passTypePlaceholder")}</option>
+              {passTypes.map((type) => <option key={type}>{type}</option>)}
             </select>
           </label>
-          <DatePartsField label="Visit date *" value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
-          <label>
-            <span>Party time</span>
+          <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
+          {showVisitTimeField ? <label>
+            <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
             <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
-          </label>
+          </label> : null}
         </div>
       </section>
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>04</span>
-          <h2>Emergency Contact</h2>
+          <h2>{configuredText(waiverContent, "emergencySectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-field-grid">
           <label>
-            <span>Full name *</span>
+            <span>{configuredText(waiverContent, "emergencyNameLabel")}</span>
             <input required value={visit.emergencyName} onChange={(event) => updateVisit("emergencyName", event.target.value)} />
           </label>
           <label>
-            <span>Relationship *</span>
+            <span>{configuredText(waiverContent, "emergencyRelationLabel")}</span>
             <select required value={visit.emergencyRelation} onChange={(event) => updateVisit("emergencyRelation", event.target.value)}>
-              <option value="">Select</option>
-              <option>Spouse / Partner</option>
-              <option>Parent</option>
-              <option>Sibling</option>
-              <option>Friend</option>
-              <option>Other</option>
+              <option value="">{configuredText(waiverContent, "emergencyRelationPlaceholder")}</option>
+              {emergencyRelationOptions.map((option) => <option key={option}>{option}</option>)}
             </select>
           </label>
           <label className="ppp-waiver-wide">
-            <span>Phone number *</span>
+            <span>{configuredText(waiverContent, "emergencyPhoneLabel")}</span>
             <input required type="tel" value={visit.emergencyPhone} onChange={(event) => updateVisit("emergencyPhone", event.target.value)} />
           </label>
         </div>
@@ -674,37 +825,37 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>05</span>
-          <h2>Terms & Acknowledgements</h2>
+          <h2>{configuredText(waiverContent, "termsSectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-checks">
           {[
-            ["risk", "I understand Pixel Pulse Play attractions involve inherent and other risks, including slips, trips, falls, collisions, equipment contact, fast movement, climbing, jumping, running, aiming, sensory stimulation, and the acts or omissions of other participants. I voluntarily assume these risks for myself and all named participants."],
-            ["liability", "To the fullest extent permitted by applicable law, I release, waive, and discharge Pixel Pulse Play, its owners, directors, officers, employees, contractors, landlords, agents, insurers, successors, and assigns from claims, losses, damages, costs, and expenses arising from participation, including ordinary negligence, on behalf of myself and all named participants."],
-            ["rules", "I agree that all named participants will follow posted rules, attraction guidelines, staff instructions, age/height/weight restrictions, and safety directions. I confirm each participant is physically and medically fit for active gameplay and will stop participating if unsafe, unwell, or instructed by staff."],
-            ["medical", "I authorize Pixel Pulse Play staff to seek emergency medical assistance for myself or any named participant if needed, and I accept responsibility for medical, ambulance, transportation, or related costs not covered by insurance or public health coverage."],
-            ["guardian", "I confirm I am the parent, legal guardian, or authorized adult for every participant under 18 listed in this form and have legal authority to sign this waiver, release, and consent on their behalf."],
-            ["privacy", "I consent to Pixel Pulse Play collecting, using, storing, and disclosing the information in this form as reasonably needed to administer waivers, operate the venue, manage safety incidents, contact guardians or emergency contacts, and comply with legal or insurance requirements."],
+            ["risk", configuredText(waiverContent, "riskAcknowledgement")],
+            ["liability", configuredText(waiverContent, "liabilityAcknowledgement")],
+            ["rules", configuredText(waiverContent, "rulesAcknowledgement")],
+            ["medical", configuredText(waiverContent, "medicalAcknowledgement")],
+            ["guardian", configuredText(waiverContent, "guardianAcknowledgement")],
+            ["privacy", configuredText(waiverContent, "privacyAcknowledgement")],
           ].map(([key, label]) => (
             <label className={checks[key] ? "is-checked" : ""} key={key}>
               <input required type="checkbox" checked={checks[key]} onChange={() => toggleCheck(key)} />
               <span>{label}</span>
             </label>
           ))}
-          <label className={checks.photo ? "is-checked" : ""}>
+          {showPhotoConsent ? <label className={checks.photo ? "is-checked" : ""}>
             <input type="checkbox" checked={checks.photo} onChange={() => toggleCheck("photo")} />
-            <span>Optional - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.</span>
-          </label>
+            <span>{configuredText(waiverContent, "photoAcknowledgement")}</span>
+          </label> : null}
         </div>
       </section>
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>06</span>
-          <h2>Signature</h2>
+          <h2>{configuredText(waiverContent, "signatureSectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-field-grid ppp-waiver-field-grid--full">
           <label>
-            <span>Draw your signature *</span>
+            <span>{configuredText(waiverContent, "signatureLabel")}</span>
             <div className="ppp-waiver-signature" ref={boxRef}>
               <canvas
                 ref={canvasRef}
@@ -716,19 +867,19 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
                 onTouchMove={drawSignature}
                 onTouchEnd={endSignature}
               />
-              {!hasSignature && <em>Draw signature here</em>}
+              {!hasSignature && <em>{configuredText(waiverContent, "signaturePlaceholder")}</em>}
             </div>
           </label>
           <div className="ppp-waiver-signature-foot">
-            <span>Your signature legally covers yourself and all named family members.</span>
-            <button type="button" onClick={clearSignature}>Clear</button>
+            <span>{configuredText(waiverContent, "signatureHelp")}</span>
+            <button type="button" onClick={clearSignature}>{configuredText(waiverContent, "clearSignatureButton")}</button>
           </div>
           <label>
-            <span>Print full legal name *</span>
+            <span>{configuredText(waiverContent, "printNameLabel")}</span>
             <input required value={visit.printName} onChange={(event) => updateVisit("printName", event.target.value)} />
           </label>
           <label>
-            <span>Date signed *</span>
+            <span>{configuredText(waiverContent, "signDateLabel")}</span>
             <input required type="date" value={visit.signDate} onChange={(event) => updateVisit("signDate", event.target.value)} />
           </label>
         </div>
@@ -738,12 +889,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
         <label className={checks.final ? "is-checked" : ""}>
           <input required type="checkbox" checked={checks.final} onChange={() => toggleCheck("final")} />
           <span>
-            <strong>I have read, understood, and voluntarily agree</strong> to all
-            terms in this waiver and release of liability, on behalf of myself
-            and every family member listed above. I confirm I am 18 years of age
-            or older, legally competent to enter this agreement, and signing of
-            my own free will. I understand this agreement is intended to be
-            governed by the laws of Ontario and applicable Canadian law.
+            <HtmlText html={configuredText(waiverContent, "finalAcknowledgement")} />
           </span>
         </label>
       </div>
@@ -752,13 +898,15 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {} }) {
         {error ? <p className="ppp-waiver-error">{error}</p> : null}
         <div className="ppp-waiver-submit-actions">
           <button type="button" className="ppp-waiver-reset" onClick={resetWaiverForm} disabled={submitting}>
-            Reset Form
+            {configuredText(waiverContent, "resetButton")}
           </button>
           <button type="submit" disabled={submitting}>
-            {submitting ? "Saving Waiver..." : "Submit Waiver & Start Playing"}
+            {submitting
+              ? configuredText(waiverContent, "submittingButton")
+              : configuredText(waiverContent, "submitButton")}
           </button>
         </div>
-        <p>Securely recorded · Vaughan, Ontario · pixelpulseplay.ca</p>
+        <p>{configuredText(waiverContent, "submitFootnote")}</p>
       </div>
 
       {toast && <div className="ppp-waiver-toast">{toast}</div>}
