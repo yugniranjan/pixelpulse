@@ -455,7 +455,12 @@
 }
 
 .ppp-birthday-stats div {
-  padding: 16px;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .ppp-birthday-stats strong {
