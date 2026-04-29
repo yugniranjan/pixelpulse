@@ -262,6 +262,7 @@
   font-size: 1.16rem;
   font-weight: 500;
   line-height: 1.7;
+  text-align: left;
 }
 
 .ppp-birthday-actions,
@@ -653,11 +654,6 @@
     grid-template-columns: 1fr;
   }
 
-  .ppp-birthday-hero__copy {
-    justify-items: center;
-    text-align: center;
-  }
-
   .ppp-birthday-hero h1 {
     font-size: clamp(2.65rem, 8vw, 4rem);
   }
@@ -701,6 +697,7 @@
 
   .ppp-birthday-hero__text {
     font-size: 1rem;
+    text-align: center;
   }
 
   .ppp-birthday-actions,
