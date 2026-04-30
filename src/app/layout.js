@@ -9,117 +9,11 @@ import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
-import { getConfiguredValue, normalizeValue } from "./lib/ctaContent";
+import { normalizeValue } from "./lib/ctaContent";
 import Breadcrumbs from "./components/Breadcrumb";
 
 
 const BASE_URL = process.env.SITE_URL;
-const GTM_KEYS = [
-  "gtm_id",
-  "gtmId",
-  "gtm",
-  "googleTagManagerId",
-  "googleTagManager",
-  "googleTagManagerContainerId",
-];
-const GOOGLE_TAG_KEYS = [
-  "googleTagId",
-  "googleTagIds",
-  "googleTag",
-  "gtagId",
-  "gtagIds",
-  "ga4MeasurementId",
-  "measurementId",
-];
-
-function cleanGtmId(value = "") {
-  const id = String(value || "").trim().toUpperCase();
-  return /^GTM-[A-Z0-9]+$/.test(id) ? id : "";
-}
-
-function cleanGoogleTagId(value = "") {
-  const id = String(value || "").trim().toUpperCase();
-  return /^[A-Z]{1,3}-[A-Z0-9]+$/.test(id) && !id.startsWith("GTM-") ? id : "";
-}
-
-function getConfiguredTagIds(sources = [], keys = []) {
-  const raw = getConfiguredValue(sources, keys, "");
-  return String(raw || "")
-    .split(/[\n,|]+/)
-    .map(cleanGoogleTagId)
-    .filter(Boolean);
-}
-
-function findTagRow(rows = []) {
-  return rows.find((row) => {
-    const values = [...GTM_KEYS, ...GOOGLE_TAG_KEYS].map((key) => row?.[key]);
-    return values.some((value) => String(value || "").trim());
-  });
-}
-
-function GlobalGoogleTags({ gtmId = "", googleTagIds = [] }) {
-  const cleanId = cleanGtmId(gtmId);
-  const tagIds = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
-  const primaryGoogleTagId = tagIds[0] || "";
-
-  if (!cleanId && !tagIds.length) {
-    return null;
-  }
-
-  return (
-    <>
-      {cleanId ? (
-        <>
-          <Script
-            id="google-tag-manager"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${cleanId}');
-              `,
-            }}
-          />
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${cleanId}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-              title="Google Tag Manager"
-            />
-          </noscript>
-        </>
-      ) : null}
-
-      {primaryGoogleTagId ? (
-        <>
-          <Script
-            id="global-google-tag-loader"
-            src={`https://www.googletagmanager.com/gtag/js?id=${primaryGoogleTagId}`}
-            strategy="afterInteractive"
-          />
-          <Script
-            id="global-google-tag-config"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                ${tagIds.map((id) => `gtag('config', '${id}');`).join("\n")}
-              `,
-            }}
-          />
-        </>
-      ) : null}
-    </>
-  );
-}
-
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME;
   try {
@@ -189,14 +83,25 @@ export default async function RootLayout({ children }) {
     console.error("layout data failed:", error);
   }
   const locationid = sheetdata?.[0]?.locationid || null;
-  const tagRow = findTagRow(sheetdata);
-  const tagSources = [tagRow || {}, configdata];
-  const gtmId = cleanGtmId(getConfiguredValue(tagSources, GTM_KEYS, ""));
-  const googleTagIds = getConfiguredTagIds(tagSources, GOOGLE_TAG_KEYS);
+  const gtmId = sheetdata?.find((item) => item?.gtm_id)?.gtm_id || "GTM-99ZBR";
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <GlobalGoogleTags gtmId={gtmId} googleTagIds={googleTagIds} />
+        {gtmId && (
+          <Script
+            id="google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${gtmId}');
+              `,
+            }}
+          />
+        )}
         <Toaster position="top-right" />
         <ChromeVisibility>
           <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
