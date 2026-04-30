@@ -94,6 +94,9 @@ const Subcategory = async ({ params }) => {
   const contactHref = ctaContent.contactHref || "/contactus";
   const isAttractionDetailPage = category_slug === "attractions";
   const isGroupsDetailPage = category_slug === "group-events";
+  const isFaqDetailPage = [category_slug, subcategory_slug, pagedata?.title]
+    .filter(Boolean)
+    .some((value) => /(^|-)faqs?$|frequently-asked-questions/i.test(String(value).trim().toLowerCase()));
   const detailContentHtml = pagedata?.seosection || "";
   const introText =
     stripHtml(pagedata?.seosection || "") ||
@@ -329,7 +332,7 @@ const Subcategory = async ({ params }) => {
           </section>
         </section>
       ) : (
-        <section className="ppp-detail-page">
+        <section className={`ppp-detail-page${isFaqDetailPage ? " ppp-faq-page" : ""}`}>
           <section className="ppp-detail-hero">
             <div className="aero-max-container ppp-detail-hero__inner">
               <div className="ppp-detail-hero__copy">
@@ -352,15 +355,25 @@ const Subcategory = async ({ params }) => {
                 )}
               </div>
 
-              <div className="ppp-detail-hero__media">
-                <Image
-                  src={heroImage}
-                  alt={pagedata?.imagetitle || pagedata?.title || "Pixel Pulse Play"}
-                  width={1200}
-                  height={800}
-                  style={{ width: "100%", height: "auto" }}
-                />
-              </div>
+              {isFaqDetailPage ? (
+                <div className="ppp-detail-hero__media ppp-faq-hero-visual" aria-hidden="true">
+                  <div className="ppp-faq-hero-visual__question">?</div>
+                  <div className="ppp-faq-hero-visual__bubble ppp-faq-hero-visual__bubble--one" />
+                  <div className="ppp-faq-hero-visual__bubble ppp-faq-hero-visual__bubble--two" />
+                  <div className="ppp-faq-hero-visual__line" />
+                  <p>Quick answers before you visit</p>
+                </div>
+              ) : (
+                <div className="ppp-detail-hero__media">
+                  <Image
+                    src={heroImage}
+                    alt={pagedata?.imagetitle || pagedata?.title || "Pixel Pulse Play"}
+                    width={1200}
+                    height={800}
+                    style={{ width: "100%", height: "auto" }}
+                  />
+                </div>
+              )}
             </div>
           </section>
 

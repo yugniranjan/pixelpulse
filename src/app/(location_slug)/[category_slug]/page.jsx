@@ -182,6 +182,7 @@ const Category = async ({ params }) => {
   const isAttractionsPage = category_slug === "attractions";
   const isGroupsEventsPage = category_slug === "group-events";
   const isAboutPage = category_slug === "about-us";
+  const isFaqPage = /(^|-)faqs?$|frequently-asked-questions/.test(category_slug);
   const attractionItems =
     attractionsData?.[0]?.children?.filter((item) => item?.isactive == 1) || [];
   const introText =
@@ -670,7 +671,7 @@ const Category = async ({ params }) => {
             </section>
           </section>
         ) : (
-          <section className="ppp-dynamic-page">
+          <section className={`ppp-dynamic-page${isFaqPage ? " ppp-faq-page" : ""}`}>
             <section className="ppp-dynamic-hero">
               <div className="aero-max-container ppp-dynamic-hero__inner">
                 <div className="ppp-dynamic-hero__copy">
@@ -707,15 +708,25 @@ const Category = async ({ params }) => {
                   )}
                 </div>
 
-                <div className="ppp-dynamic-hero__media">
-                  <Image
-                    src={pageHeroImage}
-                    alt={pageData?.imagetitle || attractionsData[0]?.desc || "Pixel Pulse Play"}
-                    width={1200}
-                    height={800}
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                </div>
+                {isFaqPage ? (
+                  <div className="ppp-dynamic-hero__media ppp-faq-hero-visual" aria-hidden="true">
+                    <div className="ppp-faq-hero-visual__question">?</div>
+                    <div className="ppp-faq-hero-visual__bubble ppp-faq-hero-visual__bubble--one" />
+                    <div className="ppp-faq-hero-visual__bubble ppp-faq-hero-visual__bubble--two" />
+                    <div className="ppp-faq-hero-visual__line" />
+                    <p>Quick answers before you visit</p>
+                  </div>
+                ) : (
+                  <div className="ppp-dynamic-hero__media">
+                    <Image
+                      src={pageHeroImage}
+                      alt={pageData?.imagetitle || attractionsData[0]?.desc || "Pixel Pulse Play"}
+                      width={1200}
+                      height={800}
+                      style={{ width: "100%", height: "auto" }}
+                    />
+                  </div>
+                )}
               </div>
             </section>
 

@@ -1312,10 +1312,41 @@
   box-shadow: 0 0 18px rgba(164, 207, 95, 0.18);
 }
 
-.ppp-detail-btn--outline {
-  border-color: var(--ppp-lime);
+.ppp-detail-hero__actions button,
+.ppp-detail-hero__actions .ppp-detail-btn {
+  min-width: 132px;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
-  color: var(--ppp-lime);
+  padding: 0.85rem 1.45rem;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ppp-detail-hero__actions button {
+  box-shadow: 0 12px 26px rgba(164, 207, 95, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.ppp-detail-btn--outline {
+  border: 2px solid var(--ppp-peach);
+  border-radius: 8px;
+  background: rgba(251, 174, 123, 0.08);
+  color: var(--ppp-peach);
+  box-shadow: inset 0 0 0 1px rgba(251, 174, 123, 0.18);
+}
+
+.ppp-detail-hero__actions button:hover,
+.ppp-detail-hero__actions .ppp-detail-btn:hover {
+  transform: translateY(-2px);
 }
 
 .ppp-detail-hero__actions button:hover {
@@ -1331,6 +1362,65 @@
 .ppp-detail-hero__media img {
   height: 100%;
   object-position: 32% center;
+}
+
+.ppp-faq-page .ppp-detail-hero {
+  padding: clamp(2rem, 4vw, 4rem) 0 clamp(2rem, 3vw, 3rem);
+  background:
+    radial-gradient(circle at 14% 22%, rgba(164, 207, 95, 0.2), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(255, 45, 120, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(7, 13, 28, 0.98), rgba(13, 25, 45, 0.96) 48%, rgba(5, 8, 16, 0.98));
+}
+
+.ppp-faq-page .ppp-detail-hero__inner {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.72fr);
+  align-items: center;
+}
+
+.ppp-faq-page .ppp-detail-hero__copy {
+  min-height: clamp(300px, 30vw, 430px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    linear-gradient(145deg, rgba(164, 207, 95, 0.16), rgba(251, 174, 123, 0.08) 46%, rgba(17, 24, 39, 0.96)),
+    #111827;
+}
+
+.ppp-faq-page .ppp-detail-hero .section-heading {
+  max-width: 10ch;
+  margin-bottom: 0.25em;
+  font-size: clamp(2.5rem, 6vw, 5rem) !important;
+  line-height: 0.92;
+  text-align: left !important;
+}
+
+.ppp-faq-page .ppp-detail-hero .section-heading span {
+  color: #ffffff;
+}
+
+.ppp-faq-page .ppp-detail-hero__copy h2 {
+  text-transform: none;
+}
+
+.ppp-faq-page .ppp-detail-hero__media.ppp-faq-hero-visual {
+  min-height: clamp(300px, 30vw, 430px);
+}
+
+@media (max-width: 900px) {
+  .ppp-faq-page .ppp-detail-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-faq-page .ppp-detail-hero .section-heading {
+    max-width: none;
+    text-align: center !important;
+  }
+
+  .ppp-faq-page .ppp-detail-hero__copy {
+    min-height: auto;
+    text-align: center;
+  }
 }
 
 .ppp-detail-body {
