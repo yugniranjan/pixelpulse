@@ -897,7 +897,7 @@
   }
 
   .ppp-birthday-stats {
-    grid-template-columns: 1fr;
+    display: none;
   }
 
   .ppp-birthday-section-heading h2,
