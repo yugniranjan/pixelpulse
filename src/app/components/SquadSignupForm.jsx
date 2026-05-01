@@ -13,10 +13,37 @@ const INITIAL_FORM = {
   terms: false,
 };
 
-export default function SquadSignupForm() {
+export default function SquadSignupForm({ content = {} }) {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const formContent = {
+    eyebrow: content.eyebrow || "Parent sign-up",
+    title: content.title || "Join the Squad",
+    childNameLabel: content.childNameLabel || "Child name",
+    ageLabel: content.ageLabel || "Age",
+    guardianNameLabel: content.guardianNameLabel || "Parent/guardian name",
+    phoneLabel: content.phoneLabel || "Phone",
+    emailLabel: content.emailLabel || "Email",
+    notesLabel: content.notesLabel || "Notes",
+    notesPlaceholder:
+      content.notesPlaceholder || "Questions, preferred visit day, or squad goals",
+    permissionText:
+      content.permissionText ||
+      "I give permission for my child to participate in the Pixel Pulse Squad program.",
+    termsText:
+      content.termsText ||
+      "I understand this is a voluntary, reward-based program with no cash compensation.",
+    sendingText: content.sendingText || "Sending your Squad request...",
+    submitText: content.submitText || "Send Squad Request",
+    successText:
+      content.successText || "Thanks. We received your Pixel Pulse Squad request.",
+    errorText: content.errorText || "We could not send this request. Please try again.",
+    helperText:
+      content.helperText || "A Pixel Pulse team member will follow up with next steps.",
+    selectedEvent: content.selectedEvent || "Pixel Pulse Squad",
+    source: content.source || "pixel-pulse-squad",
+  };
 
   function updateField(event) {
     const { name, value, type, checked } = event.target;
@@ -29,7 +56,7 @@ export default function SquadSignupForm() {
   async function handleSubmit(event) {
     event.preventDefault();
     setSubmitting(true);
-    setStatus("Sending your Squad request...");
+    setStatus(formContent.sendingText);
 
     try {
       const response = await fetch("/api/email", {
@@ -43,8 +70,8 @@ export default function SquadSignupForm() {
           phone: formData.phone,
           date: "",
           time: "",
-          from: "pixel-pulse-squad",
-          selectedEvent: "Pixel Pulse Squad",
+          from: formContent.source,
+          selectedEvent: formContent.selectedEvent,
           message: [
             `Child Name: ${formData.childName}`,
             `Age: ${formData.age}`,
@@ -64,9 +91,9 @@ export default function SquadSignupForm() {
       }
 
       setFormData(INITIAL_FORM);
-      setStatus("Thanks. We received your Pixel Pulse Squad request.");
+      setStatus(formContent.successText);
     } catch {
-      setStatus("We could not send this request. Please try again.");
+      setStatus(formContent.errorText);
     } finally {
       setSubmitting(false);
     }
@@ -75,13 +102,13 @@ export default function SquadSignupForm() {
   return (
     <form className="ppp-squad-form" id="squad-signup" onSubmit={handleSubmit}>
       <div className="ppp-squad-form__header">
-        <p>Parent sign-up</p>
-        <h2>Join the Squad</h2>
+        <p>{formContent.eyebrow}</p>
+        <h2>{formContent.title}</h2>
       </div>
 
       <div className="ppp-squad-form__grid">
         <label>
-          <span>Child name</span>
+          <span>{formContent.childNameLabel}</span>
           <input
             name="childName"
             value={formData.childName}
@@ -92,7 +119,7 @@ export default function SquadSignupForm() {
         </label>
 
         <label>
-          <span>Age</span>
+          <span>{formContent.ageLabel}</span>
           <input
             name="age"
             type="number"
@@ -105,7 +132,7 @@ export default function SquadSignupForm() {
         </label>
 
         <label className="ppp-squad-form__wide">
-          <span>Parent/guardian name</span>
+          <span>{formContent.guardianNameLabel}</span>
           <input
             name="guardianName"
             value={formData.guardianName}
@@ -116,7 +143,7 @@ export default function SquadSignupForm() {
         </label>
 
         <label>
-          <span>Phone</span>
+          <span>{formContent.phoneLabel}</span>
           <input
             name="phone"
             type="tel"
@@ -129,7 +156,7 @@ export default function SquadSignupForm() {
         </label>
 
         <label>
-          <span>Email</span>
+          <span>{formContent.emailLabel}</span>
           <input
             name="email"
             type="email"
@@ -142,12 +169,12 @@ export default function SquadSignupForm() {
         </label>
 
         <label className="ppp-squad-form__wide">
-          <span>Notes</span>
+          <span>{formContent.notesLabel}</span>
           <textarea
             name="message"
             value={formData.message}
             onChange={updateField}
-            placeholder="Questions, preferred visit day, or squad goals"
+            placeholder={formContent.notesPlaceholder}
           />
         </label>
       </div>
@@ -160,7 +187,7 @@ export default function SquadSignupForm() {
           onChange={updateField}
           required
         />
-        <span>I give permission for my child to participate in the Pixel Pulse Squad program.</span>
+        <span>{formContent.permissionText}</span>
       </label>
 
       <label className="ppp-squad-check">
@@ -171,14 +198,14 @@ export default function SquadSignupForm() {
           onChange={updateField}
           required
         />
-        <span>I understand this is a voluntary, reward-based program with no cash compensation.</span>
+        <span>{formContent.termsText}</span>
       </label>
 
       <button type="submit" disabled={submitting}>
-        {submitting ? "Sending..." : "Send Squad Request"}
+        {submitting ? "Sending..." : formContent.submitText}
       </button>
 
-      <p aria-live="polite">{status || "A Pixel Pulse team member will follow up with next steps."}</p>
+      <p aria-live="polite">{status || formContent.helperText}</p>
     </form>
   );
 }
