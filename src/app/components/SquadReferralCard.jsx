@@ -17,17 +17,17 @@ export default function SquadReferralCard({ content = {} }) {
     title: content.title || "Send friends 10% off",
     description:
       content.description ||
-      "Share Pixel Pulse with friends. They get 10% off with promo code PP10.",
+      "Share Pixel Pulse with friends. They get a unique 10% discount code made from your initials.",
     referrerNameLabel: content.referrerNameLabel || "Your name",
     referrerEmailLabel: content.referrerEmailLabel || "Your email",
     friendEmailLabel: content.friendEmailLabel || "Friend email",
     addFriendText: content.addFriendText || "Add friend",
     removeFriendText: content.removeFriendText || "Remove",
-    submitText: content.submitText || "Send PP10 Referral",
+    submitText: content.submitText || "Send 10% Referral",
     sendingText: content.sendingText || "Sending referral...",
-    successText: content.successText || "Referral sent. Your friends now have PP10.",
+    successText: content.successText || "Referral sent. Your friends now have a unique 10% code.",
     errorText: content.errorText || "Could not send referral. Please try again.",
-    helperText: content.helperText || "Promo code PP10 gives friends 10% off.",
+    helperText: content.helperText || "Friends receive a unique 10% discount code.",
   };
 
   function updateField(event) {

@@ -7,7 +7,7 @@ const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const SQUAD_URL = "https://www.pixelpulseplay.ca/squad";
-const PROMO_CODE = "PP10";
+const DISCOUNT_PERCENT = 10;
 
 function getRequiredEnv(name) {
   const value = process.env[name];
@@ -34,6 +34,25 @@ function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function getInitials(name = "") {
+  const initials = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .map((part) => part.replace(/[^a-z0-9]/gi, "").charAt(0))
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return initials || "PP";
+}
+
+function createPromoCode(referrerName = "") {
+  const initials = getInitials(referrerName);
+  const uniqueSuffix = Math.random().toString(36).slice(2, 4).toUpperCase();
+  return `${initials}${DISCOUNT_PERCENT}${uniqueSuffix}`;
 }
 
 export async function POST(request) {
@@ -80,14 +99,18 @@ export async function POST(request) {
     });
 
     const safeReferrerName = escapeHtml(referrerName);
+    const promoCode = createPromoCode(referrerName);
     const subject = `${referrerName} sent you 10% off Pixel Pulse Play`;
     const text = [
       `Hi there,`,
       "",
       `${referrerName} invited you to Pixel Pulse Play Zone.`,
       "",
-      `Use promo code ${PROMO_CODE} for 10% off your visit.`,
+      `Use promo code ${promoCode} for ${DISCOUNT_PERCENT}% off your visit.`,
       `Book or learn more: ${SQUAD_URL}`,
+      "",
+      "Want to invite your friends too?",
+      `Join the Squad and send your own invite: ${SQUAD_URL}`,
       "",
       "Pixel Pulse Play Zone",
       CONTACT_EMAIL,
@@ -107,10 +130,16 @@ export async function POST(request) {
             </p>
             <div style="margin:18px 0;padding:18px;border-radius:16px;background:rgba(183,255,34,0.1);border:1px solid rgba(183,255,34,0.35);text-align:center;">
               <div style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#b7ff22;font-weight:900;">Promo code</div>
-              <div style="margin-top:6px;color:#ffffff;font-size:34px;font-weight:900;letter-spacing:0.08em;">${PROMO_CODE}</div>
-              <div style="margin-top:6px;color:#cbd5e1;font-size:14px;">Use this code for 10% off.</div>
+              <div style="margin-top:6px;color:#ffffff;font-size:34px;font-weight:900;letter-spacing:0.08em;">${promoCode}</div>
+              <div style="margin-top:6px;color:#cbd5e1;font-size:14px;">Use this unique code for ${DISCOUNT_PERCENT}% off.</div>
             </div>
             <a href="${SQUAD_URL}" style="display:inline-block;padding:13px 18px;border-radius:10px;background:#b7ff22;color:#070610;text-decoration:none;font-weight:900;">Book your visit</a>
+            <div style="margin-top:18px;padding:16px;border-radius:16px;background:rgba(95,234,255,0.08);border:1px solid rgba(95,234,255,0.24);">
+              <p style="margin:0 0 12px;color:#e0f2fe;font-size:15px;line-height:1.6;">
+                Want to invite your friends too?
+              </p>
+              <a href="${SQUAD_URL}" style="display:inline-block;padding:11px 15px;border-radius:10px;background:#5feaff;color:#070610;text-decoration:none;font-weight:900;">Join the Squad</a>
+            </div>
           </div>
           <div style="padding:15px 22px;border-top:1px solid rgba(255,255,255,0.08);color:#94a3b8;font-size:13px;line-height:1.6;">
             Pixel Pulse Play Zone | ${CONTACT_EMAIL}
@@ -153,11 +182,12 @@ export async function POST(request) {
         `Referrer: ${referrerName}`,
         `Referrer Email: ${referrerEmail}`,
         `Friends: ${friendEmails.join(", ")}`,
-        `Promo Code: ${PROMO_CODE}`,
+        `Promo Code: ${promoCode}`,
+        `Discount: ${DISCOUNT_PERCENT}%`,
       ].join("\n"),
     });
 
-    return NextResponse.json({ success: true, sent: friendEmails.length });
+    return NextResponse.json({ success: true, sent: friendEmails.length, promoCode });
   } catch (error) {
     console.error("Squad referral send failed:", error);
     return NextResponse.json(
