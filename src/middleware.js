@@ -13,22 +13,30 @@ function isAssetPath(pathname) {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("admin_token")?.value;
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+  const next = () =>
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
-    return NextResponse.next();
+    return next();
   }
 
   // ✅ Allow auth APIs
   if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+    return next();
   }
 
   // 🔁 Logged-in admin should not see login page
   if (pathname === "/admin/login") {
     return token
       ? NextResponse.redirect(new URL("/admin/waivers", request.url))
-      : NextResponse.next();
+      : next();
   }
 
   // 🔐 Protect admin pages
@@ -46,7 +54,7 @@ export function middleware(request) {
     );
   }
 
-  return NextResponse.next();
+  return next();
 }
 
 export const config = {

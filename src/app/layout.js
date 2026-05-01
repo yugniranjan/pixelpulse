@@ -5,15 +5,193 @@ import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChromeVisibility from "./components/ChromeVisibility";
-import { fetchMenuData, fetchsheetdata, getWaiverLink } from "./lib/sheets";
+import TrackingPageViews from "./components/TrackingPageViews";
+import { fetchMenuData, fetchsheetdata } from "./lib/sheets";
 import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
-import { normalizeValue } from "./lib/ctaContent";
+import { getConfiguredValue, getRowValue, normalizeValue } from "./lib/ctaContent";
 import Breadcrumbs from "./components/Breadcrumb";
 
 
 const BASE_URL = process.env.SITE_URL;
+const DEFAULT_GTM_ID = "GTM-53N567VP";
+const GTM_KEYS = [
+  "gtm_id",
+  "gtmId",
+  "gtm",
+  "googleTagManagerId",
+  "googleTagManager",
+  "googleTagManagerContainerId",
+];
+const GOOGLE_TAG_KEYS = [
+  "googleTagId",
+  "googleTagIds",
+  "gtagId",
+  "gtagIds",
+  "ga4MeasurementId",
+  "measurementId",
+];
+const META_PIXEL_KEYS = [
+  "metaPixelId",
+  "meta_pixel_id",
+  "facebookPixelId",
+  "facebook_pixel_id",
+  "fbPixelId",
+  "pixelId",
+];
+
+function cleanGtmId(value = "") {
+  const id = String(value || "").trim().toUpperCase();
+  return /^GTM-[A-Z0-9]+$/.test(id) ? id : "";
+}
+
+function cleanGoogleTagId(value = "") {
+  const id = String(value || "").trim().toUpperCase();
+  return /^[A-Z]{1,3}-[A-Z0-9]+$/.test(id) && !id.startsWith("GTM-")
+    ? id
+    : "";
+}
+
+function cleanMetaPixelId(value = "") {
+  const id = String(value || "").trim();
+  return /^\d{5,32}$/.test(id) ? id : "";
+}
+
+function findTrackingRow(rows = []) {
+  const trackingKeys = [...GTM_KEYS, ...GOOGLE_TAG_KEYS, ...META_PIXEL_KEYS];
+
+  return rows.find((row) =>
+    trackingKeys.some((key) => getRowValue(row, key)),
+  );
+}
+
+function getGoogleTagIds(sources = []) {
+  const rawValue = getConfiguredValue(sources, GOOGLE_TAG_KEYS, "");
+
+  return rawValue
+    .split(/[\n,|]+/)
+    .map(cleanGoogleTagId)
+    .filter(Boolean);
+}
+
+function normalizePath(path = "/") {
+  if (!path) return "/";
+  return path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
+}
+
+function isTrackingExcludedPath(path = "/") {
+  const pathname = normalizePath(path);
+
+  return (
+    pathname === "/waiver" ||
+    pathname.startsWith("/waiver/") ||
+    pathname === "/waiver-data" ||
+    pathname.startsWith("/invite") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/")
+  );
+}
+
+function GlobalTrackingTags({ gtmId = "", googleTagIds = [], metaPixelId = "" }) {
+  const cleanGtm = cleanGtmId(gtmId);
+  const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
+  const cleanGoogleTags = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
+  const primaryGoogleTag = cleanGoogleTags[0];
+
+  if (!cleanGtm && cleanGoogleTags.length === 0 && !cleanMetaPixel) {
+    return null;
+  }
+
+  return (
+    <>
+      {cleanGtm ? (
+        <>
+          <Script
+            id="google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${cleanGtm}');
+              `,
+            }}
+          />
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${cleanGtm}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        </>
+      ) : null}
+
+      {primaryGoogleTag ? (
+        <>
+          <Script
+            id="global-google-tag-loader"
+            src={`https://www.googletagmanager.com/gtag/js?id=${primaryGoogleTag}`}
+            strategy="afterInteractive"
+          />
+          <Script
+            id="global-google-tag-config"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                ${cleanGoogleTags
+                  .map((id) => `gtag('config', '${id}');`)
+                  .join("\n")}
+              `,
+            }}
+          />
+        </>
+      ) : null}
+
+      {cleanMetaPixel ? (
+        <>
+          <Script
+            id="meta-pixel"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '${cleanMetaPixel}');
+                fbq('track', 'PageView');
+              `,
+            }}
+          />
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              alt=""
+              src={`https://www.facebook.com/tr?id=${cleanMetaPixel}&ev=PageView&noscript=1`}
+            />
+          </noscript>
+        </>
+      ) : null}
+    </>
+  );
+}
+
 export async function generateMetadata() {
   const location_slug = LOCATION_NAME;
   try {
@@ -66,7 +244,10 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
+  const headerStore = await headers();
   const token = cookieStore.get("admin_token")?.value;
+  const pathname = headerStore.get("x-pathname") || "/";
+  const showTracking = !isTrackingExcludedPath(pathname);
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
@@ -82,26 +263,31 @@ export default async function RootLayout({ children }) {
   } catch (error) {
     console.error("layout data failed:", error);
   }
-  const locationid = sheetdata?.[0]?.locationid || null;
-  const gtmId = sheetdata?.find((item) => item?.gtm_id)?.gtm_id || "GTM-99ZBR";
+  const trackingRow = findTrackingRow(sheetdata) || {};
+  const trackingSources = [trackingRow, configdata];
+  const gtmId =
+    cleanGtmId(getConfiguredValue(trackingSources, GTM_KEYS, "")) ||
+    DEFAULT_GTM_ID;
+  const googleTagIds = getGoogleTagIds(trackingSources);
+  const metaPixelId = cleanMetaPixelId(
+    getConfiguredValue(trackingSources, META_PIXEL_KEYS, ""),
+  );
+
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        {gtmId && (
-          <Script
-            id="google-tag-manager"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${gtmId}');
-              `,
-            }}
-          />
-        )}
+        {showTracking ? (
+          <>
+            <GlobalTrackingTags
+              gtmId={gtmId}
+              googleTagIds={googleTagIds}
+              metaPixelId={metaPixelId}
+            />
+            <Suspense fallback={null}>
+              <TrackingPageViews />
+            </Suspense>
+          </>
+        ) : null}
         <Toaster position="top-right" />
         <ChromeVisibility>
           <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
