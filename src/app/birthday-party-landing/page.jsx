@@ -1,16 +1,16 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 import "../styles/birthday-landing.css";
 import Image from "next/image";
 import Script from "next/script";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { fetchMenuData, fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
+import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
 
 const LOCATION_SLUG = "vaughan";
 const LANDING_PAGES_SHEET = "landing pages";
-const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.png";
+const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.webp";
 const ATTRACTION_FALLBACK_IMAGE =
   "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
 
@@ -30,19 +30,18 @@ async function getBirthdayConfigData() {
 
 async function getBirthdayLandingData() {
   try {
-    const freshRows = await fetchsheetdataNoCache(LANDING_PAGES_SHEET);
-    const filteredRows = freshRows.filter((row) => {
-      const location = String(row.location ?? "");
-      return location.includes(LOCATION_SLUG) || location === "";
-    });
-
-    if (filteredRows.length) {
-      return filteredRows;
-    }
-
     return await fetchsheetdata(LANDING_PAGES_SHEET, LOCATION_SLUG);
   } catch (error) {
     console.error("birthday landing sheet failed:", error);
+    return [];
+  }
+}
+
+async function getBirthdayMenuData() {
+  try {
+    return await fetchMenuData(LOCATION_SLUG);
+  } catch (error) {
+    console.error("birthday landing menu failed:", error);
     return [];
   }
 }
@@ -238,17 +237,11 @@ function getAttractions(menuData = []) {
 }
 
 export default async function BirthdayPartyLandingPage() {
-  let menuData = [];
-  const [configData, landingData] = await Promise.all([
+  const [configData, landingData, menuData] = await Promise.all([
     getBirthdayConfigData(),
     getBirthdayLandingData(),
+    getBirthdayMenuData(),
   ]);
-
-  try {
-    menuData = await fetchMenuData(LOCATION_SLUG);
-  } catch (error) {
-    console.error("birthday landing menu failed:", error);
-  }
 
   const packagesData = parseBirthdayPackages(configData);
   const packageHighlights = getPackageHighlights(packagesData);
