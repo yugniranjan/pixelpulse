@@ -65,13 +65,20 @@
 }
 
 .ppp-squad-brand-row {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  justify-items: center;
   align-items: center;
-  gap: clamp(1rem, 5vw, 4rem);
+  gap: clamp(0.85rem, 2.4vw, 1.4rem);
+}
+
+.ppp-squad-brand-row::after {
+  content: "";
+  width: clamp(140px, 18vw, 210px);
 }
 
 .ppp-squad-main-logo {
+  justify-self: end;
   width: clamp(140px, 18vw, 210px);
   height: auto;
   object-fit: contain;
@@ -79,6 +86,7 @@
 }
 
 .ppp-squad-emblem {
+  justify-self: center;
   display: grid;
   place-items: center;
   width: clamp(132px, 18vw, 190px);
@@ -420,7 +428,7 @@
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0;
-  text-transform: uppercase;
+  text-transform: none;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.24);
 }
 
@@ -575,7 +583,15 @@
   }
 
   .ppp-squad-brand-row {
-    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-squad-brand-row::after {
+    display: none;
+  }
+
+  .ppp-squad-main-logo {
+    justify-self: center;
   }
 
   .ppp-squad-hero__copy {
@@ -610,8 +626,19 @@
     grid-template-columns: 1fr;
   }
 
+  .ppp-squad-contact-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0.65rem;
+  }
+
   .ppp-squad-contact-card span,
-  .ppp-squad-contact-card strong {
-    letter-spacing: 0.02em;
+  .ppp-squad-contact-card strong,
+  .ppp-squad-contact-card p {
+    min-height: 38px;
+    padding: 0.45rem 0.35rem;
+    font-size: 0.66rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 }
