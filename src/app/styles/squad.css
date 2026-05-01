@@ -1,0 +1,617 @@
+.ppp-squad-page {
+  --squad-bg: #060711;
+  --squad-panel: rgba(10, 12, 28, 0.82);
+  --squad-lime: #b7ff22;
+  --squad-cyan: #5feaff;
+  --squad-pink: #ff28e8;
+  --squad-purple: #6f35ff;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 72%, rgba(255, 40, 232, 0.38), transparent 30%),
+    radial-gradient(circle at 92% 64%, rgba(0, 132, 255, 0.32), transparent 32%),
+    linear-gradient(180deg, #070610 0%, #080816 54%, #03142f 100%);
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ppp-squad-page * {
+  box-sizing: border-box;
+}
+
+.ppp-squad-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.ppp-squad-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 760px;
+  padding: clamp(1.1rem, 3vw, 2rem) 0 3rem;
+  display: grid;
+  align-items: center;
+}
+
+.ppp-squad-hero::before,
+.ppp-squad-hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ppp-squad-hero::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(95, 234, 255, 0.14) 8.2%, transparent 8.6% 91.4%, rgba(255, 40, 232, 0.16) 91.8%, transparent 92.2%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 82px);
+  opacity: 0.55;
+}
+
+.ppp-squad-hero::after {
+  left: 0;
+  right: 0;
+  bottom: 11%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--squad-cyan), #ffffff, var(--squad-cyan), transparent);
+  box-shadow: 0 0 20px var(--squad-cyan), 0 0 64px rgba(95, 234, 255, 0.72);
+}
+
+.ppp-squad-hero__inner {
+  display: grid;
+  gap: clamp(1.2rem, 3vw, 2rem);
+  text-align: center;
+}
+
+.ppp-squad-brand-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1rem, 5vw, 4rem);
+}
+
+.ppp-squad-main-logo {
+  width: clamp(140px, 18vw, 210px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 22px rgba(183, 255, 34, 0.24));
+}
+
+.ppp-squad-emblem {
+  display: grid;
+  place-items: center;
+  width: clamp(132px, 18vw, 190px);
+  aspect-ratio: 1;
+  border: 3px solid var(--squad-pink);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 40, 232, 0.22), rgba(95, 234, 255, 0.08) 45%, rgba(7, 6, 16, 0.86) 72%),
+    repeating-linear-gradient(90deg, rgba(95, 234, 255, 0.18) 0 2px, transparent 2px 22px);
+  box-shadow:
+    0 0 24px rgba(255, 40, 232, 0.82),
+    inset 0 0 42px rgba(95, 234, 255, 0.24);
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.ppp-squad-emblem span,
+.ppp-squad-emblem strong {
+  font-size: clamp(1.45rem, 3.1vw, 2.55rem);
+  text-shadow: 0 0 16px currentColor;
+}
+
+.ppp-squad-emblem span {
+  color: #ff9df7;
+}
+
+.ppp-squad-emblem strong {
+  color: var(--squad-cyan);
+}
+
+.ppp-squad-emblem small {
+  color: var(--squad-cyan);
+  font-size: clamp(0.66rem, 1.2vw, 0.88rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.ppp-squad-kicker {
+  margin: 0;
+  color: var(--squad-lime);
+  font-size: clamp(0.72rem, 1vw, 0.84rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-squad-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.72fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  text-align: left;
+}
+
+.ppp-squad-hero__content {
+  display: grid;
+  gap: clamp(1rem, 2.4vw, 1.8rem);
+}
+
+.ppp-squad-hero__copy {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.ppp-squad-hero__copy h1 {
+  margin: 0;
+  color: var(--squad-lime);
+  width: min(100%, 980px);
+  font-size: clamp(2.2rem, 5.4vw, 4.8rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-shadow: 0 0 24px rgba(183, 255, 34, 0.32);
+}
+
+.ppp-squad-hero__copy p:last-child {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 2.6vw, 2rem);
+  font-weight: 800;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.68);
+}
+
+.ppp-squad-stage {
+  display: grid;
+  place-items: center;
+}
+
+.ppp-squad-frame {
+  position: relative;
+  width: min(560px, 100%);
+  padding: clamp(0.72rem, 1.6vw, 1rem);
+}
+
+.ppp-squad-frame::before,
+.ppp-squad-frame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 26%;
+  border-top: 7px solid var(--squad-pink);
+  border-bottom: 7px solid var(--squad-pink);
+  filter: drop-shadow(0 0 16px var(--squad-pink));
+}
+
+.ppp-squad-frame::before {
+  left: 0;
+  border-left: 7px solid var(--squad-pink);
+}
+
+.ppp-squad-frame::after {
+  right: 0;
+  border-right: 7px solid var(--squad-pink);
+}
+
+.ppp-squad-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border: 7px solid #05060d;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.72);
+}
+
+.ppp-squad-light {
+  position: absolute;
+  bottom: 13%;
+  width: 180px;
+  height: 300px;
+  border: 6px solid var(--squad-pink);
+  filter: drop-shadow(0 0 20px var(--squad-pink)) drop-shadow(0 0 30px var(--squad-cyan));
+  opacity: 0.8;
+}
+
+.ppp-squad-light--left {
+  left: -70px;
+  transform: skewY(28deg) rotate(-32deg);
+  border-right-color: var(--squad-cyan);
+}
+
+.ppp-squad-light--right {
+  right: -70px;
+  transform: skewY(-28deg) rotate(32deg);
+  border-left-color: var(--squad-cyan);
+}
+
+.ppp-squad-info,
+.ppp-squad-parent,
+.ppp-squad-signup-section,
+.ppp-squad-terms {
+  position: relative;
+  padding: clamp(2.2rem, 5vw, 4rem) 0;
+}
+
+.ppp-squad-info__grid,
+.ppp-squad-parent__grid,
+.ppp-squad-signup__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(0.85rem, 2vw, 1.15rem);
+  align-items: start;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.ppp-squad-info__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  max-width: 1120px;
+}
+
+.ppp-squad-info article,
+.ppp-squad-parent__grid > div,
+.ppp-squad-booking-panel,
+.ppp-squad-contact-card,
+.ppp-squad-form {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(95, 234, 255, 0.32);
+  border-radius: 8px;
+  background:
+    linear-gradient(110deg, rgba(255, 40, 232, 0.1), rgba(95, 234, 255, 0.07) 48%, rgba(183, 255, 34, 0.05)),
+    var(--squad-panel);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.ppp-squad-info article::before,
+.ppp-squad-parent__grid > div::before,
+.ppp-squad-contact-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--squad-lime), var(--squad-cyan), var(--squad-pink));
+  box-shadow: 0 0 18px rgba(95, 234, 255, 0.7);
+}
+
+.ppp-squad-info article,
+.ppp-squad-parent__grid > div {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(0.95rem, 2vw, 1.2rem) clamp(1rem, 2.2vw, 1.35rem);
+}
+
+.ppp-squad-info h2,
+.ppp-squad-parent h2,
+.ppp-squad-form h2,
+.ppp-squad-terms h2 {
+  margin: 0 0 1rem;
+  color: var(--squad-lime);
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.ppp-squad-info ul,
+.ppp-squad-parent-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(0.98rem, 1.5vw, 1.14rem);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.ppp-squad-rewards {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: auto;
+}
+
+.ppp-squad-rewards div {
+  display: grid;
+  grid-template-columns: minmax(86px, 0.72fr) minmax(0, 1.28fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.72rem 0.82rem;
+  border: 1px solid rgba(95, 234, 255, 0.22);
+  border-radius: 8px;
+  color: var(--squad-cyan);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: clamp(0.9rem, 1.4vw, 1.08rem);
+  font-weight: 900;
+}
+
+.ppp-squad-rewards span {
+  text-align: right;
+}
+
+.ppp-squad-parent__grid {
+  align-items: start;
+}
+
+.ppp-squad-booking-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: start;
+  gap: 0.78rem;
+  padding: clamp(1rem, 2.4vw, 1.45rem);
+  text-align: left;
+}
+
+.ppp-squad-booking-panel img {
+  grid-row: 1 / span 2;
+  width: 76px;
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(95, 234, 255, 0.32));
+}
+
+.ppp-squad-booking-panel p,
+.ppp-squad-booking-panel h3 {
+  margin: 0;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.48);
+}
+
+.ppp-squad-booking-panel p {
+  grid-column: 2;
+  color: #ffffff;
+  font-size: clamp(1rem, 1.8vw, 1.32rem);
+  font-weight: 800;
+}
+
+.ppp-squad-booking-panel h3 {
+  grid-column: 2;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(0.96rem, 1.4vw, 1.1rem);
+}
+
+.ppp-squad-booking-panel a {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.ppp-squad-booking-panel a,
+.ppp-squad-form button {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--squad-lime);
+  border-radius: 8px;
+  background: var(--squad-lime);
+  color: #070610;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 0 28px rgba(183, 255, 34, 0.24);
+}
+
+.ppp-squad-contact-card {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  align-items: stretch;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.ppp-squad-contact-card span,
+.ppp-squad-contact-card strong {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  min-width: 0;
+  padding: 0.5rem 0.45rem;
+  border: 1px solid rgba(95, 234, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.24);
+}
+
+.ppp-squad-contact-card strong {
+  color: var(--squad-cyan);
+  font-size: 0.74rem;
+}
+
+.ppp-squad-contact-card p {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 0.45rem;
+  border: 1px solid rgba(95, 234, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ppp-squad-contact-card span::after,
+.ppp-squad-contact-card strong::after {
+  content: none;
+}
+
+.ppp-squad-form {
+  display: grid;
+  gap: 0.78rem;
+  padding: clamp(1rem, 2vw, 1.35rem);
+}
+
+.ppp-squad-form__header p,
+.ppp-squad-form__header h2 {
+  margin: 0;
+}
+
+.ppp-squad-form__header p {
+  color: var(--squad-cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ppp-squad-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 0.68rem;
+}
+
+.ppp-squad-form__wide {
+  grid-column: 1 / -1;
+}
+
+.ppp-squad-form label {
+  display: grid;
+  gap: 0.32rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ppp-squad-form input,
+.ppp-squad-form textarea {
+  width: 100%;
+  border: 1px solid rgba(95, 234, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font: inherit;
+  padding: 0.68rem 0.76rem;
+}
+
+.ppp-squad-form textarea {
+  min-height: 68px;
+  resize: vertical;
+}
+
+.ppp-squad-form input:focus,
+.ppp-squad-form textarea:focus {
+  outline: none;
+  border-color: var(--squad-pink);
+  box-shadow: 0 0 0 3px rgba(255, 40, 232, 0.16);
+}
+
+.ppp-squad-check {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.ppp-squad-check input {
+  width: 16px;
+  height: 16px;
+  margin-top: 0.15rem;
+  accent-color: var(--squad-lime);
+}
+
+.ppp-squad-form button {
+  width: 100%;
+  cursor: pointer;
+}
+
+.ppp-squad-form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.ppp-squad-form > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.ppp-squad-terms {
+  padding-top: clamp(1.3rem, 3vw, 2rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  opacity: 0.78;
+}
+
+.ppp-squad-terms h2 {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.98rem, 1.4vw, 1.18rem);
+  font-weight: 700;
+  text-transform: none;
+}
+
+.ppp-squad-terms ol {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 900px;
+  margin: 0;
+  margin-inline: auto;
+  padding-left: 1.3rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: clamp(0.76rem, 1vw, 0.88rem);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+@media (max-width: 860px) {
+  .ppp-squad-brand-row,
+  .ppp-squad-hero__grid,
+  .ppp-squad-info__grid,
+  .ppp-squad-parent__grid,
+  .ppp-squad-signup__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-squad-brand-row {
+    display: grid;
+  }
+
+  .ppp-squad-hero__copy {
+    text-align: center;
+  }
+
+  .ppp-squad-light {
+    display: none;
+  }
+
+  .ppp-squad-rewards div {
+    display: grid;
+  }
+
+  .ppp-squad-booking-panel {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ppp-squad-booking-panel a {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .ppp-squad-hero {
+    min-height: auto;
+  }
+
+  .ppp-squad-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-squad-contact-card span,
+  .ppp-squad-contact-card strong {
+    letter-spacing: 0.02em;
+  }
+}
