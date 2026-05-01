@@ -184,7 +184,7 @@ function getSquadContent(rows = []) {
       referrerNameLabel: getConfiguredValue(rows, ["squadReferralNameLabel", "referralNameLabel"], "Your name"),
       referrerEmailLabel: getConfiguredValue(rows, ["squadReferralEmailLabel", "referralEmailLabel"], "Your email"),
       friendEmailLabel: getConfiguredValue(rows, ["squadReferralFriendEmailLabel", "referralFriendEmailLabel"], "Friend email"),
-      addFriendText: getConfiguredValue(rows, ["squadReferralAddFriendText", "referralAddFriendText"], "Add another friend"),
+      addFriendText: getConfiguredValue(rows, ["squadReferralAddFriendText", "referralAddFriendText"], "Add friend"),
       removeFriendText: getConfiguredValue(rows, ["squadReferralRemoveFriendText", "referralRemoveFriendText"], "Remove"),
       submitText: getConfiguredValue(rows, ["squadReferralSubmitText", "referralSubmitText"], "Send PP10 Referral"),
       helperText: getConfiguredValue(rows, ["squadReferralHelperText", "referralHelperText"], "Friends receive a 10% discount code: PP10."),

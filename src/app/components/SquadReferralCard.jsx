@@ -159,7 +159,7 @@ export default function SquadReferralCard({ content = {} }) {
           aria-label={referralContent.addFriendText}
         >
           <span aria-hidden="true">+</span>
-          Add friend
+          {referralContent.addFriendText}
         </button>
         <button
           type="submit"
