@@ -46,6 +46,11 @@ export default function SquadLandingPage() {
       <section className="ppp-squad-hero" aria-labelledby="squad-title">
         <div className="ppp-squad-light ppp-squad-light--left" aria-hidden="true" />
         <div className="ppp-squad-light ppp-squad-light--right" aria-hidden="true" />
+        <div className="ppp-squad-led-strips" aria-hidden="true">
+          <span className="ppp-squad-led-strip ppp-squad-led-strip--top" />
+          <span className="ppp-squad-led-strip ppp-squad-led-strip--mid" />
+          <span className="ppp-squad-led-strip ppp-squad-led-strip--bottom" />
+        </div>
         <div className="ppp-squad-shell ppp-squad-hero__inner">
           <div className="ppp-squad-brand-row">
             <Image
