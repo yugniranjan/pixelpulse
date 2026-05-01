@@ -565,10 +565,14 @@
   padding: 0 0.9rem;
 }
 
-.ppp-squad-referral-card__add {
+.ppp-squad-referral-card button.ppp-squad-referral-card__add {
   gap: 0.45rem;
   min-height: 38px;
   padding: 0 0.2rem 0 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  box-shadow: none;
 }
 
 .ppp-squad-referral-card__add span {
@@ -589,8 +593,7 @@
   min-width: 190px;
 }
 
-.ppp-squad-referral-card__friends button,
-.ppp-squad-referral-card__add {
+.ppp-squad-referral-card__friends button {
   border-color: rgba(95, 234, 255, 0.34);
   background: transparent;
   color: #ffffff;

@@ -21,7 +21,7 @@ export default function SquadReferralCard({ content = {} }) {
     referrerNameLabel: content.referrerNameLabel || "Your name",
     referrerEmailLabel: content.referrerEmailLabel || "Your email",
     friendEmailLabel: content.friendEmailLabel || "Friend email",
-    addFriendText: content.addFriendText || "Add another friend",
+    addFriendText: content.addFriendText || "Add friend",
     removeFriendText: content.removeFriendText || "Remove",
     submitText: content.submitText || "Send PP10 Referral",
     sendingText: content.sendingText || "Sending referral...",
@@ -159,7 +159,7 @@ export default function SquadReferralCard({ content = {} }) {
           aria-label={referralContent.addFriendText}
         >
           <span aria-hidden="true">+</span>
-          {referralContent.addFriendText}
+          Add friend
         </button>
         <button
           type="submit"
