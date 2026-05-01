@@ -78,13 +78,27 @@ function parseJsonValue(rows = [], keys = [], fallback) {
 }
 
 function getTextList(rows = [], keys = [], fallback = []) {
-  const parsed = parseJsonValue(rows, keys, null);
-  if (Array.isArray(parsed)) {
-    return parsed.map((item) => String(item || "").trim()).filter(Boolean);
-  }
-
   const raw = getConfiguredValue(rows, keys, "");
   if (!raw) return fallback;
+
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(
+        trimmed
+          .replace(/<br\/>/g, "")
+          .replace(/\n/g, "")
+          .replace(/,\s*([}\]])/g, "$1"),
+      );
+
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => String(item || "").trim()).filter(Boolean);
+      }
+    } catch (error) {
+      console.error(`squad landing JSON parse failed for ${keys.join(", ")}:`, error);
+      return fallback;
+    }
+  }
 
   return raw
     .split(/\n|<br\/>|\|/)
