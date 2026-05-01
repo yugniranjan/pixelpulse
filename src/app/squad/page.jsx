@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import "../styles/squad.css";
 import SquadSignupForm from "@/components/SquadSignupForm";
+import SquadReferralCard from "@/components/SquadReferralCard";
 import { fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
 
@@ -177,6 +177,21 @@ function getSquadContent(rows = []) {
     bookingText: getConfiguredValue(rows, ["squadBookingText", "bookingText"], "Pixel Pulse Playzone - Vaughan"),
     bookingTitle: getConfiguredValue(rows, ["squadBookingTitle", "bookingTitle"], "Ask your parent to sign up today."),
     bookingButtonText: getConfiguredValue(rows, ["squadBookingButtonText", "bookingButtonText"], "Book Today"),
+    referral: {
+      eyebrow: getConfiguredValue(rows, ["squadReferralEyebrow", "referralEyebrow"], "Friend referral"),
+      title: getConfiguredValue(rows, ["squadReferralTitle", "referralTitle"], "Book Today"),
+      description: getConfiguredValue(rows, ["squadReferralDescription", "referralDescription"], "Email your friends a 10% discount with promo code PP10."),
+      referrerNameLabel: getConfiguredValue(rows, ["squadReferralNameLabel", "referralNameLabel"], "Your name"),
+      referrerEmailLabel: getConfiguredValue(rows, ["squadReferralEmailLabel", "referralEmailLabel"], "Your email"),
+      friendEmailLabel: getConfiguredValue(rows, ["squadReferralFriendEmailLabel", "referralFriendEmailLabel"], "Friend email"),
+      addFriendText: getConfiguredValue(rows, ["squadReferralAddFriendText", "referralAddFriendText"], "Add another friend"),
+      removeFriendText: getConfiguredValue(rows, ["squadReferralRemoveFriendText", "referralRemoveFriendText"], "Remove"),
+      submitText: getConfiguredValue(rows, ["squadReferralSubmitText", "referralSubmitText"], "Send PP10 Referral"),
+      helperText: getConfiguredValue(rows, ["squadReferralHelperText", "referralHelperText"], "Friends receive a 10% discount code: PP10."),
+      sendingText: getConfiguredValue(rows, ["squadReferralSendingText", "referralSendingText"], "Sending referral..."),
+      successText: getConfiguredValue(rows, ["squadReferralSuccessText", "referralSuccessText"], "Referral sent. Your friends now have PP10."),
+      errorText: getConfiguredValue(rows, ["squadReferralErrorText", "referralErrorText"], "Could not send referral. Please try again."),
+    },
     website: getConfiguredValue(rows, ["squadWebsite", "website"], "www.pixelpulseplay.ca"),
     phone: getConfiguredValue(rows, ["squadPhone", "phone"], "905-760-2922"),
     email: getConfiguredValue(rows, ["squadEmail", "email"], "connect@pixelpulsplay.ca"),
@@ -326,17 +341,7 @@ export default async function SquadLandingPage() {
 
       <section className="ppp-squad-parent">
         <div className="ppp-squad-shell ppp-squad-parent__grid">
-          <div className="ppp-squad-booking-panel">
-            <Image
-              src={content.bookingLogo}
-              alt={content.bookingLogoAlt}
-              width={120}
-              height={120}
-            />
-            <p>{content.bookingText}</p>
-            <h3>{content.bookingTitle}</h3>
-            <Link href="#squad-signup">{content.bookingButtonText}</Link>
-          </div>
+          <SquadReferralCard content={content.referral} />
         </div>
       </section>
 
