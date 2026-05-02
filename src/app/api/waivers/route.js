@@ -113,9 +113,9 @@ export async function POST(req) {
     );
   }
 
-  if (!visit.passType || !visit.visitDate || !visit.emergencyName || !visit.emergencyRelation || !visit.emergencyPhone || !visit.printName || !visit.signDate) {
+  if (!visit.visitDate || !visit.printName || !visit.signDate) {
     return NextResponse.json(
-      { error: "Visit, emergency contact, printed name, and signed date are required." },
+      { error: "Visit date, printed name, and signed date are required." },
       { status: 400 },
     );
   }

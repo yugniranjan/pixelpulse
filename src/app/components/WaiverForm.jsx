@@ -2,17 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const PASS_TYPES = [
-  "Walk-in / General Admission",
-  "Explorer Pass - 30 min",
-  "All-Access Pass - 60 min",
-  "Party Package - 90 min",
-  "Birthday Party Package",
-  "Corporate / Group Event",
-  "School Field Trip",
-  "University Student Special",
-];
-
 const HEALTH_CONDITIONS = [
   "Not Applicable",
   "Asthma",
@@ -400,10 +389,6 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   const [familyMembers, setFamilyMembers] = useState([]);
   const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
-  const passTypes = useMemo(
-    () => configuredList(waiverContent, "passTypes", PASS_TYPES),
-    [waiverContent],
-  );
   const healthConditions = useMemo(
     () => configuredList(waiverContent, "healthConditions", HEALTH_CONDITIONS),
     [waiverContent],
@@ -419,22 +404,10 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       ]),
     [waiverContent],
   );
-  const emergencyRelationOptions = useMemo(
-    () =>
-      configuredList(waiverContent, "emergencyRelationOptions", [
-        "Spouse / Partner",
-        "Parent",
-        "Sibling",
-        "Friend",
-        "Other",
-      ]),
-    [waiverContent],
-  );
   const showFamilyMembers = configuredBoolean(waiverContent, "showFamilyMembers", true);
   const showGenderField = configuredBoolean(waiverContent, "showGenderField", true);
   const showMedicalFields = configuredBoolean(waiverContent, "showMedicalFields", true);
   const showPartyFields = configuredBoolean(waiverContent, "showPartyFields", true);
-  const showVisitTimeField = configuredBoolean(waiverContent, "showVisitTimeField", true);
   const showPhotoConsent = configuredBoolean(waiverContent, "showPhotoConsent", true);
 
   const namedFamily = useMemo(
@@ -774,48 +747,13 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
               </label>
             </>
           ) : null}
-          <label>
-            <span>{configuredText(waiverContent, "passTypeLabel")}</span>
-            <select required value={visit.passType} onChange={(event) => updateVisit("passType", event.target.value)}>
-              <option value="">{configuredText(waiverContent, "passTypePlaceholder")}</option>
-              {passTypes.map((type) => <option key={type}>{type}</option>)}
-            </select>
-          </label>
           <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
-          {showVisitTimeField ? <label>
-            <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
-            <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
-          </label> : null}
         </div>
       </section>
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
           <span>04</span>
-          <h2>{configuredText(waiverContent, "emergencySectionTitle")}</h2>
-        </div>
-        <div className="ppp-waiver-field-grid">
-          <label>
-            <span>{configuredText(waiverContent, "emergencyNameLabel")}</span>
-            <input required value={visit.emergencyName} onChange={(event) => updateVisit("emergencyName", event.target.value)} />
-          </label>
-          <label>
-            <span>{configuredText(waiverContent, "emergencyRelationLabel")}</span>
-            <select required value={visit.emergencyRelation} onChange={(event) => updateVisit("emergencyRelation", event.target.value)}>
-              <option value="">{configuredText(waiverContent, "emergencyRelationPlaceholder")}</option>
-              {emergencyRelationOptions.map((option) => <option key={option}>{option}</option>)}
-            </select>
-          </label>
-          <label className="ppp-waiver-wide">
-            <span>{configuredText(waiverContent, "emergencyPhoneLabel")}</span>
-            <input required type="tel" value={visit.emergencyPhone} onChange={(event) => updateVisit("emergencyPhone", event.target.value)} />
-          </label>
-        </div>
-      </section>
-
-      <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>05</span>
           <h2>{configuredText(waiverContent, "termsSectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-checks">
@@ -841,7 +779,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
 
       <section className="ppp-waiver-section">
         <div className="ppp-waiver-section-head">
-          <span>06</span>
+          <span>05</span>
           <h2>{configuredText(waiverContent, "signatureSectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-field-grid ppp-waiver-field-grid--full">
