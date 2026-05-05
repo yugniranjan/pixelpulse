@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate:firestore": "node scripts/migrate-firestore-to-postgres.mjs"
   },
   "dependencies": {
     "@editorjs/code": "^2.9.3",
@@ -31,12 +32,13 @@
     "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
-    "firebase-admin": "^13.6.0",
+    "firebase-admin": "^13.8.0",
     "framer-motion": "^11.5.4",
     "jsonwebtoken": "^9.0.3",
     "next": "^14.2.33",
     "node-cache": "^5.1.2",
     "nodemailer": "^8.0.5",
+    "pg": "^8.20.0",
     "react": "^18",
     "react-countup": "^6.5.3",
     "react-dom": "^18",

@@ -8,6 +8,7 @@ import WaiverForm from "@/components/WaiverForm";
 import { db } from "@/lib/firestore";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { partyWaiverDocId, splitParticipantName } from "@/lib/partyWaivers";
+import { getPostgresPartyWaiver, hasPostgres } from "@/lib/postgresData";
 
 export const metadata = {
   title: "Waiver | Pixel Pulse Play Vaughan",
@@ -28,6 +29,11 @@ function searchValue(searchParams, key) {
 }
 
 async function getPartyWaiverDetails(partyId) {
+  if (hasPostgres() && partyId) {
+    const partyWaiver = await getPostgresPartyWaiver(partyId);
+    if (partyWaiver) return partyWaiver;
+  }
+
   if (!db || !partyId) return null;
 
   const snapshot = await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get();
@@ -59,17 +65,24 @@ async function getWaiverContent() {
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
   const partyId = searchValue(params, "partyId");
+  const queryPrimaryParticipant =
+    searchValue(params, "primaryParticipant") ||
+    searchValue(params, "guestName") ||
+    searchValue(params, "partyName");
+  const queryVisitDate = searchValue(params, "visitDate") || searchValue(params, "date");
+  const queryVisitTime = searchValue(params, "visitTime") || searchValue(params, "time");
   const [partyDetails, waiverContent] = await Promise.all([
     getPartyWaiverDetails(partyId),
     getWaiverContent(),
   ]);
-  const primaryName = splitParticipantName(partyDetails?.primaryParticipant);
+  const primaryParticipant = partyDetails?.primaryParticipant || queryPrimaryParticipant;
+  const primaryName = splitParticipantName(primaryParticipant);
   const initialVisit = {
     partyId,
-    partyName: partyDetails?.primaryParticipant || "",
+    partyName: primaryParticipant || "",
     passType: partyDetails?.passType || (partyId ? "Birthday Party Package" : ""),
-    visitDate: partyDetails?.visitDate || "",
-    visitTime: partyDetails?.visitTime || "",
+    visitDate: partyDetails?.visitDate || queryVisitDate || "",
+    visitTime: partyDetails?.visitTime || queryVisitTime || "",
   };
   const initialPrimary = {
     firstName: primaryName.firstName,

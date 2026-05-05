@@ -444,6 +444,23 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  useEffect(() => {
+    setVisit((current) => ({
+      ...current,
+      partyId: initialVisit.partyId || current.partyId,
+      partyName: initialVisit.partyName || current.partyName,
+      passType: initialVisit.passType || current.passType,
+      visitDate: initialVisit.visitDate || current.visitDate,
+      visitTime: initialVisit.visitTime || current.visitTime,
+    }));
+  }, [
+    initialVisit.partyId,
+    initialVisit.partyName,
+    initialVisit.passType,
+    initialVisit.visitDate,
+    initialVisit.visitTime,
+  ]);
+
   function pointFromEvent(event) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -732,9 +749,15 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             {configuredText(waiverContent, "linkedPartyPrefix")}{" "}
             {visit.partyName ? <strong>{visit.partyName}</strong> : configuredText(waiverContent, "linkedPartyFallback")}
             {visit.partyId ? <> {configuredText(waiverContent, "linkedPartyIdText")} <strong>{visit.partyId}</strong></> : null}.
+            {visit.visitDate ? <> Visit date: <strong>{visit.visitDate}</strong>.</> : null}
+            {visit.visitTime ? <> Party time: <strong>{visit.visitTime}</strong>.</> : null}
           </p>
         ) : null}
         <div className="ppp-waiver-field-grid">
+          <input type="hidden" name="partyId" value={visit.partyId} />
+          <input type="hidden" name="partyName" value={visit.partyName} />
+          <input type="hidden" name="passType" value={visit.passType} />
+          <input type="hidden" name="visitTime" value={visit.visitTime} />
           {showPartyFields ? (
             <>
               <label>

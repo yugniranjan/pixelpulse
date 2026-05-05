@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import { getPostgresAdminByEmail, hasPostgres } from "@/lib/postgresData";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import handlePost from "@/lib/postHandler";
@@ -10,9 +11,9 @@ import handlePost from "@/lib/postHandler";
 async function loginLogic(req) {
   const { email, password } = await req.json();
 
-  if (!db) {
+  if (!db && !hasPostgres()) {
     return NextResponse.json(
-      { error: "Firestore is not configured." },
+      { error: "Database is not configured." },
       { status: 500 }
     );
   }
@@ -24,22 +25,29 @@ async function loginLogic(req) {
     );
   }
 
-  const snap = await db
-    .collection("admins")
-    .where("email", "==", email)
-    .where("active", "==", true)
-    .limit(1)
-    .get();
+  let adminDoc = null;
+  let admin = null;
 
-  if (snap.empty) {
+  if (hasPostgres()) {
+    admin = await getPostgresAdminByEmail(email);
+    adminDoc = admin ? { id: admin.id } : null;
+  } else {
+    const snap = await db
+      .collection("admins")
+      .where("email", "==", email)
+      .where("active", "==", true)
+      .limit(1)
+      .get();
+    adminDoc = snap.docs[0] || null;
+    admin = adminDoc?.data();
+  }
+
+  if (!admin) {
     return NextResponse.json(
       { error: "Invalid email credentials" },
       { status: 401 }
     );
   }
-
-  const adminDoc = snap.docs[0];
-  const admin = adminDoc.data();
 
   const match = await bcrypt.compare(password, admin.passwordHash);
 

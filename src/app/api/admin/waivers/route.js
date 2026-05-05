@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import {
+  deletePostgresWaiver,
+  hasPostgres,
+  listPostgresWaivers,
+  updatePostgresWaiver,
+} from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -34,6 +40,10 @@ function getWaiverId(req) {
 }
 
 export async function GET() {
+  if (hasPostgres()) {
+    return NextResponse.json({ waivers: await listPostgresWaivers(100) });
+  }
+
   if (!db) {
     return NextResponse.json(
       { error: "Firestore is not configured." },
@@ -53,7 +63,7 @@ export async function GET() {
 }
 
 export async function PUT(req) {
-  if (!db) {
+  if (!db && !hasPostgres()) {
     return NextResponse.json(
       { error: "Firestore is not configured." },
       { status: 503 },
@@ -107,6 +117,13 @@ export async function PUT(req) {
     );
   }
 
+  if (hasPostgres()) {
+    const waiver = await updatePostgresWaiver(id, updateData);
+    return waiver
+      ? NextResponse.json({ success: true, waiver })
+      : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
+  }
+
   const ref = db.collection("waivers").doc(id);
   const snapshot = await ref.get();
 
@@ -124,6 +141,13 @@ export async function PUT(req) {
 }
 
 export async function DELETE(req) {
+  if (hasPostgres()) {
+    const deleted = await deletePostgresWaiver(id);
+    return deleted
+      ? NextResponse.json({ success: true, id })
+      : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
+  }
+
   if (!db) {
     return NextResponse.json(
       { error: "Firestore is not configured." },

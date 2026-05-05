@@ -1,6 +1,7 @@
 import { db } from "@/lib/firestore";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { getRowValue } from "@/lib/ctaContent";
+import { getPostgresInviteBySlug, hasPostgres } from "@/lib/postgresData";
 
 export function normalizeInviteSlug(value = "") {
   return String(value || "")
@@ -34,6 +35,13 @@ export async function getInviteBySlug(slug) {
   const normalizedSlug = normalizeInviteSlug(slug);
   if (!normalizedSlug) return null;
 
+  if (hasPostgres()) {
+    const postgresInvite = await getPostgresInviteBySlug(normalizedSlug);
+    if (postgresInvite && isActiveInvite(postgresInvite)) {
+      return postgresInvite;
+    }
+  }
+
   if (db) {
     const snapshot = await db.collection("invites").doc(normalizedSlug).get();
     const firestoreInvite = serializeFirestoreInvite(snapshot);
@@ -48,4 +56,3 @@ export async function getInviteBySlug(slug) {
     return rowSlug === normalizedSlug && isActiveInvite(row);
   }) || null;
 }
-

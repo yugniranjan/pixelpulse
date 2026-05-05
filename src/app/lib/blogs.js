@@ -1,4 +1,5 @@
 import { db } from "@/lib/firestore";
+import { fetchPostgresBlogs, hasPostgres } from "@/lib/postgresData";
 
 const fallbackImage =
   "https://storage.googleapis.com/aerosports/common/gallery-thummbnail-wall-climbwall.jpg";
@@ -137,6 +138,14 @@ function logFirestoreBlogWarning(label, error) {
 }
 
 export async function fetchBlogs() {
+  if (hasPostgres()) {
+    try {
+      return await fetchPostgresBlogs();
+    } catch (error) {
+      console.warn(`Postgres blog feed unavailable: ${error?.message || error}. Falling back to Firestore.`);
+    }
+  }
+
   if (!db) {
     console.warn(
       "Firestore blog feed unavailable: missing GCP_PROJECT_ID, GCP_CLIENT_EMAIL, or GCP_PRIVATE_KEY. Falling back to static blog cards."

@@ -8,6 +8,7 @@ import {
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
 import { db } from "@/lib/firestore";
+import { getPostgresBlogById, hasPostgres } from "@/lib/postgresData";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params, searchParams }) {
@@ -17,21 +18,24 @@ export async function generateMetadata({ params, searchParams }) {
   ]);
   const BASE_URL = process.env.SITE_URL;
 
-  if (!id || !db) return {};
+  if (!id || (!db && !hasPostgres())) return {};
 
-  let doc;
+  let data;
   try {
-    doc = await db.collection("blogs").doc(id).get();
+    if (hasPostgres()) {
+      data = await getPostgresBlogById(id);
+    } else {
+      const doc = await db.collection("blogs").doc(id).get();
+      if (doc.exists) data = doc.data();
+    }
   } catch (error) {
-    console.warn(`Firestore blog metadata unavailable: ${error?.message || error}`);
+    console.warn(`Blog metadata unavailable: ${error?.message || error}`);
     return {};
   }
 
-  if (!doc.exists) {
+  if (!data) {
     return {};
   }
-
-  const data = doc.data();
 
   const title = data?.title || "Blog";
   const description =
@@ -83,33 +87,34 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 async function getBlogById(id) {
-  if (!id || !db) return null;
+  if (!id || (!db && !hasPostgres())) return null;
 
-  let doc;
   try {
-    doc = await db.collection("blogs").doc(id).get();
+    if (hasPostgres()) {
+      return await getPostgresBlogById(id);
+    }
+    const doc = await db.collection("blogs").doc(id).get();
+    if (!doc.exists) return null;
+    const data = doc.data();
+
+    let content = data.content;
+    if (typeof content === "string") {
+      try {
+        content = JSON.parse(content);
+      } catch {
+        content = null;
+      }
+    }
+
+    return {
+      id: doc.id,
+      ...data,
+      content,
+    };
   } catch (error) {
-    console.warn(`Firestore blog detail unavailable: ${error?.message || error}`);
+    console.warn(`Blog detail unavailable: ${error?.message || error}`);
     return null;
   }
-
-  if (!doc.exists) return null;
-  const data = doc.data();
-
-  let content = data.content;
-  if (typeof content === "string") {
-    try {
-      content = JSON.parse(content);
-    } catch {
-      content = null;
-    }
-  }
-
-  return {
-    id: doc.id,
-    ...data,
-    content,
-  };
 }
 
 function renderEditorBlocks(blocks) {

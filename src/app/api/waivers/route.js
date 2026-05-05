@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import { createPostgresWaiver, hasPostgres } from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -80,9 +81,9 @@ function hasRequiredParticipantFields(participant) {
 }
 
 export async function POST(req) {
-  if (!db) {
+  if (!db && !hasPostgres()) {
     return NextResponse.json(
-      { error: "Firestore is not configured." },
+      { error: "Database is not configured." },
       { status: 503 },
     );
   }
@@ -166,10 +167,12 @@ export async function POST(req) {
     userAgent: cleanText(req.headers.get("user-agent")),
   };
 
-  const ref = await db.collection("waivers").add(doc);
+  const waiverId = hasPostgres()
+    ? await createPostgresWaiver(doc)
+    : (await db.collection("waivers").add(doc)).id;
 
   return NextResponse.json({
     success: true,
-    waiverId: ref.id,
+    waiverId,
   });
 }

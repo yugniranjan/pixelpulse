@@ -1,12 +1,26 @@
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import {
+  deletePostgresBlog,
+  getPostgresBlogById,
+  hasPostgres,
+  updatePostgresBlog,
+} from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(_, { params }) {
   const { id } = await params;
+
+  if (hasPostgres()) {
+    const blog = await getPostgresBlogById(id);
+    if (!blog) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    return NextResponse.json(blog);
+  }
 
   if (!db) {
     return NextResponse.json(
@@ -46,7 +60,7 @@ export async function GET(_, { params }) {
 export async function PUT(req, { params }) {
   const { id } = await params;
 
-  if (!db) {
+  if (!db && !hasPostgres()) {
     return NextResponse.json(
       { error: "Firestore is not configured locally" },
       { status: 503 }
@@ -88,6 +102,17 @@ export async function PUT(req, { params }) {
     updateData.featuredImage = featuredImage;
   }
 
+  if (hasPostgres()) {
+    const updated = await updatePostgresBlog(id, {
+      title,
+      content,
+      featuredImage: featuredImage && typeof featuredImage === "string" ? featuredImage : "",
+    });
+    return updated
+      ? NextResponse.json({ success: true })
+      : NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   await db.collection("blogs").doc(id).update(updateData);
 
   return NextResponse.json({ success: true });
@@ -96,6 +121,13 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(_, { params }) {
   const { id } = await params;
+
+  if (hasPostgres()) {
+    const deleted = await deletePostgresBlog(id);
+    return deleted
+      ? NextResponse.json({ success: true })
+      : NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
 
   if (!db) {
     return NextResponse.json(

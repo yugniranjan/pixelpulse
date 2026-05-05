@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import { normalizeInviteSlug } from "@/lib/invites";
+import {
+  hasPostgres,
+  postgresInviteSlugExists,
+  upsertPostgresInvite,
+} from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,7 +18,11 @@ async function getAvailableSlug(baseSlug) {
   let slug = baseSlug;
   let index = 2;
 
-  while ((await db.collection("invites").doc(slug).get()).exists) {
+  while (
+    hasPostgres()
+      ? await postgresInviteSlugExists(slug)
+      : (await db.collection("invites").doc(slug).get()).exists
+  ) {
     slug = `${baseSlug}-${index}`;
     index += 1;
   }
@@ -28,7 +37,7 @@ function getOrigin(req) {
 }
 
 export async function POST(req) {
-  if (!db) {
+  if (!db && !hasPostgres()) {
     return NextResponse.json(
       { error: "Firestore is not configured locally" },
       { status: 503 },
@@ -108,11 +117,17 @@ export async function POST(req) {
     `Waiver: ${waiverLink}`,
   ].filter(Boolean).join("\n");
 
-  await db.collection("invites").doc(slug).set({
+  const inviteRecord = {
     ...invite,
     inviteUrl,
     smsText,
-  });
+  };
+
+  if (hasPostgres()) {
+    await upsertPostgresInvite(inviteRecord);
+  } else {
+    await db.collection("invites").doc(slug).set(inviteRecord);
+  }
 
   return NextResponse.json({
     success: true,
@@ -123,4 +138,3 @@ export async function POST(req) {
     qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(inviteUrl)}&size=220`,
   });
 }
-

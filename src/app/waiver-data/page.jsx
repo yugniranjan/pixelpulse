@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import "../styles/admin-waivers.css";
 import { db } from "@/lib/firestore";
+import { hasPostgres, listPostgresWaivers } from "@/lib/postgresData";
 import LocalWaiverDashboard from "@/components/LocalWaiverDashboard";
 
 function serializeDate(value) {
@@ -31,6 +32,17 @@ function isLocalRequest(host = "") {
 }
 
 async function getWaivers() {
+  if (hasPostgres()) {
+    try {
+      return { waivers: await listPostgresWaivers(100), error: "" };
+    } catch (error) {
+      return {
+        waivers: [],
+        error: error?.message || "Unable to load waiver data.",
+      };
+    }
+  }
+
   if (!db) {
     return { waivers: [], error: "Firestore is not configured." };
   }
