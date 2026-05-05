@@ -61,3 +61,36 @@ export async function GET(req) {
     players: result.rows.map(serializePlayer),
   });
 }
+
+export async function DELETE(req) {
+  if (!getPostgresPool()) {
+    return NextResponse.json(
+      { error: "Postgres is not configured." },
+      { status: 503 },
+    );
+  }
+
+  const id = Number(new URL(req.url).searchParams.get("id"));
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json({ error: "Player ID is required." }, { status: 400 });
+  }
+
+  const result = await query(
+    `
+      DELETE FROM public."Players"
+      WHERE "PlayerID" = $1 AND "LocationID" = 2
+      RETURNING "PlayerID"
+    `,
+    [id],
+  );
+
+  if (!result.rowCount) {
+    return NextResponse.json(
+      { error: "Vaughan player not found." },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({ success: true, id });
+}
