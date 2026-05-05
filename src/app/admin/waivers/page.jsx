@@ -12,6 +12,13 @@ const DEFAULT_PARTY_FORM = {
   visitTime: "",
 };
 
+function formatDate(value) {
+  if (!value) return "Not recorded";
+  return new Intl.DateTimeFormat("en-CA", {
+    dateStyle: "medium",
+  }).format(new Date(value));
+}
+
 function formatDateTime(value) {
   if (!value) return "Not recorded";
   return new Intl.DateTimeFormat("en-CA", {
@@ -335,7 +342,61 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
   );
 }
 
+function PlayerCard({ player }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <article className="waiver-admin-card">
+      <button type="button" className="waiver-admin-card__summary player-admin-card__summary" onClick={() => setOpen((current) => !current)}>
+        <span>
+          <strong>{player.fullName}</strong>
+          <em>{player.email || "No email"}</em>
+        </span>
+        <span>
+          <strong>{player.playerId}</strong>
+          <em>Player ID</em>
+        </span>
+        <span>
+          <strong>{player.signeeId || "-"}</strong>
+          <em>Signee ID</em>
+        </span>
+        <span>
+          <strong>{formatDateTime(player.createdAt)}</strong>
+          <em>Created</em>
+        </span>
+      </button>
+
+      {open ? (
+        <div className="waiver-admin-card__details">
+          <section>
+            <h2>Player</h2>
+            <dl>
+              <div><dt>Player ID</dt><dd>{player.playerId}</dd></div>
+              <div><dt>First name</dt><dd>{player.firstName || "Not provided"}</dd></div>
+              <div><dt>Last name</dt><dd>{player.lastName || "Not provided"}</dd></div>
+              <div><dt>Date of birth</dt><dd>{formatDate(player.dateOfBirth)}</dd></div>
+              <div><dt>Email</dt><dd>{player.email || "Not provided"}</dd></div>
+            </dl>
+          </section>
+
+          <section>
+            <h2>Record</h2>
+            <dl>
+              <div><dt>Signee ID</dt><dd>{player.signeeId || "Not provided"}</dd></div>
+              <div><dt>Location</dt><dd>{player.locationName || "Vaughan"}</dd></div>
+              <div><dt>Location ID</dt><dd>{player.locationId || "2"}</dd></div>
+              <div><dt>Date signed</dt><dd>{formatDateTime(player.dateSigned)}</dd></div>
+              <div><dt>Updated</dt><dd>{formatDateTime(player.updatedAt)}</dd></div>
+            </dl>
+          </section>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 export default function AdminWaiversPage() {
+  const [activeTab, setActiveTab] = useState("waivers");
   const [waivers, setWaivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -349,6 +410,14 @@ export default function AdminWaiversPage() {
   const [editForm, setEditForm] = useState(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [editError, setEditError] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [playersLoading, setPlayersLoading] = useState(false);
+  const [playersError, setPlayersError] = useState("");
+  const [playerQuery, setPlayerQuery] = useState("");
+  const [playerDateFrom, setPlayerDateFrom] = useState("");
+  const [playerDateTo, setPlayerDateTo] = useState("");
+  const [playerPageSize, setPlayerPageSize] = useState(25);
+  const [playerPage, setPlayerPage] = useState(1);
 
   useEffect(() => {
     async function loadWaivers() {
@@ -374,6 +443,33 @@ export default function AdminWaiversPage() {
 
     loadWaivers();
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "players" || players.length || playersLoading) return;
+
+    async function loadPlayers() {
+      setPlayersLoading(true);
+      setPlayersError("");
+
+      try {
+        const response = await fetch("/api/admin/players?locationId=2&limit=1000", { cache: "no-store" });
+        const data = await response.json();
+
+        if (!response.ok) {
+          setPlayersError(data.error || "Unable to load players.");
+          return;
+        }
+
+        setPlayers(data.players || []);
+      } catch (loadError) {
+        setPlayersError("Unable to load players.");
+      } finally {
+        setPlayersLoading(false);
+      }
+    }
+
+    loadPlayers();
+  }, [activeTab, players.length, playersLoading]);
 
   const filteredWaivers = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -444,11 +540,52 @@ export default function AdminWaiversPage() {
     setPage(1);
   }, [dateFrom, dateTo, pageSize, partyOnly, query]);
 
+  const filteredPlayers = useMemo(() => {
+    const needle = playerQuery.trim().toLowerCase();
+
+    return players.filter((player) => {
+      const matchesSearch = !needle || [
+        player.playerId,
+        player.fullName,
+        player.firstName,
+        player.lastName,
+        player.email,
+        player.signeeId,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(needle));
+
+      const signedDate = player.dateSigned ? player.dateSigned.slice(0, 10) : "";
+      const matchesFrom = !playerDateFrom || signedDate >= playerDateFrom;
+      const matchesTo = !playerDateTo || signedDate <= playerDateTo;
+
+      return matchesSearch && matchesFrom && matchesTo;
+    });
+  }, [playerDateFrom, playerDateTo, playerQuery, players]);
+  const playerTotalPages = Math.max(1, Math.ceil(filteredPlayers.length / playerPageSize));
+  const currentPlayerPage = Math.min(playerPage, playerTotalPages);
+  const playerPageStart = (currentPlayerPage - 1) * playerPageSize;
+  const playerPageEnd = playerPageStart + playerPageSize;
+  const visiblePlayers = filteredPlayers.slice(playerPageStart, playerPageEnd);
+  const firstVisiblePlayer = filteredPlayers.length ? playerPageStart + 1 : 0;
+  const lastVisiblePlayer = Math.min(playerPageEnd, filteredPlayers.length);
+  const latestPlayer = players[0];
+
+  useEffect(() => {
+    setPlayerPage(1);
+  }, [playerDateFrom, playerDateTo, playerPageSize, playerQuery]);
+
   function clearFilters() {
     setQuery("");
     setDateFrom("");
     setDateTo("");
     setPartyOnly(false);
+  }
+
+  function clearPlayerFilters() {
+    setPlayerQuery("");
+    setPlayerDateFrom("");
+    setPlayerDateTo("");
   }
 
   function startEditWaiver(waiver) {
@@ -535,107 +672,200 @@ export default function AdminWaiversPage() {
           <div>
             <span className="waiver-admin-kicker">Admin dashboard</span>
             <h1>Waiver Dashboard</h1>
-            <p>Review submitted Pixel Pulse Play waivers and family participants.</p>
+            <p>Review submitted waivers and Vaughan player records from one place.</p>
           </div>
         </div>
 
-        <div className="waiver-admin-stats" aria-label="Waiver summary">
-          <article>
-            <span>Total Waivers</span>
-            <strong>{waivers.length}</strong>
-          </article>
-          <article>
-            <span>Participants</span>
-            <strong>{totalParticipants}</strong>
-          </article>
-          <article>
-            <span>Visits Today</span>
-            <strong>{todayWaivers}</strong>
-          </article>
-          <article>
-            <span>Latest</span>
-            <strong>{latestWaiver ? formatDateTime(latestWaiver.submittedAt) : "None"}</strong>
-          </article>
+        <div className="waiver-admin-tabs" role="tablist" aria-label="Waiver dashboard sections">
+          <button type="button" className={activeTab === "waivers" ? "is-active" : ""} onClick={() => setActiveTab("waivers")}>Waivers</button>
+          <button type="button" className={activeTab === "players" ? "is-active" : ""} onClick={() => setActiveTab("players")}>Players</button>
         </div>
 
-        <PartyWaiverLinkBuilder />
-
-        {loading ? <p className="waiver-admin-state">Loading waivers...</p> : null}
-        {error ? <p className="waiver-admin-error">{error}</p> : null}
-
-        {!loading && !error ? (
-          <div className="waiver-admin-list waiver-admin-list--dashboard">
-            <div className="waiver-data-toolbar">
-              <div>
-                <h2>Recent Waiver Submissions</h2>
-                <p>
-                  Showing {firstVisibleRecord}-{lastVisibleRecord} of {filteredWaivers.length}
-                  {filteredWaivers.length === waivers.length ? " records" : ` filtered records from ${waivers.length} total`}
-                </p>
-              </div>
-              <div className="waiver-data-filters">
-                <label>
-                  <span>Search</span>
-                  <input
-                    list="admin-waiver-search-suggestions"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Name, phone, email, party ID"
-                  />
-                  <datalist id="admin-waiver-search-suggestions">
-                    {searchSuggestions.map((suggestion) => (
-                      <option value={suggestion} key={suggestion} />
-                    ))}
-                  </datalist>
-                </label>
-                <label>
-                  <span>From</span>
-                  <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
-                </label>
-                <label>
-                  <span>To</span>
-                  <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
-                </label>
-                <label className="waiver-data-checkbox">
-                  <input type="checkbox" checked={partyOnly} onChange={(event) => setPartyOnly(event.target.checked)} />
-                  <span>Has party ID</span>
-                </label>
-                <label>
-                  <span>Show</span>
-                  <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
-                    {PAGE_SIZE_OPTIONS.map((option) => (
-                      <option value={option} key={option}>{option}</option>
-                    ))}
-                  </select>
-                </label>
-                <button type="button" onClick={clearFilters}>Clear</button>
-              </div>
+        {activeTab === "waivers" ? (
+          <>
+            <div className="waiver-admin-stats" aria-label="Waiver summary">
+              <article>
+                <span>Total Waivers</span>
+                <strong>{waivers.length}</strong>
+              </article>
+              <article>
+                <span>Participants</span>
+                <strong>{totalParticipants}</strong>
+              </article>
+              <article>
+                <span>Visits Today</span>
+                <strong>{todayWaivers}</strong>
+              </article>
+              <article>
+                <span>Latest</span>
+                <strong>{latestWaiver ? formatDateTime(latestWaiver.submittedAt) : "None"}</strong>
+              </article>
             </div>
-            {visibleWaivers.length ? (
-              <>
-                {visibleWaivers.map((waiver) => (
-                  <WaiverCard
-                    waiver={waiver}
-                    key={waiver.id}
-                    onDelete={deleteWaiver}
-                    onEdit={startEditWaiver}
-                  />
-                ))}
-                <div className="waiver-data-pagination">
-                  <span>Page {currentPage} of {totalPages}</span>
+
+            <PartyWaiverLinkBuilder />
+
+            {loading ? <p className="waiver-admin-state">Loading waivers...</p> : null}
+            {error ? <p className="waiver-admin-error">{error}</p> : null}
+
+            {!loading && !error ? (
+              <div className="waiver-admin-list waiver-admin-list--dashboard">
+                <div className="waiver-data-toolbar">
                   <div>
-                    <button type="button" disabled={currentPage === 1} onClick={() => setPage(1)}>First</button>
-                    <button type="button" disabled={currentPage === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
-                    <button type="button" disabled={currentPage === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>Next</button>
-                    <button type="button" disabled={currentPage === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+                    <h2>Recent Waiver Submissions</h2>
+                    <p>
+                      Showing {firstVisibleRecord}-{lastVisibleRecord} of {filteredWaivers.length}
+                      {filteredWaivers.length === waivers.length ? " records" : ` filtered records from ${waivers.length} total`}
+                    </p>
+                  </div>
+                  <div className="waiver-data-filters">
+                    <label>
+                      <span>Search</span>
+                      <input
+                        list="admin-waiver-search-suggestions"
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="Name, phone, email, party ID"
+                      />
+                      <datalist id="admin-waiver-search-suggestions">
+                        {searchSuggestions.map((suggestion) => (
+                          <option value={suggestion} key={suggestion} />
+                        ))}
+                      </datalist>
+                    </label>
+                    <label>
+                      <span>From</span>
+                      <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>To</span>
+                      <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+                    </label>
+                    <label className="waiver-data-checkbox">
+                      <input type="checkbox" checked={partyOnly} onChange={(event) => setPartyOnly(event.target.checked)} />
+                      <span>Has party ID</span>
+                    </label>
+                    <label>
+                      <span>Show</span>
+                      <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
+                        {PAGE_SIZE_OPTIONS.map((option) => (
+                          <option value={option} key={option}>{option}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="button" onClick={clearFilters}>Clear</button>
                   </div>
                 </div>
-              </>
-            ) : (
-              <p className="waiver-admin-state">No waivers found.</p>
-            )}
-          </div>
-        ) : null}
+                {visibleWaivers.length ? (
+                  <>
+                    {visibleWaivers.map((waiver) => (
+                      <WaiverCard
+                        waiver={waiver}
+                        key={waiver.id}
+                        onDelete={deleteWaiver}
+                        onEdit={startEditWaiver}
+                      />
+                    ))}
+                    <div className="waiver-data-pagination">
+                      <span>Page {currentPage} of {totalPages}</span>
+                      <div>
+                        <button type="button" disabled={currentPage === 1} onClick={() => setPage(1)}>First</button>
+                        <button type="button" disabled={currentPage === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+                        <button type="button" disabled={currentPage === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>Next</button>
+                        <button type="button" disabled={currentPage === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="waiver-admin-state">No waivers found.</p>
+                )}
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <div className="waiver-admin-stats" aria-label="Player summary">
+              <article>
+                <span>Vaughan Players</span>
+                <strong>{players.length}</strong>
+              </article>
+              <article>
+                <span>Filtered</span>
+                <strong>{filteredPlayers.length}</strong>
+              </article>
+              <article>
+                <span>Location</span>
+                <strong>Vaughan</strong>
+              </article>
+              <article>
+                <span>Latest</span>
+                <strong>{latestPlayer ? formatDateTime(latestPlayer.createdAt) : "None"}</strong>
+              </article>
+            </div>
+
+            {playersLoading ? <p className="waiver-admin-state">Loading Vaughan players...</p> : null}
+            {playersError ? <p className="waiver-admin-error">{playersError}</p> : null}
+
+            {!playersLoading && !playersError ? (
+              <div className="waiver-admin-list waiver-admin-list--dashboard">
+                <div className="waiver-data-toolbar">
+                  <div>
+                    <h2>Vaughan Players</h2>
+                    <p>
+                      Showing {firstVisiblePlayer}-{lastVisiblePlayer} of {filteredPlayers.length}
+                      {filteredPlayers.length === players.length ? " records" : ` filtered records from ${players.length} total`}
+                    </p>
+                  </div>
+                  <div className="waiver-data-filters player-data-filters">
+                    <label>
+                      <span>Search</span>
+                      <input
+                        value={playerQuery}
+                        onChange={(event) => setPlayerQuery(event.target.value)}
+                        placeholder="Name, email, player ID, signee ID"
+                      />
+                    </label>
+                    <label>
+                      <span>Signed From</span>
+                      <input type="date" value={playerDateFrom} onChange={(event) => setPlayerDateFrom(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Signed To</span>
+                      <input type="date" value={playerDateTo} onChange={(event) => setPlayerDateTo(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Show</span>
+                      <select value={playerPageSize} onChange={(event) => setPlayerPageSize(Number(event.target.value))}>
+                        {PAGE_SIZE_OPTIONS.map((option) => (
+                          <option value={option} key={option}>{option}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="button" onClick={clearPlayerFilters}>Clear</button>
+                  </div>
+                </div>
+
+                {visiblePlayers.length ? (
+                  <>
+                    {visiblePlayers.map((player) => (
+                      <PlayerCard player={player} key={player.id} />
+                    ))}
+                    <div className="waiver-data-pagination">
+                      <span>Page {currentPlayerPage} of {playerTotalPages}</span>
+                      <div>
+                        <button type="button" disabled={currentPlayerPage === 1} onClick={() => setPlayerPage(1)}>First</button>
+                        <button type="button" disabled={currentPlayerPage === 1} onClick={() => setPlayerPage((current) => Math.max(1, current - 1))}>Previous</button>
+                        <button type="button" disabled={currentPlayerPage === playerTotalPages} onClick={() => setPlayerPage((current) => Math.min(playerTotalPages, current + 1))}>Next</button>
+                        <button type="button" disabled={currentPlayerPage === playerTotalPages} onClick={() => setPlayerPage(playerTotalPages)}>Last</button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="waiver-admin-state">No Vaughan players found.</p>
+                )}
+              </div>
+            ) : null}
+          </>
+        )}
       </section>
 
       {editingWaiver && editForm ? (
