@@ -342,7 +342,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
   );
 }
 
-function PlayerCard({ player, onDelete }) {
+function PlayerCard({ player }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -388,13 +388,6 @@ function PlayerCard({ player, onDelete }) {
               <div><dt>Date signed</dt><dd>{formatDateTime(player.dateSigned)}</dd></div>
               <div><dt>Updated</dt><dd>{formatDateTime(player.updatedAt)}</dd></div>
             </dl>
-          </section>
-
-          <section className="waiver-admin-card__wide waiver-record-actions">
-            <h2>Record Actions</h2>
-            <div>
-              <button type="button" className="is-danger" onClick={() => onDelete(player)}>Delete Player</button>
-            </div>
           </section>
         </div>
       ) : null}
@@ -659,31 +652,6 @@ export default function AdminWaiversPage() {
     }
   }
 
-  async function deletePlayer(player) {
-    const confirmed = window.confirm(
-      `Delete player ${player.fullName || player.playerId}? Related wristband transactions and scores may also be removed. This cannot be undone.`,
-    );
-    if (!confirmed) return;
-
-    setPlayersError("");
-
-    try {
-      const response = await fetch(`/api/admin/players?id=${encodeURIComponent(player.playerId)}`, {
-        method: "DELETE",
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPlayersError(data.error || "Unable to delete player.");
-        return;
-      }
-
-      setPlayers((current) => current.filter((item) => item.playerId !== data.id));
-    } catch (deleteError) {
-      setPlayersError("Unable to delete player.");
-    }
-  }
-
   return (
     <main className="waiver-dashboard-shell">
       <aside className="waiver-dashboard-sidebar" aria-label="Dashboard navigation">
@@ -879,7 +847,7 @@ export default function AdminWaiversPage() {
                 {visiblePlayers.length ? (
                   <>
                     {visiblePlayers.map((player) => (
-                      <PlayerCard player={player} key={player.id} onDelete={deletePlayer} />
+                      <PlayerCard player={player} key={player.id} />
                     ))}
                     <div className="waiver-data-pagination">
                       <span>Page {currentPlayerPage} of {playerTotalPages}</span>

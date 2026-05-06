@@ -141,11 +141,6 @@ export async function PUT(req) {
 }
 
 export async function DELETE(req) {
-  const id = getWaiverId(req);
-  if (!id) {
-    return NextResponse.json({ error: "Waiver ID is required." }, { status: 400 });
-  }
-
   if (hasPostgres()) {
     const deleted = await deletePostgresWaiver(id);
     return deleted
@@ -158,6 +153,11 @@ export async function DELETE(req) {
       { error: "Firestore is not configured." },
       { status: 503 },
     );
+  }
+
+  const id = getWaiverId(req);
+  if (!id) {
+    return NextResponse.json({ error: "Waiver ID is required." }, { status: 400 });
   }
 
   const ref = db.collection("waivers").doc(id);
