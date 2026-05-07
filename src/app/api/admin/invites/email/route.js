@@ -102,7 +102,7 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: "Pixel Pulse party invite and QR code",
+      subject: "Your Party Invite at Pixel Pulse Playzone! 🎉",
       text,
       html,
     });

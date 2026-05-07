@@ -287,6 +287,14 @@ export async function getPostgresInviteBySlug(slug) {
   return result.rows[0] ? normalizeInviteRow(result.rows[0]) : null;
 }
 
+export async function getPostgresInviteByPartyId(partyId) {
+  const result = await query(
+    "select * from invites where raw->>'partyId' = $1 order by updated_at desc nulls last limit 1",
+    [partyId],
+  );
+  return result.rows[0] ? normalizeInviteRow(result.rows[0]) : null;
+}
+
 export async function postgresInviteSlugExists(slug) {
   const result = await query("select 1 from invites where slug = $1 limit 1", [slug]);
   return result.rowCount > 0;

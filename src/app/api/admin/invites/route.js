@@ -4,7 +4,7 @@ import { getConfigValue } from "@/lib/ctaContent";
 import { normalizeInviteSlug } from "@/lib/invites";
 import { partyWaiverDocId } from "@/lib/partyWaivers";
 import {
-  getPostgresPartyWaiver,
+  getPostgresInviteByPartyId,
   hasPostgres,
   postgresInviteSlugExists,
   upsertPostgresInvite,
@@ -84,12 +84,16 @@ async function getAvailableSlug(baseSlug) {
   return slug;
 }
 
-async function partyIdExists(partyId) {
+async function getInviteSlugByPartyId(partyId) {
+  if (!partyId) return "";
+
   if (hasPostgres()) {
-    return Boolean(await getPostgresPartyWaiver(partyId));
+    const invite = await getPostgresInviteByPartyId(partyId);
+    return normalizeInviteSlug(invite?.slug);
   }
 
-  return (await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get()).exists;
+  const snapshot = await db.collection("invites").where("partyId", "==", partyId).limit(1).get();
+  return normalizeInviteSlug(snapshot.docs[0]?.id);
 }
 
 function getOrigin(req) {
@@ -126,16 +130,10 @@ export async function POST(req) {
     );
   }
 
-  if (partyId && await partyIdExists(partyId)) {
-    return NextResponse.json(
-      { error: "Party ID already exists. Please use a unique Party ID." },
-      { status: 409 },
-    );
-  }
-
   const requestedSlug = normalizeInviteSlug(body.slug);
   const baseSlug = requestedSlug || normalizeInviteSlug(`${childName}-${date}`);
-  const slug = await getAvailableSlug(baseSlug);
+  const existingPartySlug = await getInviteSlugByPartyId(partyId);
+  const slug = existingPartySlug || await getAvailableSlug(baseSlug);
   const origin = getOrigin(req);
   const inviteUrl = `${origin}/invite/${slug}`;
   const waiverLink = partyId
