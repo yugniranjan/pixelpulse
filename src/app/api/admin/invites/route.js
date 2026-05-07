@@ -121,11 +121,12 @@ export async function POST(req) {
   const partyId = cleanText(body.partyId);
   const date = cleanText(body.date);
   const time = cleanText(body.time);
+  const rsvpName = cleanText(body.rsvpName);
   const phone = cleanText(body.phone);
 
-  if (!childName || !date || !time || !phone) {
+  if (!childName || !date || !time || !rsvpName || !phone) {
     return NextResponse.json(
-      { error: "Child name, date, time, and RSVP phone are required." },
+      { error: "Child name, date, time, RSVP name, and RSVP phone are required." },
       { status: 400 },
     );
   }
@@ -172,6 +173,7 @@ export async function POST(req) {
     waiverButton: cleanText(body.waiverButton) || "Complete waiver",
     waiverLink,
     rsvpLabel: cleanText(body.rsvpLabel) || "RSVP",
+    rsvpName,
     rsvpText: cleanText(body.rsvpText),
     phone,
     businessPhoneLabel: cleanText(body.businessPhoneLabel) || "Pixel Pulse Phone",

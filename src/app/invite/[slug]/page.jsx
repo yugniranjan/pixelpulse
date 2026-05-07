@@ -153,6 +153,7 @@ export default async function InviteSlugPage({ params }) {
     waiverButton: inviteText(inviteRow, configData, ["waiverButton", "inviteWaiverButton"]),
     waiverLink: inviteText(inviteRow, configData, ["waiverLink", "inviteWaiverLink"]),
     rsvpLabel: inviteText(inviteRow, configData, ["rsvpLabel", "inviteRsvpLabel"]),
+    rsvpName: inviteText(inviteRow, configData, ["rsvpName", "inviteRsvpName"]),
     rsvpText: inviteText(inviteRow, configData, ["rsvpText", "inviteRsvpText"]),
     phone: inviteText(inviteRow, configData, ["phone", "rsvpPhone", "invitePhone"]),
     businessPhoneLabel: inviteText(inviteRow, configData, ["businessPhoneLabel", "inviteBusinessPhoneLabel"]),
@@ -248,7 +249,7 @@ export default async function InviteSlugPage({ params }) {
             <div className="ppp-invite-rsvp">
               {invite.rsvpLabel ? <span>{invite.rsvpLabel}</span> : null}
               <p>
-                {invite.rsvpText} <a href={telHref}>{invite.phone}</a>
+                {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{invite.phone}</a>
               </p>
             </div>
           ) : null}

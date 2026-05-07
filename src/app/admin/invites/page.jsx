@@ -51,6 +51,7 @@ export default function AdminInvitesPage() {
     waiverText: "Please complete the waiver before the party.",
     waiverButton: "Complete waiver",
     rsvpText: "Please text or call",
+    rsvpName: "",
     phone: "",
     businessPhone: DEFAULT_BUSINESS_PHONE,
     footer: "We can't wait to celebrate with you!",
@@ -236,6 +237,9 @@ export default function AdminInvitesPage() {
             </Field>
             <Field label="Address">
               <input value={form.address} onChange={(event) => updateField("address", event.target.value)} />
+            </Field>
+            <Field label="RSVP name" required>
+              <input required value={form.rsvpName} onChange={(event) => updateField("rsvpName", event.target.value)} placeholder="Parent or guardian name" />
             </Field>
             <Field label="RSVP phone" required>
               <input required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Parent or guardian RSVP number" />

@@ -120,6 +120,7 @@ export default async function InvitePage() {
     waiverButton: configText(configData, ["inviteWaiverButton"]),
     waiverLink: configText(configData, ["inviteWaiverLink"]),
     rsvpLabel: configText(configData, ["inviteRsvpLabel"]),
+    rsvpName: configText(configData, ["inviteRsvpName"]),
     rsvpText: configText(configData, ["inviteRsvpText"]),
     phone: configText(configData, ["invitePhone"]),
     businessPhoneLabel: configText(configData, ["inviteBusinessPhoneLabel"]),
@@ -220,7 +221,7 @@ export default async function InvitePage() {
           {invite.phone ? <div className="ppp-invite-rsvp">
             <span>{invite.rsvpLabel}</span>
             <p>
-              {invite.rsvpText} <a href={telHref}>{invite.phone}</a>
+              {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{invite.phone}</a>
             </p>
           </div> : null}
 
