@@ -543,7 +543,7 @@ export default function AdminWaiversPage() {
           <span>Admin</span>
         </div>
         <nav>
-          <Link className="is-active" href="/admin/waivers">Waivers</Link>
+          <Link className="is-active" href="/admin/waivers">Player Info</Link>
           <Link href="/admin/invites">Create Party Links</Link>
           <Link href="/admin/blogs">Blogs</Link>
           <Link href="/waiver-data">Players Data</Link>

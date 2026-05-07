@@ -4,10 +4,10 @@ import "../styles/admin-waivers.css";
 
 const adminCards = [
   {
-    title: "Waivers",
+    title: "Player Info",
     description: "Review submitted waivers, family members, party IDs, signatures, and visit details.",
     href: "/admin/waivers",
-    action: "Manage Waivers",
+    action: "Manage Player Info",
   },
   {
     title: "Invites",
