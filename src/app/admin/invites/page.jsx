@@ -71,7 +71,10 @@ export default function AdminInvitesPage() {
   useEffect(() => {
     async function loadInviteDefaults() {
       try {
-        const response = await fetch("/api/admin/invites?defaults=1", { cache: "no-store" });
+        const response = await fetch("/api/admin/invites?defaults=1", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
         const data = await response.json();
         const defaults = data?.defaults || {};
 
@@ -116,6 +119,7 @@ export default function AdminInvitesPage() {
 
     const response = await fetch("/api/admin/invites", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form, slug: suggestedSlug }),
     });
@@ -142,6 +146,7 @@ export default function AdminInvitesPage() {
     try {
       const response = await fetch("/api/admin/invites/email", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: emailTo,
