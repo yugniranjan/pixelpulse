@@ -36,8 +36,7 @@ export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
     partyId: "",
-    title: "",
-    titleSuffix: "Birthday Party",
+    title: "Birthday Party",
     greeting: DEFAULT_GREETING,
     guestName: DEFAULT_GUEST_LINE,
     intro: DEFAULT_PARTY_INTRO,
@@ -194,10 +193,7 @@ export default function AdminInvitesPage() {
               <input value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Optional party ID" />
             </Field>
             <Field label="Title">
-              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Ariana's Birthday Party" />
-            </Field>
-            <Field label="Title suffix">
-              <input value={form.titleSuffix} onChange={(event) => updateField("titleSuffix", event.target.value)} />
+              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Birthday Party" />
             </Field>
             <Field label="Slug">
               <input value={form.slug} onChange={(event) => updateField("slug", event.target.value)} placeholder={suggestedSlug} />

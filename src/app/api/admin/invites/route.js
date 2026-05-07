@@ -28,6 +28,21 @@ function cleanText(value = "") {
   return String(value || "").trim();
 }
 
+function escapeRegExp(value = "") {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function titleWithoutChildName(title = "", childName = "") {
+  const cleanedTitle = cleanText(title);
+  const cleanedChildName = cleanText(childName);
+  if (!cleanedChildName) return cleanedTitle;
+
+  return cleanedTitle
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s*['’]s\\s*`, "i"), "")
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s+`, "i"), "")
+    .trim();
+}
+
 function plainSheetText(value = "") {
   return cleanText(value).replace(/<br\s*\/?>/gi, "\n");
 }
@@ -125,7 +140,7 @@ export async function POST(req) {
   const waiverLink = partyId
     ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
     : `${origin}/waiver`;
-  const title = cleanText(body.title) || "Birthday Party";
+  const title = titleWithoutChildName(cleanText(body.title) || "Birthday Party", childName) || "Birthday Party";
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
   const inviteDefaults = await getInviteDefaults();
@@ -143,7 +158,7 @@ export async function POST(req) {
     guestName,
     childName,
     title,
-    titleSuffix: cleanText(body.titleSuffix) || "Birthday Party",
+    titleSuffix: cleanText(body.titleSuffix) || title,
     intro,
     dateLabel: cleanText(body.dateLabel) || "Date",
     date,
