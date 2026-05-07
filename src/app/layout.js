@@ -5,6 +5,7 @@ import Loading from "./loading";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChromeVisibility from "./components/ChromeVisibility";
+import FloatingWaiverButton from "./components/FloatingWaiverButton";
 import TrackingPageViews from "./components/TrackingPageViews";
 import { fetchMenuData, fetchsheetdata } from "./lib/sheets";
 import { cookies } from "next/headers";
@@ -292,6 +293,7 @@ export default async function RootLayout({ children }) {
         <ChromeVisibility>
           <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
           <Breadcrumbs />
+          <FloatingWaiverButton />
         </ChromeVisibility>
         <Suspense fallback={<Loading />}>{children}</Suspense>
         <ChromeVisibility>

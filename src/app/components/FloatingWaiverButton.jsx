@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const FloatingWaiverButton = ({ waiverLink }) => {
-  const pathname = usePathname();
+const WAIVER_URL = "https://www.pixelpulseplay.ca/waiver";
 
-  if (!waiverLink) {
-    return null;
-  }
+const FloatingWaiverButton = () => {
+  const pathname = usePathname();
 
   if (pathname === "/waiver") {
     return null;
@@ -16,7 +14,7 @@ const FloatingWaiverButton = ({ waiverLink }) => {
 
   return (
     <Link
-      href="/waiver"
+      href={WAIVER_URL}
       className="ppp-floating-waiver"
       prefetch
     >

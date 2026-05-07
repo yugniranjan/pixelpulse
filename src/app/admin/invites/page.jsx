@@ -59,6 +59,9 @@ export default function AdminInvitesPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailStatus, setEmailStatus] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const suggestedSlug = useMemo(
     () => slugify(form.slug || `${form.childName}-${form.date}`),
@@ -109,6 +112,7 @@ export default function AdminInvitesPage() {
     setLoading(true);
     setError("");
     setResult(null);
+    setEmailStatus("");
 
     const response = await fetch("/api/admin/invites", {
       method: "POST",
@@ -128,6 +132,39 @@ export default function AdminInvitesPage() {
 
   async function copyText(text) {
     await navigator.clipboard.writeText(text);
+  }
+
+  async function sendInviteEmail() {
+    if (!result || !emailTo) return;
+    setSendingEmail(true);
+    setEmailStatus("");
+
+    try {
+      const response = await fetch("/api/admin/invites/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailTo,
+          partyId: result.partyId,
+          inviteUrl: result.inviteUrl,
+          waiverUrl: result.waiverUrl,
+          smsText: result.smsText,
+          qrCodeUrl: result.qrCodeUrl,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEmailStatus(data.error || "Unable to send email.");
+        return;
+      }
+
+      setEmailStatus("Email sent.");
+    } catch (sendError) {
+      setEmailStatus("Unable to send email.");
+    } finally {
+      setSendingEmail(false);
+    }
   }
 
   return (
@@ -244,6 +281,22 @@ export default function AdminInvitesPage() {
                 <span>SMS Text</span>
                 <textarea readOnly value={result.smsText} />
                 <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
+              </div>
+              <div>
+                <span>Email SMS + QR</span>
+                <input
+                  type="email"
+                  value={emailTo}
+                  onChange={(event) => {
+                    setEmailTo(event.target.value);
+                    setEmailStatus("");
+                  }}
+                  placeholder="name@example.com"
+                />
+                <button type="button" onClick={sendInviteEmail} disabled={sendingEmail || !emailTo}>
+                  {sendingEmail ? "Sending..." : "Send Email"}
+                </button>
+                {emailStatus ? <small>{emailStatus}</small> : null}
               </div>
               <div className="invite-admin-qr">
                 <span>QR Code</span>

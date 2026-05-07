@@ -56,6 +56,7 @@
 
 .invite-admin-field input,
 .invite-admin-field textarea,
+.invite-admin-output input,
 .invite-admin-output textarea {
   width: 100%;
   border: 1px solid #d0d5dd;
@@ -83,9 +84,15 @@
   cursor: pointer;
 }
 
-.invite-admin-form button:disabled {
+.invite-admin-form button:disabled,
+.invite-admin-output button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.invite-admin-output small {
+  color: #667085;
+  font-weight: 800;
 }
 
 .invite-admin-error {
