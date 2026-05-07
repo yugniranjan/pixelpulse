@@ -8,6 +8,8 @@ import { getInviteBySlug } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
+const GOOGLE_MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=";
+
 function configText(configData, keys) {
   return getConfigValue(configData, keys);
 }
@@ -169,6 +171,13 @@ export default async function InviteSlugPage({ params }) {
   const businessTelHref = invite.businessPhone
     ? `tel:${invite.businessPhone?.replace(/[^\d+]/g, "")}`
     : "";
+  const configuredDirectionsLink = invite.directionsLink.trim();
+  const finalDirectionsLink =
+    configuredDirectionsLink || invite.address
+      ? configuredDirectionsLink.startsWith("https://www.google.com/maps")
+        ? configuredDirectionsLink
+        : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`
+      : "";
   const titleRemainder = titleWithoutChildName(invite.title, invite.childName) || invite.titleSuffix;
 
   return (
@@ -213,6 +222,7 @@ export default async function InviteSlugPage({ params }) {
             <DetailCard label={invite.dateLabel} value={invite.date} />
             <DetailCard label={invite.timeLabel} value={invite.time} />
             <DetailCard label={invite.venueLabel} value={invite.venue} />
+            <DetailCard label={invite.addressLabel} value={invite.address} />
           </dl>
 
           {invite.waiverLabel || invite.waiverText || invite.waiverLink ? (
@@ -243,12 +253,20 @@ export default async function InviteSlugPage({ params }) {
             </div>
           ) : null}
 
-          {businessTelHref ? (
+          {businessTelHref || finalDirectionsLink ? (
             <div className="ppp-invite-actions" aria-label={invite.contactLinksLabel}>
-              <a href={businessTelHref}>
-                <span>{invite.businessPhoneLabel}</span>
-                {invite.businessPhone}
-              </a>
+              {businessTelHref ? (
+                <a href={businessTelHref}>
+                  <span>{invite.businessPhoneLabel}</span>
+                  {invite.businessPhone}
+                </a>
+              ) : null}
+              {finalDirectionsLink ? (
+                <a href={finalDirectionsLink} target="_blank" rel="noopener noreferrer">
+                  <span>{invite.directionsLabel}</span>
+                  {invite.directionsText}
+                </a>
+              ) : null}
             </div>
           ) : null}
 

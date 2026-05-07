@@ -13,6 +13,10 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const DEFAULT_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
+const DEFAULT_DIRECTIONS_LINK =
+  "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
+
 function cleanText(value = "") {
   return String(value || "").trim();
 }
@@ -116,7 +120,7 @@ export async function POST(req) {
     venueLabel: cleanText(body.venueLabel) || "Place",
     venue: cleanText(body.venue),
     addressLabel: cleanText(body.addressLabel) || "Address",
-    address: "",
+    address: cleanText(body.address) || DEFAULT_ADDRESS,
     waiverLabel: cleanText(body.waiverLabel) || "Waiver",
     waiverText: cleanText(body.waiverText),
     waiverButton: cleanText(body.waiverButton) || "Complete waiver",
@@ -128,7 +132,7 @@ export async function POST(req) {
     businessPhone: cleanText(body.businessPhone),
     directionsLabel: cleanText(body.directionsLabel) || "Directions",
     directionsText: cleanText(body.directionsText) || "Open map",
-    directionsLink: "",
+    directionsLink: cleanText(body.directionsLink) || DEFAULT_DIRECTIONS_LINK,
     contactLinksLabel: cleanText(body.contactLinksLabel) || "Pixel Pulse contact links",
     footer: cleanText(body.footer),
     websiteText,
@@ -149,6 +153,7 @@ export async function POST(req) {
     smsIntro,
     `${invite.dateLabel}: ${date}`,
     `${invite.timeLabel}: ${time}`,
+    `${invite.addressLabel}: ${invite.address}`,
     `Invite: ${inviteUrl}`,
     `Waiver: ${waiverLink}`,
   ].filter(Boolean).join("\n");
