@@ -546,7 +546,7 @@ export default function AdminWaiversPage() {
           <Link className="is-active" href="/admin/waivers">Waivers</Link>
           <Link href="/admin/invites">Create Party Links</Link>
           <Link href="/admin/blogs">Blogs</Link>
-          <Link href="/waiver-data">Local Waiver Data</Link>
+          <Link href="/waiver-data">Players Data</Link>
         </nav>
       </aside>
 

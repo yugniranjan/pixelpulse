@@ -5,7 +5,6 @@ import { getConfigValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
 
 export const dynamic = "force-dynamic";
-const GOOGLE_MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=";
 
 function configText(configData, keys) {
   return getConfigValue(configData, keys);
@@ -67,6 +66,21 @@ function TextLines({ text, as: Tag = "p", className = "" }) {
   );
 }
 
+function titleWithoutChildName(title = "", childName = "") {
+  const cleanedTitle = String(title || "").trim();
+  const cleanedChildName = String(childName || "").trim();
+  if (!cleanedChildName) return cleanedTitle;
+
+  return cleanedTitle
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s*['’]s\\s*`, "i"), "")
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s+`, "i"), "")
+    .trim();
+}
+
+function escapeRegExp(value = "") {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function generateMetadata() {
   const locationSlug = LOCATION_NAME || "vaughan";
   const configData = await fetchsheetdata("config", locationSlug);
@@ -106,7 +120,7 @@ export default async function InvitePage() {
     waiverLink: configText(configData, ["inviteWaiverLink"]),
     rsvpLabel: configText(configData, ["inviteRsvpLabel"]),
     rsvpText: configText(configData, ["inviteRsvpText"]),
-    phone: configText(configData, ["invitePhone", "footerPhone", "contactPhone"]),
+    phone: configText(configData, ["invitePhone"]),
     businessPhoneLabel: configText(configData, ["inviteBusinessPhoneLabel"]),
     businessPhone: configText(configData, ["inviteBusinessPhone", "locationPhone", "pixelPulsePhone"]),
     directionsLabel: configText(configData, ["inviteDirectionsLabel"]),
@@ -121,15 +135,7 @@ export default async function InvitePage() {
 
   const telHref = `tel:${invite.phone?.replace(/[^\d+]/g, "")}`;
   const businessTelHref = `tel:${invite.businessPhone?.replace(/[^\d+]/g, "")}`;
-  const configuredDirectionsLink = invite.directionsLink.trim();
-  const finalDirectionsLink = configuredDirectionsLink.startsWith("https://www.google.com/maps")
-    ? configuredDirectionsLink
-    : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`;
-  const titleRemainder =
-    invite.title
-      ?.replace(invite.childName, "")
-      ?.replace(/^['’]s\s*/i, "")
-      .trim() || invite.titleSuffix;
+  const titleRemainder = titleWithoutChildName(invite.title, invite.childName) || invite.titleSuffix;
 
   return (
     <div className="ppp-invite-page">
@@ -182,10 +188,6 @@ export default async function InvitePage() {
               <dt>{invite.venueLabel}</dt>
               <dd>{invite.venue}</dd>
             </div>
-            <div>
-              <dt>{invite.addressLabel}</dt>
-              <dd>{invite.address}</dd>
-            </div>
           </dl>
 
           <div className="ppp-invite-waiver">
@@ -203,21 +205,17 @@ export default async function InvitePage() {
             </a>
           </div>
 
-          <div className="ppp-invite-rsvp">
+          {invite.phone ? <div className="ppp-invite-rsvp">
             <span>{invite.rsvpLabel}</span>
             <p>
               {invite.rsvpText} <a href={telHref}>{invite.phone}</a>
             </p>
-          </div>
+          </div> : null}
 
           <div className="ppp-invite-actions" aria-label={invite.contactLinksLabel}>
             <a href={businessTelHref}>
               <span>{invite.businessPhoneLabel}</span>
               {invite.businessPhone}
-            </a>
-            <a href={finalDirectionsLink} target="_blank" rel="noopener noreferrer">
-              <span>{invite.directionsLabel}</span>
-              {invite.directionsText}
             </a>
           </div>
 

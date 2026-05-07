@@ -65,17 +65,13 @@ async function getWaiverContent() {
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
   const partyId = searchValue(params, "partyId");
-  const queryPrimaryParticipant =
-    searchValue(params, "primaryParticipant") ||
-    searchValue(params, "guestName") ||
-    searchValue(params, "partyName");
   const queryVisitDate = searchValue(params, "visitDate") || searchValue(params, "date");
   const queryVisitTime = searchValue(params, "visitTime") || searchValue(params, "time");
   const [partyDetails, waiverContent] = await Promise.all([
     getPartyWaiverDetails(partyId),
     getWaiverContent(),
   ]);
-  const primaryParticipant = partyDetails?.primaryParticipant || queryPrimaryParticipant;
+  const primaryParticipant = partyDetails?.primaryParticipant || "";
   const initialVisit = {
     partyId,
     partyName: primaryParticipant || "",

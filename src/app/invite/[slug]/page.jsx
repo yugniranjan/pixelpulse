@@ -8,8 +8,6 @@ import { getInviteBySlug } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
-const GOOGLE_MAPS_SEARCH_URL = "https://www.google.com/maps/search/?api=1&query=";
-
 function configText(configData, keys) {
   return getConfigValue(configData, keys);
 }
@@ -85,6 +83,21 @@ function DetailCard({ label, value }) {
   );
 }
 
+function titleWithoutChildName(title = "", childName = "") {
+  const cleanedTitle = String(title || "").trim();
+  const cleanedChildName = String(childName || "").trim();
+  if (!cleanedChildName) return cleanedTitle;
+
+  return cleanedTitle
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s*['’]s\\s*`, "i"), "")
+    .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s+`, "i"), "")
+    .trim();
+}
+
+function escapeRegExp(value = "") {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const locationSlug = LOCATION_NAME || "vaughan";
@@ -156,18 +169,7 @@ export default async function InviteSlugPage({ params }) {
   const businessTelHref = invite.businessPhone
     ? `tel:${invite.businessPhone?.replace(/[^\d+]/g, "")}`
     : "";
-  const configuredDirectionsLink = invite.directionsLink.trim();
-  const finalDirectionsLink =
-    configuredDirectionsLink || invite.address
-      ? configuredDirectionsLink.startsWith("https://www.google.com/maps")
-        ? configuredDirectionsLink
-        : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`
-      : "";
-  const titleRemainder =
-    invite.title
-      ?.replace(invite.childName, "")
-      ?.replace(/^['’]s\s*/i, "")
-      .trim() || invite.titleSuffix;
+  const titleRemainder = titleWithoutChildName(invite.title, invite.childName) || invite.titleSuffix;
 
   return (
     <div className="ppp-invite-page">
@@ -211,7 +213,6 @@ export default async function InviteSlugPage({ params }) {
             <DetailCard label={invite.dateLabel} value={invite.date} />
             <DetailCard label={invite.timeLabel} value={invite.time} />
             <DetailCard label={invite.venueLabel} value={invite.venue} />
-            <DetailCard label={invite.addressLabel} value={invite.address} />
           </dl>
 
           {invite.waiverLabel || invite.waiverText || invite.waiverLink ? (
@@ -233,29 +234,21 @@ export default async function InviteSlugPage({ params }) {
             </div>
           ) : null}
 
-          {invite.rsvpLabel || invite.rsvpText || invite.phone ? (
+          {invite.phone ? (
             <div className="ppp-invite-rsvp">
               {invite.rsvpLabel ? <span>{invite.rsvpLabel}</span> : null}
               <p>
-                {invite.rsvpText} {telHref ? <a href={telHref}>{invite.phone}</a> : invite.phone}
+                {invite.rsvpText} <a href={telHref}>{invite.phone}</a>
               </p>
             </div>
           ) : null}
 
-          {businessTelHref || finalDirectionsLink ? (
+          {businessTelHref ? (
             <div className="ppp-invite-actions" aria-label={invite.contactLinksLabel}>
-              {businessTelHref ? (
-                <a href={businessTelHref}>
-                  <span>{invite.businessPhoneLabel}</span>
-                  {invite.businessPhone}
-                </a>
-              ) : null}
-              {finalDirectionsLink ? (
-                <a href={finalDirectionsLink} target="_blank" rel="noopener noreferrer">
-                  <span>{invite.directionsLabel}</span>
-                  {invite.directionsText}
-                </a>
-              ) : null}
+              <a href={businessTelHref}>
+                <span>{invite.businessPhoneLabel}</span>
+                {invite.businessPhone}
+              </a>
             </div>
           ) : null}
 

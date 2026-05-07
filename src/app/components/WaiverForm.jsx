@@ -607,11 +607,11 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
         <div className="ppp-waiver-field-grid">
           <label>
             <span>{configuredText(waiverContent, "firstNameLabel")}</span>
-            <input required value={primary.firstName} onChange={(event) => updatePrimary("firstName", event.target.value)} />
+            <input required autoComplete="off" value={primary.firstName} onChange={(event) => updatePrimary("firstName", event.target.value)} />
           </label>
           <label>
             <span>{configuredText(waiverContent, "lastNameLabel")}</span>
-            <input required value={primary.lastName} onChange={(event) => updatePrimary("lastName", event.target.value)} />
+            <input required autoComplete="off" value={primary.lastName} onChange={(event) => updatePrimary("lastName", event.target.value)} />
           </label>
           <DobField label={configuredText(waiverContent, "dobLabel")} value={primary.dob} onChange={(value) => updatePrimary("dob", value)} />
           {showGenderField ? (
@@ -771,6 +771,10 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             </>
           ) : null}
           <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
+          <label>
+            <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
+            <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
+          </label>
         </div>
       </section>
 

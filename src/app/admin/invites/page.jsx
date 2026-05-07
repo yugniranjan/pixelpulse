@@ -23,8 +23,6 @@ function Field({ label, children }) {
   );
 }
 
-const DEFAULT_DIRECTIONS_LINK =
-  "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
 const DEFAULT_BUSINESS_PHONE = "+1 (905) 760-2922";
 
 export default function AdminInvitesPage() {
@@ -39,13 +37,11 @@ export default function AdminInvitesPage() {
     date: "",
     time: "",
     venue: "Pixel Pulse Playzone",
-    address: "",
     waiverText: "Please complete the waiver before the party.",
     waiverButton: "Complete waiver",
     rsvpText: "Please text or call",
     phone: "",
     businessPhone: DEFAULT_BUSINESS_PHONE,
-    directionsLink: DEFAULT_DIRECTIONS_LINK,
     footer: "We can't wait to celebrate with you!",
     websiteText: "www.pixelpulseplay.ca",
     websiteLink: "https://www.pixelpulseplay.ca",
@@ -153,14 +149,8 @@ export default function AdminInvitesPage() {
             <Field label="Venue">
               <input value={form.venue} onChange={(event) => updateField("venue", event.target.value)} />
             </Field>
-            <Field label="Address / directions search">
-              <input value={form.address} onChange={(event) => updateField("address", event.target.value)} />
-            </Field>
-            <Field label="Directions link">
-              <input value={form.directionsLink} onChange={(event) => updateField("directionsLink", event.target.value)} placeholder="Optional Google Maps URL" />
-            </Field>
             <Field label="RSVP phone">
-              <input value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
+              <input value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Parent or guardian RSVP number" />
             </Field>
             <Field label="Pixel Pulse phone">
               <input value={form.businessPhone} onChange={(event) => updateField("businessPhone", event.target.value)} />

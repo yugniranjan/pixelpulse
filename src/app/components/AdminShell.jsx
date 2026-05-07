@@ -8,7 +8,7 @@ const ADMIN_LINKS = [
   { href: "/admin/waivers", label: "Waivers" },
   { href: "/admin/invites", label: "Create Party Links" },
   { href: "/admin/blogs", label: "Blogs" },
-  { href: "/waiver-data", label: "Local Waiver Data" },
+  { href: "/waiver-data", label: "Players Data" },
 ];
 
 function isActiveLink(pathname, href) {

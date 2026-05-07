@@ -82,7 +82,7 @@ export default async function LocalWaiverDataPage() {
       <main className="waiver-admin-page">
         <div className="waiver-admin-header">
           <div>
-            <h1>Waiver Data</h1>
+            <h1>Players Data</h1>
             <p>This local-only viewer is disabled in production.</p>
           </div>
         </div>
@@ -107,9 +107,9 @@ export default async function LocalWaiverDataPage() {
           <span>Admin</span>
         </div>
         <nav>
-          <Link className="is-active" href="/waiver-data">Waiver Data</Link>
+          <Link className="is-active" href="/waiver-data">Players Data</Link>
           <Link href="/admin/waivers">Admin Waivers</Link>
-          <Link href="/admin/invites">Invite Builder</Link>
+          <Link href="/admin/invites">Create Party Links</Link>
           <Link href="/admin/blogs">Blogs</Link>
         </nav>
       </aside>
@@ -118,7 +118,7 @@ export default async function LocalWaiverDataPage() {
         <div className="waiver-admin-header waiver-admin-header--dashboard">
           <div>
             <span className="waiver-admin-kicker">Local dashboard</span>
-            <h1>Waiver Data</h1>
+            <h1>Players Data</h1>
             <p>Development-only view. No admin login required on localhost.</p>
           </div>
           <div className="waiver-admin-local-pill">Local only</div>

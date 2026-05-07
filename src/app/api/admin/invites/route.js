@@ -93,8 +93,7 @@ export async function POST(req) {
   const partyId = await getAvailablePartyId(body.partyId);
   const inviteUrl = `${origin}/invite/${slug}`;
   const waiverLink = `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`;
-  const title = cleanText(body.title) || `${childName}'s Birthday Party`;
-  const directionsLink = cleanText(body.directionsLink) || cleanText(body.address);
+  const title = cleanText(body.title) || "Birthday Party";
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
   const now = new Date();
@@ -117,7 +116,7 @@ export async function POST(req) {
     venueLabel: cleanText(body.venueLabel) || "Place",
     venue: cleanText(body.venue),
     addressLabel: cleanText(body.addressLabel) || "Address",
-    address: cleanText(body.address),
+    address: "",
     waiverLabel: cleanText(body.waiverLabel) || "Waiver",
     waiverText: cleanText(body.waiverText),
     waiverButton: cleanText(body.waiverButton) || "Complete waiver",
@@ -129,7 +128,7 @@ export async function POST(req) {
     businessPhone: cleanText(body.businessPhone),
     directionsLabel: cleanText(body.directionsLabel) || "Directions",
     directionsText: cleanText(body.directionsText) || "Open map",
-    directionsLink,
+    directionsLink: "",
     contactLinksLabel: cleanText(body.contactLinksLabel) || "Pixel Pulse contact links",
     footer: cleanText(body.footer),
     websiteText,
@@ -140,12 +139,16 @@ export async function POST(req) {
     updatedAt: now,
   };
 
+  const smsIntro = [
+    "🎉 You’re Invited to the Ultimate Birthday Adventure! 🎮✨",
+    "",
+    "Join us at Pixel Pulse Playzone for an action-packed birthday celebration full of games, challenges, laughs, and fun! 🕹️⚡",
+  ].join("\n");
+
   const smsText = [
-    invite.greeting,
-    invite.guestName || `You're invited to ${title}!`,
+    smsIntro,
     `${invite.dateLabel}: ${date}`,
     `${invite.timeLabel}: ${time}`,
-    invite.address ? `${invite.addressLabel}: ${invite.address}` : "",
     `Invite: ${inviteUrl}`,
     `Waiver: ${waiverLink}`,
   ].filter(Boolean).join("\n");
