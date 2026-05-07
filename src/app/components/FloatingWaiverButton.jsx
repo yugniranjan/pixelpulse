@@ -17,6 +17,8 @@ const FloatingWaiverButton = () => {
       href={WAIVER_URL}
       className="ppp-floating-waiver"
       prefetch
+      target="_blank"
+      rel="noopener noreferrer"
     >
       <span className="ppp-floating-waiver__eyebrow">Required</span>
       <span className="ppp-floating-waiver__label">Sign Waiver</span>
