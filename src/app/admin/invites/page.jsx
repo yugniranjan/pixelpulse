@@ -34,17 +34,12 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
-const INVITE_THEMES = [
-  { id: "blue", label: "Blue", swatch: "#36a3ff" },
-  { id: "pink", label: "Pink", swatch: "#ff5fa8" },
-];
 
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
     partyId: "",
     title: "Birthday Party",
-    theme: "blue",
     greeting: DEFAULT_GREETING,
     guestName: DEFAULT_GUEST_LINE,
     intro: DEFAULT_PARTY_INTRO,
@@ -212,25 +207,6 @@ export default function AdminInvitesPage() {
             <Field label="Time" required>
               <input required type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
             </Field>
-          </div>
-        </section>
-
-        <section>
-          <h2>Invite Theme</h2>
-          <div className="invite-admin-theme-options" role="radiogroup" aria-label="Invite theme">
-            {INVITE_THEMES.map((theme) => (
-              <button
-                key={theme.id}
-                type="button"
-                role="radio"
-                aria-checked={form.theme === theme.id}
-                className={form.theme === theme.id ? "is-selected" : ""}
-                onClick={() => updateField("theme", theme.id)}
-              >
-                <span style={{ backgroundColor: theme.swatch }} aria-hidden="true" />
-                {theme.label}
-              </button>
-            ))}
           </div>
         </section>
 

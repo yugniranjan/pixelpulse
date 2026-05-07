@@ -23,7 +23,6 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
-const INVITE_THEMES = new Set(["blue", "pink"]);
 
 function cleanText(value = "") {
   return String(value || "").trim();
@@ -42,11 +41,6 @@ function titleWithoutChildName(title = "", childName = "") {
     .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s*['’]s\\s*`, "i"), "")
     .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s+`, "i"), "")
     .trim();
-}
-
-function cleanInviteTheme(value = "") {
-  const theme = cleanText(value).toLowerCase();
-  return INVITE_THEMES.has(theme) ? theme : "blue";
 }
 
 function plainSheetText(value = "") {
@@ -154,7 +148,6 @@ export async function POST(req) {
   const greeting = cleanText(body.greeting) || inviteDefaults.greeting;
   const guestName = cleanText(body.guestName) || inviteDefaults.guestName;
   const intro = cleanText(body.intro) || inviteDefaults.intro;
-  const theme = cleanInviteTheme(body.theme);
   const now = new Date();
 
   const invite = {
@@ -167,7 +160,6 @@ export async function POST(req) {
     childName,
     title,
     titleSuffix: cleanText(body.titleSuffix) || title,
-    theme,
     intro,
     dateLabel: cleanText(body.dateLabel) || "Date",
     date,
