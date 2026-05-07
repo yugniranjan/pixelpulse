@@ -139,6 +139,7 @@ export default async function InviteSlugPage({ params }) {
     childName: inviteText(inviteRow, configData, ["childName", "inviteChildName"]),
     title: inviteText(inviteRow, configData, ["title", "inviteTitle"]),
     titleSuffix: inviteText(inviteRow, configData, ["titleSuffix", "tilesuffix", "inviteTitleSuffix"]),
+    theme: inviteText(inviteRow, configData, ["theme", "inviteTheme"]),
     intro: inviteText(inviteRow, configData, ["intro", "message", "inviteIntro", "inviteMessage"]),
     dateLabel: inviteText(inviteRow, configData, ["dateLabel", "inviteDateLabel"]),
     date: formatInviteDate(inviteText(inviteRow, configData, ["date", "inviteDate"])),
@@ -179,9 +180,11 @@ export default async function InviteSlugPage({ params }) {
         : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`
       : "";
   const titleRemainder = titleWithoutChildName(invite.title, invite.childName) || invite.titleSuffix;
+  const selectedTheme = String(invite.theme || "").trim().toLowerCase();
+  const inviteTheme = ["pink", "blue"].includes(selectedTheme) ? selectedTheme : "blue";
 
   return (
-    <div className="ppp-invite-page">
+    <div className={`ppp-invite-page ppp-invite-page--${inviteTheme}`}>
       <section className="ppp-invite-card" aria-labelledby="invite-title">
         <div className="ppp-invite-card__shine" aria-hidden="true" />
         <div className="ppp-invite-card__content">

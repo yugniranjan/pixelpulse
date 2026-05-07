@@ -74,7 +74,6 @@ export async function POST(request) {
 
     const text = [
       partyId ? `Party ID: ${partyId}` : "",
-      "SMS Text:",
       smsText,
       "",
       `QR Code: ${qrCodeUrl}`,
@@ -84,7 +83,6 @@ export async function POST(request) {
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
         <h2 style="margin:0 0 12px;">Pixel Pulse Party Links</h2>
         ${partyId ? `<p><strong>Party ID:</strong> ${escapeHtml(partyId)}</p>` : ""}
-        <p><strong>SMS Text</strong></p>
         <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
           ${textToHtml(smsText)}
         </div>
@@ -104,7 +102,7 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: "Pixel Pulse party invite SMS and QR code",
+      subject: "Pixel Pulse party invite and QR code",
       text,
       html,
     });

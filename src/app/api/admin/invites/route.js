@@ -23,6 +23,7 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
+const INVITE_THEMES = new Set(["blue", "pink"]);
 
 function cleanText(value = "") {
   return String(value || "").trim();
@@ -41,6 +42,11 @@ function titleWithoutChildName(title = "", childName = "") {
     .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s*['’]s\\s*`, "i"), "")
     .replace(new RegExp(`^${escapeRegExp(cleanedChildName)}\\s+`, "i"), "")
     .trim();
+}
+
+function cleanInviteTheme(value = "") {
+  const theme = cleanText(value).toLowerCase();
+  return INVITE_THEMES.has(theme) ? theme : "blue";
 }
 
 function plainSheetText(value = "") {
@@ -117,10 +123,11 @@ export async function POST(req) {
   const partyId = cleanText(body.partyId);
   const date = cleanText(body.date);
   const time = cleanText(body.time);
+  const phone = cleanText(body.phone);
 
-  if (!childName || !date || !time) {
+  if (!childName || !date || !time || !phone) {
     return NextResponse.json(
-      { error: "Child name, date, and time are required." },
+      { error: "Child name, date, time, and RSVP phone are required." },
       { status: 400 },
     );
   }
@@ -147,6 +154,7 @@ export async function POST(req) {
   const greeting = cleanText(body.greeting) || inviteDefaults.greeting;
   const guestName = cleanText(body.guestName) || inviteDefaults.guestName;
   const intro = cleanText(body.intro) || inviteDefaults.intro;
+  const theme = cleanInviteTheme(body.theme);
   const now = new Date();
 
   const invite = {
@@ -159,6 +167,7 @@ export async function POST(req) {
     childName,
     title,
     titleSuffix: cleanText(body.titleSuffix) || title,
+    theme,
     intro,
     dateLabel: cleanText(body.dateLabel) || "Date",
     date,
@@ -174,7 +183,7 @@ export async function POST(req) {
     waiverLink,
     rsvpLabel: cleanText(body.rsvpLabel) || "RSVP",
     rsvpText: cleanText(body.rsvpText),
-    phone: cleanText(body.phone),
+    phone,
     businessPhoneLabel: cleanText(body.businessPhoneLabel) || "Pixel Pulse Phone",
     businessPhone: cleanText(body.businessPhone),
     directionsLabel: cleanText(body.directionsLabel) || "Directions",

@@ -14,10 +14,13 @@ function slugify(value = "") {
     ?.replace(/^-+|-+$/g, "");
 }
 
-function Field({ label, children }) {
+function Field({ label, required = false, children }) {
   return (
     <label className="invite-admin-field">
-      <span>{label}</span>
+      <span>
+        {label}
+        {required ? <b aria-label="required">*</b> : null}
+      </span>
       {children}
     </label>
   );
@@ -31,12 +34,17 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
+const INVITE_THEMES = [
+  { id: "blue", label: "Blue", swatch: "#36a3ff" },
+  { id: "pink", label: "Pink", swatch: "#ff5fa8" },
+];
 
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
     partyId: "",
     title: "Birthday Party",
+    theme: "blue",
     greeting: DEFAULT_GREETING,
     guestName: DEFAULT_GUEST_LINE,
     intro: DEFAULT_PARTY_INTRO,
@@ -186,7 +194,7 @@ export default function AdminInvitesPage() {
         <section>
           <h2>Party Details</h2>
           <div className="invite-admin-grid">
-            <Field label="Child name">
+            <Field label="Child name" required>
               <input required value={form.childName} onChange={(event) => updateField("childName", event.target.value)} />
             </Field>
             <Field label="Party ID">
@@ -198,12 +206,31 @@ export default function AdminInvitesPage() {
             <Field label="Slug">
               <input value={form.slug} onChange={(event) => updateField("slug", event.target.value)} placeholder={suggestedSlug} />
             </Field>
-            <Field label="Date">
+            <Field label="Date" required>
               <input required type="date" value={form.date} onChange={(event) => updateField("date", event.target.value)} />
             </Field>
-            <Field label="Time">
+            <Field label="Time" required>
               <input required type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
             </Field>
+          </div>
+        </section>
+
+        <section>
+          <h2>Invite Theme</h2>
+          <div className="invite-admin-theme-options" role="radiogroup" aria-label="Invite theme">
+            {INVITE_THEMES.map((theme) => (
+              <button
+                key={theme.id}
+                type="button"
+                role="radio"
+                aria-checked={form.theme === theme.id}
+                className={form.theme === theme.id ? "is-selected" : ""}
+                onClick={() => updateField("theme", theme.id)}
+              >
+                <span style={{ backgroundColor: theme.swatch }} aria-hidden="true" />
+                {theme.label}
+              </button>
+            ))}
           </div>
         </section>
 
@@ -234,8 +261,8 @@ export default function AdminInvitesPage() {
             <Field label="Address">
               <input value={form.address} onChange={(event) => updateField("address", event.target.value)} />
             </Field>
-            <Field label="RSVP phone">
-              <input value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Parent or guardian RSVP number" />
+            <Field label="RSVP phone" required>
+              <input required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Parent or guardian RSVP number" />
             </Field>
             <Field label="Pixel Pulse phone">
               <input value={form.businessPhone} onChange={(event) => updateField("businessPhone", event.target.value)} />

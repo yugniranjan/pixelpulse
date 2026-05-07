@@ -106,6 +106,7 @@ export default async function InvitePage() {
     childName: configText(configData, ["inviteChildName"]),
     title: configText(configData, ["inviteTitle"]),
     titleSuffix: configText(configData, ["inviteTitleSuffix", "inviteTilesuffix"]),
+    theme: configText(configData, ["inviteTheme"]),
     intro: configText(configData, ["inviteIntro", "inviteMessage"]),
     dateLabel: configText(configData, ["inviteDateLabel"]),
     date: formatInviteDate(configText(configData, ["inviteDate"])),
@@ -144,9 +145,11 @@ export default async function InvitePage() {
         : `${GOOGLE_MAPS_SEARCH_URL}${encodeURIComponent(configuredDirectionsLink || invite.address)}`
       : "";
   const titleRemainder = titleWithoutChildName(invite.title, invite.childName) || invite.titleSuffix;
+  const selectedTheme = String(invite.theme || "").trim().toLowerCase();
+  const inviteTheme = ["pink", "blue"].includes(selectedTheme) ? selectedTheme : "blue";
 
   return (
-    <div className="ppp-invite-page">
+    <div className={`ppp-invite-page ppp-invite-page--${inviteTheme}`}>
       <section className="ppp-invite-card" aria-labelledby="invite-title">
         <div className="ppp-invite-card__shine" aria-hidden="true" />
         <div className="ppp-invite-card__content">
