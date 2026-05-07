@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import { getConfigValue } from "@/lib/ctaContent";
 import { normalizeInviteSlug } from "@/lib/invites";
 import { partyWaiverDocId } from "@/lib/partyWaivers";
 import {
@@ -9,6 +10,8 @@ import {
   upsertPostgresInvite,
   upsertPostgresPartyWaiver,
 } from "@/lib/postgresData";
+import { fetchsheetdata } from "@/lib/sheets";
+import { LOCATION_NAME } from "@/lib/constant";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,9 +19,38 @@ export const runtime = "nodejs";
 const DEFAULT_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const DEFAULT_DIRECTIONS_LINK =
   "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
+const DEFAULT_GREETING = "Hi,";
+const DEFAULT_GUEST_LINE = "You are invited!";
+const DEFAULT_PARTY_INTRO =
+  "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
 
 function cleanText(value = "") {
   return String(value || "").trim();
+}
+
+function plainSheetText(value = "") {
+  return cleanText(value).replace(/<br\s*\/?>/gi, "\n");
+}
+
+async function getInviteDefaults() {
+  const configData = await fetchsheetdata("config", LOCATION_NAME || "vaughan");
+  const greeting = plainSheetText(
+    getConfigValue(configData, ["partyFormGreeting", "inviteGreeting", "greeting"]),
+  ) || DEFAULT_GREETING;
+  const guestName = plainSheetText(
+    getConfigValue(configData, ["partyFormGuestLine", "inviteGuestName", "guestName"]),
+  ) || DEFAULT_GUEST_LINE;
+  const intro = plainSheetText(
+    getConfigValue(configData, [
+      "partyFormIntro",
+      "inviteSmsIntro",
+      "smsIntro",
+      "inviteIntro",
+      "inviteMessage",
+    ]),
+  ) || DEFAULT_PARTY_INTRO;
+
+  return { greeting, guestName, intro };
 }
 
 async function getAvailableSlug(baseSlug) {
@@ -70,6 +102,12 @@ function getOrigin(req) {
   return new URL(req.url).origin;
 }
 
+export async function GET() {
+  return NextResponse.json({
+    defaults: await getInviteDefaults(),
+  });
+}
+
 export async function POST(req) {
   if (!db && !hasPostgres()) {
     return NextResponse.json(
@@ -100,6 +138,10 @@ export async function POST(req) {
   const title = cleanText(body.title) || "Birthday Party";
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
+  const inviteDefaults = await getInviteDefaults();
+  const greeting = cleanText(body.greeting) || inviteDefaults.greeting;
+  const guestName = cleanText(body.guestName) || inviteDefaults.guestName;
+  const intro = cleanText(body.intro) || inviteDefaults.intro;
   const now = new Date();
 
   const invite = {
@@ -107,12 +149,12 @@ export async function POST(req) {
     slug,
     partyId,
     eyebrow: cleanText(body.eyebrow) || "Birthday Invite",
-    greeting: cleanText(body.greeting),
-    guestName: cleanText(body.guestName),
+    greeting,
+    guestName,
     childName,
     title,
     titleSuffix: cleanText(body.titleSuffix) || "Birthday Party",
-    intro: cleanText(body.intro),
+    intro,
     dateLabel: cleanText(body.dateLabel) || "Date",
     date,
     timeLabel: cleanText(body.timeLabel) || "Time",
@@ -143,14 +185,8 @@ export async function POST(req) {
     updatedAt: now,
   };
 
-  const smsIntro = [
-    "🎉 You’re Invited to the Ultimate Birthday Adventure! 🎮✨",
-    "",
-    "Join us at Pixel Pulse Playzone for an action-packed birthday celebration full of games, challenges, laughs, and fun! 🕹️⚡",
-  ].join("\n");
-
   const smsText = [
-    smsIntro,
+    intro,
     `${invite.dateLabel}: ${date}`,
     `${invite.timeLabel}: ${time}`,
     `${invite.addressLabel}: ${invite.address}`,

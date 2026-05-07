@@ -182,6 +182,10 @@ export async function getWaiverLink(location){
   return waiver;
 }
  
+function challengeRoomTitle(value = "") {
+  return String(value || "").replace(/trampoline/gi, "challenge rooms");
+}
+
 
 export async function generateMetadataLib({ location, category, page }) {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -204,9 +208,10 @@ export async function generateMetadataLib({ location, category, page }) {
   const imageUrl = metadataItem?.headerimage?.startsWith("http")
     ? metadataItem.headerimage
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
+  const metaTitle = challengeRoomTitle(metadataItem?.metatitle || "pixelpulseplay Challenge Rooms");
 
   return {
-    title: metadataItem?.metatitle || "pixelpulseplay Trampoline Park",
+    title: metaTitle,
     description: metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!",
     robots: {
       index: true,
@@ -216,10 +221,10 @@ export async function generateMetadataLib({ location, category, page }) {
       canonical: fullUrl,
     },
     openGraph: {
-      title: metadataItem?.metatitle || "pixelpulseplay Trampoline Park",
+      title: metaTitle,
       description: metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!",
       url: fullUrl,
-      siteName: "pixelpulseplay Trampoline Park",
+      siteName: "pixelpulseplay Challenge Rooms",
       images: imageUrl
         ? [
             {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../../styles/admin-invites.css";
 import "../../styles/admin-waivers.css";
 import AdminShell from "@/components/AdminShell";
@@ -27,6 +27,10 @@ const DEFAULT_BUSINESS_PHONE = "+1 (905) 760-2922";
 const DEFAULT_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const DEFAULT_DIRECTIONS_LINK =
   "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
+const DEFAULT_GREETING = "Hi,";
+const DEFAULT_GUEST_LINE = "You are invited!";
+const DEFAULT_PARTY_INTRO =
+  "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
 
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
@@ -34,9 +38,9 @@ export default function AdminInvitesPage() {
     partyId: "",
     title: "",
     titleSuffix: "Birthday Party",
-    greeting: "Hi,",
-    guestName: "You are invited!",
-    intro: "",
+    greeting: DEFAULT_GREETING,
+    guestName: DEFAULT_GUEST_LINE,
+    intro: DEFAULT_PARTY_INTRO,
     date: "",
     time: "",
     venue: "Pixel Pulse Playzone",
@@ -60,6 +64,41 @@ export default function AdminInvitesPage() {
     () => slugify(form.slug || `${form.childName}-${form.date}`),
     [form.childName, form.date, form.slug],
   );
+
+  useEffect(() => {
+    async function loadInviteDefaults() {
+      try {
+        const response = await fetch("/api/admin/invites?defaults=1", { cache: "no-store" });
+        const data = await response.json();
+        const defaults = data?.defaults || {};
+
+        if (!response.ok) return;
+
+        setForm((current) => ({
+          ...current,
+          greeting:
+            defaults.greeting &&
+            (!current.greeting || current.greeting === DEFAULT_GREETING)
+              ? defaults.greeting
+              : current.greeting,
+          guestName:
+            defaults.guestName &&
+            (!current.guestName || current.guestName === DEFAULT_GUEST_LINE)
+              ? defaults.guestName
+              : current.guestName,
+          intro:
+            defaults.intro &&
+            (!current.intro || current.intro === DEFAULT_PARTY_INTRO)
+              ? defaults.intro
+              : current.intro,
+        }));
+      } catch (error) {
+        // Keep the local default if sheet-backed defaults are unavailable.
+      }
+    }
+
+    loadInviteDefaults();
+  }, []);
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));

@@ -35,7 +35,7 @@ if (imagesString) {
               width={400}
               height={267}
             />
-            <p className={styles.title}>pixelpulseplay Trampoline Fun</p>
+            <p className={styles.title}>pixelpulseplay Challenge Rooms Fun</p>
           </div>
         ) : (
           images.map((image, index) => (
