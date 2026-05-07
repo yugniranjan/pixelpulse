@@ -96,8 +96,8 @@ export default function AdminInvitesPage() {
         <div className="invite-admin-header waiver-admin-header--dashboard">
           <div>
             <span className="waiver-admin-kicker">Admin dashboard</span>
-            <h1>Invite Builder</h1>
-            <p>Create birthday invite links, waiver links, SMS text, and QR codes.</p>
+            <h1>Create Party Links</h1>
+            <p>Create the birthday invite, waiver link, SMS text, and QR code from one party setup.</p>
           </div>
         </div>
 
@@ -177,13 +177,13 @@ export default function AdminInvitesPage() {
         {error ? <p className="invite-admin-error">{error}</p> : null}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Invite"}
+          {loading ? "Creating..." : "Create Party Links"}
         </button>
         </form>
 
         {result ? (
           <section className="invite-admin-result">
-            <h2>Invite Ready</h2>
+            <h2>Party Links Ready</h2>
             <div className="invite-admin-output">
               <div>
                 <span>Party ID</span>

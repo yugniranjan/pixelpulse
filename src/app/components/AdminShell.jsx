@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const ADMIN_LINKS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/waivers", label: "Waivers" },
-  { href: "/admin/invites", label: "Invite Builder" },
+  { href: "/admin/invites", label: "Create Party Links" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/waiver-data", label: "Local Waiver Data" },
 ];

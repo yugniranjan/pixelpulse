@@ -5,12 +5,6 @@ import Link from "next/link";
 import "../../styles/admin-waivers.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
-const DEFAULT_PARTY_FORM = {
-  partyId: "",
-  primaryParticipant: "",
-  visitDate: "",
-  visitTime: "",
-};
 
 function formatDate(value) {
   if (!value) return "Not recorded";
@@ -120,105 +114,6 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
         </div>
       </form>
     </div>
-  );
-}
-
-function PartyWaiverLinkBuilder() {
-  const [form, setForm] = useState(DEFAULT_PARTY_FORM);
-  const [copied, setCopied] = useState("");
-  const [origin, setOrigin] = useState("");
-  const [savingParty, setSavingParty] = useState(false);
-  const [partyMessage, setPartyMessage] = useState("");
-
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
-
-  const waiverUrl = useMemo(() => {
-    if (!origin) return "";
-    const params = new URLSearchParams();
-    if (form.partyId) params.set("partyId", form.partyId);
-    const query = params.toString();
-    return `${origin}/waiver${query ? `?${query}` : ""}`;
-  }, [form.partyId, origin]);
-
-  function update(field, value) {
-    setCopied("");
-    setPartyMessage("");
-    setForm((current) => ({ ...current, [field]: value }));
-  }
-
-  async function savePartyWaiver() {
-    setSavingParty(true);
-    setCopied("");
-    setPartyMessage("");
-
-    try {
-      const response = await fetch("/api/admin/party-waivers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPartyMessage(data.error || "Unable to save party waiver details.");
-        return false;
-      }
-
-      setPartyMessage("Party waiver details saved.");
-      return true;
-    } catch (saveError) {
-      setPartyMessage("Unable to save party waiver details.");
-      return false;
-    } finally {
-      setSavingParty(false);
-    }
-  }
-
-  async function copyLink() {
-    if (!waiverUrl) return;
-    const saved = await savePartyWaiver();
-    if (!saved) return;
-    await navigator.clipboard.writeText(waiverUrl);
-    setCopied("Waiver link copied.");
-  }
-
-  return (
-    <section className="party-link-builder">
-      <div>
-        <span className="waiver-admin-kicker">Party waiver setup</span>
-        <h2>Create a Party Waiver Link</h2>
-        <p>Enter the Party ID once, then share this link so every guest waiver is attached to the same party.</p>
-      </div>
-      <div className="party-link-grid">
-        <label>
-          <span>Party ID</span>
-          <input required value={form.partyId} onChange={(event) => update("partyId", event.target.value)} placeholder="PP-0428-01" />
-        </label>
-        <label>
-          <span>Primary Participant</span>
-          <input value={form.primaryParticipant} onChange={(event) => update("primaryParticipant", event.target.value)} placeholder="Vijayant Verma" />
-        </label>
-        <label>
-          <span>Visit date</span>
-          <input type="date" value={form.visitDate} onChange={(event) => update("visitDate", event.target.value)} />
-        </label>
-        <label>
-          <span>Party time</span>
-          <input type="time" value={form.visitTime} onChange={(event) => update("visitTime", event.target.value)} />
-        </label>
-      </div>
-      <div className="party-link-output">
-        <span>Waiver URL</span>
-        <a href={waiverUrl} target="_blank" rel="noopener noreferrer">{waiverUrl}</a>
-        <button type="button" onClick={copyLink} disabled={savingParty}>
-          {savingParty ? "Saving..." : "Save & Copy Link"}
-        </button>
-      </div>
-      {partyMessage ? <p className="party-link-copied">{partyMessage}</p> : null}
-      {copied ? <p className="party-link-copied">{copied}</p> : null}
-    </section>
   );
 }
 
@@ -649,7 +544,7 @@ export default function AdminWaiversPage() {
         </div>
         <nav>
           <Link className="is-active" href="/admin/waivers">Waivers</Link>
-          <Link href="/admin/invites">Invite Builder</Link>
+          <Link href="/admin/invites">Create Party Links</Link>
           <Link href="/admin/blogs">Blogs</Link>
           <Link href="/waiver-data">Local Waiver Data</Link>
         </nav>
@@ -689,8 +584,6 @@ export default function AdminWaiversPage() {
                 <strong>{latestWaiver ? formatDateTime(latestWaiver.submittedAt) : "None"}</strong>
               </article>
             </div>
-
-            <PartyWaiverLinkBuilder />
 
             {loading ? <p className="waiver-admin-state">Loading waivers...</p> : null}
             {error ? <p className="waiver-admin-error">{error}</p> : null}
