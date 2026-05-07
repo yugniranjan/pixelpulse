@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import { normalizeInviteSlug } from "@/lib/invites";
+import { partyWaiverDocId } from "@/lib/partyWaivers";
 import {
+  getPostgresPartyWaiver,
   hasPostgres,
   postgresInviteSlugExists,
   upsertPostgresInvite,
+  upsertPostgresPartyWaiver,
 } from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +33,33 @@ async function getAvailableSlug(baseSlug) {
   return slug;
 }
 
+function generatePartyId() {
+  return `pp${Math.floor(10000 + Math.random() * 90000)}`;
+}
+
+async function partyIdExists(partyId) {
+  if (hasPostgres()) {
+    return Boolean(await getPostgresPartyWaiver(partyId));
+  }
+
+  return (await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get()).exists;
+}
+
+async function getAvailablePartyId(requestedPartyId) {
+  const normalizedPartyId = cleanText(requestedPartyId);
+  if (normalizedPartyId && !(await partyIdExists(normalizedPartyId))) {
+    return normalizedPartyId;
+  }
+
+  let partyId = normalizedPartyId || generatePartyId();
+
+  while (await partyIdExists(partyId)) {
+    partyId = generatePartyId();
+  }
+
+  return partyId;
+}
+
 function getOrigin(req) {
   const configured = process.env.SITE_URL || process.env.NEXT_PUBLIC_BASE_URL;
   if (configured) return configured?.replace(/\/$/, "");
@@ -48,11 +78,10 @@ export async function POST(req) {
   const childName = cleanText(body.childName);
   const date = cleanText(body.date);
   const time = cleanText(body.time);
-  const waiverLink = cleanText(body.waiverLink);
 
-  if (!childName || !date || !time || !waiverLink) {
+  if (!childName || !date || !time) {
     return NextResponse.json(
-      { error: "Child name, date, time, and waiver URL are required." },
+      { error: "Child name, date, and time are required." },
       { status: 400 },
     );
   }
@@ -61,15 +90,19 @@ export async function POST(req) {
   const baseSlug = requestedSlug || normalizeInviteSlug(`${childName}-${date}`);
   const slug = await getAvailableSlug(baseSlug);
   const origin = getOrigin(req);
+  const partyId = await getAvailablePartyId(body.partyId);
   const inviteUrl = `${origin}/invite/${slug}`;
+  const waiverLink = `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`;
   const title = cleanText(body.title) || `${childName}'s Birthday Party`;
   const directionsLink = cleanText(body.directionsLink) || cleanText(body.address);
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
+  const now = new Date();
 
   const invite = {
     active: "1",
     slug,
+    partyId,
     eyebrow: cleanText(body.eyebrow) || "Birthday Invite",
     greeting: cleanText(body.greeting),
     guestName: cleanText(body.guestName),
@@ -103,8 +136,8 @@ export async function POST(req) {
     websiteLink,
     logoAlt: cleanText(body.logoAlt) || "Pixel Pulse Play logo",
     metaTitle: cleanText(body.metaTitle) || `${title} Invite`,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: now,
+    updatedAt: now,
   };
 
   const smsText = [
@@ -125,13 +158,35 @@ export async function POST(req) {
 
   if (hasPostgres()) {
     await upsertPostgresInvite(inviteRecord);
+    await upsertPostgresPartyWaiver({
+      partyId,
+      primaryParticipant: childName,
+      visitDate: date,
+      visitTime: time,
+      passType: "Birthday Party Package",
+      createdAt: now,
+      updatedAt: now,
+    });
   } else {
     await db.collection("invites").doc(slug).set(inviteRecord);
+    await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).set(
+      {
+        partyId,
+        primaryParticipant: childName,
+        visitDate: date,
+        visitTime: time,
+        passType: "Birthday Party Package",
+        createdAt: now,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
   }
 
   return NextResponse.json({
     success: true,
     slug,
+    partyId,
     inviteUrl,
     waiverUrl: waiverLink,
     smsText,

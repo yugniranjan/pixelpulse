@@ -138,21 +138,9 @@ function PartyWaiverLinkBuilder() {
     if (!origin) return "";
     const params = new URLSearchParams();
     if (form.partyId) params.set("partyId", form.partyId);
-    if (form.primaryParticipant) {
-      params.set("primaryParticipant", form.primaryParticipant);
-      params.set("guestName", form.primaryParticipant);
-    }
-    if (form.visitDate) {
-      params.set("visitDate", form.visitDate);
-      params.set("date", form.visitDate);
-    }
-    if (form.visitTime) {
-      params.set("visitTime", form.visitTime);
-      params.set("time", form.visitTime);
-    }
     const query = params.toString();
     return `${origin}/waiver${query ? `?${query}` : ""}`;
-  }, [form.partyId, form.primaryParticipant, form.visitDate, form.visitTime, origin]);
+  }, [form.partyId, origin]);
 
   function update(field, value) {
     setCopied("");
@@ -222,7 +210,7 @@ function PartyWaiverLinkBuilder() {
         </label>
       </div>
       <div className="party-link-output">
-        <span>Prefilled waiver URL</span>
+        <span>Waiver URL</span>
         <a href={waiverUrl} target="_blank" rel="noopener noreferrer">{waiverUrl}</a>
         <button type="button" onClick={copyLink} disabled={savingParty}>
           {savingParty ? "Saving..." : "Save & Copy Link"}

@@ -23,9 +23,14 @@ function Field({ label, children }) {
   );
 }
 
+const DEFAULT_DIRECTIONS_LINK =
+  "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
+const DEFAULT_BUSINESS_PHONE = "+1 (905) 760-2922";
+
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
+    partyId: "",
     title: "",
     titleSuffix: "Birthday Party",
     greeting: "Hi,",
@@ -37,11 +42,10 @@ export default function AdminInvitesPage() {
     address: "",
     waiverText: "Please complete the waiver before the party.",
     waiverButton: "Complete waiver",
-    waiverLink: "",
     rsvpText: "Please text or call",
     phone: "",
-    businessPhone: "",
-    directionsLink: "",
+    businessPhone: DEFAULT_BUSINESS_PHONE,
+    directionsLink: DEFAULT_DIRECTIONS_LINK,
     footer: "We can't wait to celebrate with you!",
     websiteText: "www.pixelpulseplay.ca",
     websiteLink: "https://www.pixelpulseplay.ca",
@@ -104,6 +108,9 @@ export default function AdminInvitesPage() {
             <Field label="Child name">
               <input required value={form.childName} onChange={(event) => updateField("childName", event.target.value)} />
             </Field>
+            <Field label="Party ID">
+              <input value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Auto-generated if blank" />
+            </Field>
             <Field label="Title">
               <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Ariana's Birthday Party" />
             </Field>
@@ -152,9 +159,6 @@ export default function AdminInvitesPage() {
             <Field label="Directions link">
               <input value={form.directionsLink} onChange={(event) => updateField("directionsLink", event.target.value)} placeholder="Optional Google Maps URL" />
             </Field>
-            <Field label="Waiver URL">
-              <input required value={form.waiverLink} onChange={(event) => updateField("waiverLink", event.target.value)} />
-            </Field>
             <Field label="RSVP phone">
               <input value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
             </Field>
@@ -181,6 +185,11 @@ export default function AdminInvitesPage() {
           <section className="invite-admin-result">
             <h2>Invite Ready</h2>
             <div className="invite-admin-output">
+              <div>
+                <span>Party ID</span>
+                <strong>{result.partyId}</strong>
+                <button type="button" onClick={() => copyText(result.partyId)}>Copy</button>
+              </div>
               <div>
                 <span>Invite URL</span>
                 <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">{result.inviteUrl}</a>

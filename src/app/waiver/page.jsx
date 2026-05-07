@@ -7,7 +7,7 @@ import SectionHeading from "@/components/home/SectionHeading";
 import WaiverForm from "@/components/WaiverForm";
 import { db } from "@/lib/firestore";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
-import { partyWaiverDocId, splitParticipantName } from "@/lib/partyWaivers";
+import { partyWaiverDocId } from "@/lib/partyWaivers";
 import { getPostgresPartyWaiver, hasPostgres } from "@/lib/postgresData";
 
 export const metadata = {
@@ -76,7 +76,6 @@ export default async function WaiverPage({ searchParams }) {
     getWaiverContent(),
   ]);
   const primaryParticipant = partyDetails?.primaryParticipant || queryPrimaryParticipant;
-  const primaryName = splitParticipantName(primaryParticipant);
   const initialVisit = {
     partyId,
     partyName: primaryParticipant || "",
@@ -85,8 +84,8 @@ export default async function WaiverPage({ searchParams }) {
     visitTime: partyDetails?.visitTime || queryVisitTime || "",
   };
   const initialPrimary = {
-    firstName: primaryName.firstName,
-    lastName: primaryName.lastName,
+    firstName: "",
+    lastName: "",
   };
 
   return (
