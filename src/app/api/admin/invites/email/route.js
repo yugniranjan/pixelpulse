@@ -81,7 +81,6 @@ export async function POST(request) {
 
     const html = `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
-        <h2 style="margin:0 0 12px;">Pixel Pulse Party Links</h2>
         ${partyId ? `<p><strong>Party ID:</strong> ${escapeHtml(partyId)}</p>` : ""}
         <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
           ${textToHtml(smsText)}
