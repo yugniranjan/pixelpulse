@@ -124,9 +124,9 @@ export async function POST(req) {
   const rsvpName = cleanText(body.rsvpName);
   const phone = cleanText(body.phone);
 
-  if (!childName || !date || !time || !rsvpName || !phone) {
+  if (!childName || !partyId || !date || !time || !rsvpName || !phone) {
     return NextResponse.json(
-      { error: "Child name, date, time, RSVP name, and RSVP phone are required." },
+      { error: "Child name, Party ID, date, time, RSVP name, and RSVP phone are required." },
       { status: 400 },
     );
   }
