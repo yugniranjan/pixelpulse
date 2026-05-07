@@ -69,31 +69,12 @@ async function getAvailableSlug(baseSlug) {
   return slug;
 }
 
-function generatePartyId() {
-  return `pp${Math.floor(10000 + Math.random() * 90000)}`;
-}
-
 async function partyIdExists(partyId) {
   if (hasPostgres()) {
     return Boolean(await getPostgresPartyWaiver(partyId));
   }
 
   return (await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get()).exists;
-}
-
-async function getAvailablePartyId(requestedPartyId) {
-  const normalizedPartyId = cleanText(requestedPartyId);
-  if (normalizedPartyId && !(await partyIdExists(normalizedPartyId))) {
-    return normalizedPartyId;
-  }
-
-  let partyId = normalizedPartyId || generatePartyId();
-
-  while (await partyIdExists(partyId)) {
-    partyId = generatePartyId();
-  }
-
-  return partyId;
 }
 
 function getOrigin(req) {
@@ -118,6 +99,7 @@ export async function POST(req) {
 
   const body = await req.json();
   const childName = cleanText(body.childName);
+  const partyId = cleanText(body.partyId);
   const date = cleanText(body.date);
   const time = cleanText(body.time);
 
@@ -128,13 +110,21 @@ export async function POST(req) {
     );
   }
 
+  if (partyId && await partyIdExists(partyId)) {
+    return NextResponse.json(
+      { error: "Party ID already exists. Please use a unique Party ID." },
+      { status: 409 },
+    );
+  }
+
   const requestedSlug = normalizeInviteSlug(body.slug);
   const baseSlug = requestedSlug || normalizeInviteSlug(`${childName}-${date}`);
   const slug = await getAvailableSlug(baseSlug);
   const origin = getOrigin(req);
-  const partyId = await getAvailablePartyId(body.partyId);
   const inviteUrl = `${origin}/invite/${slug}`;
-  const waiverLink = `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`;
+  const waiverLink = partyId
+    ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
+    : `${origin}/waiver`;
   const title = cleanText(body.title) || "Birthday Party";
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
@@ -202,19 +192,8 @@ export async function POST(req) {
 
   if (hasPostgres()) {
     await upsertPostgresInvite(inviteRecord);
-    await upsertPostgresPartyWaiver({
-      partyId,
-      primaryParticipant: childName,
-      visitDate: date,
-      visitTime: time,
-      passType: "Birthday Party Package",
-      createdAt: now,
-      updatedAt: now,
-    });
-  } else {
-    await db.collection("invites").doc(slug).set(inviteRecord);
-    await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).set(
-      {
+    if (partyId) {
+      await upsertPostgresPartyWaiver({
         partyId,
         primaryParticipant: childName,
         visitDate: date,
@@ -222,9 +201,24 @@ export async function POST(req) {
         passType: "Birthday Party Package",
         createdAt: now,
         updatedAt: now,
-      },
-      { merge: true },
-    );
+      });
+    }
+  } else {
+    await db.collection("invites").doc(slug).set(inviteRecord);
+    if (partyId) {
+      await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).set(
+        {
+          partyId,
+          primaryParticipant: childName,
+          visitDate: date,
+          visitTime: time,
+          passType: "Birthday Party Package",
+          createdAt: now,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+    }
   }
 
   return NextResponse.json({

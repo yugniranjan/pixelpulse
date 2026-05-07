@@ -77,8 +77,6 @@ export async function POST(request) {
       "SMS Text:",
       smsText,
       "",
-      `Invite URL: ${inviteUrl}`,
-      waiverUrl ? `Waiver URL: ${waiverUrl}` : "",
       `QR Code: ${qrCodeUrl}`,
     ].filter(Boolean).join("\n");
 
@@ -90,8 +88,6 @@ export async function POST(request) {
         <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
           ${textToHtml(smsText)}
         </div>
-        <p><strong>Invite:</strong> <a href="${escapeHtml(inviteUrl)}">${escapeHtml(inviteUrl)}</a></p>
-        ${waiverUrl ? `<p><strong>Waiver:</strong> <a href="${escapeHtml(waiverUrl)}">${escapeHtml(waiverUrl)}</a></p>` : ""}
         <p><strong>QR Code</strong></p>
         <p>
           <a href="${escapeHtml(inviteUrl)}">

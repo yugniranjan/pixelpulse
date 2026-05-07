@@ -191,7 +191,7 @@ export default function AdminInvitesPage() {
               <input required value={form.childName} onChange={(event) => updateField("childName", event.target.value)} />
             </Field>
             <Field label="Party ID">
-              <input value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Auto-generated if blank" />
+              <input value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Optional party ID" />
             </Field>
             <Field label="Title">
               <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Ariana's Birthday Party" />
