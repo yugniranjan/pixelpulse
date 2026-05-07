@@ -406,6 +406,39 @@ export default function AdminWaiversPage() {
       ),
     [waivers],
   );
+  const partyGroups = useMemo(() => {
+    const groups = new Map();
+
+    waivers.forEach((waiver) => {
+      const partyId = waiver.visit?.partyId?.trim();
+      if (!partyId) return;
+
+      const current = groups.get(partyId) || {
+        partyId,
+        partyName: waiver.visit?.partyName || "",
+        visitDate: waiver.visit?.visitDate || "",
+        visitTime: waiver.visit?.visitTime || "",
+        records: 0,
+        participants: 0,
+        latestSubmittedAt: "",
+      };
+
+      current.records += 1;
+      current.participants += Number(waiver.participantCount) || 1;
+      current.partyName ||= waiver.visit?.partyName || "";
+      current.visitDate ||= waiver.visit?.visitDate || "";
+      current.visitTime ||= waiver.visit?.visitTime || "";
+      if (!current.latestSubmittedAt || waiver.submittedAt > current.latestSubmittedAt) {
+        current.latestSubmittedAt = waiver.submittedAt;
+      }
+
+      groups.set(partyId, current);
+    });
+
+    return Array.from(groups.values()).sort((a, b) =>
+      (b.latestSubmittedAt || "").localeCompare(a.latestSubmittedAt || ""),
+    );
+  }, [waivers]);
   const todayWaivers = useMemo(() => {
     const today = new Date().toISOString().split("T")[0];
     return waivers.filter((waiver) => waiver.visit?.visitDate === today).length;
@@ -469,6 +502,12 @@ export default function AdminWaiversPage() {
     setPlayerQuery("");
     setPlayerDateFrom("");
     setPlayerDateTo("");
+  }
+
+  function viewPartyWaivers(partyId) {
+    setQuery(partyId);
+    setPartyOnly(false);
+    setPage(1);
   }
 
   function startEditWaiver(waiver) {
@@ -590,6 +629,36 @@ export default function AdminWaiversPage() {
 
             {!loading && !error ? (
               <div className="waiver-admin-list waiver-admin-list--dashboard">
+                {partyGroups.length ? (
+                  <section className="waiver-party-groups" aria-label="Party waiver groups">
+                    <div className="waiver-party-groups__head">
+                      <div>
+                        <h2>Party Waiver Groups</h2>
+                        <p>Click a Party ID to show everyone who submitted a waiver for that party.</p>
+                      </div>
+                    </div>
+                    <div className="waiver-party-groups__grid">
+                      {partyGroups.slice(0, 8).map((group) => (
+                        <article key={group.partyId}>
+                          <div>
+                            <strong>{group.partyId}</strong>
+                            <span>{group.partyName || "Birthday party"}</span>
+                          </div>
+                          <dl>
+                            <div><dt>Waivers</dt><dd>{group.records}</dd></div>
+                            <div><dt>Players</dt><dd>{group.participants}</dd></div>
+                            <div><dt>Date</dt><dd>{group.visitDate || "Not set"}</dd></div>
+                            <div><dt>Time</dt><dd>{group.visitTime || "Not set"}</dd></div>
+                          </dl>
+                          <button type="button" onClick={() => viewPartyWaivers(group.partyId)}>
+                            View Party
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+
                 <div className="waiver-data-toolbar">
                   <div>
                     <h2>Recent Waiver Submissions</h2>
