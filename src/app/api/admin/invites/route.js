@@ -132,9 +132,13 @@ export async function POST(req) {
   }
 
   const requestedSlug = normalizeInviteSlug(body.slug);
-  const baseSlug = requestedSlug || normalizeInviteSlug(`${childName}-${date}`);
+  const baseSlug = requestedSlug || normalizeInviteSlug(childName);
   const existingPartySlug = await getInviteSlugByPartyId(partyId);
-  const slug = existingPartySlug || await getAvailableSlug(baseSlug);
+  const slug = requestedSlug
+    ? requestedSlug === existingPartySlug
+      ? existingPartySlug
+      : await getAvailableSlug(requestedSlug)
+    : existingPartySlug || await getAvailableSlug(baseSlug);
   const origin = getOrigin(req);
   const inviteUrl = `${origin}/invite/${slug}`;
   const waiverLink = partyId

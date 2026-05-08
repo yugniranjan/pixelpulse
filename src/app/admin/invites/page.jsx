@@ -65,10 +65,11 @@ export default function AdminInvitesPage() {
   const [emailTo, setEmailTo] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [slugEdited, setSlugEdited] = useState(false);
 
   const suggestedSlug = useMemo(
-    () => slugify(form.slug || `${form.childName}-${form.date}`),
-    [form.childName, form.date, form.slug],
+    () => slugify(form.slug || form.childName),
+    [form.childName, form.slug],
   );
 
   useEffect(() => {
@@ -111,6 +112,19 @@ export default function AdminInvitesPage() {
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateChildName(value) {
+    setForm((current) => ({
+      ...current,
+      childName: value,
+      slug: slugEdited ? current.slug : slugify(value),
+    }));
+  }
+
+  function updateSlug(value) {
+    setSlugEdited(true);
+    setForm((current) => ({ ...current, slug: value }));
   }
 
   async function createInvite(event) {
@@ -191,7 +205,7 @@ export default function AdminInvitesPage() {
           <h2>Party Details</h2>
           <div className="invite-admin-grid">
             <Field label="Child name" required>
-              <input required value={form.childName} onChange={(event) => updateField("childName", event.target.value)} />
+              <input required value={form.childName} onChange={(event) => updateChildName(event.target.value)} />
             </Field>
             <Field label="Party ID" required>
               <input required value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Party ID" />
@@ -200,7 +214,7 @@ export default function AdminInvitesPage() {
               <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Birthday Party" />
             </Field>
             <Field label="Slug">
-              <input value={form.slug} onChange={(event) => updateField("slug", event.target.value)} placeholder={suggestedSlug} />
+              <input value={form.slug} onChange={(event) => updateSlug(event.target.value)} placeholder={suggestedSlug} />
             </Field>
             <Field label="Date" required>
               <input required type="date" value={form.date} onChange={(event) => updateField("date", event.target.value)} />
