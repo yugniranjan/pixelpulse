@@ -17,6 +17,7 @@ import { LOCATION_NAME } from "@/lib/constant";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { getCtaContent } from "@/lib/ctaContent";
+import { safeImageUrl } from "@/lib/seo";
 
 function stripHtml(html = "") {
   return html
@@ -38,9 +39,9 @@ function looksLikeRenderableImage(url = "") {
 }
 
 function getPreferredHeroImage(pageData) {
-  if (looksLikeRenderableImage(pageData?.smallimage)) return pageData.smallimage;
-  if (looksLikeRenderableImage(pageData?.headerimage)) return pageData.headerimage;
-  return pageData?.smallimage || pageData?.headerimage || "/assets/images/logo.png";
+  if (looksLikeRenderableImage(pageData?.smallimage)) return safeImageUrl(pageData.smallimage);
+  if (looksLikeRenderableImage(pageData?.headerimage)) return safeImageUrl(pageData.headerimage);
+  return safeImageUrl(pageData?.smallimage || pageData?.headerimage);
 }
 
 export async function generateMetadata({ params }) {
@@ -194,7 +195,7 @@ const Subcategory = async ({ params }) => {
                           className="ppp-subcategory-card__media"
                         >
                           <Image
-                            src={item?.smallimage || "/assets/images/logo.png"}
+                            src={safeImageUrl(item?.smallimage)}
                             alt={item?.metatitle || item?.desc || "Attraction image"}
                             width={800}
                             height={600}
@@ -300,7 +301,7 @@ const Subcategory = async ({ params }) => {
                           className="ppp-groupdetail-card__media"
                         >
                           <Image
-                            src={item?.smallimage || "/assets/images/logo.png"}
+                            src={safeImageUrl(item?.smallimage)}
                             alt={item?.metatitle || item?.desc || "Group event image"}
                             width={800}
                             height={600}
@@ -407,7 +408,7 @@ const Subcategory = async ({ params }) => {
                           className="ppp-detail-card__media"
                         >
                           <Image
-                            src={item?.smallimage || "/assets/images/logo.png"}
+                            src={safeImageUrl(item?.smallimage)}
                             alt={item?.imagetitle || item?.desc || "Pixel Pulse Play"}
                             width={800}
                             height={600}

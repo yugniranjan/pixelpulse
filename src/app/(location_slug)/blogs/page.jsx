@@ -11,17 +11,17 @@ import { LOCATION_NAME } from "@/lib/constant";
 import { slugify } from "@/utils/slugify";
 import SectionHeading from "@/components/home/SectionHeading";
 import { getCtaContent } from "@/lib/ctaContent";
+import { canonicalUrl } from "@/lib/seo";
 
 export async function generateMetadata({ params }) {
   await params;
   const location_slug = LOCATION_NAME || "vaughan";
-  const BASE_URL = process.env.SITE_URL;
 
   const title = `Blogs | Pixel Pulse Play ${location_slug}`;
   const description =
     "Read the latest blogs, guides, and updates from Pixel Pulse Play. Discover arcade tips, challenge room experiences, and fun activities for families and groups.";
 
-  const url = `${BASE_URL}/${location_slug}/blogs`;
+  const url = canonicalUrl("/blogs");
 
   return {
     title,
@@ -94,14 +94,14 @@ const schema = {
   name: "Pixel Pulse Play Blog",
   description:
     "Read the latest blogs, guides, and updates from Pixel Pulse Play.",
-  url: `${process.env.SITE_URL}/${location_slug}/blogs`,
+  url: canonicalUrl("/blogs"),
   blogPost: blogsToRender?.map((blog) => {
     const slug = slugify(blog.title);
 
     return {
       "@type": "BlogPosting",
       headline: blog.title,
-      url: blog.href || `${process.env.SITE_URL}/${location_slug}/blogs/${slug}?uid=${blog.id}`,
+      url: blog.href || canonicalUrl(`/blogs/${slug}?uid=${blog.id}`),
       image:
         blog.featuredImage ||
         "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",

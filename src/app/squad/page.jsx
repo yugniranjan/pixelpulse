@@ -4,8 +4,9 @@ import SquadSignupForm from "@/components/SquadSignupForm";
 import SquadReferralCard from "@/components/SquadReferralCard";
 import { fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
+import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
-const siteUrl = process.env.SITE_URL || "https://www.pixelpulseplay.ca";
+const siteUrl = getCanonicalSiteUrl();
 const LOCATION_SLUG = "vaughan";
 const SQUAD_SHEET = "squadlanding";
 const FALLBACK_HERO_IMAGE = "/assets/images/floorchallenge.jpg";
@@ -158,7 +159,7 @@ function getSquadContent(rows = []) {
       ["squadMetaDescription", "metaDescription"],
       "Join the Pixel Pulse Squad in Vaughan. Bring friends, play arcade challenges, earn rewards, and compete on leaderboards in a safe supervised program for ages 11-17.",
     ),
-    canonical: getConfiguredValue(rows, ["squadCanonical", "canonical"], `${siteUrl}/squad`),
+    canonical: getConfiguredValue(rows, ["squadCanonical", "canonical"], canonicalUrl("/squad")),
     ogImage: absoluteUrl(localOrRemoteImage(getConfiguredValue(rows, ["squadOgImage", "ogImage"], "/assets/images/arcade.JPG"), "/assets/images/arcade.JPG")),
     mainLogo: localOrRemoteImage(getConfiguredValue(rows, ["squadMainLogo", "mainLogo"], FALLBACK_MAIN_LOGO), FALLBACK_MAIN_LOGO),
     mainLogoAlt: getConfiguredValue(rows, ["squadMainLogoAlt", "mainLogoAlt"], "Pixel Pulse Play n Party"),

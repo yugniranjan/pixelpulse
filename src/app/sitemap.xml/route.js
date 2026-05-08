@@ -3,9 +3,8 @@ import { format } from 'date-fns';
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { fetchBlogs } from "@/lib/blogs";
 import { LOCATION_NAME } from "@/lib/constant";
+import { canonicalUrl } from "@/lib/seo";
 export async function GET() {
-  const siteUrl =
-    process.env.SITE_URL?.replace(/\/$/, "") || "https://www.pixelpulseplay.ca";
   const dynamicPaths = new Set();
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
   const getLocationPath = (location = "") => {
@@ -37,12 +36,12 @@ export async function GET() {
 
       locations.forEach(loc => {
         const locationPath = getLocationPath(loc);
-        dynamicPaths.add(`${siteUrl}${locationPath}`);
+        dynamicPaths.add(canonicalUrl(locationPath));
         const basePath = (!parentid || parentid === path)
           ? `${locationPath}/${path}`
           : `${locationPath}/${parentid}/${path}`;
 
-        dynamicPaths.add(`${siteUrl}${basePath}`);
+        dynamicPaths.add(canonicalUrl(basePath));
       });
     });
 
@@ -56,12 +55,12 @@ export async function GET() {
           .replace(/[^\w\s-]/g, "")
           .replace(/\s+/g, "-");
 
-        dynamicPaths.add(`${siteUrl}/blogs/${slug}?uid=${blog.id}`);
+        dynamicPaths.add(canonicalUrl(`/blogs/${slug}?uid=${blog.id}`));
       }
     });
 
-    dynamicPaths.add(`${siteUrl}/${locationName}/waiver`);
-    dynamicPaths.add(`${siteUrl}/birthday-party-landing`);
+    dynamicPaths.add(canonicalUrl("/waiver"));
+    dynamicPaths.add(canonicalUrl("/birthday-party-landing"));
 
   } catch (error) {
     console.error("Sitemap generation error:", error);

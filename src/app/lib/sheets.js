@@ -2,6 +2,7 @@
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { getConfigValue } from "@/lib/ctaContent";
+import { DEFAULT_SEO_IMAGE, canonicalUrl, getCanonicalSiteUrl, safeImageUrl } from "@/lib/seo";
 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I/export?format=xlsx`;
 const sheetCache = new Map();
@@ -188,7 +189,7 @@ function challengeRoomTitle(value = "") {
 
 
 export async function generateMetadataLib({ location, category, page }) {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = getCanonicalSiteUrl();
   const pagefordata = page?page:'home';
   const data = await fetchPageData(location, pagefordata);
 
@@ -204,10 +205,11 @@ export async function generateMetadataLib({ location, category, page }) {
     canonicalPath += `/${category}`;
   }
 
-  const fullUrl = `${BASE_URL}/${canonicalPath}`;
-  const imageUrl = metadataItem?.headerimage?.startsWith("http")
+  const fullUrl = canonicalUrl(canonicalPath);
+  const rawImageUrl = metadataItem?.headerimage?.startsWith("http")
     ? metadataItem.headerimage
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
+  const imageUrl = safeImageUrl(rawImageUrl, DEFAULT_SEO_IMAGE);
   const metaTitle = challengeRoomTitle(metadataItem?.metatitle || "pixelpulseplay Challenge Rooms");
 
   return {
@@ -257,7 +259,7 @@ export async function generateMetadataLib({ location, category, page }) {
 // }
    
 export async function generateSchema(pagedata, locationData, category, page ) {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = getCanonicalSiteUrl();
 
   const metadataItem = pagedata;//?.find((item) => item.path === pagefordata);
 //console.log('pagedata', pagedata);
@@ -271,10 +273,11 @@ export async function generateSchema(pagedata, locationData, category, page ) {
   }
 
 
-  const fullUrl = `${BASE_URL}/${canonicalPath}`;
-  const imageUrl = metadataItem?.headerimage?.startsWith("http")
+  const fullUrl = canonicalUrl(canonicalPath);
+  const rawImageUrl = metadataItem?.headerimage?.startsWith("http")
     ? metadataItem.headerimage
     : `${BASE_URL}${metadataItem?.headerimage || ""}`;
+  const imageUrl = safeImageUrl(rawImageUrl, DEFAULT_SEO_IMAGE);
 
   const filled = locationData?.[0]?.schema
   .replace('"{{metadesc}}"', JSON.stringify(metadataItem?.metadescription || "Fun for all ages at pixelpulseplay!"))

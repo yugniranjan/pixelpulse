@@ -1,6 +1,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { safeImageUrl } from "@/lib/seo";
 const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, parentpath }) => {
 
   return (
@@ -29,7 +30,7 @@ const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, p
                 <article className="d-flex-dir-col">
                   <figure>
                     <Image
-                      src={item?.smallimage}
+                      src={safeImageUrl(item?.smallimage)}
                       width={330}
                       height={200}
                       alt={item?.metatitle}

@@ -601,7 +601,7 @@
 
 .ppp-attraction-card-modern__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background:
     linear-gradient(135deg, rgba(164, 207, 95, 0.2), rgba(251, 174, 123, 0.12) 42%, rgba(17, 24, 39, 0.96)),
@@ -611,7 +611,7 @@
 .ppp-attraction-card-modern__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.35s ease;
 }
 
@@ -989,14 +989,15 @@
 
 .ppp-group-card-modern__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-group-card-modern__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.35s ease;
 }
 
@@ -1465,14 +1466,15 @@
 
 .ppp-about-card-modern__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-about-card-modern__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.35s ease;
 }
 
@@ -1733,15 +1735,16 @@
 
 .ppp-dynamic-card__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-dynamic-card__media img {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .ppp-dynamic-card__body {

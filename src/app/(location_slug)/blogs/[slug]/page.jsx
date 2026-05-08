@@ -10,13 +10,13 @@ import { LOCATION_NAME } from "@/lib/constant";
 import { db } from "@/lib/firestore";
 import { getPostgresBlogById, hasPostgres } from "@/lib/postgresData";
 import { notFound } from "next/navigation";
+import { canonicalUrl } from "@/lib/seo";
 
 export async function generateMetadata({ params, searchParams }) {
   const [{ slug }, { uid: id } = {}] = await Promise.all([
     params,
     searchParams,
   ]);
-  const BASE_URL = process.env.SITE_URL;
 
   if (!id || (!db && !hasPostgres())) return {};
 
@@ -47,8 +47,7 @@ export async function generateMetadata({ params, searchParams }) {
     data?.featuredImage ||
     "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 
-  const locationSlug = LOCATION_NAME || "vaughan";
-  const url = `${BASE_URL}/${locationSlug}/blogs/${slug}?uid=${id}`;
+  const url = canonicalUrl(`/blogs/${slug}?uid=${id}`);
 
   return {
     title,

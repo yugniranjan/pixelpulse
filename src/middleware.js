@@ -12,6 +12,7 @@ function isAssetPath(pathname) {
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  const { hostname } = request.nextUrl;
   const token = request.cookies.get("admin_token")?.value;
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
@@ -25,6 +26,12 @@ export function middleware(request) {
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
     return next();
+  }
+
+  if (hostname === "www.pixelpulseplay.ca") {
+    const url = request.nextUrl.clone();
+    url.hostname = "pixelpulseplay.ca";
+    return NextResponse.redirect(url, 308);
   }
 
   // ✅ Allow auth APIs

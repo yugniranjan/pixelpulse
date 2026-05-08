@@ -112,6 +112,7 @@ const nextConfig = {
     return [
       { source: "/vaughan", destination: "/", permanent: true },
       { source: "/vaughan/:path*", destination: "/:path*", permanent: true },
+      { source: "/contact-us", destination: "/contactus", permanent: true },
       ...socialRedirects,
     ];
   },

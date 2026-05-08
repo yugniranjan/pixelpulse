@@ -2,6 +2,16 @@ import React from 'react'
 import '../../styles/contactus.css'
 import ContactForm from '@/components/smallComponents/ContactForm';
 import SectionHeading from '@/components/home/SectionHeading';
+import { canonicalUrl } from '@/lib/seo';
+
+export const metadata = {
+  title: "Contact Pixel Pulse Play Vaughan",
+  description:
+    "Contact Pixel Pulse Play in Vaughan for birthday parties, group bookings, fundraisers, and visit planning.",
+  alternates: {
+    canonical: canonicalUrl("/contactus"),
+  },
+};
 
 const page = () => {
   return (

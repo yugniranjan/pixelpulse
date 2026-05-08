@@ -9,13 +9,14 @@ import { db } from "@/lib/firestore";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { partyWaiverDocId } from "@/lib/partyWaivers";
 import { getPostgresPartyWaiver, hasPostgres } from "@/lib/postgresData";
+import { canonicalUrl } from "@/lib/seo";
 
 export const metadata = {
   title: "Waiver | Pixel Pulse Play Vaughan",
   description:
     "Complete your Pixel Pulse Play waiver online before your visit so check-in stays fast and easy.",
   alternates: {
-    canonical: `${process.env.SITE_URL || "https://www.pixelpulseplay.ca"}/waiver`,
+    canonical: canonicalUrl("/waiver"),
   },
   robots: {
     index: true,

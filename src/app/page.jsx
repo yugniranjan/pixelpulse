@@ -17,6 +17,7 @@ import SectionHeading from "./components/home/SectionHeading";
 import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
+import { safeImageUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -55,9 +56,9 @@ function looksLikeRenderableImage(url = "") {
 }
 
 function getPreferredImage(pageData) {
-  if (looksLikeRenderableImage(pageData?.smallimage)) return pageData.smallimage;
-  if (looksLikeRenderableImage(pageData?.headerimage)) return pageData.headerimage;
-  return pageData?.smallimage || pageData?.headerimage || "/assets/images/logo.png";
+  if (looksLikeRenderableImage(pageData?.smallimage)) return safeImageUrl(pageData.smallimage);
+  if (looksLikeRenderableImage(pageData?.headerimage)) return safeImageUrl(pageData.headerimage);
+  return safeImageUrl(pageData?.smallimage || pageData?.headerimage);
 }
 
 function normalizeAttractionKey(value = "") {
@@ -325,18 +326,22 @@ function parseSiteDataSheets(sheets) {
         desc: String(row.desc || ""),
       })).filter((row) => row.title || row.desc),
     },
-    games: rowsFromSheet(sheets, "games").map((row) => ({
-      id: String(row.id || ""),
-      name: String(row.name || ""),
-      tag: String(row.tag || ""),
-      diff: Number(row.diff || 0),
-      bestFor: String(row.bestFor || ""),
-      color: String(row.color || ""),
-      emoji: String(row.emoji || ""),
-      image: String(row.image || row.imageUrl || row.imageurl || row.image_url || row.smallimage || row.headerimage || ""),
-      imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || ""),
-      link: String(row.link || row.url || row.href || ""),
-    })).filter((row) => row.name || row.tag),
+    games: rowsFromSheet(sheets, "games").map((row) => {
+      const image = row.image || row.imageUrl || row.imageurl || row.image_url || row.smallimage || row.headerimage;
+
+      return {
+        id: String(row.id || ""),
+        name: String(row.name || ""),
+        tag: String(row.tag || ""),
+        diff: Number(row.diff || 0),
+        bestFor: String(row.bestFor || ""),
+        color: String(row.color || ""),
+        emoji: String(row.emoji || ""),
+        image: image ? safeImageUrl(image) : "",
+        imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || ""),
+        link: String(row.link || row.url || row.href || ""),
+      };
+    }).filter((row) => row.name || row.tag),
     gamesMeta: {
       title: sheetValue(gamesMeta, "title"),
       accent: sheetValue(gamesMeta, "accent"),

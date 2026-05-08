@@ -7,6 +7,7 @@ import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
+import { canonicalUrl, safeImageUrl } from "@/lib/seo";
 
 const LOCATION_SLUG = "vaughan";
 const LANDING_PAGES_SHEET = "landing pages";
@@ -17,7 +18,7 @@ const ATTRACTION_FALLBACK_IMAGE =
 const FALLBACK_META_TITLE = "Birthday Party Offer | Pixel Pulse Play Vaughan";
 const FALLBACK_META_DESCRIPTION =
   "Book a high-energy Pixel Pulse Play birthday party in Vaughan and claim up to $50 off limited discounted slots.";
-const FALLBACK_CANONICAL = "https://www.pixelpulseplay.ca/birthday-party-landing";
+const FALLBACK_CANONICAL = canonicalUrl("/birthday-party-landing");
 
 async function getBirthdayConfigData() {
   try {
@@ -232,7 +233,7 @@ function getAttractions(menuData = []) {
     .map((item) => ({
       title: item.title || item.desc,
       text: item.smalltext || item.metadescription || "",
-      image: item.smallimage || item.icon || item.headerimage || ATTRACTION_FALLBACK_IMAGE,
+      image: safeImageUrl(item.smallimage || item.icon || item.headerimage, ATTRACTION_FALLBACK_IMAGE),
     }));
 }
 

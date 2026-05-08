@@ -14,9 +14,9 @@ import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
 import { getConfiguredValue, getRowValue, normalizeValue } from "./lib/ctaContent";
 import Breadcrumbs from "./components/Breadcrumb";
+import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
 
-const BASE_URL = process.env.SITE_URL;
 const DEFAULT_GTM_ID = "GTM-53N567VP";
 const GTM_KEYS = [
   "gtm_id",
@@ -207,7 +207,7 @@ export async function generateMetadata() {
         )
         .map((item) => [item.key?.replace("meta_", ""), normalizeValue(item.value)])
     );
-    const siteUrl = BASE_URL || "https://www.pixelpulseplay.ca";
+    const siteUrl = getCanonicalSiteUrl();
 
     return {
       title: "Pixel Pulse Play Vaughan – Ultimate Indoor Arcade & Challenge Rooms",
@@ -216,6 +216,9 @@ export async function generateMetadata() {
       robots: {
         index: true,
         follow: true,
+      },
+      alternates: {
+        canonical: canonicalUrl(),
       },
       other: {
         ...dynamicMeta,

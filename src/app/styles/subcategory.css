@@ -398,14 +398,15 @@
 
 .ppp-subcategory-card__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-subcategory-card__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.35s ease;
 }
@@ -641,14 +642,15 @@
 
 .ppp-groupdetail-card__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-groupdetail-card__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.35s ease;
 }
@@ -812,15 +814,16 @@
 
 .ppp-detail-card__media {
   display: block;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  background: #111827;
 }
 
 .ppp-detail-card__media img {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .ppp-detail-card__body {

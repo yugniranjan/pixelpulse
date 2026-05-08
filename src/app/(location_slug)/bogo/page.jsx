@@ -8,6 +8,7 @@ import { LOCATION_NAME } from "@/lib/constant";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { getCtaContent } from "@/lib/ctaContent";
+import { safeImageUrl } from "@/lib/seo";
 
 function stripHtml(html = "") {
   return html
@@ -18,7 +19,7 @@ function stripHtml(html = "") {
 }
 
 function getPreferredImage(pageData) {
-  return pageData?.smallimage || pageData?.headerimage || "/assets/images/logo.png";
+  return safeImageUrl(pageData?.smallimage || pageData?.headerimage);
 }
 
 export async function generateMetadata({ params }) {

@@ -17,6 +17,7 @@ import { notFound } from "next/navigation";
 import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { getConfigValue, getConfiguredValue, getCtaContent } from "@/lib/ctaContent";
+import { safeImageUrl } from "@/lib/seo";
 
 const ABOUT_BUILDING_IMAGE_FALLBACK =
   "https://storage.googleapis.com/pixel-pulse-play/web/pixelmainbuilding.jpg";
@@ -143,9 +144,9 @@ function looksLikeRenderableImage(url = "") {
 }
 
 function getPreferredImage(pageData) {
-  if (looksLikeRenderableImage(pageData?.smallimage)) return pageData.smallimage;
-  if (looksLikeRenderableImage(pageData?.headerimage)) return pageData.headerimage;
-  return pageData?.smallimage || pageData?.headerimage || "/assets/images/logo.png";
+  if (looksLikeRenderableImage(pageData?.smallimage)) return safeImageUrl(pageData.smallimage);
+  if (looksLikeRenderableImage(pageData?.headerimage)) return safeImageUrl(pageData.headerimage);
+  return safeImageUrl(pageData?.smallimage || pageData?.headerimage);
 }
 
 export async function generateMetadata({ params }) {
@@ -387,7 +388,7 @@ const Category = async ({ params }) => {
                           className="ppp-attraction-card-modern__media"
                         >
                           <Image
-                            src={item?.smallimage || "/assets/images/logo.png"}
+                            src={safeImageUrl(item?.smallimage)}
                             alt={item?.desc || "Attraction image"}
                             width={800}
                             height={600}
@@ -530,7 +531,7 @@ const Category = async ({ params }) => {
                           className="ppp-group-card-modern__media"
                         >
                           <Image
-                            src={item?.smallimage || "/assets/images/logo.png"}
+                            src={safeImageUrl(item?.smallimage)}
                             alt={item?.desc || "Group event image"}
                             width={800}
                             height={600}
@@ -639,7 +640,7 @@ const Category = async ({ params }) => {
                             className="ppp-about-card-modern__media"
                           >
                             <Image
-                              src={item?.smallimage || "/assets/images/logo.png"}
+                              src={safeImageUrl(item?.smallimage)}
                               alt={item?.desc || "About page image"}
                               width={800}
                               height={600}
@@ -755,7 +756,7 @@ const Category = async ({ params }) => {
                             className="ppp-dynamic-card__media"
                           >
                             <Image
-                              src={item?.smallimage || "/assets/images/logo.png"}
+                              src={safeImageUrl(item?.smallimage)}
                               alt={item?.imagetitle || item?.desc || "Pixel Pulse Play"}
                               width={800}
                               height={600}
