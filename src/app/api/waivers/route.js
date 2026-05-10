@@ -19,7 +19,7 @@ const REQUIRED_CHECKS = [
   "final",
 ];
 const DUPLICATE_WAIVER_MESSAGE =
-  "You have already completed a waiver with this email address. Need to update something? Please contact our team and we will help you.";
+  "You have already completed a waiver with this email address. Need to update something? Email connect@pixelpulseplay.ca and our team will help you.";
 
 function cleanText(value = "") {
   return String(value || "").trim();
