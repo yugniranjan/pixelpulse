@@ -16,16 +16,50 @@ function participantName(person = {}) {
   return person.fullLegalName || [person.firstName, person.lastName].filter(Boolean).join(" ") || "Unnamed";
 }
 
+function splitFamilyMembers(familyMembers = []) {
+  return {
+    children: familyMembers.filter((member) => member.type === "minor"),
+    additionalAdults: familyMembers.filter((member) => member.type !== "minor"),
+  };
+}
+
+function relationshipSummary(children = []) {
+  if (!children.length) return "No children listed";
+
+  const names = children.map(participantName).filter(Boolean);
+  if (names.length <= 2) return `Children: ${names.join(", ")}`;
+  return `Children: ${names.slice(0, 2).join(", ")} +${names.length - 2} more`;
+}
+
+function PersonTile({ person, relationship }) {
+  return (
+    <div>
+      <strong>{participantName(person)}</strong>
+      <span>{relationship}</span>
+      <span>DOB: {person.dob || "Not provided"}</span>
+      <span>Gender: {person.gender || "Not provided"}</span>
+      {person.email ? <span>Email: {person.email}</span> : null}
+      <span>Health: {person.healthCondition || "Not Applicable"}</span>
+      <span>Medical: {person.medicalNotes || "None"}</span>
+    </div>
+  );
+}
+
 function WaiverRecord({ waiver }) {
   const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
+  const { children, additionalAdults } = splitFamilyMembers(familyMembers);
   const attractions = Array.isArray(waiver.attractions) ? waiver.attractions : [];
 
   return (
     <details className="waiver-admin-card waiver-admin-card--intuitive">
       <summary className="waiver-admin-card__summary">
         <span>
-          <strong>{waiver.primaryName || participantName(waiver.primary)}</strong>
+          <strong>Parent / Guardian: {waiver.primaryName || participantName(waiver.primary)}</strong>
           <em>{waiver.primary?.phone || waiver.primary?.email || "No contact"}</em>
+        </span>
+        <span>
+          <strong>{children.length || "No"} child{children.length === 1 ? "" : "ren"}</strong>
+          <em>{relationshipSummary(children)}</em>
         </span>
         <span>
           <strong>{waiver.visit?.partyId || "No party ID"}</strong>
@@ -43,7 +77,7 @@ function WaiverRecord({ waiver }) {
 
       <div className="waiver-admin-card__details">
         <section>
-          <h2>Primary Participant</h2>
+          <h2>Parent / Guardian</h2>
           <dl>
             <div><dt>Full legal name</dt><dd>{participantName(waiver.primary)}</dd></div>
             <div><dt>DOB</dt><dd>{waiver.primary?.dob || "Not provided"}</dd></div>
@@ -73,23 +107,36 @@ function WaiverRecord({ waiver }) {
         </section>
 
         <section className="waiver-admin-card__wide">
-          <h2>Family Members</h2>
-          {familyMembers.length ? (
+          <h2>Children</h2>
+          {children.length ? (
             <div className="waiver-admin-members">
-              {familyMembers.map((member, index) => (
-                <div key={`${member.firstName}-${member.lastName}-${index}`}>
-                  <strong>{participantName(member)}</strong>
-                  <span>{member.type === "minor" ? "Minor under 18" : "Adult 18+"}</span>
-                  <span>DOB: {member.dob || "Not provided"}</span>
-                  <span>Gender: {member.gender || "Not provided"}</span>
-                  {member.email ? <span>Email: {member.email}</span> : null}
-                  <span>Health: {member.healthCondition || "Not Applicable"}</span>
-                  <span>Medical: {member.medicalNotes || "None"}</span>
-                </div>
+              {children.map((member, index) => (
+                <PersonTile
+                  key={`${member.firstName}-${member.lastName}-${index}`}
+                  person={member}
+                  relationship="Child / Minor under 18"
+                />
               ))}
             </div>
           ) : (
-            <p>No additional family members.</p>
+            <p>No children listed.</p>
+          )}
+        </section>
+
+        <section className="waiver-admin-card__wide">
+          <h2>Additional Adults</h2>
+          {additionalAdults.length ? (
+            <div className="waiver-admin-members">
+              {additionalAdults.map((member, index) => (
+                <PersonTile
+                  key={`${member.firstName}-${member.lastName}-${index}`}
+                  person={member}
+                  relationship="Additional adult"
+                />
+              ))}
+            </div>
+          ) : (
+            <p>No additional adults listed.</p>
           )}
         </section>
 
