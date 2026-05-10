@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
-import { createPostgresWaiver, hasPostgres } from "@/lib/postgresData";
+import {
+  createPostgresWaiver,
+  getPostgresWaiverByEmail,
+  hasPostgres,
+} from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,9 +18,15 @@ const REQUIRED_CHECKS = [
   "privacy",
   "final",
 ];
+const DUPLICATE_WAIVER_MESSAGE =
+  "You have already completed a waiver with this email address. Need to update something? Please contact our team and we will help you.";
 
 function cleanText(value = "") {
   return String(value || "").trim();
+}
+
+function cleanEmail(value = "") {
+  return cleanText(value).toLowerCase();
 }
 
 function todayInToronto() {
@@ -43,7 +53,7 @@ function cleanParticipant(participant = {}) {
     lastName: cleanText(participant.lastName),
     dob: cleanText(participant.dob),
     gender: cleanText(participant.gender),
-    email: cleanText(participant.email),
+    email: cleanEmail(participant.email),
     phone: cleanText(participant.phone),
     city: cleanText(participant.city),
     healthCondition: cleanText(participant.healthCondition) || "Not Applicable",
@@ -80,6 +90,52 @@ function hasRequiredParticipantFields(participant) {
   return Boolean(participant.firstName && participant.lastName && participant.dob);
 }
 
+async function getExistingWaiverByEmail(email, originalEmail = email) {
+  const normalizedEmail = cleanEmail(email);
+  const cleanOriginalEmail = cleanText(originalEmail);
+  if (!normalizedEmail) return null;
+
+  if (hasPostgres()) {
+    return getPostgresWaiverByEmail(normalizedEmail);
+  }
+
+  if (!db) return null;
+
+  const normalizedSnapshot = await db
+    .collection("waivers")
+    .where("primary.emailNormalized", "==", normalizedEmail)
+    .limit(1)
+    .get();
+
+  if (!normalizedSnapshot.empty) {
+    return { id: normalizedSnapshot.docs[0].id };
+  }
+
+  const exactSnapshot = await db
+    .collection("waivers")
+    .where("primary.email", "==", normalizedEmail)
+    .limit(1)
+    .get();
+
+  if (!exactSnapshot.empty) {
+    return { id: exactSnapshot.docs[0].id };
+  }
+
+  if (cleanOriginalEmail && cleanOriginalEmail !== normalizedEmail) {
+    const originalSnapshot = await db
+      .collection("waivers")
+      .where("primary.email", "==", cleanOriginalEmail)
+      .limit(1)
+      .get();
+
+    if (!originalSnapshot.empty) {
+      return { id: originalSnapshot.docs[0].id };
+    }
+  }
+
+  return null;
+}
+
 export async function POST(req) {
   if (!db && !hasPostgres()) {
     return NextResponse.json(
@@ -104,6 +160,18 @@ export async function POST(req) {
     return NextResponse.json(
       { error: "Primary participant name, date of birth, email, phone, and city are required." },
       { status: 400 },
+    );
+  }
+
+  const existingWaiver = await getExistingWaiverByEmail(primary.email, body?.primary?.email);
+  if (existingWaiver) {
+    return NextResponse.json(
+      {
+        error: DUPLICATE_WAIVER_MESSAGE,
+        code: "WAIVER_ALREADY_EXISTS",
+        waiverId: existingWaiver.id || "",
+      },
+      { status: 409 },
     );
   }
 
@@ -144,7 +212,10 @@ export async function POST(req) {
 
   const now = new Date();
   const doc = {
-    primary,
+    primary: {
+      ...primary,
+      emailNormalized: primary.email,
+    },
     familyMembers,
     visit,
     checks: {
@@ -161,6 +232,7 @@ export async function POST(req) {
     signatureDataUrl,
     participantCount: 1 + familyMembers.length,
     primaryName: primary.fullLegalName,
+    primaryEmail: primary.email,
     submittedAt: now,
     updatedAt: now,
     source: "pixelpulse-web-waiver",

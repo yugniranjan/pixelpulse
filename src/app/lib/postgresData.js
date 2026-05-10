@@ -190,6 +190,26 @@ export async function listPostgresWaivers(limit = 100) {
   return result.rows.map(normalizeWaiverRow);
 }
 
+export async function getPostgresWaiverByEmail(email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) return null;
+
+  const result = await query(
+    `
+      select *
+      from waivers
+      where lower(primary_participant->>'email') = $1
+         or lower(raw->'primary'->>'email') = $1
+         or lower(raw->>'primaryEmail') = $1
+      order by submitted_at desc nulls last
+      limit 1
+    `,
+    [normalizedEmail],
+  );
+
+  return result.rows[0] ? normalizeWaiverRow(result.rows[0]) : null;
+}
+
 export async function createPostgresWaiver(doc) {
   const id = crypto.randomUUID();
   await query(
