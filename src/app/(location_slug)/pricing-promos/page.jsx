@@ -478,7 +478,21 @@ const PricingPromosPage = async ({ params }) => {
   const helpfulDetailsHtml = normalizeListHtml(pageData?.section4 || "");
   const extraText = stripHtml(helpfulDetailsHtml);
   const hasPricingCards = pricingCards.length > 0;
-  const visiblePromotions = promotions.length > 0 ? promotions : allPromotions;
+  const visiblePromotions = (promotions.length > 0 ? promotions : allPromotions).filter((promo) =>
+    parseBoolean(
+      promo.showOnPricingPromos ??
+      promo.show_on_pricing_promos ??
+      promo.showOnPricing ??
+      promo.show_on_pricing ??
+      promo.showOnPromos ??
+      promo.show_on_promos ??
+      promo.pricingPromos ??
+      promo.pricing_promos ??
+      promo.promosPage ??
+      promo.promos_page,
+      true,
+    ),
+  );
   const hasPromotions = visiblePromotions.length > 0;
   const configCta = getCtaContent(configData);
   const pageCta = getCtaContent(pageData || {});
