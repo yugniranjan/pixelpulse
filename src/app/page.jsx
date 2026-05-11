@@ -40,11 +40,6 @@ const SITE_DATA_SHEET_NAMES = [
   "cta",
 ];
 
-const BIRTHDAY_VAULT_PROMO_IMAGE =
-  "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
-const SCHOOL_TRIPS_PROMO_IMAGE =
-  "https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.png";
-
 function looksLikeRenderableImage(url = "") {
   if (!url) return false;
   if (url.startsWith("/")) return true;
@@ -256,6 +251,26 @@ function parseBool(value) {
   return ["true", "yes", "1"].includes(String(value).trim().toLowerCase());
 }
 
+function parseSheetBool(value, fallback = true) {
+  const normalizedValue = String(value ?? "").trim().toLowerCase();
+  if (!normalizedValue) return fallback;
+
+  if (["true", "yes", "1", "show", "visible", "enabled", "on"].includes(normalizedValue)) {
+    return true;
+  }
+
+  if (["false", "no", "0", "hide", "hidden", "disabled", "off"].includes(normalizedValue)) {
+    return false;
+  }
+
+  return fallback;
+}
+
+function parsePositiveInteger(value) {
+  const parsed = Number.parseInt(String(value ?? "").trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function parseRating(value, fallback = 5) {
   const rating = Number(value || fallback);
   if (!Number.isFinite(rating)) return fallback;
@@ -402,16 +417,66 @@ function parseSiteDataSheets(sheets) {
       time: String(row.time || ""),
     })).filter((row) => row.name || row.game || row.score),
     promotions: rowsFromSheet(sheets, "promotions").map((row) => ({
-      tag: String(row.tag || ""),
+      tag: String(row.tag || row.badge || ""),
       title: String(row.title || ""),
-      desc: String(row.desc || ""),
+      desc: String(row.desc || row.description || ""),
       code: String(row.code || ""),
-      valid: String(row.valid || ""),
+      valid: String(row.valid || row.validity || row.validUntil || row.valid_until || ""),
       linktext: String(row.linktext || row.linkText || row.link_text || ""),
       link: String(row.link || row.url || row.href || ""),
       linktitle: String(row.linktitle || row.linkTitle || row.link_title || ""),
-      image: String(row.image || row.imageUrl || row.imageurl || row.image_url || ""),
-      imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || ""),
+      image: String(
+        row.image ||
+        row.imageUrl ||
+        row.imageurl ||
+        row.image_url ||
+        row.cardImage ||
+        row.card_image ||
+        row.promoImage ||
+        row.promo_image ||
+        row.promotionImage ||
+        row.promotion_image ||
+        row.currentImage ||
+        row.current_image ||
+        row.currentPromotionImage ||
+        row.current_promotion_image ||
+        row.thumbnail ||
+        row.smallimage ||
+        row.headerimage ||
+        "",
+      ),
+      imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || row.alt || ""),
+      showInMarquee: parseSheetBool(
+        row.showInMarquee ??
+        row.show_in_marquee ??
+        row.marquee ??
+        row.showMarquee ??
+        row.show_marquee ??
+        row.includeInMarquee ??
+        row.include_in_marquee,
+        true,
+      ),
+      showOnHome: parseSheetBool(
+        row.showOnHome ??
+        row.show_on_home ??
+        row.showOnHomepage ??
+        row.show_on_homepage ??
+        row.homepage ??
+        row.homePage ??
+        row.home_page ??
+        row.showHomepage ??
+        row.show_homepage,
+        true,
+      ),
+      marqueeOrder: parsePositiveInteger(row.marqueeOrder || row.marquee_order || row.order),
+      marqueeLimit: parsePositiveInteger(
+        row.marqueeLimit ||
+        row.marquee_limit ||
+        row.marqueeCount ||
+        row.marquee_count ||
+        row.promotionMarqueeLimit ||
+        row.promotion_marquee_limit,
+      ),
     })).filter((row) => row.title || row.desc),
     testimonials: rowsFromSheet(sheets, "testimonials").map((row) => ({
       name: String(row.name || ""),
@@ -423,45 +488,159 @@ function parseSiteDataSheets(sheets) {
   };
 }
 
-function getPromotionImage(promo = {}, index = 0) {
+function getPromotionImage(promo = {}) {
   const sheetImage =
     promo.image ||
     promo.imageUrl ||
     promo.imageurl ||
     promo.image_url ||
+    promo.cardImage ||
+    promo.card_image ||
+    promo.promoImage ||
+    promo.promo_image ||
+    promo.promotionImage ||
+    promo.promotion_image ||
+    promo.currentImage ||
+    promo.current_image ||
+    promo.currentPromotionImage ||
+    promo.current_promotion_image ||
+    promo.thumbnail ||
+    promo.smallimage ||
+    promo.headerimage ||
     "";
 
-  if (sheetImage) {
-    return {
-      src: sheetImage,
-      alt: promo.imageAlt || promo.imagealt || promo.image_alt || `${promo.title || "Promotion"} image`,
-    };
-  }
+  const safeSheetImage = safeImageUrl(sheetImage, "");
 
-  const normalizedTitle = String(promo.title || "").toLowerCase();
-
-  if (normalizedTitle.includes("birthday vault")) {
+  if (safeSheetImage) {
     return {
-      src: BIRTHDAY_VAULT_PROMO_IMAGE,
-      alt: "Private party celebration at Pixel Pulse Play",
-    };
-  }
-
-  if (normalizedTitle.includes("school trip")) {
-    return {
-      src: SCHOOL_TRIPS_PROMO_IMAGE,
-      alt: "School trip group at Pixel Pulse Play",
-    };
-  }
-
-  if (index === 1) {
-    return {
-      src: SCHOOL_TRIPS_PROMO_IMAGE,
-      alt: "School trip group at Pixel Pulse Play",
+      src: safeSheetImage,
+      alt: promo.imageAlt || promo.imagealt || promo.image_alt || promo.alt || `${promo.title || "Promotion"} image`,
     };
   }
 
   return null;
+}
+
+function renderHighlightedPromoText(value = "") {
+  return String(value || "")
+    .split(/(\bnew\b|\bcode\b)/gi)
+    .map((part, index) => {
+      if (/^(new|code)$/i.test(part)) {
+        return (
+          <span className="ppp-promo-highlight" key={`${part}-${index}`}>
+            {part}
+          </span>
+        );
+      }
+
+      return part;
+    });
+}
+
+function getPromotionMarqueeLimit(promotions = [], configData = []) {
+  const rowLimit = promotions.map((promotion) => promotion.marqueeLimit).find(Boolean);
+  if (rowLimit) return rowLimit;
+
+  return parsePositiveInteger(
+    getConfigValue(configData, [
+      "promotionMarqueeLimit",
+      "promoMarqueeLimit",
+      "marqueePromotionLimit",
+      "marqueePromotionCount",
+      "homePromotionMarqueeLimit",
+    ]),
+  );
+}
+
+function getPromotionMarqueeItems(promotions = [], claimOfferText = "", limit = null) {
+  const sortedPromotions = [...promotions].sort((first, second) => {
+    const firstOrder = first.marqueeOrder || Number.MAX_SAFE_INTEGER;
+    const secondOrder = second.marqueeOrder || Number.MAX_SAFE_INTEGER;
+    return firstOrder - secondOrder;
+  });
+
+  const marqueePromotions = sortedPromotions
+    .filter((promotion) => promotion.showInMarquee !== false)
+    .slice(0, limit || sortedPromotions.length);
+
+  return marqueePromotions
+    .map((promotion) => {
+      const messageParts = [
+        promotion.tag,
+        promotion.title,
+        promotion.desc,
+        promotion.valid,
+        promotion.code ? `Code: ${promotion.code}` : "",
+      ].filter(Boolean);
+
+      if (!messageParts.length) return null;
+
+      return {
+        message: messageParts.join(" | "),
+        link: promotion.link,
+        linktext: promotion.linktext || claimOfferText,
+        linktitle: promotion.linktitle || promotion.linktext || claimOfferText || promotion.title,
+      };
+    })
+    .filter(Boolean);
+}
+
+function PromotionHeroMarquee({ promotions = [] }) {
+  if (!promotions.length) return null;
+
+  const marqueeItems = promotions.map((promotion, index) => {
+    const hasLink = Boolean(promotion.link && promotion.linktext);
+    const isExternalLink = hasLink && promotion.link.startsWith("http");
+
+    return (
+      <span className="ppp-promo-marquee__item" key={`${promotion.message}-${index}`}>
+        <span className="ppp-promo-marquee__message">
+          {renderHighlightedPromoText(promotion.message)}
+        </span>
+        {hasLink && (
+          <Link
+            href={promotion.link}
+            className="ppp-promo-marquee__link"
+            target={isExternalLink ? "_blank" : undefined}
+            rel={isExternalLink ? "noopener noreferrer" : undefined}
+            title={promotion.linktitle || undefined}
+            aria-label={promotion.linktitle || promotion.linktext}
+            prefetch={!isExternalLink}
+          >
+            {promotion.linktext}
+          </Link>
+        )}
+      </span>
+    );
+  });
+
+  const hiddenMarqueeItems = promotions.map((promotion, index) => (
+    <span
+      className="ppp-promo-marquee__item"
+      key={`${promotion.message}-duplicate-${index}`}
+      aria-hidden="true"
+    >
+      <span className="ppp-promo-marquee__message">
+        {renderHighlightedPromoText(promotion.message)}
+      </span>
+      {promotion.link && promotion.linktext && (
+        <span className="ppp-promo-marquee__link">{promotion.linktext}</span>
+      )}
+    </span>
+  ));
+
+  const itemGroupStyle = {
+    "--ppp-promo-marquee-count": promotions.length,
+  };
+
+  return (
+    <section className="ppp-promo-marquee" aria-label="Current promotions">
+      <div className="ppp-promo-marquee__track" style={itemGroupStyle}>
+        {marqueeItems}
+        {hiddenMarqueeItems}
+      </div>
+    </section>
+  );
 }
 
 export async function generateMetadata() {
@@ -679,6 +858,13 @@ const Home = async () => {
   };
   const pricingHref = ctaContent.pricingHref || "/pricing-promos";
   const articlesHref = ctaContent.articlesHref || "/blogs";
+  const promotionMarqueeLimit = getPromotionMarqueeLimit(siteData.promotions, dataconfig);
+  const promotionMarqueeItems = getPromotionMarqueeItems(
+    siteData.promotions,
+    ctaContent.claimOfferText,
+    promotionMarqueeLimit,
+  );
+  const homepagePromotions = siteData.promotions.filter((promo) => promo.showOnHome !== false);
   const homepageGames = siteData.games.map((game) => {
     const matchedAttraction = findHomepageAttractionItem(game, attractionChildren);
     const attractionHref =
@@ -705,6 +891,7 @@ const Home = async () => {
       />
 
       {/* ── Hero ── */}
+      <PromotionHeroMarquee promotions={promotionMarqueeItems} />
       <MotionImage pageData={safeHeaderImage} heroData={heroData} waiverLink={waiverLink} />
 
       {(heroData.urgencyStrip || heroData.ctaPrimary) && (
@@ -919,7 +1106,7 @@ const Home = async () => {
       )}
 
       {/* ── Promotions ── */}
-      {siteData.promotions.length > 0 && (
+      {homepagePromotions.length > 0 && (
         <section className="ppp-section ppp-promos">
           <div className="aero-max-container">
             {(promotionsHeading.title || promotionsHeading.accent) && (
@@ -931,8 +1118,8 @@ const Home = async () => {
               <p className="ppp-section__sub">{promotionsHeading.subtitle}</p>
             )}
             <div className="promotions__grid">
-              {siteData.promotions.map((promo, index) => {
-                const promoImage = getPromotionImage(promo, index);
+              {homepagePromotions.map((promo, index) => {
+                const promoImage = getPromotionImage(promo);
 
                 return (
                 <article
@@ -941,11 +1128,19 @@ const Home = async () => {
                 >
                   <div className="promotion-card__content">
                     {promo.tag && <span className="promotion-card__badge">{promo.tag}</span>}
-                    <h3 className="promotion-card__title">{promo.title}</h3>
-                    {promo.desc && <p className="promotion-card__description">{promo.desc}</p>}
+                    <h3 className="promotion-card__title">{renderHighlightedPromoText(promo.title)}</h3>
+                    {promo.desc && (
+                      <p className="promotion-card__description">
+                        {renderHighlightedPromoText(promo.desc)}
+                      </p>
+                    )}
                     <div className="promotion-card__details">
                       {promo.valid && <time className="promotion-card__validity">{promo.valid}</time>}
-                      {promo.code && <span className="promotion-card__code">{promo.code}</span>}
+                      {promo.code && (
+                        <span className="promotion-card__code">
+                          <span>Code</span>: {promo.code}
+                        </span>
+                      )}
                     </div>
                     {promo.link && (promo.linktext || ctaContent.claimOfferText) && (
                       <Link

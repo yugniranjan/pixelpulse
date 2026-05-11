@@ -9,17 +9,14 @@ import SectionHeading from "@/components/home/SectionHeading";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import {
   fetchsheetdata,
+  fetchsheetdataNoCache,
   getWaiverLink,
   fetchPageData,
   generateMetadataLib,
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
 import { getCtaContent, hasConfiguredKey, resolveConfiguredValue } from "@/lib/ctaContent";
-
-const BIRTHDAY_VAULT_PROMO_IMAGE =
-  "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
-const SCHOOL_TRIPS_PROMO_IMAGE =
-  "https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.png";
+import { safeImageUrl } from "@/lib/seo";
 
 export async function generateMetadata({ params }) {
   await params;
@@ -385,45 +382,53 @@ function buildPricingCards(pricingSections, cardMeta) {
   });
 }
 
-function getPromotionImage(promo = {}, index = 0) {
+function getPromotionImage(promo = {}) {
   const sheetImage =
     promo.image ||
     promo.imageUrl ||
     promo.imageurl ||
     promo.image_url ||
+    promo.cardImage ||
+    promo.card_image ||
+    promo.promoImage ||
+    promo.promo_image ||
+    promo.promotionImage ||
+    promo.promotion_image ||
+    promo.currentImage ||
+    promo.current_image ||
+    promo.currentPromotionImage ||
+    promo.current_promotion_image ||
+    promo.thumbnail ||
+    promo.smallimage ||
+    promo.headerimage ||
     "";
 
-  if (sheetImage) {
-    return {
-      src: sheetImage,
-      alt: promo.imageAlt || promo.imagealt || promo.image_alt || `${promo.title || "Promotion"} image`,
-    };
-  }
+  const safeSheetImage = safeImageUrl(sheetImage, "");
 
-  const normalizedTitle = String(promo.title || "").toLowerCase();
-
-  if (normalizedTitle.includes("birthday vault")) {
+  if (safeSheetImage) {
     return {
-      src: BIRTHDAY_VAULT_PROMO_IMAGE,
-      alt: "Private party celebration at Pixel Pulse Play",
-    };
-  }
-
-  if (normalizedTitle.includes("school trip")) {
-    return {
-      src: SCHOOL_TRIPS_PROMO_IMAGE,
-      alt: "School trip group at Pixel Pulse Play",
-    };
-  }
-
-  if (index === 1) {
-    return {
-      src: SCHOOL_TRIPS_PROMO_IMAGE,
-      alt: "School trip group at Pixel Pulse Play",
+      src: safeSheetImage,
+      alt: promo.imageAlt || promo.imagealt || promo.image_alt || promo.alt || `${promo.title || "Promotion"} image`,
     };
   }
 
   return null;
+}
+
+function renderHighlightedPromoText(value = "") {
+  return String(value || "")
+    .split(/(\bnew\b|\bcode\b)/gi)
+    .map((part, index) => {
+      if (/^(new|code)$/i.test(part)) {
+        return (
+          <span className="ppp-promo-highlight" key={`${part}-${index}`}>
+            {part}
+          </span>
+        );
+      }
+
+      return part;
+    });
 }
 
 const PricingPromosPage = async ({ params }) => {
@@ -433,13 +438,15 @@ const PricingPromosPage = async ({ params }) => {
   let pageData = null;
   let configData = [];
   let promotions = [];
+  let allPromotions = [];
   let waiverLink = "";
 
   try {
-    [pageData, configData, promotions, waiverLink] = await Promise.all([
+    [pageData, configData, promotions, allPromotions, waiverLink] = await Promise.all([
       fetchPageData(location_slug, "pricing-promos"),
       fetchsheetdata("config", location_slug),
       fetchsheetdata("promotions", location_slug),
+      fetchsheetdataNoCache("promotions"),
       getWaiverLink(location_slug),
     ]);
   } catch (error) {
@@ -471,7 +478,8 @@ const PricingPromosPage = async ({ params }) => {
   const helpfulDetailsHtml = normalizeListHtml(pageData?.section4 || "");
   const extraText = stripHtml(helpfulDetailsHtml);
   const hasPricingCards = pricingCards.length > 0;
-  const hasPromotions = promotions.length > 0;
+  const visiblePromotions = promotions.length > 0 ? promotions : allPromotions;
+  const hasPromotions = visiblePromotions.length > 0;
   const configCta = getCtaContent(configData);
   const pageCta = getCtaContent(pageData || {});
   const ctaContent = {
@@ -655,8 +663,11 @@ const PricingPromosPage = async ({ params }) => {
                   </p>
 
                   <div className="promotions__grid">
-                    {promotions.map((promo, index) => {
-                      const promoImage = getPromotionImage(promo, index);
+                    {visiblePromotions.map((promo, index) => {
+                      const promoImage = getPromotionImage(promo);
+                      const promoBadge = promo.badge || promo.tag;
+                      const promoDescription = promo.description || promo.desc;
+                      const promoValidity = promo.validity || promo.valid || promo.validUntil || promo.valid_until;
 
                       return (
                         <article
@@ -664,15 +675,23 @@ const PricingPromosPage = async ({ params }) => {
                           className={`promotion-card${promoImage ? " promotion-card--with-image" : ""}`}
                         >
                           <div className="promotion-card__content">
-                            {promo.badge && <span className="promotion-card__badge">{promo.badge}</span>}
-                            <h3 className="promotion-card__title">{promo.title}</h3>
-                            <p className="promotion-card__description">{promo.description}</p>
+                            {promoBadge && <span className="promotion-card__badge">{promoBadge}</span>}
+                            <h3 className="promotion-card__title">
+                              {renderHighlightedPromoText(promo.title)}
+                            </h3>
+                            {promoDescription && (
+                              <p className="promotion-card__description">
+                                {renderHighlightedPromoText(promoDescription)}
+                              </p>
+                            )}
                             <div className="promotion-card__details">
-                              {promo.validity && (
-                                <time className="promotion-card__validity">{promo.validity}</time>
+                              {promoValidity && (
+                                <time className="promotion-card__validity">{promoValidity}</time>
                               )}
                               {promo.code && (
-                                <span className="promotion-card__code">Code: {promo.code}</span>
+                                <span className="promotion-card__code">
+                                  <span>Code</span>: {promo.code}
+                                </span>
                               )}
                             </div>
                             {promo.link && (promo.linktext || ctaContent.claimOfferText) && (
