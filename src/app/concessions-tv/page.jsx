@@ -50,6 +50,20 @@ function isHidden(row = {}) {
   return ["false", "no", "0", "hidden", "inactive"].includes(value.toLowerCase());
 }
 
+function isConfigRow(row = {}) {
+  return Boolean(getRowValue(row, "key"));
+}
+
+function isTaxNoteRow(row = {}) {
+  const values = [
+    getRowValue(row, ["name", "item", "title"]),
+    getRowValue(row, ["value", "description", "note"]),
+    getRowValue(row, ["category", "section", "group"]),
+  ].join(" ");
+
+  return /hst|gst/i.test(values);
+}
+
 function normalizeAccent(value = "", index = 0) {
   const accent = String(value || "").trim().toLowerCase();
   const allowed = new Set(["cyan", "green", "orange", "pink"]);
@@ -76,7 +90,13 @@ function formatPrice(value = "") {
 
 function normalizeItems(rows = []) {
   const sheetItems = rows
-    .filter((row) => getRowValue(row, ["name", "item", "title"]) && !isHidden(row))
+    .filter(
+      (row) =>
+        getRowValue(row, ["name", "item", "title"]) &&
+        !isHidden(row) &&
+        !isConfigRow(row) &&
+        !isTaxNoteRow(row),
+    )
     .map((row, index) => ({
       category: getRowValue(row, ["category", "section", "group"]) || "Concessions",
       name: getRowValue(row, ["name", "item", "title"]),
