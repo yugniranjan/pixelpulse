@@ -258,9 +258,9 @@
   position: absolute;
   left: 5vw;
   right: 5vw;
-  bottom: 1.2rem;
+  bottom: 0.75rem;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.3rem;
   color: rgba(245, 249, 255, 0.48);
   font-size: clamp(0.72rem, 1vw, 1.12rem);
   font-weight: 900;
@@ -271,9 +271,9 @@
 
 .ppp-concessions-footer strong {
   color: rgba(245, 249, 255, 0.78);
-  font-size: clamp(0.68rem, 0.9vw, 1rem);
+  font-size: clamp(0.62rem, 0.78vw, 0.86rem);
   font-weight: 900;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.18em;
   text-shadow: 0 0 12px rgba(0, 216, 255, 0.28);
 }
 
