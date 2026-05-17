@@ -259,12 +259,22 @@
   left: 5vw;
   right: 5vw;
   bottom: 1.2rem;
+  display: grid;
+  gap: 0.45rem;
   color: rgba(245, 249, 255, 0.48);
   font-size: clamp(0.72rem, 1vw, 1.12rem);
   font-weight: 900;
   letter-spacing: 0.42em;
   text-align: center;
   text-transform: uppercase;
+}
+
+.ppp-concessions-footer strong {
+  color: rgba(245, 249, 255, 0.78);
+  font-size: clamp(0.68rem, 0.9vw, 1rem);
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  text-shadow: 0 0 12px rgba(0, 216, 255, 0.28);
 }
 
 .ppp-concessions-corner {

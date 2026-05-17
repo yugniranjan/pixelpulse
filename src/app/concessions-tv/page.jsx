@@ -130,6 +130,7 @@ export default async function ConcessionsTvPage() {
   const title = getConfiguredValue(rows, ["screenTitle", "concessionsTitle"], "Concessions");
   const subtitle = getConfiguredValue(rows, ["screenSubtitle", "concessionsSubtitle"], "Fuel up. Play on");
   const footer = getConfiguredValue(rows, ["screenFooter", "concessionsFooter"], "Cash & card welcome • pixelpulseplay.ca • Vaughan, ON");
+  const taxNote = getConfiguredValue(rows, ["taxNote", "screenTaxNote", "concessionsTaxNote"], "Prices subject to 13% HST/GST");
   const heroVideo = getConfiguredValue(rows, ["heroVideo", "backgroundVideo", "screenVideo"], "");
   const heroVideoPoster = getConfiguredValue(rows, ["heroVideoPoster", "backgroundVideoPoster", "screenVideoPoster"], "");
 
@@ -185,7 +186,10 @@ export default async function ConcessionsTvPage() {
         </div>
       </section>
 
-      <footer className="ppp-concessions-footer">{footer}</footer>
+      <footer className="ppp-concessions-footer">
+        <span>{footer}</span>
+        {taxNote ? <strong>{taxNote}</strong> : null}
+      </footer>
     </main>
   );
 }
