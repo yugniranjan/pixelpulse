@@ -86,9 +86,24 @@ function isTrackingExcludedPath(path = "/") {
   const pathname = normalizePath(path);
 
   return (
+    pathname === "/concessions-tv" ||
     pathname === "/waiver" ||
     pathname.startsWith("/waiver/") ||
     pathname === "/waiver-data" ||
+    pathname.startsWith("/invite") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/")
+  );
+}
+
+function isChromeExcludedPath(path = "/") {
+  const pathname = normalizePath(path);
+
+  return (
+    pathname === "/birthday-party-landing" ||
+    pathname === "/concessions-tv" ||
+    pathname === "/squad" ||
+    pathname === "/waiver" ||
     pathname.startsWith("/invite") ||
     pathname === "/admin" ||
     pathname.startsWith("/admin/")
@@ -252,6 +267,7 @@ export default async function RootLayout({ children }) {
   const token = cookieStore.get("admin_token")?.value;
   const pathname = headerStore.get("x-pathname") || "/";
   const showTracking = !isTrackingExcludedPath(pathname);
+  const showChrome = !isChromeExcludedPath(pathname);
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
@@ -293,19 +309,23 @@ export default async function RootLayout({ children }) {
           </>
         ) : null}
         <Toaster position="top-right" />
-        <ChromeVisibility>
-          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
-          <Breadcrumbs />
-          <FloatingWaiverButton />
-        </ChromeVisibility>
+        {showChrome ? (
+          <ChromeVisibility>
+            <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
+            <Breadcrumbs />
+            <FloatingWaiverButton />
+          </ChromeVisibility>
+        ) : null}
         <Suspense fallback={<Loading />}>{children}</Suspense>
-        <ChromeVisibility>
-          <Footer
-            location_slug={location_slug}
-            configdata={configdata}
-            menudata={menudata}
-          />
-        </ChromeVisibility>
+        {showChrome ? (
+          <ChromeVisibility>
+            <Footer
+              location_slug={location_slug}
+              configdata={configdata}
+              menudata={menudata}
+            />
+          </ChromeVisibility>
+        ) : null}
         <div id="modal-root"></div>
       </body>
     </html>
