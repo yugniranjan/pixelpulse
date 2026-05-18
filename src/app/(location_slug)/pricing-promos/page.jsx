@@ -226,8 +226,12 @@ const DEFAULT_PRICING_CARD_META = [
 ];
 
 const DEFAULT_SUMMER_PLAY_PASS = {
+  sectionLabel: "Summer Play Pass",
+  sectionTitle: "Choose Your Summer Play Pass",
   title: "Unlimited Summer. Unlimited Play.",
   subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
+  bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php",
+  bookingText: "Book Now",
   cards: [
     {
       title: "SUMMER PLAY PASS - 60",
@@ -346,6 +350,16 @@ function buildSummerPlayPassContent(configData = [], pageData = {}) {
   const cards = parseSummerPassCards(configData);
 
   return {
+    sectionLabel: resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassSectionLabel", "summerPassSectionLabel"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.sectionLabel,
+    }),
+    sectionTitle: resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassSectionTitle", "summerPassSectionTitle"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.sectionTitle,
+    }),
     title: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassTitle", "summerPassTitle"],
@@ -357,6 +371,16 @@ function buildSummerPlayPassContent(configData = [], pageData = {}) {
       fallback: DEFAULT_SUMMER_PLAY_PASS.subtitle,
     }),
     cards: cards.length > 0 ? cards : DEFAULT_SUMMER_PLAY_PASS.cards,
+    bookingUrl: resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassBookingUrl", "summerPassBookingUrl"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.bookingUrl,
+    }),
+    bookingText: resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassBookingText", "summerPassBookingText"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.bookingText,
+    }),
     valueTitle: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassValueTitle", "summerPassValueTitle"],
@@ -795,12 +819,17 @@ const PricingPromosPage = async ({ params }) => {
               {summerPlayPass.show && (
                 <article className="ppp-summer-pass-block" id="summer-play-pass">
                   <div className="ppp-summer-pass-block__header">
+                    {summerPlayPass.sectionLabel && (
+                      <span className="ppp-summer-pass-block__label">
+                        {summerPlayPass.sectionLabel}
+                      </span>
+                    )}
                     <SectionHeading className="section-heading-white">
-                      {summerPlayPass.title}
+                      {summerPlayPass.sectionTitle}
                     </SectionHeading>
-                    {summerPlayPass.subtitle && (
+                    {(summerPlayPass.title || summerPlayPass.subtitle) && (
                       <p className="ppp-summer-pass-block__subtitle">
-                        {summerPlayPass.subtitle}
+                        {[summerPlayPass.title, summerPlayPass.subtitle].filter(Boolean).join(" ")}
                       </p>
                     )}
                   </div>
@@ -827,6 +856,16 @@ const PricingPromosPage = async ({ params }) => {
                         )}
                         {card.note && (
                           <p className="ppp-summer-pass-card__note">{card.note}</p>
+                        )}
+                        {summerPlayPass.bookingUrl && (
+                          <a
+                            className="ppp-summer-pass-card__button"
+                            href={summerPlayPass.bookingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {summerPlayPass.bookingText}
+                          </a>
                         )}
                       </article>
                     ))}

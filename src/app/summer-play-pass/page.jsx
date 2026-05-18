@@ -128,6 +128,8 @@ const features = [
 const DEFAULT_SUMMER_PLAY_PASS = {
   title: "Unlimited Summer. Unlimited Play.",
   subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
+  bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php",
+  bookingText: "Book Now",
   cards: [
     {
       title: "SUMMER PLAY PASS - 60",
@@ -289,6 +291,8 @@ function buildSummerPlayPassContent(configData = []) {
     title: getConfiguredValue(configData, ["summerPlayPassTitle", "summerPassTitle"], DEFAULT_SUMMER_PLAY_PASS.title),
     subtitle: getConfiguredValue(configData, ["summerPlayPassSubtitle", "summerPassSubtitle"], DEFAULT_SUMMER_PLAY_PASS.subtitle),
     cards: cards.length > 0 ? cards : DEFAULT_SUMMER_PLAY_PASS.cards,
+    bookingUrl: getConfiguredValue(configData, ["summerPlayPassBookingUrl", "summerPassBookingUrl"], DEFAULT_SUMMER_PLAY_PASS.bookingUrl),
+    bookingText: getConfiguredValue(configData, ["summerPlayPassBookingText", "summerPassBookingText"], DEFAULT_SUMMER_PLAY_PASS.bookingText),
     valueTitle: getConfiguredValue(configData, ["summerPlayPassValueTitle", "summerPassValueTitle"], DEFAULT_SUMMER_PLAY_PASS.valueTitle),
     valueText: getConfiguredValue(configData, ["summerPlayPassValueText", "summerPassValueText"], DEFAULT_SUMMER_PLAY_PASS.valueText),
     addonsTitle: getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
@@ -434,9 +438,16 @@ export default async function SummerPlayPassPage() {
                     {plan.features.map((item) => <li key={item}>{item}</li>)}
                   </ul>
                   {plan.note && <p className="ppp-summer-plan__note">{plan.note}</p>}
-                  <a className={plan.badge ? "ppp-summer-plan__button is-filled" : "ppp-summer-plan__button"} href="#top">
-                    Inquire Now
-                  </a>
+                  {summerPass.bookingUrl && (
+                    <a
+                      className={plan.badge ? "ppp-summer-plan__button is-filled" : "ppp-summer-plan__button"}
+                      href={summerPass.bookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {summerPass.bookingText}
+                    </a>
+                  )}
                 </article>
               ))}
             </div>

@@ -2222,9 +2222,28 @@
 
 .ppp-summer-pass-block__header {
   display: grid;
-  gap: 0.45rem;
-  max-width: 760px;
-  margin-bottom: 1rem;
+  justify-items: center;
+  gap: 0.75rem;
+  max-width: none;
+  margin-bottom: clamp(1.2rem, 2vw, 1.6rem);
+  text-align: center;
+}
+
+.ppp-summer-pass-block__label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.28rem 0.75rem;
+  border: 1px solid rgba(164, 207, 95, 0.28);
+  border-radius: 999px;
+  background: rgba(164, 207, 95, 0.1);
+  color: #a4cf5f;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .ppp-summer-pass-block .section-heading {
@@ -2232,22 +2251,23 @@
   color: var(--white-color) !important;
   font-size: clamp(1.45rem, 2.35vw, 2.05rem) !important;
   line-height: 0.95 !important;
-  text-align: left !important;
+  text-align: center !important;
 }
 
 .ppp-summer-pass-block__subtitle {
-  margin: 0;
-  max-width: 46rem;
+  margin: 0.15rem auto 0;
+  max-width: none;
   color: rgba(240, 246, 255, 0.76);
   font-size: clamp(0.95rem, 1.25vw, 1.05rem);
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.65;
+  white-space: nowrap;
 }
 
 .ppp-summer-pass-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.75rem, 1.4vw, 1rem);
+  gap: clamp(0.9rem, 1.6vw, 1.2rem);
 }
 
 .ppp-summer-pass-card {
@@ -2255,8 +2275,8 @@
   display: flex;
   min-height: 100%;
   flex-direction: column;
-  gap: 0.7rem;
-  padding: 1rem;
+  gap: 0.9rem;
+  padding: clamp(1.15rem, 1.8vw, 1.45rem);
   border: 1px solid rgba(240, 246, 255, 0.12);
   border-radius: 8px;
   background:
@@ -2299,7 +2319,7 @@
 }
 
 .ppp-summer-pass-card__price {
-  margin: 0;
+  margin: 0.1rem 0 0.05rem;
   color: #a4cf5f;
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: clamp(2.4rem, 4vw, 3.4rem);
@@ -2310,7 +2330,7 @@
 
 .ppp-summer-pass-card__features {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.6rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2326,7 +2346,7 @@
   color: rgba(240, 246, 255, 0.78);
   font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .ppp-summer-pass-card__features li::before {
@@ -2342,8 +2362,8 @@
 }
 
 .ppp-summer-pass-card__note {
-  margin: 0;
-  padding: 0.65rem 0.75rem;
+  margin: 0.1rem 0 0;
+  padding: 0.75rem 0.85rem;
   border: 1px solid rgba(164, 207, 95, 0.2);
   border-radius: 8px;
   background: rgba(164, 207, 95, 0.08);
@@ -2351,6 +2371,36 @@
   font-size: 0.84rem;
   font-weight: 800;
   line-height: 1.35;
+}
+
+.ppp-summer-pass-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin-top: clamp(0.35rem, 1vw, 0.65rem);
+  padding: 0.72rem 1rem;
+  border: 2px solid #a4cf5f;
+  border-radius: 8px;
+  background: #a4cf5f;
+  color: #050810;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(164, 207, 95, 0.2);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ppp-summer-pass-card__button:hover {
+  transform: translateY(-2px);
+  border-color: #fbae7b;
+  background: #fbae7b;
+  color: #050810;
+  box-shadow: 0 0 24px rgba(251, 174, 123, 0.28);
 }
 
 .ppp-summer-pass-summary {
@@ -2779,6 +2829,10 @@
 
   .ppp-summer-pass-card h3 {
     padding-right: 0;
+  }
+
+  .ppp-summer-pass-block__subtitle {
+    white-space: normal;
   }
 
   .ppp-summer-pass-card__badge {

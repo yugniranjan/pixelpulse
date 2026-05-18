@@ -13,6 +13,7 @@
 .git
 .gitignore
 .next
+*.session.sql
 
 # Node.js dependencies:
 node_modules/
