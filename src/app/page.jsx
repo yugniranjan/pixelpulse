@@ -1124,7 +1124,9 @@ const Home = async () => {
 
                   <div className="promotion-card__motion" aria-hidden="true">
                     <span className="promotion-card__motion-ring" />
-                    <span className="promotion-card__motion-ticket" />
+                    <span className="promotion-card__motion-ticket">
+                      <span>Promo</span>
+                    </span>
                     <span className="promotion-card__motion-spark" />
                   </div>
                 </article>

@@ -1,12 +1,19 @@
 import Image from "next/image";
 import "../styles/summer-play-pass.css";
-import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
+import { canonicalUrl, getCanonicalSiteUrl, safeImageUrl } from "@/lib/seo";
+import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
+import { LOCATION_NAME } from "@/lib/constant";
+import { getConfiguredValue } from "@/lib/ctaContent";
+import SummerPlayPassInquiryForm from "@/components/SummerPlayPassInquiryForm";
 
 const logo = "/assets/images/logoD.png";
 const arcadeImage = "/assets/images/arcade.JPG";
 const floorImage = "/assets/images/floorchallenge.jpg";
 const shootingImage = "/assets/images/shootinggame.jpg";
+const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
 const siteUrl = getCanonicalSiteUrl();
+
+export const dynamic = "force-dynamic";
 
 const games = [
   {
@@ -21,7 +28,7 @@ const games = [
     genre: "Puzzle / Reflex",
     emoji: "⬢",
     tags: ["Interactive", "Strategy"],
-    image: arcadeImage,
+    image: floorImage,
   },
   {
     name: "Edge Climb",
@@ -63,7 +70,7 @@ const games = [
     genre: "Sports / Power",
     emoji: "⚽",
     tags: ["Active", "Family"],
-    image: arcadeImage,
+    image: shootingImage,
   },
   {
     name: "Ball Toss",
@@ -84,7 +91,7 @@ const games = [
     genre: "Adventure / Escape",
     emoji: "🦖",
     tags: ["Adventure", "Immersive"],
-    image: arcadeImage,
+    image: floorImage,
   },
   {
     name: "Seashells",
@@ -118,35 +125,195 @@ const features = [
   },
 ];
 
-const plans = [
-  {
-    name: "Quick Play",
-    description: "A lighter summer visit for players who want a fast burst of Pixel Pulse action.",
-    price: "30",
-    period: "min",
-    button: "Book Quick Play",
-    featured: false,
-    features: ["Challenge room access", "Great for first timers", "Score-based games", "Easy weekday add-on"],
-  },
-  {
-    name: "Summer Play Pass",
-    description: "The sweet spot for families who want enough time to try more games and chase better scores.",
-    price: "60",
-    period: "min",
-    button: "Book Play Pass",
-    featured: true,
-    features: ["Most popular session length", "Multiple Pixel Pulse attractions", "Perfect for friends and siblings", "Best for repeat challenges", "Indoor summer fun"],
-  },
-  {
-    name: "Extended Play",
-    description: "More time, more rematches, and more room to explore the full Pixel Pulse lineup.",
-    price: "90",
-    period: "min",
-    button: "Book Extended Play",
-    featured: false,
-    features: ["Longest play window", "Ideal for groups", "More time per attraction", "Great for rainy-day plans"],
-  },
-];
+const DEFAULT_SUMMER_PLAY_PASS = {
+  title: "Unlimited Summer. Unlimited Play.",
+  subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
+  cards: [
+    {
+      title: "SUMMER PLAY PASS - 60",
+      badge: "",
+      price: "$99",
+      features: [
+        "60 minutes play access",
+        "Valid for 5 visits (June-Aug)",
+        "Weekday + off-peak weekend access",
+      ],
+      note: "Effective price: ~$20 per visit vs $35 regular",
+    },
+    {
+      title: "SUMMER PLAY PASS - 90",
+      badge: "Most Popular",
+      price: "$149",
+      features: [
+        "90 minutes play access",
+        "Valid for 5 visits (June-Aug)",
+        "Priority booking slots",
+      ],
+      note: "Effective price: ~$30 per visit vs $44 regular",
+    },
+    {
+      title: "UNLIMITED SUMMER PASS",
+      badge: "Hero Offer",
+      price: "$199",
+      features: [
+        "60 mins play per day",
+        "Valid all summer (June-Aug)",
+        "Weekdays + limited weekend slots",
+        "10% off arcade credits",
+      ],
+      note: "",
+    },
+  ],
+  valueTitle: "Regular price = $34-$49 per visit",
+  valueText: "Save up to 40%",
+  addonsTitle: "Add-ons",
+  addons: [
+    "Bring a friend - $19",
+    "Arcade credits bonus",
+    "Upgrade to party anytime",
+  ],
+  termsTitle: "Terms",
+  terms: [
+    "Valid June-Aug",
+    "Booking required",
+    "Non-transferable",
+    "Limited weekend slots",
+  ],
+  cta: "Don't just play once. PLAY ALL SUMMER.",
+};
+
+function parseBoolean(value, fallback = true) {
+  const normalizedValue = String(value ?? "").trim().toLowerCase();
+  if (!normalizedValue) return fallback;
+  if (["true", "yes", "1", "show"].includes(normalizedValue)) return true;
+  if (["false", "no", "0", "hide", "hidden"].includes(normalizedValue)) return false;
+  return fallback;
+}
+
+function splitConfigList(value = "") {
+  return String(value || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .split(/[\n|]/)
+    .map((item) => item.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function parseConfigMatrix(configData, key) {
+  const normalizedKey = String(key || "").trim().toLowerCase();
+
+  return (Array.isArray(configData) ? configData : [])
+    .filter((item) => String(item.key || "").trim().toLowerCase() === normalizedKey)
+    .flatMap((item) =>
+      String(item?.value || "")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+    )
+    .map((value) => value.split(";"))
+    .map((columns) => {
+      const mappedValues = {};
+      columns.forEach((column, index) => {
+        mappedValues[`value${index + 1}`] = column?.trim() || "";
+      });
+      return mappedValues;
+    });
+}
+
+function parseJsonConfigValue(value) {
+  const cleaned = String(value || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .trim();
+
+  if (!cleaned) return null;
+
+  for (const candidate of [cleaned, cleaned.replace(/^"+|"+$/g, "").replace(/""/g, '"')]) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Try the next candidate.
+    }
+  }
+
+  return null;
+}
+
+function getConfigValues(configData, key) {
+  const normalizedKey = String(key || "").trim().toLowerCase();
+
+  return (Array.isArray(configData) ? configData : [])
+    .filter((item) => String(item.key || "").trim().toLowerCase() === normalizedKey)
+    .map((item) => item?.value)
+    .filter((value) => value !== undefined && value !== null && String(value).trim());
+}
+
+function parseSummerPassCards(configData = []) {
+  const jsonCards = getConfigValues(configData, "summerPlayPassCards")
+    .flatMap((value) => {
+      const parsed = parseJsonConfigValue(value);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === "object") return [parsed];
+      return [];
+    })
+    .map((item) => ({
+      title: item.title || item.name || "",
+      badge: item.badge || item.tag || "",
+      price: item.price || item.amount || "",
+      features: Array.isArray(item.features)
+        ? item.features.filter(Boolean)
+        : splitConfigList(item.features || item.details),
+      note: item.note || item.value || "",
+    }))
+    .filter((item) => item.title || item.price || item.features.length > 0);
+
+  const matrixCards = [
+    ...(parseConfigMatrix(configData, "summerPlayPassCard") || []),
+    ...(parseConfigMatrix(configData, "summerPassCard") || []),
+  ]
+    .map((row) => ({
+      title: row.value1 || "",
+      badge: row.value2 || "",
+      price: row.value3 || "",
+      features: splitConfigList(row.value4),
+      note: row.value5 || "",
+    }))
+    .filter((item) => item.title || item.price || item.features.length > 0);
+
+  return [...jsonCards, ...matrixCards];
+}
+
+function buildSummerPlayPassContent(configData = []) {
+  const cards = parseSummerPassCards(configData);
+
+  return {
+    title: getConfiguredValue(configData, ["summerPlayPassTitle", "summerPassTitle"], DEFAULT_SUMMER_PLAY_PASS.title),
+    subtitle: getConfiguredValue(configData, ["summerPlayPassSubtitle", "summerPassSubtitle"], DEFAULT_SUMMER_PLAY_PASS.subtitle),
+    cards: cards.length > 0 ? cards : DEFAULT_SUMMER_PLAY_PASS.cards,
+    valueTitle: getConfiguredValue(configData, ["summerPlayPassValueTitle", "summerPassValueTitle"], DEFAULT_SUMMER_PLAY_PASS.valueTitle),
+    valueText: getConfiguredValue(configData, ["summerPlayPassValueText", "summerPassValueText"], DEFAULT_SUMMER_PLAY_PASS.valueText),
+    addonsTitle: getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
+    addons: splitConfigList(getConfiguredValue(configData, ["summerPlayPassAddons", "summerPassAddons"], DEFAULT_SUMMER_PLAY_PASS.addons.join("|"))),
+    termsTitle: getConfiguredValue(configData, ["summerPlayPassTermsTitle", "summerPassTermsTitle"], DEFAULT_SUMMER_PLAY_PASS.termsTitle),
+    terms: splitConfigList(getConfiguredValue(configData, ["summerPlayPassTerms", "summerPassTerms"], DEFAULT_SUMMER_PLAY_PASS.terms.join("|"))),
+    cta: getConfiguredValue(configData, ["summerPlayPassCta", "summerPassCta"], DEFAULT_SUMMER_PLAY_PASS.cta),
+    show: parseBoolean(getConfiguredValue(configData, ["showSummerPlayPass", "summerPlayPassShow"], "true"), true),
+  };
+}
+
+function getLineupGames(menuData = []) {
+  const attractions = menuData.find((item) => item.path === "attractions");
+  const children = Array.isArray(attractions?.children) ? attractions.children : [];
+
+  return children
+    .filter((item) => item?.isactive == 1)
+    .map((item) => ({
+      name: item.title || item.desc || "Pixel Pulse Game",
+      genre: item.smalltext || item.metadescription || "",
+      image: safeImageUrl(item.smallimage || item.icon || item.headerimage, attractionFallbackImage),
+      tags: [],
+    }))
+    .filter((item) => item.name || item.genre);
+}
 
 const reviews = [
   {
@@ -183,8 +350,27 @@ export const metadata = {
   },
 };
 
-export default function SummerPlayPassPage() {
-  const marqueeGames = [...games.slice(0, 10), ...games.slice(0, 10)];
+export default async function SummerPlayPassPage() {
+  let configData = [];
+  let menuData = [];
+
+  try {
+    configData = await fetchsheetdata("config", LOCATION_NAME || "vaughan");
+  } catch (error) {
+    console.error("summer-play-pass config failed to load:", error);
+  }
+
+  try {
+    menuData = await fetchMenuData(LOCATION_NAME || "vaughan");
+  } catch (error) {
+    console.error("summer-play-pass menu failed to load:", error);
+  }
+
+  const summerPass = buildSummerPlayPassContent(configData);
+  const lineupGames = getLineupGames(menuData);
+  const displayGames = lineupGames.length > 0 ? lineupGames : games;
+  const marqueeGames = [...displayGames.slice(0, 10), ...displayGames.slice(0, 10)];
+  const passOptions = summerPass.cards.map((card) => card.title).filter(Boolean);
 
   return (
     <main className="ppp-summer-page">
@@ -206,33 +392,84 @@ export default function SummerPlayPassPage() {
         <div className="ppp-summer-hero__image" aria-hidden="true">
           <Image src={arcadeImage} alt="" fill priority sizes="100vw" />
         </div>
-        <div className="ppp-summer-hero__content">
-          <span className="ppp-summer-badge">Summer 2026 | Limited Time</span>
-          <h1>
-            <span>Unlock the</span>
-            <strong>Summer Play Pass</strong>
-          </h1>
-          <p>
-            Beat the heat with active indoor games, challenge rooms, arcade-style scoring, and all the rematches your crew can handle.
-          </p>
-          <div className="ppp-summer-actions">
-            <a className="ppp-summer-btn ppp-summer-btn--primary" href="#pricing">Get My Pass</a>
-            <a className="ppp-summer-btn ppp-summer-btn--secondary" href="#games">Browse Games</a>
+        <div className="ppp-summer-hero__layout">
+          <div className="ppp-summer-hero__content">
+            <span className="ppp-summer-badge">Summer 2026 | Limited Time</span>
+            <h1>{summerPass.title}</h1>
+            <p>{summerPass.subtitle}</p>
+            <div className="ppp-summer-actions">
+              <a className="ppp-summer-btn ppp-summer-btn--primary" href="#pricing">View Passes</a>
+              <a className="ppp-summer-btn ppp-summer-btn--secondary" href="#games">Browse Games</a>
+            </div>
+            <div className="ppp-summer-stats" aria-label="Summer Play Pass highlights">
+              <div><strong>{summerPass.cards.length}</strong><span>Pass Options</span></div>
+              <div><strong>June-Aug</strong><span>Summer Validity</span></div>
+              <div><strong>40%</strong><span>Possible Savings</span></div>
+            </div>
           </div>
-          <div className="ppp-summer-stats" aria-label="Summer Play Pass highlights">
-            <div><strong>12+</strong><span>Attractions</span></div>
-            <div><strong>3</strong><span>Pass Options</span></div>
-            <div><strong>100%</strong><span>Indoor Fun</span></div>
-            <div><strong>Vaughan</strong><span>Location</span></div>
-          </div>
+          <SummerPlayPassInquiryForm passOptions={passOptions} />
         </div>
       </section>
+
+      {summerPass.show && (
+        <section className="ppp-summer-section ppp-summer-pricing" id="pricing">
+          <div className="ppp-summer-inner">
+            <div className="ppp-summer-section__header">
+              <span>Choose Your Pass</span>
+              <h2>{summerPass.title}</h2>
+              <p>{summerPass.subtitle}</p>
+            </div>
+            <div className="ppp-summer-pricing__grid">
+              {summerPass.cards.map((plan) => (
+                <article
+                  className={`ppp-summer-plan ${plan.badge ? "is-featured" : ""}`}
+                  key={plan.title}
+                >
+                  {plan.badge ? <span className="ppp-summer-plan__badge">{plan.badge}</span> : null}
+                  <h3>{plan.title}</h3>
+                  <div className="ppp-summer-plan__price">
+                    <strong>{plan.price}</strong>
+                  </div>
+                  <ul>
+                    {plan.features.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                  {plan.note && <p className="ppp-summer-plan__note">{plan.note}</p>}
+                  <a className={plan.badge ? "ppp-summer-plan__button is-filled" : "ppp-summer-plan__button"} href="#top">
+                    Inquire Now
+                  </a>
+                </article>
+              ))}
+            </div>
+            <div className="ppp-summer-pass-summary">
+              <div className="ppp-summer-pass-summary__value">
+                <span>Applies to summer passes</span>
+                <strong>{summerPass.valueText}</strong>
+                <small>{summerPass.valueTitle}</small>
+              </div>
+              {summerPass.addons.length > 0 && (
+                <div className="ppp-summer-pass-summary__addons">
+                  <span>{summerPass.addonsTitle}</span>
+                  <div>
+                    {summerPass.addons.map((item) => <strong key={item}>{item}</strong>)}
+                  </div>
+                </div>
+              )}
+            </div>
+            {summerPass.terms.length > 0 && (
+              <p className="ppp-summer-pass-terms">
+                <strong>{summerPass.termsTitle}:</strong> {summerPass.terms.join(" | ")}
+              </p>
+            )}
+            {summerPass.cta && <div className="ppp-summer-pass-cta">{summerPass.cta}</div>}
+          </div>
+        </section>
+      )}
 
       <div className="ppp-summer-marquee" aria-label="Pixel Pulse games">
         <div>
           {marqueeGames.map((game, index) => (
             <span key={`${game.name}-${index}`}>
-              {game.emoji} {game.name}
+              {game.emoji ? `${game.emoji} ` : ""}{game.name}
               <b>✦</b>
             </span>
           ))}
@@ -246,19 +483,20 @@ export default function SummerPlayPassPage() {
             <h2>Pixel Pulse Summer Lineup</h2>
             <p>Swap screen time for active challenges, score chasing, and games that feel different every time you play.</p>
           </div>
-          <div className="ppp-summer-games__grid">
-            {games.map((game) => (
+          <div className="ppp-summer-games__grid" aria-label="Pixel Pulse Summer Lineup carousel">
+            {displayGames.map((game) => (
               <article className="ppp-summer-game-card" key={game.name}>
                 <div className="ppp-summer-game-card__media">
-                  <Image src={game.image} alt="" fill sizes="(max-width: 760px) 100vw, 25vw" />
-                  <span>{game.emoji}</span>
+                  <Image src={game.image} alt={`${game.name} at Pixel Pulse Play`} fill sizes="(max-width: 760px) 82vw, 340px" />
                 </div>
                 <div className="ppp-summer-game-card__body">
                   <h3>{game.name}</h3>
                   <p>{game.genre}</p>
-                  <div>
-                    {game.tags.map((tag) => <span key={tag}>{tag}</span>)}
-                  </div>
+                  {game.tags?.length ? (
+                    <div>
+                      {game.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                    </div>
+                  ) : null}
                 </div>
               </article>
             ))}
@@ -296,35 +534,6 @@ export default function SummerPlayPassPage() {
               <strong>Play Pass Active</strong>
               <span>Indoor challenges | Vaughan, ON</span>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-summer-section ppp-summer-pricing" id="pricing">
-        <div className="ppp-summer-inner">
-          <div className="ppp-summer-section__header">
-            <span>Choose Your Pass</span>
-            <h2>Simple Summer Play Options</h2>
-            <p>Pick your play time and step into Pixel Pulse. Final pricing and availability can be confirmed at booking.</p>
-          </div>
-          <div className="ppp-summer-pricing__grid">
-            {plans.map((plan) => (
-              <article className={`ppp-summer-plan ${plan.featured ? "is-featured" : ""}`} key={plan.name}>
-                {plan.featured ? <span className="ppp-summer-plan__badge">Most Popular</span> : null}
-                <h3>{plan.name}</h3>
-                <p>{plan.description}</p>
-                <div className="ppp-summer-plan__price">
-                  <strong>{plan.price}</strong>
-                  <span>{plan.period}</span>
-                </div>
-                <ul>
-                  {plan.features.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-                <a className={plan.featured ? "ppp-summer-plan__button is-filled" : "ppp-summer-plan__button"} href="/pricing-promos">
-                  {plan.button}
-                </a>
-              </article>
-            ))}
           </div>
         </div>
       </section>
