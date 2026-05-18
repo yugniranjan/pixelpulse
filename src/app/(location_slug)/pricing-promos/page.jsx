@@ -915,6 +915,8 @@ const PricingPromosPage = async ({ params }) => {
                       const promoBadge = promo.badge || promo.tag;
                       const promoDescription = promo.description || promo.desc;
                       const promoValidity = promo.validity || promo.valid || promo.validUntil || promo.valid_until;
+                      const promoCode = promo.code || promo.promoCode || promo.couponCode || promo.coupon_code || "";
+                      const promoTicketText = promoCode || "Promo";
 
                       return (
                         <article
@@ -935,9 +937,9 @@ const PricingPromosPage = async ({ params }) => {
                               {promoValidity && (
                                 <time className="promotion-card__validity">{promoValidity}</time>
                               )}
-                              {promo.code && (
+                              {promoCode && (
                                 <span className="promotion-card__code">
-                                  <span>Code</span>: {promo.code}
+                                  <span>Code</span>: {promoCode}
                                 </span>
                               )}
                             </div>
@@ -964,7 +966,10 @@ const PricingPromosPage = async ({ params }) => {
                           <div className="promotion-card__motion" aria-hidden="true">
                             <span className="promotion-card__motion-ring" />
                             <span className="promotion-card__motion-ticket">
-                              <span>Promo</span>
+                              <span className="promotion-card__motion-ticket-text">
+                                {promoCode ? <small>Code</small> : null}
+                                <strong>{promoTicketText}</strong>
+                              </span>
                             </span>
                             <span className="promotion-card__motion-spark" />
                           </div>

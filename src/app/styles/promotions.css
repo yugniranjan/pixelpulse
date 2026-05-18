@@ -2675,21 +2675,42 @@
   top: 56%;
 }
 
-.promotion-card__motion-ticket span {
+.promotion-card__motion-ticket-text {
   position: absolute;
-  left: 9%;
+  left: 39%;
+  right: 8%;
   top: 50%;
-  width: 28%;
-  transform: translateY(-50%) rotate(-90deg);
+  display: grid;
+  gap: 2px;
+  transform: translateY(-50%);
   color: rgba(5, 8, 16, 0.82);
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(0.62rem, 1vw, 0.86rem);
-  font-weight: 900;
-  letter-spacing: 0.02em;
   line-height: 1;
   text-align: center;
   text-transform: uppercase;
   text-shadow: 0 1px 0 rgba(240, 246, 255, 0.28);
+}
+
+.promotion-card__motion-ticket-text small,
+.promotion-card__motion-ticket-text strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.promotion-card__motion-ticket-text small {
+  font-size: clamp(0.44rem, 0.75vw, 0.58rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+}
+
+.promotion-card__motion-ticket-text strong {
+  font-size: clamp(0.72rem, 1.25vw, 1rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
 }
 
 .promotion-card__motion-spark {
