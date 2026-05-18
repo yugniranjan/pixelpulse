@@ -103,6 +103,7 @@ function isChromeExcludedPath(path = "/") {
     pathname === "/birthday-party-landing" ||
     pathname === "/concessions-tv" ||
     pathname === "/squad" ||
+    pathname === "/summer-play-pass" ||
     pathname === "/waiver" ||
     pathname.startsWith("/invite") ||
     pathname === "/admin" ||

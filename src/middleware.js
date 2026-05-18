@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 const PUBLIC_FILES = ["/favicon.ico", "/robots.txt"];
+const SUMMER_PLAY_PASS_HOSTS = new Set([
+  "summer.pixelpulseplay.ca",
+  "www.summer.pixelpulseplay.ca",
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -14,14 +18,26 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
   const { hostname } = request.nextUrl;
   const token = request.cookies.get("admin_token")?.value;
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-pathname", pathname);
-  const next = () =>
-    NextResponse.next({
+  const next = (pathnameForLayout = pathname) => {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-pathname", pathnameForLayout);
+
+    return NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     });
+  };
+  const rewrite = (url, pathnameForLayout = url.pathname) => {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-pathname", pathnameForLayout);
+
+    return NextResponse.rewrite(url, {
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  };
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
@@ -32,6 +48,12 @@ export function middleware(request) {
     const url = request.nextUrl.clone();
     url.hostname = "pixelpulseplay.ca";
     return NextResponse.redirect(url, 308);
+  }
+
+  if (SUMMER_PLAY_PASS_HOSTS.has(hostname) && pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/summer-play-pass";
+    return rewrite(url, "/summer-play-pass");
   }
 
   // ✅ Allow auth APIs

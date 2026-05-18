@@ -6,6 +6,7 @@ const STANDALONE_PATHS = new Set([
   "/birthday-party-landing",
   "/concessions-tv",
   "/squad",
+  "/summer-play-pass",
   "/waiver",
 ]);
 
