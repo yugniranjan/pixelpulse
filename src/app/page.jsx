@@ -488,39 +488,6 @@ function parseSiteDataSheets(sheets) {
   };
 }
 
-function getPromotionImage(promo = {}) {
-  const sheetImage =
-    promo.image ||
-    promo.imageUrl ||
-    promo.imageurl ||
-    promo.image_url ||
-    promo.cardImage ||
-    promo.card_image ||
-    promo.promoImage ||
-    promo.promo_image ||
-    promo.promotionImage ||
-    promo.promotion_image ||
-    promo.currentImage ||
-    promo.current_image ||
-    promo.currentPromotionImage ||
-    promo.current_promotion_image ||
-    promo.thumbnail ||
-    promo.smallimage ||
-    promo.headerimage ||
-    "";
-
-  const safeSheetImage = safeImageUrl(sheetImage, "");
-
-  if (safeSheetImage) {
-    return {
-      src: safeSheetImage,
-      alt: promo.imageAlt || promo.imagealt || promo.image_alt || promo.alt || `${promo.title || "Promotion"} image`,
-    };
-  }
-
-  return null;
-}
-
 function renderHighlightedPromoText(value = "") {
   return String(value || "")
     .split(/(\bnew\b|\bcode\b)/gi)
@@ -1119,12 +1086,10 @@ const Home = async () => {
             )}
             <div className="promotions__grid">
               {homepagePromotions.map((promo, index) => {
-                const promoImage = getPromotionImage(promo);
-
                 return (
                 <article
                   key={index}
-                  className={`promotion-card${promoImage ? " promotion-card--with-image" : ""}`}
+                  className="promotion-card promotion-card--animated"
                 >
                   <div className="promotion-card__content">
                     {promo.tag && <span className="promotion-card__badge">{promo.tag}</span>}
@@ -1157,18 +1122,11 @@ const Home = async () => {
                     )}
                   </div>
 
-                  {promoImage && (
-                    <div className="promotion-card__image-wrap">
-                      <Image
-                        src={promoImage.src}
-                        alt={promoImage.alt}
-                        width={1200}
-                        height={800}
-                        className="promotion-card__image"
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                    </div>
-                  )}
+                  <div className="promotion-card__motion" aria-hidden="true">
+                    <span className="promotion-card__motion-ring" />
+                    <span className="promotion-card__motion-ticket" />
+                    <span className="promotion-card__motion-spark" />
+                  </div>
                 </article>
               );
               })}

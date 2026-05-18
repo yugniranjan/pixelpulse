@@ -16,7 +16,6 @@ import {
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
 import { getCtaContent, hasConfiguredKey, resolveConfiguredValue } from "@/lib/ctaContent";
-import { safeImageUrl } from "@/lib/seo";
 
 export async function generateMetadata({ params }) {
   await params;
@@ -382,39 +381,6 @@ function buildPricingCards(pricingSections, cardMeta) {
   });
 }
 
-function getPromotionImage(promo = {}) {
-  const sheetImage =
-    promo.image ||
-    promo.imageUrl ||
-    promo.imageurl ||
-    promo.image_url ||
-    promo.cardImage ||
-    promo.card_image ||
-    promo.promoImage ||
-    promo.promo_image ||
-    promo.promotionImage ||
-    promo.promotion_image ||
-    promo.currentImage ||
-    promo.current_image ||
-    promo.currentPromotionImage ||
-    promo.current_promotion_image ||
-    promo.thumbnail ||
-    promo.smallimage ||
-    promo.headerimage ||
-    "";
-
-  const safeSheetImage = safeImageUrl(sheetImage, "");
-
-  if (safeSheetImage) {
-    return {
-      src: safeSheetImage,
-      alt: promo.imageAlt || promo.imagealt || promo.image_alt || promo.alt || `${promo.title || "Promotion"} image`,
-    };
-  }
-
-  return null;
-}
-
 function renderHighlightedPromoText(value = "") {
   return String(value || "")
     .split(/(\bnew\b|\bcode\b)/gi)
@@ -625,7 +591,7 @@ const PricingPromosPage = async ({ params }) => {
                           alt={card.imageAlt}
                           width={800}
                           height={600}
-                          style={{ width: "100%", height: "auto" }}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
                       </div>
 
@@ -678,7 +644,6 @@ const PricingPromosPage = async ({ params }) => {
 
                   <div className="promotions__grid">
                     {visiblePromotions.map((promo, index) => {
-                      const promoImage = getPromotionImage(promo);
                       const promoBadge = promo.badge || promo.tag;
                       const promoDescription = promo.description || promo.desc;
                       const promoValidity = promo.validity || promo.valid || promo.validUntil || promo.valid_until;
@@ -686,7 +651,7 @@ const PricingPromosPage = async ({ params }) => {
                       return (
                         <article
                           key={`${promo.title}-${index}`}
-                          className={`promotion-card${promoImage ? " promotion-card--with-image" : ""}`}
+                          className="promotion-card promotion-card--animated"
                         >
                           <div className="promotion-card__content">
                             {promoBadge && <span className="promotion-card__badge">{promoBadge}</span>}
@@ -728,18 +693,11 @@ const PricingPromosPage = async ({ params }) => {
                             )}
                           </div>
 
-                          {promoImage && (
-                            <div className="promotion-card__image-wrap">
-                              <Image
-                                src={promoImage.src}
-                                alt={promoImage.alt}
-                                className="promotion-card__image"
-                                width={1200}
-                                height={800}
-                                style={{ width: "100%", height: "auto" }}
-                              />
-                            </div>
-                          )}
+                          <div className="promotion-card__motion" aria-hidden="true">
+                            <span className="promotion-card__motion-ring" />
+                            <span className="promotion-card__motion-ticket" />
+                            <span className="promotion-card__motion-spark" />
+                          </div>
                         </article>
                       );
                     })}
