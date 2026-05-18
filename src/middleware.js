@@ -17,6 +17,14 @@ function isAssetPath(pathname) {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
   const { hostname } = request.nextUrl;
+  const requestHostname = (
+    request.headers.get("x-forwarded-host") ||
+    request.headers.get("host") ||
+    hostname ||
+    ""
+  )
+    .split(":")[0]
+    .toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
   const next = (pathnameForLayout = pathname) => {
     const requestHeaders = new Headers(request.headers);
@@ -44,16 +52,24 @@ export function middleware(request) {
     return next();
   }
 
-  if (hostname === "www.pixelpulseplay.ca") {
+  if (SUMMER_PLAY_PASS_HOSTS.has(requestHostname)) {
+    if (requestHostname === "www.summer.pixelpulseplay.ca") {
+      const url = request.nextUrl.clone();
+      url.hostname = "summer.pixelpulseplay.ca";
+      return NextResponse.redirect(url, 308);
+    }
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/summer-play-pass";
+      return rewrite(url, "/summer-play-pass");
+    }
+  }
+
+  if (requestHostname === "www.pixelpulseplay.ca") {
     const url = request.nextUrl.clone();
     url.hostname = "pixelpulseplay.ca";
     return NextResponse.redirect(url, 308);
-  }
-
-  if (SUMMER_PLAY_PASS_HOSTS.has(hostname) && pathname === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/summer-play-pass";
-    return rewrite(url, "/summer-play-pass");
   }
 
   // ✅ Allow auth APIs
