@@ -5,6 +5,10 @@ const SUMMER_PLAY_PASS_HOSTS = new Set([
   "summer.pixelpulseplay.ca",
   "www.summer.pixelpulseplay.ca",
 ]);
+const SQUAD_HOSTS = new Set([
+  "squad.pixelpulseplay.ca",
+  "www.squad.pixelpulseplay.ca",
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -63,6 +67,20 @@ export function middleware(request) {
       const url = request.nextUrl.clone();
       url.pathname = "/summer-play-pass";
       return rewrite(url, "/summer-play-pass");
+    }
+  }
+
+  if (SQUAD_HOSTS.has(requestHostname)) {
+    if (requestHostname === "www.squad.pixelpulseplay.ca") {
+      const url = request.nextUrl.clone();
+      url.hostname = "squad.pixelpulseplay.ca";
+      return NextResponse.redirect(url, 308);
+    }
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/squad";
+      return rewrite(url, "/squad");
     }
   }
 
