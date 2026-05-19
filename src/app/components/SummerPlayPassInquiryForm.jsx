@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const INITIAL_FORM = {
@@ -13,6 +14,7 @@ const INITIAL_FORM = {
 };
 
 export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
+  const router = useRouter();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
@@ -54,7 +56,9 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
 
       setFormData(INITIAL_FORM);
       setStatus("Your inquiry was sent. We will follow up soon.");
+      window.sessionStorage.setItem("pppContactEmail", formData.email);
       toast.success("Your inquiry was sent. We will follow up soon.");
+      router.push("/contactus/thank-you");
     } catch {
       setStatus("We could not send your inquiry. Please try again later.");
       toast.error("We could not send your inquiry. Please try again later.");
