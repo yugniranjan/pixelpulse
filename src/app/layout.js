@@ -111,7 +111,7 @@ function isChromeExcludedPath(path = "/") {
   );
 }
 
-function GlobalTrackingTags({ gtmId = "", googleTagIds = [], metaPixelId = "" }) {
+function HeadTrackingScripts({ gtmId = "", googleTagIds = [], metaPixelId = "" }) {
   const cleanGtm = cleanGtmId(gtmId);
   const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
   const cleanGoogleTags = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
@@ -127,7 +127,7 @@ function GlobalTrackingTags({ gtmId = "", googleTagIds = [], metaPixelId = "" })
         <>
           <Script
             id="google-tag-manager"
-            strategy="afterInteractive"
+            strategy="beforeInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -138,15 +138,6 @@ function GlobalTrackingTags({ gtmId = "", googleTagIds = [], metaPixelId = "" })
               `,
             }}
           />
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${cleanGtm}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-              title="Google Tag Manager"
-            />
-          </noscript>
         </>
       ) : null}
 
@@ -194,16 +185,43 @@ function GlobalTrackingTags({ gtmId = "", googleTagIds = [], metaPixelId = "" })
               `,
             }}
           />
-          <noscript>
-            <img
-              height="1"
-              width="1"
-              style={{ display: "none" }}
-              alt=""
-              src={`https://www.facebook.com/tr?id=${cleanMetaPixel}&ev=PageView&noscript=1`}
-            />
-          </noscript>
         </>
+      ) : null}
+    </>
+  );
+}
+
+function BodyTrackingNoScripts({ gtmId = "", metaPixelId = "" }) {
+  const cleanGtm = cleanGtmId(gtmId);
+  const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
+
+  if (!cleanGtm && !cleanMetaPixel) {
+    return null;
+  }
+
+  return (
+    <>
+      {cleanGtm ? (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${cleanGtm}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+      ) : null}
+      {cleanMetaPixel ? (
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            alt=""
+            src={`https://www.facebook.com/tr?id=${cleanMetaPixel}&ev=PageView&noscript=1`}
+          />
+        </noscript>
       ) : null}
     </>
   );
@@ -296,12 +314,20 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
+      {showTracking ? (
+        <head>
+          <HeadTrackingScripts
+            gtmId={gtmId}
+            googleTagIds={googleTagIds}
+            metaPixelId={metaPixelId}
+          />
+        </head>
+      ) : null}
       <body suppressHydrationWarning>
         {showTracking ? (
           <>
-            <GlobalTrackingTags
+            <BodyTrackingNoScripts
               gtmId={gtmId}
-              googleTagIds={googleTagIds}
               metaPixelId={metaPixelId}
             />
             <Suspense fallback={null}>
