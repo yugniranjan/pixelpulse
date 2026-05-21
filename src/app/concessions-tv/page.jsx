@@ -270,27 +270,6 @@ export default async function ConcessionsTvPage() {
           </div>
         </header>
 
-        <div className="ppp-concessions-ticker" aria-hidden="true">
-          <div className="ppp-concessions-ticker-track">
-            <span>Cash & card accepted at the counter</span>
-            <i>◆</i>
-            <span>Recharge between rounds</span>
-            <i>◆</i>
-            <span>Private parties & group events available</span>
-            <i>◆</i>
-            <span>pixelpulseplay.ca</span>
-            <i>◆</i>
-            <span>Cash & card accepted at the counter</span>
-            <i>◆</i>
-            <span>Recharge between rounds</span>
-            <i>◆</i>
-            <span>Private parties & group events available</span>
-            <i>◆</i>
-            <span>pixelpulseplay.ca</span>
-            <i>◆</i>
-          </div>
-        </div>
-
         <div className="ppp-concessions-menu" style={{ "--section-count": groups.length }}>
           {groups.map((group, groupIndex) => {
             const tone = getGroupTone(group.title, groupIndex);
