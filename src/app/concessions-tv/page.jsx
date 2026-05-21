@@ -121,13 +121,13 @@ function normalizeIconFields(row = {}) {
 
   if (imageUrl) {
     return {
-      emoji: getRowValue(row, ["emoji"]) || "✦",
+      emoji: getRowValue(row, ["emoji"]),
       imageUrl,
     };
   }
 
   return {
-    emoji: getRowValue(row, ["emoji", "icon", "image"]) || "✦",
+    emoji: getRowValue(row, ["emoji", "icon", "image"]),
     imageUrl: "",
   };
 }
@@ -310,16 +310,18 @@ export default async function ConcessionsTvPage() {
                 <div className="ppp-concessions-grid" data-count={group.items.length}>
                   {group.items.map((item) => (
                     <article className={`ppp-concessions-card is-${item.accent}`} key={`${group.title}-${item.name}`}>
-                      <div className="ppp-concessions-icon" aria-hidden="true">
-                        {item.imageUrl ? (
-                          <span
-                            className="ppp-concessions-item-image"
-                            style={{ backgroundImage: `url("${item.imageUrl.replaceAll('"', "%22")}")` }}
-                          />
-                        ) : (
-                          item.emoji
-                        )}
-                      </div>
+                      {item.imageUrl || item.emoji ? (
+                        <div className="ppp-concessions-icon" aria-hidden="true">
+                          {item.imageUrl ? (
+                            <span
+                              className="ppp-concessions-item-image"
+                              style={{ backgroundImage: `url("${item.imageUrl.replaceAll('"', "%22")}")` }}
+                            />
+                          ) : (
+                            item.emoji
+                          )}
+                        </div>
+                      ) : null}
                       <h3>{item.name}</h3>
                       {item.price ? <strong>{item.price}</strong> : null}
                     </article>

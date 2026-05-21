@@ -316,7 +316,8 @@
 }
 
 .ppp-concessions-grid[data-count="1"],
-.ppp-concessions-grid[data-count="2"] {
+.ppp-concessions-grid[data-count="2"],
+.ppp-concessions-grid[data-count="4"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
