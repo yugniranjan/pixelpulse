@@ -81,6 +81,57 @@ function formatPrice(value = "") {
   return raw;
 }
 
+function normalizeImageUrl(value = "") {
+  const raw = String(value || "").trim();
+
+  if (!raw) {
+    return "";
+  }
+
+  if (raw.startsWith("/")) {
+    return raw;
+  }
+
+  try {
+    const url = new URL(raw);
+
+    if (["http:", "https:"].includes(url.protocol)) {
+      return url.toString();
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
+function normalizeIconFields(row = {}) {
+  const imageUrl = normalizeImageUrl(
+    getRowValue(row, [
+      "imageUrl",
+      "imageURL",
+      "image_url",
+      "photoUrl",
+      "photoURL",
+      "photo_url",
+      "image",
+      "icon",
+    ]),
+  );
+
+  if (imageUrl) {
+    return {
+      emoji: getRowValue(row, ["emoji"]) || "✦",
+      imageUrl,
+    };
+  }
+
+  return {
+    emoji: getRowValue(row, ["emoji", "icon", "image"]) || "✦",
+    imageUrl: "",
+  };
+}
+
 function normalizeItems(rows = []) {
   const sheetItems = rows
     .filter(
@@ -90,14 +141,19 @@ function normalizeItems(rows = []) {
         !isConfigRow(row) &&
         !isTaxNoteRow(row),
     )
-    .map((row, index) => ({
-      category: getRowValue(row, ["category", "section", "group"]) || "Concessions",
-      name: getRowValue(row, ["name", "item", "title"]),
-      price: formatPrice(getRowValue(row, ["price", "amount", "cost"])),
-      emoji: getRowValue(row, ["emoji", "icon", "image"]) || "✦",
-      accent: normalizeAccent(getRowValue(row, ["accent", "color", "theme"]), index),
-      sort: Number(getRowValue(row, ["sort", "order", "position"]) || index + 1),
-    }))
+    .map((row, index) => {
+      const iconFields = normalizeIconFields(row);
+
+      return {
+        category: getRowValue(row, ["category", "section", "group"]) || "Concessions",
+        name: getRowValue(row, ["name", "item", "title"]),
+        price: formatPrice(getRowValue(row, ["price", "amount", "cost"])),
+        emoji: iconFields.emoji,
+        imageUrl: iconFields.imageUrl,
+        accent: normalizeAccent(getRowValue(row, ["accent", "color", "theme"]), index),
+        sort: Number(getRowValue(row, ["sort", "order", "position"]) || index + 1),
+      };
+    })
     .sort((a, b) => a.sort - b.sort);
 
   return sheetItems;
@@ -255,7 +311,14 @@ export default async function ConcessionsTvPage() {
                   {group.items.map((item) => (
                     <article className={`ppp-concessions-card is-${item.accent}`} key={`${group.title}-${item.name}`}>
                       <div className="ppp-concessions-icon" aria-hidden="true">
-                        {item.emoji}
+                        {item.imageUrl ? (
+                          <span
+                            className="ppp-concessions-item-image"
+                            style={{ backgroundImage: `url("${item.imageUrl.replaceAll('"', "%22")}")` }}
+                          />
+                        ) : (
+                          item.emoji
+                        )}
                       </div>
                       <h3>{item.name}</h3>
                       {item.price ? <strong>{item.price}</strong> : null}
