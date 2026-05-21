@@ -1,21 +1,36 @@
 .ppp-concessions-tv {
-  --tv-bg: #030813;
-  --tv-cyan: #00d8ff;
-  --tv-green: #00f08d;
-  --tv-orange: #ff7a1a;
-  --tv-pink: #ff3fd5;
-  --tv-text: #f5f9ff;
+  --tv-bg: #06090f;
+  --tv-surface: rgba(13, 18, 32, 0.92);
+  --tv-card: #111826;
+  --tv-border: rgba(255, 255, 255, 0.08);
+  --tv-cyan: #00e5ff;
+  --tv-yellow: #ffe600;
+  --tv-green: #39ff7a;
+  --tv-orange: #ff7d1a;
+  --tv-pink: #ff3aac;
+  --tv-text: #f0f6ff;
+  --tv-muted: rgba(240, 246, 255, 0.56);
+  --tv-radius: clamp(10px, 1vw, 18px);
+  --tv-gap: clamp(0.55rem, 1.1vw, 1.35rem);
   position: relative;
   isolation: isolate;
+  width: 100%;
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 0%, rgba(0, 216, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 14% 42%, rgba(0, 216, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 83% 46%, rgba(255, 122, 26, 0.12), transparent 30%),
-    linear-gradient(180deg, #050b18 0%, #020610 56%, #030714 100%);
+    linear-gradient(rgba(0, 229, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(145deg, rgba(0, 229, 255, 0.1), transparent 34%),
+    linear-gradient(225deg, rgba(255, 58, 172, 0.08), transparent 36%),
+    var(--tv-bg);
+  background-size:
+    clamp(24px, 3vw, 48px) clamp(24px, 3vw, 48px),
+    clamp(24px, 3vw, 48px) clamp(24px, 3vw, 48px),
+    auto,
+    auto,
+    auto;
   color: var(--tv-text);
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Arial Narrow", Impact, "Franklin Gothic Medium", system-ui, sans-serif;
 }
 
 .ppp-concessions-tv::before,
@@ -29,15 +44,15 @@
 
 .ppp-concessions-tv::before {
   background:
-    linear-gradient(90deg, transparent 0 49.9%, rgba(0, 216, 255, 0.18) 50%, transparent 50.1%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 5px);
-  opacity: 0.5;
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.03)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px);
+  opacity: 0.36;
 }
 
 .ppp-concessions-tv::after {
-  inset: auto 3vw 4.8rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 216, 255, 0.45), transparent);
+  inset: 0 0 auto;
+  height: 38vh;
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.08), transparent);
 }
 
 .ppp-concessions-bg-video,
@@ -52,300 +67,476 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.44;
-  filter: saturate(1.18) contrast(1.08) brightness(0.68);
+  opacity: 0.34;
+  filter: saturate(1.15) contrast(1.08) brightness(0.62);
 }
 
 .ppp-concessions-video-scrim {
   z-index: -1;
   background:
-    radial-gradient(circle at 50% 10%, rgba(0, 216, 255, 0.12), transparent 30%),
-    linear-gradient(180deg, rgba(3, 8, 19, 0.68), rgba(3, 8, 19, 0.82) 48%, rgba(3, 8, 19, 0.92)),
-    linear-gradient(90deg, rgba(3, 8, 19, 0.78), rgba(3, 8, 19, 0.3) 50%, rgba(3, 8, 19, 0.78));
+    linear-gradient(180deg, rgba(6, 9, 15, 0.62), rgba(6, 9, 15, 0.82) 48%, rgba(6, 9, 15, 0.94)),
+    linear-gradient(90deg, rgba(6, 9, 15, 0.8), transparent 50%, rgba(6, 9, 15, 0.8));
 }
 
 .ppp-concessions-board {
-  width: min(96vw, 1840px);
-  min-height: calc(100vh - 5.4rem);
-  margin: 0 auto;
-  padding: clamp(1.1rem, 2.1vw, 2.15rem) 0 1.2rem;
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  min-height: 100vh;
+  padding: clamp(0.65rem, 1.4vw, 1.65rem);
   display: grid;
-  grid-template-rows: auto 1fr;
-  gap: clamp(0.8rem, 1.4vw, 1.4rem);
+  grid-template-rows: auto auto 1fr auto;
+  gap: clamp(0.5rem, 0.9vw, 1.1rem);
+}
+
+.ppp-concessions-header,
+.ppp-concessions-footer {
+  border: 1px solid rgba(0, 229, 255, 0.18);
+  border-radius: var(--tv-radius);
+  background: var(--tv-surface);
+  box-shadow:
+    0 0 40px rgba(0, 229, 255, 0.06),
+    inset 0 1px 0 rgba(0, 229, 255, 0.1);
+  backdrop-filter: blur(12px);
 }
 
 .ppp-concessions-header {
-  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(320px, 1.4fr) minmax(180px, 0.6fr);
+  align-items: center;
+  gap: clamp(0.7rem, 1.4vw, 1.4rem);
+  padding: clamp(0.5rem, 0.95vw, 1rem) clamp(0.85rem, 1.8vw, 2.2rem);
+}
+
+.ppp-concessions-brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(0.9rem, 1.6vw, 1.5rem);
-  min-height: clamp(74px, 10vh, 120px);
-  border-bottom: 1px solid rgba(0, 216, 255, 0.2);
-  text-align: center;
+  gap: clamp(0.55rem, 1vw, 1.2rem);
+  min-width: 0;
 }
 
 .ppp-concessions-logo {
-  width: clamp(116px, 12vw, 210px);
+  width: clamp(76px, 8vw, 148px);
   height: auto;
+  display: block;
+  flex: 0 0 auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 18px rgba(164, 207, 95, 0.36));
+  filter:
+    drop-shadow(0 0 clamp(8px, 1.4vw, 22px) rgba(0, 229, 255, 0.32))
+    drop-shadow(0 0 clamp(6px, 1vw, 16px) rgba(57, 255, 122, 0.2));
 }
 
-.ppp-concessions-header h1 {
+.ppp-concessions-title-block {
+  min-width: 0;
+  text-align: center;
+}
+
+.ppp-concessions-title-block h1 {
   margin: 0;
   color: var(--tv-cyan);
-  font-size: clamp(2.5rem, 5vw, 5.6rem);
+  font-size: clamp(2.8rem, 6.2vw, 7rem);
   font-weight: 900;
-  line-height: 0.92;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.06em;
+  line-height: 0.9;
   text-transform: uppercase;
   text-shadow:
-    0 0 12px rgba(0, 216, 255, 0.82),
-    0 0 34px rgba(0, 216, 255, 0.35);
+    0 0 clamp(12px, 2vw, 38px) rgba(0, 229, 255, 0.72),
+    0 0 clamp(24px, 4vw, 78px) rgba(0, 229, 255, 0.28);
 }
 
-.ppp-concessions-header p {
-  margin: 0.6rem 0 0;
-  color: rgba(245, 249, 255, 0.66);
-  font-size: clamp(0.72rem, 1vw, 1.12rem);
-  font-weight: 900;
-  letter-spacing: 0.55em;
+.ppp-concessions-title-block p {
+  margin: clamp(0.1rem, 0.3vw, 0.35rem) 0 0;
+  color: var(--tv-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1vw, 1.08rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.ppp-concessions-status {
+  display: grid;
+  justify-items: end;
+  gap: clamp(0.25rem, 0.45vw, 0.5rem);
+  min-width: 0;
+  text-align: right;
+}
+
+.ppp-concessions-status strong {
+  color: var(--tv-yellow);
+  font-size: clamp(1.4rem, 2.8vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  text-shadow: 0 0 clamp(8px, 1.5vw, 24px) rgba(255, 230, 0, 0.58);
+}
+
+.ppp-concessions-status span {
+  max-width: 100%;
+  padding: clamp(3px, 0.35vw, 6px) clamp(7px, 0.8vw, 13px);
+  border: 1px solid rgba(255, 230, 0, 0.17);
+  border-radius: 4px;
+  background: rgba(255, 230, 0, 0.07);
+  color: var(--tv-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.52rem, 0.72vw, 0.82rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-concessions-ticker {
+  min-height: clamp(32px, 2.9vw, 46px);
+  padding-block: clamp(0.2rem, 0.35vw, 0.42rem);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border-block: 1px solid rgba(0, 229, 255, 0.12);
+  background: rgba(0, 229, 255, 0.055);
+}
+
+.ppp-concessions-ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  color: var(--tv-cyan);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.58rem, 0.88vw, 0.88rem);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: ppp-concessions-ticker 30s linear infinite;
+}
+
+.ppp-concessions-ticker-track span,
+.ppp-concessions-ticker-track i {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ppp-concessions-ticker-track i {
+  margin: 0 clamp(0.85rem, 2vw, 2.5rem);
+  color: rgba(0, 229, 255, 0.34);
+  font-style: normal;
+}
+
+@keyframes ppp-concessions-ticker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .ppp-concessions-menu {
+  min-height: 0;
   display: grid;
-  align-content: start;
-  gap: clamp(1rem, 1.65vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr));
+  gap: var(--tv-gap);
+  overflow: hidden;
 }
 
 .ppp-concessions-section {
+  min-height: 0;
   display: grid;
-  gap: clamp(0.7rem, 1vw, 1rem);
+  grid-template-rows: auto 1fr;
+  gap: var(--tv-gap);
+  overflow: hidden;
 }
 
 .ppp-concessions-section-title {
-  display: grid;
-  grid-template-columns: minmax(40px, 1fr) auto minmax(40px, 1fr);
+  display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: clamp(0.5rem, 0.95vw, 1.2rem);
+  padding: clamp(0.55rem, 1vw, 1.1rem) clamp(0.75rem, 1.35vw, 1.6rem);
+  border-radius: var(--tv-radius);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.13), rgba(0, 229, 255, 0.04));
+  box-shadow: 0 0 clamp(8px, 1.5vw, 24px) rgba(0, 229, 255, 0.08);
+}
+
+.ppp-concessions-section.is-snacks .ppp-concessions-section-title,
+.ppp-concessions-section.is-treats .ppp-concessions-section-title {
+  border-color: rgba(255, 125, 26, 0.25);
+  background: linear-gradient(135deg, rgba(255, 125, 26, 0.13), rgba(255, 125, 26, 0.04));
+  box-shadow: 0 0 clamp(8px, 1.5vw, 24px) rgba(255, 125, 26, 0.08);
+}
+
+.ppp-concessions-section-title > span {
+  font-size: clamp(1.45rem, 3vw, 3.5rem);
+  line-height: 1;
+}
+
+.ppp-concessions-section-title h2 {
+  margin: 0;
   color: var(--tv-cyan);
-  font-size: clamp(0.75rem, 1.1vw, 1.24rem);
+  font-size: clamp(1.35rem, 2.6vw, 3rem);
   font-weight: 900;
-  letter-spacing: 0.62em;
-  text-align: center;
+  letter-spacing: 0.1em;
+  line-height: 0.9;
   text-transform: uppercase;
-  text-shadow: 0 0 13px rgba(0, 216, 255, 0.72);
+  text-shadow: 0 0 clamp(8px, 1.5vw, 20px) rgba(0, 229, 255, 0.5);
 }
 
-.ppp-concessions-section-title::before,
-.ppp-concessions-section-title::after {
-  content: "";
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 216, 255, 0.38));
+.ppp-concessions-section.is-snacks .ppp-concessions-section-title h2,
+.ppp-concessions-section.is-treats .ppp-concessions-section-title h2 {
+  color: var(--tv-orange);
+  text-shadow: 0 0 clamp(8px, 1.5vw, 20px) rgba(255, 125, 26, 0.5);
 }
 
-.ppp-concessions-section-title::after {
-  background: linear-gradient(90deg, rgba(0, 216, 255, 0.38), transparent);
+.ppp-concessions-section-title p {
+  margin: 0.24rem 0 0;
+  color: var(--tv-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.52rem, 0.76vw, 0.86rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .ppp-concessions-grid {
+  min-height: 0;
   display: grid;
-  grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
-  gap: clamp(0.8rem, 1.25vw, 1.4rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--tv-gap);
+  align-content: stretch;
 }
 
-.ppp-concessions-grid[data-count="1"] {
-  --columns: 1;
-}
-
+.ppp-concessions-grid[data-count="1"],
 .ppp-concessions-grid[data-count="2"] {
-  --columns: 2;
-}
-
-.ppp-concessions-grid[data-count="3"] {
-  --columns: 3;
-}
-
-.ppp-concessions-grid[data-count="4"] {
-  --columns: 4;
-}
-
-.ppp-concessions-grid[data-count="5"],
-.ppp-concessions-grid[data-count="6"] {
-  --columns: 6;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ppp-concessions-card {
   --card-accent: var(--tv-cyan);
-  --card-accent-rgb: 0, 216, 255;
-  min-height: clamp(138px, 20vh, 260px);
-  padding: clamp(0.9rem, 1.7vw, 1.8rem);
-  display: grid;
-  grid-template-rows: 1fr auto auto;
-  place-items: center;
-  gap: clamp(0.55rem, 0.9vw, 1rem);
-  border: 2px solid rgba(var(--card-accent-rgb), 0.72);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(var(--card-accent-rgb), 0.1), transparent 62%),
-    rgba(2, 9, 19, 0.78);
+  --card-accent-rgb: 0, 229, 255;
+  position: relative;
+  min-width: 0;
+  min-height: clamp(118px, 17vh, 225px);
+  padding: clamp(0.75rem, 1.8vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.25rem, 0.55vw, 0.72rem);
+  overflow: hidden;
+  border: 1px solid var(--tv-border);
+  border-radius: var(--tv-radius);
+  background: var(--tv-card);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-    0 0 19px rgba(var(--card-accent-rgb), 0.32),
-    0 18px 42px rgba(0, 0, 0, 0.38);
+    0 16px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   text-align: center;
+  animation: ppp-concessions-card-in 520ms ease both;
+}
+
+.ppp-concessions-card:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.ppp-concessions-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.ppp-concessions-card:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.ppp-concessions-card:nth-child(5) {
+  animation-delay: 240ms;
+}
+
+.ppp-concessions-card:nth-child(6) {
+  animation-delay: 300ms;
+}
+
+.ppp-concessions-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.045), transparent 58%),
+    linear-gradient(180deg, rgba(var(--card-accent-rgb), 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes ppp-concessions-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .ppp-concessions-card.is-cyan {
   --card-accent: var(--tv-cyan);
-  --card-accent-rgb: 0, 216, 255;
+  --card-accent-rgb: 0, 229, 255;
 }
 
 .ppp-concessions-card.is-green {
   --card-accent: var(--tv-green);
-  --card-accent-rgb: 0, 240, 141;
+  --card-accent-rgb: 57, 255, 122;
 }
 
 .ppp-concessions-card.is-orange {
   --card-accent: var(--tv-orange);
-  --card-accent-rgb: 255, 122, 26;
+  --card-accent-rgb: 255, 125, 26;
 }
 
 .ppp-concessions-card.is-pink {
   --card-accent: var(--tv-pink);
-  --card-accent-rgb: 255, 63, 213;
+  --card-accent-rgb: 255, 58, 172;
 }
 
 .ppp-concessions-icon {
-  font-size: clamp(2.8rem, 4.8vw, 5.5rem);
+  position: relative;
+  z-index: 1;
+  font-size: clamp(1.8rem, 3.5vw, 4.1rem);
   line-height: 1;
-  filter: drop-shadow(0 0 14px rgba(var(--card-accent-rgb), 0.58));
+  filter: drop-shadow(0 0 clamp(5px, 0.8vw, 10px) rgba(255, 255, 255, 0.24));
 }
 
-.ppp-concessions-card h2 {
+.ppp-concessions-card h3 {
+  position: relative;
+  z-index: 1;
   margin: 0;
   max-width: 100%;
-  color: #f8fbff;
-  font-size: clamp(0.95rem, 1.35vw, 1.58rem);
+  color: var(--tv-text);
+  font-size: clamp(1.05rem, 2vw, 2.25rem);
   font-weight: 900;
-  letter-spacing: 0.08em;
-  line-height: 1.08;
+  letter-spacing: 0.06em;
+  line-height: 0.95;
   overflow-wrap: anywhere;
   text-transform: uppercase;
 }
 
 .ppp-concessions-card strong {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: clamp(88px, 8vw, 148px);
-  min-height: clamp(36px, 4vh, 54px);
-  padding: 0.18rem 1.1rem;
-  border: 2px solid rgba(var(--card-accent-rgb), 0.76);
-  border-radius: 999px;
+  position: relative;
+  z-index: 1;
   color: var(--card-accent);
-  font-size: clamp(1.08rem, 1.95vw, 2.25rem);
+  font-size: clamp(1.25rem, 2.6vw, 3rem);
   font-weight: 900;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(var(--card-accent-rgb), 0.72);
-  box-shadow: 0 0 18px rgba(var(--card-accent-rgb), 0.34) inset;
+  text-shadow: 0 0 clamp(7px, 1.2vw, 20px) rgba(var(--card-accent-rgb), 0.5);
 }
 
 .ppp-concessions-footer {
-  position: absolute;
-  left: 5vw;
-  right: 5vw;
-  bottom: 0.75rem;
   display: grid;
-  gap: 0.3rem;
-  color: rgba(245, 249, 255, 0.48);
-  font-size: clamp(0.72rem, 1vw, 1.12rem);
-  font-weight: 900;
-  letter-spacing: 0.42em;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--tv-gap);
+  padding: clamp(0.45rem, 0.8vw, 0.95rem) clamp(0.8rem, 1.8vw, 2.2rem);
+  color: var(--tv-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.62rem, 0.95vw, 1.02rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-align: center;
   text-transform: uppercase;
 }
 
+.ppp-concessions-footer > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ppp-concessions-payments {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.45rem, 0.8vw, 1rem);
+}
+
+.ppp-concessions-payments span {
+  padding: clamp(4px, 0.45vw, 8px) clamp(8px, 1vw, 16px);
+  border: 1px solid rgba(57, 255, 122, 0.22);
+  border-radius: calc(var(--tv-radius) / 1.5);
+  background: rgba(57, 255, 122, 0.08);
+  color: var(--tv-green);
+  white-space: nowrap;
+}
+
 .ppp-concessions-footer strong {
-  color: rgba(245, 249, 255, 0.78);
-  font-size: clamp(0.62rem, 0.78vw, 0.86rem);
+  padding: clamp(4px, 0.45vw, 8px) clamp(8px, 1vw, 16px);
+  border: 1px solid var(--tv-border);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(240, 246, 255, 0.72);
+  font-size: clamp(0.52rem, 0.78vw, 0.85rem);
   font-weight: 900;
-  letter-spacing: 0.18em;
-  text-shadow: 0 0 12px rgba(0, 216, 255, 0.28);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
-.ppp-concessions-corner {
-  position: absolute;
-  width: clamp(34px, 3.2vw, 72px);
-  height: clamp(34px, 3.2vw, 72px);
-  border-color: rgba(0, 216, 255, 0.46);
-  filter: drop-shadow(0 0 8px rgba(0, 216, 255, 0.42));
+@media (min-width: 2560px) {
+  .ppp-concessions-card {
+    min-height: clamp(210px, 17vh, 330px);
+  }
 }
 
-.ppp-concessions-corner--tl {
-  top: 1.8vw;
-  left: 1.8vw;
-  border-top: 2px solid;
-  border-left: 2px solid;
+@media (max-width: 1180px) {
+  .ppp-concessions-header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .ppp-concessions-status {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .ppp-concessions-menu {
+    overflow: visible;
+  }
+
+  .ppp-concessions-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-concessions-payments {
+    justify-content: center;
+  }
 }
 
-.ppp-concessions-corner--tr {
-  top: 1.8vw;
-  right: 1.8vw;
-  border-top: 2px solid;
-  border-right: 2px solid;
-}
+@media (max-width: 700px) {
+  .ppp-concessions-tv {
+    overflow: visible;
+  }
 
-.ppp-concessions-corner--bl {
-  bottom: 1.8vw;
-  left: 1.8vw;
-  border-bottom: 2px solid;
-  border-left: 2px solid;
-}
-
-.ppp-concessions-corner--br {
-  right: 1.8vw;
-  bottom: 1.8vw;
-  border-right: 2px solid;
-  border-bottom: 2px solid;
-}
-
-@media (max-width: 900px) {
   .ppp-concessions-board {
     min-height: auto;
-    padding-bottom: 5.5rem;
+    overflow: visible;
   }
 
-  .ppp-concessions-header {
-    flex-direction: column;
-  }
-
-  .ppp-concessions-header h1 {
-    letter-spacing: 0.12em;
-  }
-
-  .ppp-concessions-header p,
-  .ppp-concessions-footer,
-  .ppp-concessions-section-title {
-    letter-spacing: 0.22em;
-  }
-
-  .ppp-concessions-grid,
-  .ppp-concessions-grid[data-count] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 520px) {
+  .ppp-concessions-menu,
   .ppp-concessions-grid,
   .ppp-concessions-grid[data-count] {
     grid-template-columns: 1fr;
   }
 
+  .ppp-concessions-title-block p,
   .ppp-concessions-footer {
-    letter-spacing: 0.12em;
+    letter-spacing: 0.06em;
+  }
+
+  .ppp-concessions-payments {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppp-concessions-ticker-track,
+  .ppp-concessions-card {
+    animation: none;
   }
 }
