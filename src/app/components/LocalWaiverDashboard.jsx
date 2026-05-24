@@ -31,6 +31,10 @@ function relationshipSummary(children = []) {
   return `Children: ${names.slice(0, 2).join(", ")} +${names.length - 2} more`;
 }
 
+function normalizeSearchValue(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
 function PersonTile({ person, relationship }) {
   return (
     <div>
@@ -169,10 +173,14 @@ export default function LocalWaiverDashboard({ waivers }) {
   const [page, setPage] = useState(1);
 
   const filteredWaivers = useMemo(() => {
-    const needle = query.trim().toLowerCase();
+    const needle = normalizeSearchValue(query);
+    const hasExactPartyIdMatch = Boolean(needle) && waivers.some(
+      (waiver) => normalizeSearchValue(waiver.visit?.partyId) === needle,
+    );
 
     return waivers.filter((waiver) => {
-      const matchesSearch = !needle || [
+      const partyId = normalizeSearchValue(waiver.visit?.partyId);
+      const searchableValues = [
         waiver.primaryName,
         waiver.primary?.email,
         waiver.primary?.phone,
@@ -180,9 +188,14 @@ export default function LocalWaiverDashboard({ waivers }) {
         waiver.visit?.partyName,
         waiver.visit?.passType,
         waiver.visit?.visitDate,
-      ]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(needle));
+      ];
+      const matchesSearch = !needle || (
+        hasExactPartyIdMatch
+          ? partyId === needle
+          : searchableValues
+            .filter(Boolean)
+            .some((value) => normalizeSearchValue(value).includes(needle))
+      );
 
       const waiverVisitDate = waiver.visit?.visitDate || "";
       const matchesFrom = !dateFrom || waiverVisitDate >= dateFrom;
