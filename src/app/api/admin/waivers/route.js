@@ -41,7 +41,7 @@ function getWaiverId(req) {
 
 export async function GET() {
   if (hasPostgres()) {
-    return NextResponse.json({ waivers: await listPostgresWaivers(100) });
+    return NextResponse.json({ waivers: await listPostgresWaivers(1000) });
   }
 
   if (!db) {
@@ -54,7 +54,7 @@ export async function GET() {
   const snapshot = await db
     .collection("waivers")
     .orderBy("submittedAt", "desc")
-    .limit(100)
+    .limit(1000)
     .get();
 
   return NextResponse.json({

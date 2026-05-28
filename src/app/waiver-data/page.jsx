@@ -34,7 +34,7 @@ function isLocalRequest(host = "") {
 async function getWaivers() {
   if (hasPostgres()) {
     try {
-      return { waivers: await listPostgresWaivers(100), error: "" };
+      return { waivers: await listPostgresWaivers(1000), error: "" };
     } catch (error) {
       return {
         waivers: [],
@@ -51,7 +51,7 @@ async function getWaivers() {
     const snapshot = await db
       .collection("waivers")
       .orderBy("submittedAt", "desc")
-      .limit(100)
+      .limit(1000)
       .get();
 
     return {

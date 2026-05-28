@@ -182,7 +182,7 @@ export async function getPostgresAdminByEmail(email) {
   };
 }
 
-export async function listPostgresWaivers(limit = 100) {
+export async function listPostgresWaivers(limit = 1000) {
   const result = await query(
     "select * from waivers order by submitted_at desc nulls last limit $1",
     [limit],
