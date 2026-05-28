@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const STANDALONE_PATHS = new Set([
   "/birthday-party-landing",
+  "/birthday-party-bookings-vaughan",
   "/concessions-tv",
   "/private-party",
   "/squad",

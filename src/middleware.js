@@ -9,6 +9,10 @@ const SQUAD_HOSTS = new Set([
   "squad.pixelpulseplay.ca",
   "www.squad.pixelpulseplay.ca",
 ]);
+const PARTIES_HOSTS = new Set([
+  "parties.pixelpulseplay.ca",
+  "www.parties.pixelpulseplay.ca",
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -85,6 +89,22 @@ export function middleware(request) {
       const url = request.nextUrl.clone();
       url.pathname = "/squad";
       return rewrite(url, "/squad");
+    }
+  }
+
+  if (PARTIES_HOSTS.has(requestHostname)) {
+    if (requestHostname === "www.parties.pixelpulseplay.ca") {
+      const url = request.nextUrl.clone();
+      url.protocol = "https";
+      url.hostname = "parties.pixelpulseplay.ca";
+      url.port = "";
+      return NextResponse.redirect(url, 308);
+    }
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/birthday-party-bookings-vaughan";
+      return rewrite(url, "/birthday-party-bookings-vaughan");
     }
   }
 

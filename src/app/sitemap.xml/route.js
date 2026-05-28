@@ -61,6 +61,7 @@ export async function GET() {
 
     dynamicPaths.add(canonicalUrl("/waiver"));
     dynamicPaths.add(canonicalUrl("/birthday-party-landing"));
+    dynamicPaths.add(canonicalUrl("/birthday-party-bookings-vaughan"));
     dynamicPaths.add(canonicalUrl("/private-party"));
 
   } catch (error) {

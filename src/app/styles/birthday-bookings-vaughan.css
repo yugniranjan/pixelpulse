@@ -1,0 +1,688 @@
+.ppp-bday-booking-page {
+  --bday-ink: #101828;
+  --bday-muted: #667085;
+  --bday-deep: #13212e;
+  --bday-slate: #1f3140;
+  --bday-green: #a4cf5f;
+  --bday-coral: #ff6b6b;
+  --bday-gold: #fbae7b;
+  --bday-cyan: #32c7c7;
+  --bday-paper: #f7faf8;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #f7faf8;
+  color: var(--bday-ink);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ppp-bday-booking-page * {
+  box-sizing: border-box;
+}
+
+.ppp-bday-booking-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.ppp-bday-booking-nav {
+  position: fixed;
+  z-index: 20;
+  top: 16px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  width: min(1180px, calc(100% - 32px));
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(19, 33, 46, 0.82);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+  transform: translateX(-50%);
+}
+
+.ppp-bday-booking-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ppp-bday-booking-logo img {
+  width: clamp(126px, 14vw, 188px);
+  height: auto;
+}
+
+.ppp-bday-booking-nav div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.ppp-bday-booking-nav a {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.9rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.ppp-bday-booking-nav div a,
+.ppp-bday-nav-phone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+}
+
+.ppp-bday-booking-nav div a:hover,
+.ppp-bday-nav-phone {
+  background: rgba(164, 207, 95, 0.14);
+  color: #ffffff;
+}
+
+.ppp-bday-nav-phone {
+  border: 1px solid rgba(251, 174, 123, 0.5);
+}
+
+.ppp-bday-booking-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 760px;
+  padding: 110px 0 56px;
+  isolation: isolate;
+  color: #ffffff;
+}
+
+.ppp-bday-booking-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(104deg, rgba(19, 33, 46, 0.94) 0%, rgba(19, 33, 46, 0.76) 46%, rgba(19, 33, 46, 0.18) 76%),
+    linear-gradient(180deg, rgba(19, 33, 46, 0.08), rgba(19, 33, 46, 0.74));
+}
+
+.ppp-bday-booking-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 10px;
+  background: linear-gradient(90deg, var(--bday-green), var(--bday-gold), var(--bday-coral), var(--bday-cyan));
+}
+
+.ppp-bday-booking-hero__image {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 64% center;
+  filter: saturate(1.14) contrast(1.04);
+}
+
+.ppp-bday-booking-hero__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(340px, 0.78fr);
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: center;
+}
+
+.ppp-bday-booking-hero__copy {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+}
+
+.ppp-bday-kicker,
+.ppp-bday-section-heading > p,
+.ppp-bday-final p {
+  width: fit-content;
+  margin: 0;
+  padding: 7px 11px;
+  border: 1px solid rgba(164, 207, 95, 0.4);
+  border-radius: 8px;
+  background: rgba(164, 207, 95, 0.12);
+  color: var(--bday-green);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-bday-booking-hero h1,
+.ppp-bday-section-heading h2,
+.ppp-bday-final h2 {
+  max-width: 100%;
+  margin: 0;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2.35rem, 4.2vw, 4.05rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.ppp-bday-booking-hero h1 {
+  font-size: clamp(2.3rem, 4.2vw, 4rem);
+}
+
+.ppp-bday-booking-hero__copy > p:not(.ppp-bday-kicker) {
+  max-width: 700px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  font-weight: 520;
+  line-height: 1.7;
+}
+
+.ppp-bday-booking-actions,
+.ppp-bday-final__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.ppp-bday-booking-actions button,
+.ppp-bday-booking-actions a,
+.ppp-bday-final__actions button,
+.ppp-bday-final__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 22px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.ppp-bday-booking-actions button,
+.ppp-bday-final__actions button {
+  border: 2px solid var(--bday-green);
+  background: var(--bday-green);
+  color: #071117;
+  cursor: pointer;
+}
+
+.ppp-bday-booking-actions a,
+.ppp-bday-final__actions a {
+  border: 2px solid rgba(251, 174, 123, 0.72);
+  color: #ffffff;
+  background: rgba(251, 174, 123, 0.1);
+}
+
+.ppp-bday-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 680px;
+}
+
+.ppp-bday-hero-stats div {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.ppp-bday-hero-stats strong {
+  display: block;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.9rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-bday-hero-stats span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form {
+  border-color: rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(145deg, rgba(50, 199, 199, 0.14), rgba(251, 174, 123, 0.14)),
+    rgba(16, 24, 40, 0.78);
+}
+
+.ppp-bday-booking-section {
+  padding: clamp(2.25rem, 4.2vw, 4rem) 0;
+  background: var(--bday-paper);
+}
+
+.ppp-bday-booking-section--light {
+  background:
+    linear-gradient(90deg, rgba(164, 207, 95, 0.13), transparent 48%, rgba(50, 199, 199, 0.12)),
+    #ffffff;
+}
+
+.ppp-bday-booking-section--packages {
+  background:
+    linear-gradient(120deg, rgba(164, 207, 95, 0.16), transparent 32%, rgba(255, 107, 107, 0.14) 72%, rgba(50, 199, 199, 0.14)),
+    linear-gradient(180deg, #13212e, #1f3140);
+  color: #ffffff;
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-section-heading h2 {
+  color: #ffffff;
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-package-grid article {
+  border-color: rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.24);
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-package-grid article:nth-child(2) {
+  border-color: rgba(251, 174, 123, 0.46);
+  box-shadow: 0 24px 54px rgba(251, 174, 123, 0.12);
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-package-grid h3,
+.ppp-bday-booking-section--packages .ppp-bday-package-grid li {
+  color: #ffffff;
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-package-grid span {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.ppp-bday-booking-section--packages .ppp-bday-package-grid p {
+  background: rgba(164, 207, 95, 0.13);
+  color: var(--bday-green);
+}
+
+.ppp-bday-section-heading {
+  display: grid;
+  gap: 10px;
+  max-width: 100%;
+  margin-bottom: 18px;
+}
+
+.ppp-bday-section-heading--center {
+  justify-items: center;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ppp-bday-section-heading--wide {
+  max-width: 100%;
+}
+
+.ppp-bday-section-heading h2 {
+  color: var(--bday-deep);
+  font-size: clamp(2rem, 3.8vw, 3.45rem);
+}
+
+.ppp-bday-positioning {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.ppp-bday-positioning__grid,
+.ppp-bday-age-grid,
+.ppp-bday-package-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ppp-bday-positioning__grid article,
+.ppp-bday-age-grid article,
+.ppp-bday-package-grid article,
+.ppp-bday-flow article,
+.ppp-bday-faq details {
+  border: 1px solid rgba(19, 33, 46, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.08);
+}
+
+.ppp-bday-positioning__grid article {
+  min-height: 178px;
+  padding: 22px;
+}
+
+.ppp-bday-positioning__grid h3,
+.ppp-bday-age-grid h3,
+.ppp-bday-package-grid h3,
+.ppp-bday-flow h3,
+.ppp-bday-experience-grid h3 {
+  margin: 0;
+  color: var(--bday-deep);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.72rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-bday-positioning__grid p,
+.ppp-bday-age-grid p,
+.ppp-bday-package-grid span,
+.ppp-bday-flow p,
+.ppp-bday-experience-grid p,
+.ppp-bday-faq p {
+  margin: 14px 0 0;
+  color: var(--bday-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.ppp-bday-age-grid article {
+  min-height: 220px;
+  padding: 22px;
+}
+
+.ppp-bday-age-grid span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--bday-deep);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.ppp-bday-age-grid strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--bday-coral);
+}
+
+.ppp-bday-experience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ppp-bday-experience-grid article {
+  position: relative;
+  min-height: 380px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--bday-deep);
+  box-shadow: 0 20px 52px rgba(16, 24, 40, 0.18);
+}
+
+.ppp-bday-experience-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.08) contrast(1.03);
+}
+
+.ppp-bday-experience-grid article::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(19, 33, 46, 0.04), rgba(19, 33, 46, 0.9));
+}
+
+.ppp-bday-experience-grid div {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  padding: 24px;
+}
+
+.ppp-bday-experience-grid h3 {
+  color: #ffffff;
+}
+
+.ppp-bday-experience-grid p {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.ppp-bday-booking-section--arena {
+  position: relative;
+  min-height: 520px;
+  color: #ffffff;
+  isolation: isolate;
+}
+
+.ppp-bday-booking-section--arena > img {
+  z-index: -2;
+  object-fit: cover;
+}
+
+.ppp-bday-booking-section--arena::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(19, 33, 46, 0.94), rgba(19, 33, 46, 0.58)),
+    linear-gradient(180deg, rgba(19, 33, 46, 0.14), rgba(19, 33, 46, 0.86));
+}
+
+.ppp-bday-flow-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.ppp-bday-booking-section--arena .ppp-bday-section-heading h2 {
+  color: #ffffff;
+}
+
+.ppp-bday-flow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ppp-bday-flow article {
+  min-height: 160px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.ppp-bday-flow span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--bday-green);
+  font-weight: 900;
+}
+
+.ppp-bday-flow h3 {
+  color: #ffffff;
+}
+
+.ppp-bday-flow p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ppp-bday-package-grid article {
+  display: grid;
+  gap: 12px;
+  min-height: 310px;
+  padding: 22px;
+}
+
+.ppp-bday-package-grid article:nth-child(2) {
+  border-color: rgba(255, 107, 107, 0.38);
+  box-shadow: 0 22px 48px rgba(255, 107, 107, 0.12);
+}
+
+.ppp-bday-package-grid p {
+  width: fit-content;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(50, 199, 199, 0.12);
+  color: #146c6c;
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.ppp-bday-package-grid ul {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-bday-package-grid li {
+  color: var(--bday-slate);
+  font-weight: 650;
+}
+
+.ppp-bday-package-grid li::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: var(--bday-green);
+}
+
+.ppp-bday-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.ppp-bday-faq {
+  display: grid;
+  gap: 12px;
+}
+
+.ppp-bday-faq details {
+  padding: 16px 18px;
+}
+
+.ppp-bday-faq summary {
+  cursor: pointer;
+  color: var(--bday-deep);
+  font-weight: 850;
+}
+
+.ppp-bday-final {
+  padding: clamp(2.25rem, 4.4vw, 3.75rem) 0;
+  background: var(--bday-deep);
+  color: #ffffff;
+}
+
+.ppp-bday-final__inner {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(1.2rem, 2.4vw, 1.8rem);
+  border-radius: 8px;
+  background:
+    linear-gradient(110deg, rgba(164, 207, 95, 0.2), rgba(251, 174, 123, 0.16), rgba(50, 199, 199, 0.12)),
+    rgba(255, 255, 255, 0.06);
+}
+
+.ppp-bday-final p {
+  color: var(--bday-gold);
+  border-color: rgba(251, 174, 123, 0.38);
+  background: rgba(251, 174, 123, 0.1);
+}
+
+.ppp-bday-final h2 {
+  max-width: 100%;
+  margin-top: 10px;
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+}
+
+@media (max-width: 980px) {
+  .ppp-bday-booking-nav {
+    position: absolute;
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .ppp-bday-booking-nav div {
+    display: none;
+  }
+
+  .ppp-bday-booking-hero {
+    padding-top: 150px;
+  }
+
+  .ppp-bday-booking-hero__layout,
+  .ppp-bday-positioning,
+  .ppp-bday-flow-layout,
+  .ppp-bday-faq-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-bday-positioning__grid,
+  .ppp-bday-age-grid,
+  .ppp-bday-package-grid,
+  .ppp-bday-experience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-bday-final__inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .ppp-bday-booking-shell,
+  .ppp-bday-booking-nav {
+    width: min(100% - 22px, 1180px);
+  }
+
+  .ppp-bday-booking-hero {
+    min-height: 0;
+    padding-bottom: 36px;
+  }
+
+  .ppp-bday-booking-hero::before {
+    background:
+      linear-gradient(180deg, rgba(19, 33, 46, 0.58), rgba(19, 33, 46, 0.92)),
+      linear-gradient(90deg, rgba(19, 33, 46, 0.76), rgba(19, 33, 46, 0.24));
+  }
+
+  .ppp-bday-booking-hero h1,
+  .ppp-bday-section-heading h2 {
+    font-size: 2rem;
+  }
+
+  .ppp-bday-booking-actions,
+  .ppp-bday-booking-actions button,
+  .ppp-bday-booking-actions a,
+  .ppp-bday-final__actions,
+  .ppp-bday-final__actions button,
+  .ppp-bday-final__actions a {
+    width: 100%;
+  }
+
+  .ppp-bday-hero-stats,
+  .ppp-bday-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-bday-experience-grid article {
+    min-height: 320px;
+  }
+
+  .ppp-bday-booking-page .ppp-birthday-hero-form__fields {
+    grid-template-columns: 1fr;
+  }
+}
