@@ -35,12 +35,25 @@
   align-items: center;
   width: min(1180px, calc(100% - 32px));
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 8px;
-  background: rgba(19, 33, 46, 0.82);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(16px);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
+    rgba(19, 33, 46, 0.42);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(22px) saturate(1.35);
   transform: translateX(-50%);
+}
+
+.ppp-bday-booking-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
 }
 
 .ppp-bday-booking-logo {
@@ -61,6 +74,8 @@
 }
 
 .ppp-bday-booking-nav a {
+  position: relative;
+  z-index: 1;
   color: rgba(255, 255, 255, 0.84);
   font-size: 0.9rem;
   font-weight: 750;
@@ -91,8 +106,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 780px;
-  padding: 110px 0 56px;
+  min-height: 720px;
+  padding: 104px 0 44px;
   isolation: isolate;
   color: #ffffff;
 }
@@ -103,8 +118,8 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(104deg, rgba(19, 33, 46, 0.9) 0%, rgba(19, 33, 46, 0.68) 42%, rgba(19, 33, 46, 0.2) 75%),
-    linear-gradient(180deg, rgba(19, 33, 46, 0.08), rgba(19, 33, 46, 0.7));
+    linear-gradient(104deg, rgba(19, 33, 46, 0.82) 0%, rgba(19, 33, 46, 0.54) 43%, rgba(19, 33, 46, 0.08) 78%),
+    linear-gradient(180deg, rgba(19, 33, 46, 0.03), rgba(19, 33, 46, 0.56));
 }
 
 .ppp-bday-booking-hero::after {
@@ -128,15 +143,16 @@
 
 .ppp-bday-booking-hero__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(340px, 0.78fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(300px, 0.58fr);
   gap: clamp(1.2rem, 3vw, 2.4rem);
   align-items: center;
 }
 
 .ppp-bday-booking-hero__copy {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   align-content: center;
+  max-width: 650px;
 }
 
 .ppp-bday-kicker,
@@ -159,8 +175,8 @@
 .ppp-bday-booking-section--games .ppp-bday-section-heading > p,
 .ppp-bday-booking-section--packages .ppp-bday-section-heading > p {
   border-color: rgba(251, 174, 123, 0.7);
-  background: rgba(251, 174, 123, 0.18);
-  color: #fff8ef;
+  background: rgba(251, 174, 123, 0.12);
+  color: rgba(255, 248, 239, 0.86);
 }
 
 .ppp-bday-booking-hero h1,
@@ -176,16 +192,17 @@
 }
 
 .ppp-bday-booking-hero h1 {
-  font-size: clamp(2.3rem, 4.2vw, 4rem);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(2.15rem, 3.8vw, 3.65rem);
 }
 
 .ppp-bday-booking-hero__copy > p:not(.ppp-bday-kicker) {
-  max-width: 700px;
+  max-width: 520px;
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
-  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  font-size: clamp(0.96rem, 1.35vw, 1.08rem);
   font-weight: 520;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 .ppp-bday-booking-actions,
@@ -228,13 +245,13 @@
 
 .ppp-bday-hero-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  max-width: 780px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 540px;
 }
 
 .ppp-bday-hero-stats div {
-  padding: 16px;
+  padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
@@ -244,21 +261,69 @@
 .ppp-bday-hero-stats strong {
   display: block;
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 1.9rem;
+  font-size: 1.45rem;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .ppp-bday-hero-stats span {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.92rem;
+  font-size: 0.78rem;
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form {
+  gap: 10px;
+  padding: 16px;
   border-color: rgba(255, 255, 255, 0.22);
   background:
-    linear-gradient(145deg, rgba(50, 199, 199, 0.14), rgba(251, 174, 123, 0.14)),
-    rgba(16, 24, 40, 0.78);
+    linear-gradient(145deg, rgba(50, 199, 199, 0.1), rgba(251, 174, 123, 0.12)),
+    rgba(16, 24, 40, 0.68);
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form::before {
+  height: 3px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__head h2 {
+  margin-top: 3px;
+  font-size: 1.48rem;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__head p,
+.ppp-bday-booking-page .ppp-birthday-hero-form label {
+  font-size: 0.74rem;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__fields {
+  gap: 7px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form label {
+  gap: 4px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form input,
+.ppp-bday-booking-page .ppp-birthday-hero-form textarea {
+  padding: 8px 10px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form textarea {
+  min-height: 52px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form button {
+  min-height: 42px;
+  font-size: 0.88rem;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form > p {
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.ppp-bday-booking-page .ppp-birthday-urgency {
+  padding: 6px 9px;
+  font-size: 0.78rem;
 }
 
 .ppp-bday-booking-section {

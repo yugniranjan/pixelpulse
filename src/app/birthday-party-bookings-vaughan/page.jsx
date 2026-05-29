@@ -57,10 +57,9 @@ const navLinks = [
 ];
 
 const heroStats = [
-  { value: "Hosted", label: "birthday parties" },
-  { value: "10+", label: "interactive games" },
-  { value: "Ages 6-16", label: "kids, tweens, and teens" },
-  { value: "Vaughan", label: "indoor party venue" },
+  { value: "10+", label: "games" },
+  { value: "Ages 6-16", label: "kids and teens" },
+  { value: "Vaughan", label: "indoor venue" },
 ];
 
 const highlights = [
@@ -253,10 +252,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell ppp-bday-booking-hero__layout">
           <div className="ppp-bday-booking-hero__copy">
             <p className="ppp-bday-kicker">Birthday parties in Vaughan</p>
-            <h1>A birthday party kids actually get excited about.</h1>
+            <h1>Birthday parties kids get excited about.</h1>
             <p>
-              High-energy interactive games and immersive challenge rooms designed for
-              kids, tweens, and teens, not toddler play zones.
+              Interactive challenge rooms for kids, tweens, and teens.
             </p>
             <div className="ppp-bday-booking-actions">
               <BookingButton title="Book your party" bookingType="party" />
