@@ -3,7 +3,7 @@
   --bday-muted: #667085;
   --bday-deep: #13212e;
   --bday-slate: #1f3140;
-  --bday-green: #a4cf5f;
+  --bday-green: #2e302c;
   --bday-coral: #ff6b6b;
   --bday-gold: #fbae7b;
   --bday-cyan: #32c7c7;
@@ -79,7 +79,7 @@
 
 .ppp-bday-booking-nav div a:hover,
 .ppp-bday-nav-phone {
-  background: rgba(164, 207, 95, 0.14);
+  background: rgba(251, 174, 123, 0.16);
   color: #ffffff;
 }
 
@@ -91,7 +91,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 760px;
+  min-height: 780px;
   padding: 110px 0 56px;
   isolation: isolate;
   color: #ffffff;
@@ -103,8 +103,8 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(104deg, rgba(19, 33, 46, 0.94) 0%, rgba(19, 33, 46, 0.76) 46%, rgba(19, 33, 46, 0.18) 76%),
-    linear-gradient(180deg, rgba(19, 33, 46, 0.08), rgba(19, 33, 46, 0.74));
+    linear-gradient(104deg, rgba(19, 33, 46, 0.9) 0%, rgba(19, 33, 46, 0.68) 42%, rgba(19, 33, 46, 0.2) 75%),
+    linear-gradient(180deg, rgba(19, 33, 46, 0.08), rgba(19, 33, 46, 0.7));
 }
 
 .ppp-bday-booking-hero::after {
@@ -115,10 +115,14 @@
   background: linear-gradient(90deg, var(--bday-green), var(--bday-gold), var(--bday-coral), var(--bday-cyan));
 }
 
-.ppp-bday-booking-hero__image {
+.ppp-bday-booking-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: -2;
   object-fit: cover;
-  object-position: 64% center;
+  object-position: center;
   filter: saturate(1.14) contrast(1.04);
 }
 
@@ -141,14 +145,22 @@
   width: fit-content;
   margin: 0;
   padding: 7px 11px;
-  border: 1px solid rgba(164, 207, 95, 0.4);
+  border: 1px solid rgba(46, 48, 44, 0.35);
   border-radius: 8px;
-  background: rgba(164, 207, 95, 0.12);
+  background: rgba(46, 48, 44, 0.08);
   color: var(--bday-green);
   font-size: 0.8rem;
   font-weight: 850;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.ppp-bday-booking-hero .ppp-bday-kicker,
+.ppp-bday-booking-section--games .ppp-bday-section-heading > p,
+.ppp-bday-booking-section--packages .ppp-bday-section-heading > p {
+  border-color: rgba(251, 174, 123, 0.7);
+  background: rgba(251, 174, 123, 0.18);
+  color: #fff8ef;
 }
 
 .ppp-bday-booking-hero h1,
@@ -203,7 +215,7 @@
 .ppp-bday-final__actions button {
   border: 2px solid var(--bday-green);
   background: var(--bday-green);
-  color: #071117;
+  color: #ffffff;
   cursor: pointer;
 }
 
@@ -216,9 +228,9 @@
 
 .ppp-bday-hero-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  max-width: 680px;
+  max-width: 780px;
 }
 
 .ppp-bday-hero-stats div {
@@ -254,15 +266,59 @@
   background: var(--bday-paper);
 }
 
+.ppp-bday-booking-section--highlights {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(247, 250, 248, 0.88)),
+    linear-gradient(120deg, rgba(251, 174, 123, 0.2), transparent 34%, rgba(50, 199, 199, 0.18)),
+    #edf5f1;
+  isolation: isolate;
+}
+
+.ppp-bday-booking-section--highlights::before,
+.ppp-bday-booking-section--highlights::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ppp-bday-booking-section--highlights::before {
+  inset: 0;
+  background:
+    linear-gradient(rgba(19, 33, 46, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 33, 46, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.ppp-bday-booking-section--highlights::after {
+  width: min(520px, 56vw);
+  aspect-ratio: 1;
+  right: -140px;
+  top: -160px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 46% 46%, rgba(251, 174, 123, 0.3), transparent 58%),
+    radial-gradient(circle at 56% 62%, rgba(50, 199, 199, 0.24), transparent 62%);
+  filter: blur(3px);
+}
+
+.ppp-bday-booking-section--highlights .ppp-bday-booking-shell {
+  position: relative;
+  z-index: 1;
+}
+
 .ppp-bday-booking-section--light {
   background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.13), transparent 48%, rgba(50, 199, 199, 0.12)),
+    linear-gradient(90deg, rgba(46, 48, 44, 0.06), transparent 48%, rgba(50, 199, 199, 0.12)),
     #ffffff;
 }
 
 .ppp-bday-booking-section--packages {
   background:
-    linear-gradient(120deg, rgba(164, 207, 95, 0.16), transparent 32%, rgba(255, 107, 107, 0.14) 72%, rgba(50, 199, 199, 0.14)),
+    linear-gradient(120deg, rgba(46, 48, 44, 0.22), transparent 32%, rgba(255, 107, 107, 0.14) 72%, rgba(50, 199, 199, 0.14)),
     linear-gradient(180deg, #13212e, #1f3140);
   color: #ffffff;
 }
@@ -294,8 +350,8 @@
 }
 
 .ppp-bday-booking-section--packages .ppp-bday-package-grid p {
-  background: rgba(164, 207, 95, 0.13);
-  color: var(--bday-green);
+  background: rgba(251, 174, 123, 0.16);
+  color: #fff4e8;
 }
 
 .ppp-bday-section-heading {
@@ -321,11 +377,167 @@
   font-size: clamp(2rem, 3.8vw, 3.45rem);
 }
 
+.ppp-bday-section-copy {
+  margin: 0;
+  color: var(--bday-muted);
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  line-height: 1.7;
+}
+
+.ppp-bday-section-copy--contrast {
+  padding: 14px 16px;
+  border-left: 5px solid var(--bday-coral);
+  border-radius: 8px;
+  background: #fff3e8;
+  color: var(--bday-deep);
+  font-weight: 750;
+}
+
+.ppp-bday-highlight-grid,
+.ppp-bday-game-grid,
+.ppp-bday-review-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.ppp-bday-highlight-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ppp-bday-highlight-grid article,
+.ppp-bday-game-grid article,
+.ppp-bday-party-panel,
+.ppp-bday-review-grid article {
+  border: 1px solid rgba(19, 33, 46, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.08);
+}
+
+.ppp-bday-highlight-grid article {
+  position: relative;
+  min-height: 176px;
+  overflow: hidden;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  outline: none;
+  transform: translateY(0);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.ppp-bday-highlight-grid article::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: linear-gradient(180deg, var(--bday-gold), var(--bday-coral), var(--bday-cyan));
+  transform: scaleY(0.28);
+  transform-origin: top;
+  transition: transform 180ms ease;
+}
+
+.ppp-bday-highlight-grid article::after {
+  content: "";
+  position: absolute;
+  inset: auto 16px 16px auto;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(19, 33, 46, 0.1);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(50, 199, 199, 0.2) 0 2px, transparent 3px),
+    rgba(19, 33, 46, 0.04);
+  opacity: 0.7;
+  transform: translate(14px, 14px) scale(0.86);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.ppp-bday-highlight-grid article:hover,
+.ppp-bday-highlight-grid article:focus-visible {
+  border-color: rgba(251, 174, 123, 0.56);
+  background: #ffffff;
+  box-shadow: 0 24px 52px rgba(16, 24, 40, 0.14);
+  transform: translateY(-6px);
+}
+
+.ppp-bday-highlight-grid article:hover::before,
+.ppp-bday-highlight-grid article:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.ppp-bday-highlight-grid article:hover::after,
+.ppp-bday-highlight-grid article:focus-visible::after {
+  opacity: 1;
+  transform: translate(4px, 4px) scale(1);
+}
+
+.ppp-bday-highlight-grid article:focus-visible {
+  outline: 3px solid rgba(251, 174, 123, 0.35);
+  outline-offset: 3px;
+}
+
+.ppp-bday-highlight-grid article span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 30px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: var(--bday-deep);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.ppp-bday-highlight-grid article:hover span,
+.ppp-bday-highlight-grid article:focus-visible span {
+  background: var(--bday-gold);
+  color: var(--bday-deep);
+  transform: translateX(4px);
+}
+
+.ppp-bday-highlight-grid h3,
+.ppp-bday-game-grid h3,
+.ppp-bday-party-panel span {
+  margin: 0;
+  color: var(--bday-deep);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.56rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-bday-highlight-grid p,
+.ppp-bday-game-grid p,
+.ppp-bday-review-grid p {
+  margin: 12px 0 0;
+  color: var(--bday-muted);
+  font-size: 0.98rem;
+  line-height: 1.62;
+}
+
 .ppp-bday-positioning {
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
   gap: 18px;
   align-items: start;
+}
+
+.ppp-bday-positioning--media {
+  grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
 }
 
 .ppp-bday-positioning__grid,
@@ -417,6 +629,14 @@
   box-shadow: 0 20px 52px rgba(16, 24, 40, 0.18);
 }
 
+.ppp-bday-experience-grid--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ppp-bday-experience-grid--compact article {
+  min-height: 430px;
+}
+
 .ppp-bday-experience-grid img {
   width: 100%;
   height: 100%;
@@ -468,6 +688,208 @@
     linear-gradient(180deg, rgba(19, 33, 46, 0.14), rgba(19, 33, 46, 0.86));
 }
 
+.ppp-bday-booking-section--games {
+  background:
+    linear-gradient(135deg, rgba(19, 33, 46, 0.96), rgba(31, 49, 64, 0.92)),
+    #13212e;
+  color: #ffffff;
+}
+
+.ppp-bday-booking-section--games .ppp-bday-section-heading h2 {
+  color: #ffffff;
+}
+
+.ppp-bday-game-carousel {
+  scrollbar-color: rgba(251, 174, 123, 0.72) rgba(255, 255, 255, 0.08);
+}
+
+.ppp-bday-game-card {
+  border-color: rgba(251, 174, 123, 0.48);
+}
+
+.ppp-bday-game-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ppp-bday-game-grid article {
+  position: relative;
+  min-height: 180px;
+  overflow: hidden;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.ppp-bday-game-grid article::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(115deg, rgba(19, 33, 46, 0.95) 0%, rgba(19, 33, 46, 0.78) 48%, rgba(19, 33, 46, 0.46) 100%),
+    var(--game-image);
+  background-position: center;
+  background-size: cover;
+  opacity: 0.9;
+}
+
+.ppp-bday-game-grid article::before {
+  content: "";
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 42px;
+  height: 8px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  background: var(--accent, var(--bday-green));
+}
+
+.ppp-bday-game-grid h3 {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.ppp-bday-game-grid p {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.ppp-bday-game-grid .is-green {
+  --accent: var(--bday-gold);
+}
+
+.ppp-bday-game-grid .is-orange {
+  --accent: var(--bday-gold);
+}
+
+.ppp-bday-game-grid .is-blue {
+  --accent: var(--bday-cyan);
+}
+
+.ppp-bday-game-grid .is-red {
+  --accent: var(--bday-coral);
+}
+
+.ppp-bday-game-grid .is-purple {
+  --accent: #a78bfa;
+}
+
+.ppp-bday-game-grid .is-yellow {
+  --accent: #ffe066;
+}
+
+.ppp-bday-booking-section--party {
+  background:
+    linear-gradient(90deg, rgba(255, 107, 107, 0.14), transparent 44%, rgba(251, 174, 123, 0.16)),
+    #fff8f3;
+}
+
+.ppp-bday-party-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.ppp-bday-party-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.ppp-bday-party-panel span {
+  min-height: 76px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(19, 33, 46, 0.06);
+  font-size: 1.28rem;
+}
+
+.ppp-bday-booking-section--summer {
+  padding-block: clamp(1.25rem, 2.6vw, 2.25rem);
+  background:
+    linear-gradient(120deg, rgba(46, 48, 44, 0.08), rgba(50, 199, 199, 0.14)),
+    #f7faf8;
+}
+
+.ppp-bday-summer {
+  display: grid;
+  grid-template-columns: minmax(0, 760px) auto;
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(1rem, 2vw, 1.45rem);
+  border: 1px solid rgba(19, 33, 46, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72)),
+    rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 46px rgba(16, 24, 40, 0.08);
+}
+
+.ppp-bday-summer .ppp-bday-section-heading {
+  max-width: 760px;
+  margin-bottom: 0;
+}
+
+.ppp-bday-summer .ppp-bday-section-heading h2 {
+  font-size: clamp(1.9rem, 3.1vw, 3rem);
+}
+
+.ppp-bday-summer .ppp-bday-section-copy {
+  max-width: 700px;
+}
+
+.ppp-bday-summer a {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 22px;
+  border-radius: 8px;
+  background: var(--bday-deep);
+  color: #ffffff;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.ppp-bday-booking-section--reviews {
+  background:
+    linear-gradient(180deg, rgba(19, 33, 46, 0.03), rgba(50, 199, 199, 0.1)),
+    #ffffff;
+}
+
+.ppp-bday-review-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ppp-bday-review-grid article {
+  min-height: 150px;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.ppp-bday-review-grid p {
+  margin: 0;
+  color: var(--bday-deep);
+  font-size: 1.08rem;
+  font-weight: 750;
+}
+
+.ppp-bday-review-grid p::before {
+  content: "\"";
+  color: var(--bday-coral);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 2.1rem;
+  line-height: 0;
+}
+
 .ppp-bday-flow-layout {
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
@@ -496,7 +918,7 @@
 .ppp-bday-flow span {
   display: block;
   margin-bottom: 12px;
-  color: var(--bday-green);
+  color: var(--bday-gold);
   font-weight: 900;
 }
 
@@ -555,6 +977,10 @@
   background: var(--bday-green);
 }
 
+.ppp-bday-booking-section--packages .ppp-bday-package-grid li::before {
+  background: var(--bday-gold);
+}
+
 .ppp-bday-faq-layout {
   display: grid;
   grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
@@ -591,7 +1017,7 @@
   padding: clamp(1.2rem, 2.4vw, 1.8rem);
   border-radius: 8px;
   background:
-    linear-gradient(110deg, rgba(164, 207, 95, 0.2), rgba(251, 174, 123, 0.16), rgba(50, 199, 199, 0.12)),
+    linear-gradient(110deg, rgba(46, 48, 44, 0.28), rgba(251, 174, 123, 0.16), rgba(50, 199, 199, 0.12)),
     rgba(255, 255, 255, 0.06);
 }
 
@@ -605,6 +1031,15 @@
   max-width: 100%;
   margin-top: 10px;
   font-size: clamp(1.9rem, 3.4vw, 3rem);
+}
+
+.ppp-bday-final__inner span {
+  display: block;
+  max-width: 620px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 @media (max-width: 980px) {
@@ -625,15 +1060,29 @@
   .ppp-bday-booking-hero__layout,
   .ppp-bday-positioning,
   .ppp-bday-flow-layout,
-  .ppp-bday-faq-layout {
+  .ppp-bday-faq-layout,
+  .ppp-bday-party-layout,
+  .ppp-bday-summer {
     grid-template-columns: 1fr;
   }
 
   .ppp-bday-positioning__grid,
   .ppp-bday-age-grid,
   .ppp-bday-package-grid,
-  .ppp-bday-experience-grid {
+  .ppp-bday-experience-grid,
+  .ppp-bday-highlight-grid,
+  .ppp-bday-game-grid,
+  .ppp-bday-review-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ppp-bday-hero-stats,
+  .ppp-bday-party-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ppp-bday-summer a {
+    justify-self: start;
   }
 
   .ppp-bday-final__inner {
@@ -674,7 +1123,8 @@
   }
 
   .ppp-bday-hero-stats,
-  .ppp-bday-flow {
+  .ppp-bday-flow,
+  .ppp-bday-party-panel {
     grid-template-columns: 1fr;
   }
 

@@ -3,33 +3,39 @@ import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
+import { fetchMenuData } from "@/lib/sheets";
+import { safeImageUrl } from "@/lib/seo";
 
-const heroImage = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.webp";
-const arenaImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
-const localArcadeImage = "/assets/images/arcade.JPG";
+const heroImage = "/assets/images/birthday-party-room-hero.webp";
+const heroVideo = "/assets/videos/birthday-hero.mp4";
 const localFloorImage = "/assets/images/floorchallenge.jpg";
 const localShootingImage = "/assets/images/shootinggame.jpg";
+const LOCATION_SLUG = "vaughan";
+const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
 const phoneUrl = "tel:+19057602922";
 const pageUrl = "https://parties.pixelpulseplay.ca";
+const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
+
+export const revalidate = 900;
 
 export const metadata = {
   title: "Kids & Teens Birthday Party Bookings Vaughan | Pixel Pulse Play",
   description:
-    "Book a kids or teens birthday party in Vaughan at Pixel Pulse Play, an interactive gaming arena with challenge rooms, live scores, party hosts, and active group play.",
+    "Book a kids, tweens, or teens birthday party in Vaughan with interactive challenge rooms, hosted gameplay, private party rooms, and high-energy indoor fun.",
   alternates: {
     canonical: pageUrl,
   },
   openGraph: {
     title: "Kids & Teens Birthday Party Bookings Vaughan | Pixel Pulse Play",
     description:
-      "A birthday party in Vaughan built around interactive gaming, challenge rooms, live leaderboards, and hosted group energy for kids and teens.",
+      "A high-energy birthday party in Vaughan with real-life gaming, interactive challenge rooms, hosted competitions, and private party rooms.",
     url: pageUrl,
     images: [
       {
-        url: heroImage,
+        url: ogImage,
         width: 1200,
         height: 630,
-        alt: "Birthday party bookings at Pixel Pulse Play Vaughan",
+        alt: "Pixel Pulse Play birthday party room in Vaughan",
       },
     ],
     type: "website",
@@ -38,83 +44,82 @@ export const metadata = {
     card: "summary_large_image",
     title: "Kids & Teens Birthday Party Bookings Vaughan | Pixel Pulse Play",
     description:
-      "Interactive birthday party bookings for kids and teens in Vaughan.",
-    images: [heroImage],
+      "Interactive birthday party bookings for kids, tweens, and teens in Vaughan.",
+    images: [ogImage],
   },
 };
 
 const navLinks = [
-  { label: "Why Pixel Pulse", href: "#positioning" },
-  { label: "Age Fit", href: "#age-fit" },
+  { label: "Highlights", href: "#highlights" },
+  { label: "Games", href: "#games" },
   { label: "Packages", href: "#packages" },
   { label: "FAQ", href: "#faq" },
 ];
 
 const heroStats = [
-  { value: "Kids", label: "active party games" },
-  { value: "Teens", label: "competitive challenges" },
-  { value: "Vaughan", label: "indoor party arena" },
+  { value: "Hosted", label: "birthday parties" },
+  { value: "10+", label: "interactive games" },
+  { value: "Ages 6-16", label: "kids, tweens, and teens" },
+  { value: "Vaughan", label: "indoor party venue" },
 ];
 
-const positioningPoints = [
+const highlights = [
   {
-    title: "Interactive gaming, not passive screen time",
-    text: "Guests move through physical game rooms where timing, memory, aim, speed, balance, and teamwork all matter.",
+    title: "Interactive challenge rooms",
+    text: "Real-life gaming experiences with lights, targets, missions, and fast reactions.",
   },
   {
-    title: "Built for birthday groups",
-    text: "The party flow gives kids and teens enough structure to stay together, with enough variety to keep every guest engaged.",
+    title: "Team battles and competitions",
+    text: "Perfect for groups, siblings, friends, and anyone chasing the high score.",
   },
   {
-    title: "Leaderboard energy",
-    text: "Scores turn the celebration into a friendly competition, so the group gets moments to cheer, replay, and compare wins.",
-  },
-];
-
-const ageBands = [
-  {
-    age: "Kids",
-    range: "7-12",
-    title: "Easy to jump in",
-    text: "Fast instructions, active rooms, and host guidance help younger players feel confident quickly.",
+    title: "Guided party experience",
+    text: "Hosted gameplay keeps the group organized, moving, and fully engaged.",
   },
   {
-    age: "Tweens",
-    range: "10-13",
-    title: "Enough challenge to matter",
-    text: "Puzzle, reflex, and movement games give friend groups a party that feels more grown up than a play place.",
+    title: "Private party rooms",
+    text: "Celebrate, eat, open gifts, and take photos together after the games.",
   },
   {
-    age: "Teens",
-    range: "13+",
-    title: "Competitive and social",
-    text: "High-score chasing, team rotations, and live results make the party feel like a real gaming event.",
+    title: "Indoor summer fun",
+    text: "Air-conditioned, weather-proof birthday fun without heat, rain, or party-hall boredom.",
+  },
+  {
+    title: "Social-media worthy moments",
+    text: "Colorful party rooms, action shots, and memorable moments parents can actually capture.",
   },
 ];
 
-const experienceTiles = [
+const fallbackAttractions = [
   {
-    title: "Challenge Rooms",
-    text: "Rotate through interactive rooms made for movement, reaction time, and group competition.",
+    title: "Laser Maze",
     image: localFloorImage,
+    text: "Duck, dodge, and crawl through laser beams before time runs out.",
   },
   {
-    title: "Target Games",
-    text: "Aim, score, and replay. Great for mixed ages because everyone understands the goal fast.",
+    title: "Hexa Quest",
+    image: localFloorImage,
+    text: "Solve physical puzzles, unlock clues, and race against time.",
+  },
+  {
+    title: "Edge Climb",
+    image: localFloorImage,
+    text: "Crawl, balance, climb, and move through an active challenge room.",
+  },
+  {
+    title: "Shoot It Out",
     image: localShootingImage,
-  },
-  {
-    title: "Arcade Energy",
-    text: "Classic arcade fun supports the main party flow and gives guests more ways to stay engaged.",
-    image: localArcadeImage,
+    text: "Team-based target action with zones, sensors, and light-up tiles.",
   },
 ];
 
-const partyFlow = [
-  ["01", "Arrive", "Guests check in, meet the host, and get ready for the party flow."],
-  ["02", "Play", "The group rotates through interactive games and challenge rooms."],
-  ["03", "Compete", "Scores, rematches, and team moments keep the room buzzing."],
-  ["04", "Celebrate", "Wrap with food, cake, photos, and a winner-worthy finish."],
+const partyFeatures = [
+  "Dedicated party rooms",
+  "Guided gameplay rotations",
+  "Music and high-energy atmosphere",
+  "Food and add-ons available",
+  "Easy online booking",
+  "Great for kids, tweens, and teens",
 ];
 
 const packages = [
@@ -138,30 +143,83 @@ const packages = [
   },
 ];
 
+const reviews = [
+  "Best birthday party we have ever done.",
+  "Finally something my 12-year-old actually loved.",
+  "The kids did not want to leave.",
+  "So much better than a regular trampoline park.",
+];
+
 const faqs = [
   {
-    question: "Is Pixel Pulse Play better for kids or teens?",
+    question: "What ages is Pixel Pulse best for?",
     answer:
-      "Both. Younger kids like the movement and quick games, while teens usually lock into the competitive scoring and challenge-room format.",
+      "Pixel Pulse is designed for kids, tweens, and teens, with the strongest fit around ages 6 to 16.",
   },
   {
-    question: "Where is the birthday party venue?",
+    question: "How long are parties?",
     answer:
-      "Pixel Pulse Play is in Vaughan, serving families from Vaughan, Woodbridge, Maple, Concord, and nearby areas.",
+      "Party timing depends on the package and group size. Send a request and the team will confirm the best available options.",
   },
   {
-    question: "Can parents request a callback before booking?",
+    question: "Can we bring cake?",
     answer:
-      "Yes. Use the party request form and the team can help with date availability, group size, and package fit.",
+      "Yes, parties can include time in a party room for cake, food, gifts, and photos.",
   },
   {
-    question: "Do guests need waivers?",
+    question: "Do you provide food?",
     answer:
-      "Yes. Sending the waiver link before the party helps make check-in faster on the day of the event.",
+      "Food and add-ons may be available depending on the party package and date.",
+  },
+  {
+    question: "Are socks required?",
+    answer:
+      "The team will confirm any footwear or play requirements with your booking details.",
+  },
+  {
+    question: "How many kids can attend?",
+    answer:
+      "Capacity depends on the party format. Share your expected guest count and we will recommend the right package.",
+  },
+  {
+    question: "Can parents stay?",
+    answer:
+      "Yes, parents can stay during the party and enjoy the celebration flow.",
+  },
+  {
+    question: "Is it private?",
+    answer:
+      "Private party room access is included with party experiences, and larger private options can be discussed when booking.",
   },
 ];
 
-export default function BirthdayPartyBookingsVaughanPage() {
+async function getBirthdayMenuData() {
+  try {
+    return await fetchMenuData(LOCATION_SLUG);
+  } catch (error) {
+    console.error("birthday bookings menu failed:", error);
+    return [];
+  }
+}
+
+function getAttractions(menuData = []) {
+  const attractions = menuData.find((item) => item.path === "attractions");
+  const children = Array.isArray(attractions?.children) ? attractions.children : [];
+
+  return children
+    .filter((item) => item?.isactive == 1)
+    .map((item) => ({
+      title: item.title || item.desc,
+      text: item.smalltext || item.metadescription || "",
+      image: safeImageUrl(item.smallimage || item.icon || item.headerimage, attractionFallbackImage),
+    }));
+}
+
+export default async function BirthdayPartyBookingsVaughanPage() {
+  const menuData = await getBirthdayMenuData();
+  const attractions = getAttractions(menuData);
+  const gameCards = attractions.length ? attractions : fallbackAttractions;
+
   return (
     <main className="ppp-bday-booking-page">
       <nav className="ppp-bday-booking-nav" aria-label="Birthday party page navigation">
@@ -181,28 +239,30 @@ export default function BirthdayPartyBookingsVaughanPage() {
       </nav>
 
       <section className="ppp-bday-booking-hero">
-        <Image
-          className="ppp-bday-booking-hero__image"
-          src={heroImage}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-        />
+        <video
+          className="ppp-bday-booking-hero__media"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={heroImage}
+          aria-label="Pixel Pulse Play birthday party video with kids and teens celebrating interactive games"
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
         <div className="ppp-bday-booking-shell ppp-bday-booking-hero__layout">
           <div className="ppp-bday-booking-hero__copy">
-            <p className="ppp-bday-kicker">Birthday party bookings in Vaughan</p>
-            <h1>Kids and teens birthday parties powered by interactive gaming.</h1>
+            <p className="ppp-bday-kicker">Birthday parties in Vaughan</p>
+            <h1>A birthday party kids actually get excited about.</h1>
             <p>
-              Pixel Pulse Play positions the birthday party as a live gaming arena:
-              active challenge rooms, friendly competition, real scores, and a host-led
-              flow that keeps the group moving.
+              High-energy interactive games and immersive challenge rooms designed for
+              kids, tweens, and teens, not toddler play zones.
             </p>
             <div className="ppp-bday-booking-actions">
-              <BookingButton title="Book a birthday party" bookingType="party" />
-              <a href="#birthday-party-form">Request a callback</a>
+              <BookingButton title="Book your party" bookingType="party" />
+              <a href="#packages">View party packages</a>
             </div>
-            <div className="ppp-bday-hero-stats" aria-label="Birthday party audience">
+            <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
               {heroStats.map((item) => (
                 <div key={item.value}>
                   <strong>{item.value}</strong>
@@ -212,14 +272,14 @@ export default function BirthdayPartyBookingsVaughanPage() {
             </div>
           </div>
 
-          <BirthdayHeroContactForm urgency="Weekend birthday slots can fill quickly. Ask about availability for your preferred date." />
+          <BirthdayHeroContactForm urgency="Summer weekend spots fill quickly. Reserve your preferred party date today." />
         </div>
       </section>
 
       <section className="ppp-bday-booking-section ppp-bday-booking-section--packages" id="packages">
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
-            <p>Booking options</p>
+            <p>Party packages</p>
             <h2>Choose the birthday format that fits your group.</h2>
           </div>
           <div className="ppp-bday-package-grid">
@@ -239,55 +299,77 @@ export default function BirthdayPartyBookingsVaughanPage() {
         </div>
       </section>
 
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--highlights" id="highlights">
+        <div className="ppp-bday-booking-shell">
+          <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
+            <p>Quick highlights</p>
+            <h2>Everything kids and teens love without anything they will call boring.</h2>
+          </div>
+          <div className="ppp-bday-highlight-grid">
+            {highlights.map((item, index) => (
+              <article key={item.title} tabIndex={0}>
+                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="ppp-bday-booking-section" id="positioning">
-        <div className="ppp-bday-booking-shell ppp-bday-positioning">
+        <div className="ppp-bday-booking-shell ppp-bday-positioning ppp-bday-positioning--media">
           <div className="ppp-bday-section-heading">
-            <p>Pixel Pulse positioning</p>
-            <h2>A birthday party that feels like stepping inside the game.</h2>
+            <p>What makes Pixel Pulse different</p>
+            <h2>Not another indoor playground.</h2>
+            <p className="ppp-bday-section-copy">
+              Pixel Pulse turns kids into players inside real-life video games. Run
+              through laser mazes, hit glowing targets, race against the clock, compete
+              with friends, and unlock challenges together.
+            </p>
+            <p className="ppp-bday-section-copy ppp-bday-section-copy--contrast">
+              Every room is interactive, active, and designed to keep kids moving,
+              laughing, and fully engaged. No screens, no sitting around, just real action.
+            </p>
           </div>
-          <div className="ppp-bday-positioning__grid">
-            {positioningPoints.map((point) => (
-              <article key={point.title}>
-                <h3>{point.title}</h3>
-                <p>{point.text}</p>
-              </article>
-            ))}
+          <div className="ppp-bday-experience-grid ppp-bday-experience-grid--compact">
+            <article>
+              <Image src={localFloorImage} alt="" width={720} height={520} sizes="(max-width: 900px) 100vw, 33vw" />
+              <div>
+                <h3>Movement games</h3>
+                <p>Fast rooms built for running, reacting, and replaying.</p>
+              </div>
+            </article>
+            <article>
+              <Image src={localShootingImage} alt="" width={720} height={520} sizes="(max-width: 900px) 100vw, 33vw" />
+              <div>
+                <h3>Target challenges</h3>
+                <p>Lights, targets, speed, and instant competition.</p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <section className="ppp-bday-booking-section ppp-bday-booking-section--light" id="age-fit">
-        <div className="ppp-bday-booking-shell">
-          <div className="ppp-bday-section-heading ppp-bday-section-heading--wide">
-            <p>Age fit</p>
-            <h2>One Vaughan venue, different wins for kids, tweens, and teens.</h2>
-          </div>
-          <div className="ppp-bday-age-grid">
-            {ageBands.map((band) => (
-              <article key={band.age}>
-                <span>{band.range}</span>
-                <h3>{band.age}</h3>
-                <strong>{band.title}</strong>
-                <p>{band.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-bday-booking-section">
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--games" id="games">
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading">
-            <p>Interactive gaming mix</p>
-            <h2>Active play, arcade moments, and score-chasing in one party.</h2>
+            <p>Featured games</p>
+            <h2>Every room is a new challenge.</h2>
           </div>
-          <div className="ppp-bday-experience-grid">
-            {experienceTiles.map((item) => (
-              <article key={item.title}>
-                <Image src={item.image} alt="" width={720} height={520} sizes="(max-width: 900px) 100vw, 33vw" />
+          <div className="ppp-birthday-attraction-carousel ppp-bday-game-carousel" aria-label="Featured Pixel Pulse games">
+            {gameCards.map((game) => (
+              <article className="ppp-birthday-attraction-card ppp-bday-game-card" key={game.title}>
+                <Image
+                  src={game.image}
+                  alt=""
+                  width={800}
+                  height={600}
+                  style={{ width: "100%", height: "auto" }}
+                />
                 <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
+                  <h3>{game.title}</h3>
+                  <p>{game.text}</p>
                 </div>
               </article>
             ))}
@@ -295,19 +377,50 @@ export default function BirthdayPartyBookingsVaughanPage() {
         </div>
       </section>
 
-      <section className="ppp-bday-booking-section ppp-bday-booking-section--arena">
-        <Image src={arenaImage} alt="" fill sizes="100vw" />
-        <div className="ppp-bday-booking-shell ppp-bday-flow-layout">
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--party">
+        <div className="ppp-bday-booking-shell ppp-bday-party-layout">
           <div className="ppp-bday-section-heading">
-            <p>Party flow</p>
-            <h2>Simple for parents and electric for the guests.</h2>
+            <p>Party experience</p>
+            <h2>We handle the chaos while you enjoy the celebration.</h2>
+            <p className="ppp-bday-section-copy">
+              Your party host keeps everything moving while kids jump into guided
+              game challenges and team competitions. You celebrate. We handle the fun.
+            </p>
           </div>
-          <div className="ppp-bday-flow">
-            {partyFlow.map(([number, title, text]) => (
-              <article key={number}>
-                <span>{number}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
+          <div className="ppp-bday-party-panel">
+            {partyFeatures.map((feature) => (
+              <span key={feature}>{feature}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--summer">
+        <div className="ppp-bday-booking-shell ppp-bday-summer">
+          <div className="ppp-bday-section-heading">
+            <p>Summer birthday positioning</p>
+            <h2>The ultimate summer birthday experience.</h2>
+            <p className="ppp-bday-section-copy">
+              Skip the same old birthday party this summer. Pixel Pulse delivers
+              air-conditioned indoor fun, active gameplay, immersive challenges, and
+              unforgettable memories without worrying about weather, heat, or boring
+              party halls.
+            </p>
+          </div>
+          <a href="#birthday-party-form">Check available dates</a>
+        </div>
+      </section>
+
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--reviews">
+        <div className="ppp-bday-booking-shell">
+          <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
+            <p>Social proof</p>
+            <h2>Why families love Pixel Pulse.</h2>
+          </div>
+          <div className="ppp-bday-review-grid">
+            {reviews.map((review) => (
+              <article key={review}>
+                <p>{review}</p>
               </article>
             ))}
           </div>
@@ -317,8 +430,8 @@ export default function BirthdayPartyBookingsVaughanPage() {
       <section className="ppp-bday-booking-section ppp-bday-booking-section--light" id="faq">
         <div className="ppp-bday-booking-shell ppp-bday-faq-layout">
           <div className="ppp-bday-section-heading">
-            <p>Booking questions</p>
-            <h2>Before you pick the date.</h2>
+            <p>FAQ</p>
+            <h2>Questions parents usually ask.</h2>
           </div>
           <div className="ppp-bday-faq">
             {faqs.map((item) => (
@@ -334,12 +447,13 @@ export default function BirthdayPartyBookingsVaughanPage() {
       <section className="ppp-bday-final">
         <div className="ppp-bday-booking-shell ppp-bday-final__inner">
           <div>
-            <p>Pixel Pulse Play Vaughan</p>
-            <h2>Ready to book a birthday party they will talk about after the scores reset?</h2>
+            <p>Book your party</p>
+            <h2>Ready to give them a birthday they will never forget?</h2>
+            <span>Summer weekend spots fill quickly. Reserve your preferred party date today.</span>
           </div>
           <div className="ppp-bday-final__actions">
-            <BookingButton title="Book birthday party" bookingType="party" />
-            <a href={phoneUrl}>Call the team</a>
+            <BookingButton title="Book your party" bookingType="party" />
+            <a href={phoneUrl}>Call now</a>
           </div>
         </div>
       </section>
