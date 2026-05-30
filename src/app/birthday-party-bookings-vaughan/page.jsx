@@ -1,13 +1,14 @@
 import Image from "next/image";
 import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
+import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
-const heroVideo = "/assets/videos/birthday-hero.mp4";
+const heroVideo = "/assets/videos/birthdayparties.mp4";
 const localFloorImage = "/assets/images/floorchallenge.jpg";
 const localShootingImage = "/assets/images/shootinggame.jpg";
 const LOCATION_SLUG = "vaughan";
@@ -238,17 +239,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
       </nav>
 
       <section className="ppp-bday-booking-hero">
-        <video
-          className="ppp-bday-booking-hero__media"
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster={heroImage}
-          aria-label="Pixel Pulse Play birthday party video with kids and teens celebrating interactive games"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+        <BirthdayHeroVideo src={heroVideo} poster={heroImage} />
         <div className="ppp-bday-booking-shell ppp-bday-booking-hero__layout">
           <div className="ppp-bday-booking-hero__copy">
             <p className="ppp-bday-kicker">Birthday parties in Vaughan</p>
