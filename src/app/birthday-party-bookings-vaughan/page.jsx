@@ -14,7 +14,7 @@ const localShootingImage = "/assets/images/shootinggame.jpg";
 const LOCATION_SLUG = "vaughan";
 const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
 const phoneUrl = "tel:+19057602922";
-const pageUrl = "https://parties.pixelpulseplay.ca";
+const pageUrl = "https://birthdays.pixelpulseplay.ca";
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
 
 export const revalidate = 900;

@@ -9,7 +9,11 @@ const SQUAD_HOSTS = new Set([
   "squad.pixelpulseplay.ca",
   "www.squad.pixelpulseplay.ca",
 ]);
-const PARTIES_HOSTS = new Set([
+const BIRTHDAY_HOSTS = new Set([
+  "birthdays.pixelpulseplay.ca",
+  "www.birthdays.pixelpulseplay.ca",
+]);
+const LEGACY_PARTIES_HOSTS = new Set([
   "parties.pixelpulseplay.ca",
   "www.parties.pixelpulseplay.ca",
 ]);
@@ -92,11 +96,19 @@ export function middleware(request) {
     }
   }
 
-  if (PARTIES_HOSTS.has(requestHostname)) {
-    if (requestHostname === "www.parties.pixelpulseplay.ca") {
+  if (LEGACY_PARTIES_HOSTS.has(requestHostname)) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https";
+    url.hostname = "birthdays.pixelpulseplay.ca";
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
+  if (BIRTHDAY_HOSTS.has(requestHostname)) {
+    if (requestHostname === "www.birthdays.pixelpulseplay.ca") {
       const url = request.nextUrl.clone();
       url.protocol = "https";
-      url.hostname = "parties.pixelpulseplay.ca";
+      url.hostname = "birthdays.pixelpulseplay.ca";
       url.port = "";
       return NextResponse.redirect(url, 308);
     }
