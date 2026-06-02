@@ -8,7 +8,7 @@ import { fetchMenuData } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
-const heroVideo = "/assets/videos/birthdayparties.mp4";
+const heroVideo = "/assets/videos/pixelgame.mp4";
 const localFloorImage = "/assets/images/floorchallenge.jpg";
 const localShootingImage = "/assets/images/shootinggame.jpg";
 const LOCATION_SLUG = "vaughan";
@@ -240,10 +240,15 @@ export default async function BirthdayPartyBookingsVaughanPage() {
 
       <section className="ppp-bday-booking-hero">
         <BirthdayHeroVideo src={heroVideo} poster={heroImage} />
+        <div className="ppp-bday-balloons" aria-hidden="true">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <span key={index} />
+          ))}
+        </div>
         <div className="ppp-bday-booking-shell ppp-bday-booking-hero__layout">
           <div className="ppp-bday-booking-hero__copy">
             <p className="ppp-bday-kicker">Birthday parties in Vaughan</p>
-            <h1>Birthday parties kids get excited about.</h1>
+            <h1>Birthday parties kids get <em>excited</em> about.</h1>
             <p>
               Interactive challenge rooms for kids, tweens, and teens.
             </p>
@@ -269,7 +274,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
             <p>Party packages</p>
-            <h2>Choose the birthday format that fits your group.</h2>
+            <h2>Choose the birthday <em>format</em> that fits your group.</h2>
           </div>
           <div className="ppp-bday-package-grid">
             {packages.map((pkg) => (
@@ -292,7 +297,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
             <p>Quick highlights</p>
-            <h2>Everything kids and teens love without anything they will call boring.</h2>
+            <h2>Everything kids and teens <em>love</em> without anything they will call boring.</h2>
           </div>
           <div className="ppp-bday-highlight-grid">
             {highlights.map((item, index) => (
@@ -310,7 +315,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell ppp-bday-positioning ppp-bday-positioning--media">
           <div className="ppp-bday-section-heading">
             <p>What makes Pixel Pulse different</p>
-            <h2>Not another indoor playground.</h2>
+            <h2>Not another indoor <em>playground</em>.</h2>
             <p className="ppp-bday-section-copy">
               Pixel Pulse turns kids into players inside real-life video games. Run
               through laser mazes, hit glowing targets, race against the clock, compete
@@ -344,7 +349,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading">
             <p>Featured games</p>
-            <h2>Every room is a new challenge.</h2>
+            <h2>Every room is a new <em>challenge</em>.</h2>
           </div>
           <div className="ppp-birthday-attraction-carousel ppp-bday-game-carousel" aria-label="Featured Pixel Pulse games">
             {gameCards.map((game) => (
@@ -370,7 +375,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell ppp-bday-party-layout">
           <div className="ppp-bday-section-heading">
             <p>Party experience</p>
-            <h2>We handle the chaos while you enjoy the celebration.</h2>
+            <h2>We handle the chaos while you enjoy the <em>celebration</em>.</h2>
             <p className="ppp-bday-section-copy">
               Your party host keeps everything moving while kids jump into guided
               game challenges and team competitions. You celebrate. We handle the fun.
@@ -388,7 +393,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell ppp-bday-summer">
           <div className="ppp-bday-section-heading">
             <p>Summer birthday positioning</p>
-            <h2>The ultimate summer birthday experience.</h2>
+            <h2>The ultimate <em>summer</em> birthday experience.</h2>
             <p className="ppp-bday-section-copy">
               Skip the same old birthday party this summer. Pixel Pulse delivers
               air-conditioned indoor fun, active gameplay, immersive challenges, and
@@ -404,7 +409,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
             <p>Social proof</p>
-            <h2>Why families love Pixel Pulse.</h2>
+            <h2>Why families <em>love</em> Pixel Pulse.</h2>
           </div>
           <div className="ppp-bday-review-grid">
             {reviews.map((review) => (
@@ -437,7 +442,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell ppp-bday-final__inner">
           <div>
             <p>Book your party</p>
-            <h2>Ready to give them a birthday they will never forget?</h2>
+            <h2>Ready to give them a birthday they will <em>never forget</em>?</h2>
             <span>Summer weekend spots fill quickly. Reserve your preferred party date today.</span>
           </div>
           <div className="ppp-bday-final__actions">
