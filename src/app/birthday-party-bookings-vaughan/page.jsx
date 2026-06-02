@@ -54,12 +54,11 @@ const navLinks = [
   { label: "Highlights", href: "#highlights" },
   { label: "Games", href: "#games" },
   { label: "Packages", href: "#packages" },
-  { label: "FAQ", href: "#faq" },
 ];
 
 const heroStats = [
-  { value: "10+", label: "games" },
-  { value: "Ages 6-16", label: "kids and teens" },
+  { value: "13+", label: "games" },
+  { value: "Ages 7-16", label: "kids and teens" },
   { value: "Vaughan", label: "indoor venue" },
 ];
 
@@ -150,48 +149,74 @@ const reviews = [
   "So much better than a regular trampoline park.",
 ];
 
-const faqs = [
-  {
-    question: "What ages is Pixel Pulse best for?",
-    answer:
-      "Pixel Pulse is designed for kids, tweens, and teens, with the strongest fit around ages 6 to 16.",
-  },
-  {
-    question: "How long are parties?",
-    answer:
-      "Party timing depends on the package and group size. Send a request and the team will confirm the best available options.",
-  },
-  {
-    question: "Can we bring cake?",
-    answer:
-      "Yes, parties can include time in a party room for cake, food, gifts, and photos.",
-  },
-  {
-    question: "Do you provide food?",
-    answer:
-      "Food and add-ons may be available depending on the party package and date.",
-  },
-  {
-    question: "Are socks required?",
-    answer:
-      "The team will confirm any footwear or play requirements with your booking details.",
-  },
-  {
-    question: "How many kids can attend?",
-    answer:
-      "Capacity depends on the party format. Share your expected guest count and we will recommend the right package.",
-  },
-  {
-    question: "Can parents stay?",
-    answer:
-      "Yes, parents can stay during the party and enjoy the celebration flow.",
-  },
-  {
-    question: "Is it private?",
-    answer:
-      "Private party room access is included with party experiences, and larger private options can be discussed when booking.",
-  },
+// 8-bit pixel-art sprites that float through the hero. "1" = filled pixel.
+const SPRITE_HEART = [
+  "0110110",
+  "1111111",
+  "1111111",
+  "0111110",
+  "0011100",
+  "0001000",
 ];
+
+const SPRITE_INVADER = [
+  "00100000100",
+  "00010001000",
+  "00111111100",
+  "01101110110",
+  "11111111111",
+  "10111111101",
+  "10100000101",
+  "00011011000",
+];
+
+const SPRITE_DIAMOND = [
+  "0001000",
+  "0011100",
+  "0111110",
+  "1111111",
+  "0111110",
+  "0011100",
+  "0001000",
+];
+
+const SPRITE_SPARKLE = [
+  "00011000",
+  "00011000",
+  "00111100",
+  "11111111",
+  "11111111",
+  "00111100",
+  "00011000",
+  "00011000",
+];
+
+const heroSprites = [SPRITE_HEART, SPRITE_INVADER, SPRITE_DIAMOND, SPRITE_SPARKLE];
+
+function PixelSprite({ grid }) {
+  const height = grid.length;
+  const width = grid[0].length;
+  const cells = [];
+
+  grid.forEach((row, y) => {
+    [...row].forEach((value, x) => {
+      if (value === "1") {
+        cells.push(<rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" />);
+      }
+    });
+  });
+
+  return (
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      fill="currentColor"
+      shapeRendering="crispEdges"
+      aria-hidden="true"
+    >
+      {cells}
+    </svg>
+  );
+}
 
 async function getBirthdayMenuData() {
   try {
@@ -240,9 +265,11 @@ export default async function BirthdayPartyBookingsVaughanPage() {
 
       <section className="ppp-bday-booking-hero">
         <BirthdayHeroVideo src={heroVideo} poster={heroImage} />
-        <div className="ppp-bday-balloons" aria-hidden="true">
+        <div className="ppp-bday-sprites" aria-hidden="true">
           {Array.from({ length: 9 }).map((_, index) => (
-            <span key={index} />
+            <span className="ppp-bday-sprite" key={index}>
+              <PixelSprite grid={heroSprites[index % heroSprites.length]} />
+            </span>
           ))}
         </div>
         <div className="ppp-bday-booking-shell ppp-bday-booking-hero__layout">
@@ -416,23 +443,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               <article key={review}>
                 <p>{review}</p>
               </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-bday-booking-section ppp-bday-booking-section--light" id="faq">
-        <div className="ppp-bday-booking-shell ppp-bday-faq-layout">
-          <div className="ppp-bday-section-heading">
-            <p>FAQ</p>
-            <h2>Questions parents usually ask.</h2>
-          </div>
-          <div className="ppp-bday-faq">
-            {faqs.map((item) => (
-              <details key={item.question}>
-                <summary>{item.question}</summary>
-                <p>{item.answer}</p>
-              </details>
             ))}
           </div>
         </div>

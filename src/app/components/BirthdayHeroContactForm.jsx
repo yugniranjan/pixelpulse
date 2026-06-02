@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 const INITIAL_FORM = {
   fullName: "",
+  childName: "",
+  age: "",
   email: "",
   phone: "",
   date: "",
@@ -77,6 +79,30 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
             value={formData.fullName}
             onChange={updateField}
             autoComplete="name"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Child&apos;s name</span>
+          <input
+            name="childName"
+            value={formData.childName}
+            onChange={updateField}
+            required
+          />
+        </label>
+
+        <label>
+          <span>Age</span>
+          <input
+            type="number"
+            name="age"
+            value={formData.age}
+            onChange={updateField}
+            min="1"
+            max="18"
+            inputMode="numeric"
             required
           />
         </label>
