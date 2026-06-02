@@ -304,6 +304,16 @@
   color: rgba(240, 246, 255, 0.52);
 }
 
+.ppp-birthday-hero-form input[type="date"] {
+  color-scheme: dark;
+}
+
+.ppp-birthday-hero-form input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(1) brightness(1.45) saturate(1.2);
+  opacity: 0.9;
+}
+
 .ppp-birthday-hero-form textarea {
   min-height: 84px;
   resize: vertical;
