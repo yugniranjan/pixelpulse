@@ -123,6 +123,11 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               </li>
             ))}
             <li>
+              <a href="https://squad.pixelpulseplay.ca/" target="_blank" rel="noopener noreferrer">
+                Join the squad
+              </a>
+            </li>
+            <li>
               <BookingButton title="Book Now" className="aero_footer_link_button" />
             </li>
             {companyData?.[0]?.children?.length > 0 && (
