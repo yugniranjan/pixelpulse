@@ -31,12 +31,22 @@ function cleanEmailAddress(value, fallback) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned) ? cleaned : fallback;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    ?.replace(/&/g, "&amp;")
+    ?.replace(/</g, "&lt;")
+    ?.replace(/>/g, "&gt;");
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
 
     const {
       fullName,
+      childName,
+      childYear,
+      age,
       email,
       phone,
       date,
@@ -70,6 +80,8 @@ export async function POST(request) {
     const visitorDisplayName = visitorName.toLowerCase();
     const visitorEmail = cleanEmailAddress(email, "");
     const visitorPhone = cleanHeaderValue(phone, "");
+    const childDisplayName = cleanHeaderValue(childName, "");
+    const childDisplayYear = cleanHeaderValue(childYear || age, "");
 
     if (!visitorEmail) {
       return NextResponse.json(
@@ -91,6 +103,8 @@ export async function POST(request) {
       `From Location: ${from || "Pixel Pulse Play"}`,
       `Inquiry Type: ${selectedEvent || "Not provided"}`,
       `Name: ${fullName || "Not provided"}`,
+      `Child Name: ${childDisplayName || "Not provided"}`,
+      `Year: ${childDisplayYear || "Not provided"}`,
       `Email: ${email || "Not provided"}`,
       `Phone: ${visitorPhone}`,
       `Preferred Date: ${date || "Not provided"}`,
@@ -100,38 +114,20 @@ export async function POST(request) {
       message || "No message provided",
     ].join("\n");
 
-    const safeName = String(fullName || "there")
-      ?.replace(/&/g, "&amp;")
-      ?.replace(/</g, "&lt;")
-      ?.replace(/>/g, "&gt;");
+    const safeName = escapeHtml(fullName || "there");
 
     const html = `
       <div>
-        <p><strong>Inquiry Type:</strong> ${String(selectedEvent || "Not provided")
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
-        <p><strong>Email:</strong> ${String(email || "Not provided")
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
-        <p><strong>Phone:</strong> ${String(visitorPhone)
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
-        <p><strong>Preferred Date:</strong> ${String(date || "Not provided")
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
-        <p><strong>Preferred Time:</strong> ${String(time || "Not provided")
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
+        <p><strong>Inquiry Type:</strong> ${escapeHtml(selectedEvent || "Not provided")}</p>
+        <p><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</p>
+        <p><strong>Child Name:</strong> ${escapeHtml(childDisplayName || "Not provided")}</p>
+        <p><strong>Year:</strong> ${escapeHtml(childDisplayYear || "Not provided")}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email || "Not provided")}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(visitorPhone)}</p>
+        <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
+        <p><strong>Preferred Time:</strong> ${escapeHtml(time || "Not provided")}</p>
         <p><strong>Message:</strong></p>
-        <p>${String(message || "No message provided")
-          ?.replace(/&/g, "&amp;")
-          ?.replace(/</g, "&lt;")
-          ?.replace(/>/g, "&gt;")}</p>
+        <p>${escapeHtml(message || "No message provided")}</p>
       </div>
     `;
 

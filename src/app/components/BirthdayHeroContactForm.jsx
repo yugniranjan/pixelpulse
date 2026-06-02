@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 const INITIAL_FORM = {
   fullName: "",
   childName: "",
-  age: "",
+  childYear: "",
   email: "",
   phone: "",
   date: "",
@@ -94,11 +94,11 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
         </label>
 
         <label>
-          <span>Age</span>
+          <span>Year</span>
           <input
             type="number"
-            name="age"
-            value={formData.age}
+            name="childYear"
+            value={formData.childYear}
             onChange={updateField}
             min="1"
             max="18"
