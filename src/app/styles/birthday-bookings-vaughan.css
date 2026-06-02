@@ -19,7 +19,7 @@
   /* Pixel Pulse logo palette: PIXEL green, PULSE orange, tagline yellow.
      Names kept as accent "slots"; the logo only uses three hues, so
      violet/amber alias onto orange/yellow. */
-  --cyan: #9be84f;    /* logo green  (PIXEL)  — primary  */
+  --cyan: #bcff6b;    /* brand green (PIXEL)  — primary  */
   --magenta: #f7944f; /* logo orange (PULSE)  — secondary */
   --lime: #f0ea22;    /* logo yellow (tagline) — tertiary */
   --violet: #f7944f;  /* → orange */
@@ -35,7 +35,7 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(1200px 620px at 78% -8%, rgba(155, 232, 79, 0.14), transparent 60%),
+    radial-gradient(1200px 620px at 78% -8%, rgba(188, 255, 107, 0.14), transparent 60%),
     radial-gradient(1000px 560px at 8% 12%, rgba(247, 148, 79, 0.12), transparent 58%),
     radial-gradient(900px 700px at 50% 120%, rgba(247, 148, 79, 0.14), transparent 60%),
     linear-gradient(180deg, var(--night) 0%, var(--night-2) 55%, #060a16 100%);
@@ -89,14 +89,14 @@
   width: min(1180px, calc(100% - 32px));
   padding: 10px 12px 10px 16px;
   overflow: hidden;
-  border: 1px solid rgba(155, 232, 79, 0.22);
+  border: 1px solid rgba(188, 255, 107, 0.22);
   border-radius: 14px;
   background:
-    linear-gradient(135deg, rgba(155, 232, 79, 0.08), rgba(247, 148, 79, 0.06)),
+    linear-gradient(135deg, rgba(188, 255, 107, 0.08), rgba(247, 148, 79, 0.06)),
     rgba(8, 12, 26, 0.66);
   box-shadow:
     0 18px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(155, 232, 79, 0.05),
+    0 0 0 1px rgba(188, 255, 107, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px) saturate(1.4);
   transform: translateX(-50%);
@@ -118,7 +118,7 @@
 }
 
 .ppp-bday-booking-logo img {
-  width: clamp(120px, 13vw, 176px);
+  width: clamp(148px, 16vw, 220px);
   height: auto;
 }
 
@@ -152,8 +152,8 @@
 
 .ppp-bday-booking-nav div a:hover {
   color: #fff;
-  background: rgba(155, 232, 79, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(155, 232, 79, 0.3);
+  background: rgba(188, 255, 107, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(188, 255, 107, 0.3);
 }
 
 .ppp-bday-nav-phone {
@@ -191,7 +191,7 @@
   background:
     linear-gradient(102deg, rgba(6, 10, 22, 0.94) 0%, rgba(6, 10, 22, 0.72) 38%, rgba(6, 10, 22, 0.18) 76%),
     linear-gradient(180deg, rgba(6, 10, 22, 0.22), rgba(6, 10, 22, 0.82)),
-    radial-gradient(800px 460px at 84% 30%, rgba(155, 232, 79, 0.22), transparent 62%);
+    radial-gradient(800px 460px at 84% 30%, rgba(188, 255, 107, 0.22), transparent 62%);
 }
 
 .ppp-bday-booking-hero::after {
@@ -201,7 +201,7 @@
   height: 4px;
   background: linear-gradient(90deg, var(--lime), var(--cyan), var(--violet), var(--magenta));
   background-size: 220% 100%;
-  box-shadow: 0 0 28px rgba(155, 232, 79, 0.45);
+  box-shadow: 0 0 28px rgba(188, 255, 107, 0.45);
   animation: ppp-marquee 7s linear infinite;
 }
 
@@ -233,8 +233,8 @@
   opacity: 0;
   will-change: transform, opacity;
   filter:
-    drop-shadow(0 0 5px var(--bal-glow, rgba(155, 232, 79, 0.75)))
-    drop-shadow(0 0 13px var(--bal-glow, rgba(155, 232, 79, 0.45)));
+    drop-shadow(0 0 5px var(--bal-glow, rgba(188, 255, 107, 0.75)))
+    drop-shadow(0 0 13px var(--bal-glow, rgba(188, 255, 107, 0.45)));
   animation: ppp-sprite-rise var(--dur, 18s) linear var(--delay, 0s) infinite;
 }
 
@@ -244,12 +244,12 @@
   height: auto;
 }
 
-.ppp-bday-sprite:nth-child(1) { left: 6%;  --bal: var(--cyan);    --bal-glow: rgba(155, 232, 79, 0.75); --dur: 17s; --delay: 0s;   --scale: 0.85; }
+.ppp-bday-sprite:nth-child(1) { left: 6%;  --bal: var(--cyan);    --bal-glow: rgba(188, 255, 107, 0.75); --dur: 17s; --delay: 0s;   --scale: 0.85; }
 .ppp-bday-sprite:nth-child(2) { left: 18%; --bal: var(--magenta); --bal-glow: rgba(247, 148, 79, 0.75); --dur: 21s; --delay: 5s;   --scale: 1.05; }
 .ppp-bday-sprite:nth-child(3) { left: 30%; --bal: var(--lime);    --bal-glow: rgba(240, 234, 34, 0.6);  --dur: 15s; --delay: 9s;   --scale: 0.7; }
 .ppp-bday-sprite:nth-child(4) { left: 43%; --bal: var(--violet);  --bal-glow: rgba(247, 148, 79, 0.75); --dur: 23s; --delay: 2s;   --scale: 1.15; }
 .ppp-bday-sprite:nth-child(5) { left: 55%; --bal: var(--amber);   --bal-glow: rgba(240, 234, 34, 0.7);  --dur: 19s; --delay: 11s; --scale: 0.9; }
-.ppp-bday-sprite:nth-child(6) { left: 68%; --bal: var(--cyan);    --bal-glow: rgba(155, 232, 79, 0.75); --dur: 16s; --delay: 6s;   --scale: 0.78; }
+.ppp-bday-sprite:nth-child(6) { left: 68%; --bal: var(--cyan);    --bal-glow: rgba(188, 255, 107, 0.75); --dur: 16s; --delay: 6s;   --scale: 0.78; }
 .ppp-bday-sprite:nth-child(7) { left: 79%; --bal: var(--magenta); --bal-glow: rgba(247, 148, 79, 0.75); --dur: 22s; --delay: 14s; --scale: 1.1; }
 .ppp-bday-sprite:nth-child(8) { left: 88%; --bal: var(--lime);    --bal-glow: rgba(240, 234, 34, 0.6);  --dur: 18s; --delay: 3s;   --scale: 0.95; }
 .ppp-bday-sprite:nth-child(9) { left: 96%; --bal: var(--violet);  --bal-glow: rgba(247, 148, 79, 0.75); --dur: 20s; --delay: 8s;   --scale: 0.72; }
@@ -292,8 +292,8 @@
   font-family: var(--display);
   font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
   box-shadow: 0 0 18px color-mix(in srgb, var(--neon) 30%, transparent);
 }
 
@@ -313,7 +313,7 @@
   line-height: 1.0;
   text-shadow:
     0 0 1px rgba(255, 255, 255, 0.6),
-    0 0 26px rgba(155, 232, 79, 0.4),
+    0 0 26px rgba(188, 255, 107, 0.4),
     0 0 54px rgba(247, 148, 79, 0.22);
 }
 
@@ -366,13 +366,13 @@
   background: linear-gradient(120deg, var(--cyan), var(--magenta));
   color: #050810;
   cursor: pointer;
-  box-shadow: 0 0 28px rgba(155, 232, 79, 0.4), 0 14px 30px rgba(247, 148, 79, 0.24);
+  box-shadow: 0 0 28px rgba(188, 255, 107, 0.4), 0 14px 30px rgba(247, 148, 79, 0.24);
 }
 
 .ppp-bday-booking-actions button:hover,
 .ppp-bday-final__actions button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 40px rgba(155, 232, 79, 0.6), 0 18px 38px rgba(247, 148, 79, 0.34);
+  box-shadow: 0 0 40px rgba(188, 255, 107, 0.6), 0 18px 38px rgba(247, 148, 79, 0.34);
 }
 
 /* secondary = neon outline */
@@ -402,10 +402,10 @@
 
 .ppp-bday-hero-stats div {
   padding: 14px 14px 12px;
-  border: 1px solid rgba(155, 232, 79, 0.22);
+  border: 1px solid rgba(188, 255, 107, 0.22);
   border-radius: 12px;
   background: rgba(8, 12, 26, 0.5);
-  box-shadow: inset 0 0 22px rgba(155, 232, 79, 0.06);
+  box-shadow: inset 0 0 22px rgba(188, 255, 107, 0.06);
   backdrop-filter: blur(10px);
 }
 
@@ -417,7 +417,7 @@
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.01em;
-  text-shadow: 0 0 18px rgba(155, 232, 79, 0.45);
+  text-shadow: 0 0 18px rgba(188, 255, 107, 0.45);
 }
 
 .ppp-bday-hero-stats span {
@@ -437,7 +437,7 @@
   border: 1px solid rgba(247, 148, 79, 0.3);
   border-radius: 16px;
   background:
-    linear-gradient(150deg, rgba(247, 148, 79, 0.1), rgba(155, 232, 79, 0.08)),
+    linear-gradient(150deg, rgba(247, 148, 79, 0.1), rgba(188, 255, 107, 0.08)),
     rgba(8, 12, 26, 0.82);
   box-shadow:
     0 26px 70px rgba(0, 0, 0, 0.55),
@@ -496,7 +496,7 @@
 .ppp-bday-booking-page .ppp-birthday-hero-form input:focus,
 .ppp-bday-booking-page .ppp-birthday-hero-form textarea:focus {
   border-color: var(--cyan);
-  box-shadow: 0 0 0 3px rgba(155, 232, 79, 0.16), 0 0 22px rgba(155, 232, 79, 0.18);
+  box-shadow: 0 0 0 3px rgba(188, 255, 107, 0.16), 0 0 22px rgba(188, 255, 107, 0.18);
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form textarea {
@@ -508,7 +508,7 @@
 .ppp-bday-booking-page .ppp-birthday-hero-form input[type="date"] {
   padding-right: 42px;
   background-color: rgba(6, 10, 22, 0.6);
-  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239be84f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v16H3V6a2 2 0 0 1 2-2Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23bcff6b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v16H3V6a2 2 0 0 1 2-2Z'/%3E%3C/svg%3E");
   background-position: right 14px center;
   background-repeat: no-repeat;
   background-size: 18px 18px;
@@ -532,13 +532,13 @@
   font-size: 1.04rem;
   font-weight: 600;
   letter-spacing: 0.005em;
-  box-shadow: 0 0 26px rgba(155, 232, 79, 0.34), 0 12px 26px rgba(247, 148, 79, 0.22);
+  box-shadow: 0 0 26px rgba(188, 255, 107, 0.34), 0 12px 26px rgba(247, 148, 79, 0.22);
   transition: transform 160ms ease, box-shadow 200ms ease;
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 0 38px rgba(155, 232, 79, 0.5), 0 16px 30px rgba(247, 148, 79, 0.3);
+  box-shadow: 0 0 38px rgba(188, 255, 107, 0.5), 0 16px 30px rgba(247, 148, 79, 0.3);
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form > p {
@@ -626,17 +626,16 @@
 
 .ppp-bday-package-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .ppp-bday-package-grid article {
   position: relative;
   display: grid;
-  gap: 14px;
+  gap: 12px;
   align-content: start;
-  min-height: 320px;
-  padding: 26px 24px;
+  padding: 24px 20px;
   overflow: hidden;
   transition: transform 200ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
@@ -656,15 +655,15 @@
   box-shadow: 0 26px 56px rgba(0, 0, 0, 0.5), 0 0 34px rgba(247, 148, 79, 0.18);
 }
 
-/* middle card = featured */
-.ppp-bday-package-grid article:nth-child(2) {
-  border-color: rgba(155, 232, 79, 0.45);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.5), 0 0 38px rgba(155, 232, 79, 0.2);
+/* spotlight (Most Popular) card */
+.ppp-bday-package-grid article.is-featured {
+  border-color: rgba(188, 255, 107, 0.45);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.5), 0 0 38px rgba(188, 255, 107, 0.2);
 }
 
-.ppp-bday-package-grid article:nth-child(2)::before {
+.ppp-bday-package-grid article.is-featured::before {
   height: 4px;
-  box-shadow: 0 0 20px rgba(155, 232, 79, 0.5);
+  box-shadow: 0 0 20px rgba(188, 255, 107, 0.5);
 }
 
 .ppp-bday-package-grid p {
@@ -678,51 +677,113 @@
   font-family: var(--display);
   font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+}
+
+.ppp-bday-package-grid article.is-featured p {
+  border-color: color-mix(in srgb, var(--lime) 55%, transparent);
+  background: color-mix(in srgb, var(--lime) 14%, transparent);
+  color: var(--lime);
 }
 
 .ppp-bday-package-grid h3 {
   margin: 0;
   color: #fff;
   font-family: var(--display);
-  font-size: 1.9rem;
+  font-size: 1.7rem;
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.01em;
 }
 
-.ppp-bday-package-grid span {
-  color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.6;
+.ppp-bday-package-price {
+  font-family: var(--display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cyan);
+  text-shadow: 0 0 22px rgba(188, 255, 107, 0.35);
 }
 
 .ppp-bday-package-grid ul {
   display: grid;
-  gap: 9px;
+  gap: 10px;
   margin: 4px 0 0;
-  padding: 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
   list-style: none;
 }
 
 .ppp-bday-package-grid li {
-  display: flex;
-  align-items: center;
-  color: rgba(234, 242, 255, 0.88);
-  font-size: 0.95rem;
-  font-weight: 500;
+  display: grid;
+  gap: 2px;
 }
 
-.ppp-bday-package-grid li::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
-  margin-right: 11px;
-  border-radius: 2px;
-  background: var(--lime);
-  box-shadow: 0 0 10px rgba(240, 234, 34, 0.7);
+.ppp-bday-package-key {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ppp-bday-package-val {
+  color: rgba(234, 242, 255, 0.94);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ppp-bday-package-grid button {
+  margin-top: 6px;
+  min-height: 46px;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 0 22px rgba(188, 255, 107, 0.28), 0 10px 22px rgba(247, 148, 79, 0.2);
+  transition: transform 160ms ease, box-shadow 200ms ease;
+}
+
+.ppp-bday-package-grid button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(188, 255, 107, 0.45), 0 14px 28px rgba(247, 148, 79, 0.3);
+}
+
+/* "Check available dates" band under the positioning section */
+.ppp-bday-mid-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(1.8rem, 3.5vw, 2.8rem);
+}
+
+.ppp-bday-mid-cta a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 32px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  font-family: var(--display);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  box-shadow: 0 0 28px rgba(188, 255, 107, 0.4), 0 14px 30px rgba(247, 148, 79, 0.24);
+  transition: transform 160ms ease, box-shadow 200ms ease;
+}
+
+.ppp-bday-mid-cta a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 42px rgba(188, 255, 107, 0.6), 0 18px 38px rgba(247, 148, 79, 0.34);
 }
 
 /* ---------------------------------------------------------
@@ -830,10 +891,10 @@
   position: relative;
   min-height: 440px;
   overflow: hidden;
-  border: 1px solid rgba(155, 232, 79, 0.28);
+  border: 1px solid rgba(188, 255, 107, 0.28);
   border-radius: 16px;
   background: var(--panel-solid);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.5), 0 0 28px rgba(155, 232, 79, 0.1);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.5), 0 0 28px rgba(188, 255, 107, 0.1);
 }
 
 .ppp-bday-experience-grid img {
@@ -902,10 +963,10 @@
   display: block;
   min-height: 300px;
   overflow: hidden;
-  border: 1px solid rgba(155, 232, 79, 0.4);
+  border: 1px solid rgba(188, 255, 107, 0.4);
   border-radius: 16px;
   background: var(--panel-solid);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 26px rgba(155, 232, 79, 0.12);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 26px rgba(188, 255, 107, 0.12);
   scroll-snap-align: start;
   transition: transform 220ms ease, box-shadow 240ms ease, border-color 240ms ease;
 }
@@ -913,7 +974,7 @@
 .ppp-bday-booking-page .ppp-bday-game-card:hover {
   transform: translateY(-6px);
   border-color: var(--cyan);
-  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(155, 232, 79, 0.3);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(188, 255, 107, 0.3);
 }
 
 .ppp-bday-booking-page .ppp-bday-game-card img {
@@ -1125,7 +1186,7 @@
   border: 1px solid rgba(247, 148, 79, 0.3);
   border-radius: 20px;
   background:
-    radial-gradient(700px 380px at 18% 0%, rgba(155, 232, 79, 0.16), transparent 60%),
+    radial-gradient(700px 380px at 18% 0%, rgba(188, 255, 107, 0.16), transparent 60%),
     radial-gradient(700px 380px at 100% 100%, rgba(247, 148, 79, 0.18), transparent 60%),
     rgba(8, 12, 26, 0.78);
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 0 50px rgba(247, 148, 79, 0.05);
@@ -1219,7 +1280,7 @@
   .ppp-bday-booking-hero::before {
     background:
       linear-gradient(180deg, rgba(6, 10, 22, 0.62), rgba(6, 10, 22, 0.94)),
-      radial-gradient(600px 360px at 70% 20%, rgba(155, 232, 79, 0.2), transparent 60%);
+      radial-gradient(600px 360px at 70% 20%, rgba(188, 255, 107, 0.2), transparent 60%);
   }
 
   .ppp-bday-package-grid,

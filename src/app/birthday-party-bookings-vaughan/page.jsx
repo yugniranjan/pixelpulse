@@ -4,7 +4,7 @@ import "../styles/birthday-bookings-vaughan.css";
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { fetchMenuData } from "@/lib/sheets";
+import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
@@ -58,7 +58,7 @@ const navLinks = [
 
 const heroStats = [
   { value: "13+", label: "games" },
-  { value: "Ages 7-16", label: "kids and teens" },
+  { value: "Ages 7+", label: "kids and teens" },
   { value: "Vaughan", label: "indoor venue" },
 ];
 
@@ -121,24 +121,42 @@ const partyFeatures = [
   "Great for kids, tweens, and teens",
 ];
 
-const packages = [
+// Mirrors the kids-birthday-parties "birthday_packages" config. Used as a
+// fallback so the section always renders if the live config is unavailable.
+const PACKAGE_PRICE_KEY = "Package Price";
+
+const fallbackPackages = [
   {
-    name: "Kids Birthday",
-    label: "Most flexible",
-    text: "A hosted party for younger groups that need clear flow, easy rotations, and room to celebrate.",
-    includes: ["Game time", "Party host", "Party area", "Waiver support"],
+    name: "Pixel Punch",
+    [PACKAGE_PRICE_KEY]: "$399",
+    "Number of Participants": "Up to 8",
+    "Game Time Included": "1 hour",
+    "Total Party Duration": "1 hour 45 minutes",
+    Refreshments: "2 Large Pizza + Juice/ water for each participant",
   },
   {
-    name: "Teen Challenge Party",
-    label: "Best for competition",
-    text: "A higher-energy party built around scores, rematches, team play, and bragging rights.",
-    includes: ["Live leaderboard", "Challenge rooms", "Arcade time", "Group rotations"],
+    name: "Pixel Ultra",
+    [PACKAGE_PRICE_KEY]: "$499",
+    "Number of Participants": "Up to 12",
+    "Game Time Included": "1 hour",
+    "Total Party Duration": "2 hour",
+    Refreshments: "3 Large Pizza + Juice/ water for each participant",
   },
   {
-    name: "Private Arena Party",
-    label: "Big moment",
-    text: "A stronger option for larger birthday groups that want more control over the arena experience.",
-    includes: ["Private event flow", "Dedicated host", "Custom timing", "Group scoring"],
+    name: "Pixel Jumbo",
+    [PACKAGE_PRICE_KEY]: "$799",
+    "Number of Participants": "Up to 20",
+    "Game Time Included": "1.5 hours",
+    "Total Party Duration": "2.5 hours",
+    Refreshments: "4 Large Pizza + Juice/ water for each participant",
+  },
+  {
+    name: "Pulse Max",
+    [PACKAGE_PRICE_KEY]: "$1199",
+    "Number of Participants": "Up to 25",
+    "Game Time Included": "2 hours",
+    "Total Party Duration": "3 hours",
+    Refreshments: "6 Large Pizza + Juice/ water for each participant",
   },
 ];
 
@@ -227,6 +245,38 @@ async function getBirthdayMenuData() {
   }
 }
 
+// Parse the "birthday_packages" config blob the same way the
+// kids-birthday-parties page does, then fall back to the static list.
+function parsePackages(rows = []) {
+  try {
+    const raw = rows?.[0]?.value;
+    if (!raw) return null;
+    const cleaned = raw
+      .replace(/<br\/>/g, "")
+      .replace(/\n/g, "")
+      .replace(/,\s*([}\]])/g, "$1")
+      .trim();
+    const parsed = JSON.parse(cleaned);
+    return parsed?.packages?.length ? parsed.packages : null;
+  } catch (error) {
+    console.error("birthday packages parse failed:", error);
+    return null;
+  }
+}
+
+async function getBirthdayPackages() {
+  try {
+    const config = await fetchsheetdata("config", LOCATION_SLUG);
+    const rows = Array.isArray(config)
+      ? config.filter((item) => item.key === "birthday_packages")
+      : [];
+    return parsePackages(rows) || fallbackPackages;
+  } catch (error) {
+    console.error("birthday packages fetch failed:", error);
+    return fallbackPackages;
+  }
+}
+
 function getAttractions(menuData = []) {
   const attractions = menuData.find((item) => item.path === "attractions");
   const children = Array.isArray(attractions?.children) ? attractions.children : [];
@@ -241,9 +291,19 @@ function getAttractions(menuData = []) {
 }
 
 export default async function BirthdayPartyBookingsVaughanPage() {
-  const menuData = await getBirthdayMenuData();
+  const [menuData, packageList] = await Promise.all([
+    getBirthdayMenuData(),
+    getBirthdayPackages(),
+  ]);
   const attractions = getAttractions(menuData);
   const gameCards = attractions.length ? attractions : fallbackAttractions;
+
+  const packageFeatureKeys = packageList.length
+    ? Object.keys(packageList[0]).filter(
+        (key) => key !== "name" && key !== PACKAGE_PRICE_KEY,
+      )
+    : [];
+  const spotlightIndex = packageList.length > 1 ? 1 : 0;
 
   return (
     <main className="ppp-bday-booking-page">
@@ -301,19 +361,26 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
             <p>Party packages</p>
-            <h2>Choose the birthday <em>format</em> that fits your group.</h2>
+            <h2>Pick the birthday <em>package</em> that fits your group.</h2>
           </div>
           <div className="ppp-bday-package-grid">
-            {packages.map((pkg) => (
-              <article key={pkg.name}>
-                <p>{pkg.label}</p>
+            {packageList.map((pkg, index) => (
+              <article
+                key={pkg.name}
+                className={index === spotlightIndex ? "is-featured" : undefined}
+              >
+                <p>{index === spotlightIndex ? "Most Popular" : "Package"}</p>
                 <h3>{pkg.name}</h3>
-                <span>{pkg.text}</span>
+                <div className="ppp-bday-package-price">{pkg[PACKAGE_PRICE_KEY]}</div>
                 <ul>
-                  {pkg.includes.map((item) => (
-                    <li key={item}>{item}</li>
+                  {packageFeatureKeys.map((key) => (
+                    <li key={key}>
+                      <span className="ppp-bday-package-key">{key}</span>
+                      <strong className="ppp-bday-package-val">{pkg[key] || "-"}</strong>
+                    </li>
                   ))}
                 </ul>
+                <BookingButton title="Book this package" bookingType="party" />
               </article>
             ))}
           </div>
@@ -369,6 +436,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               </div>
             </article>
           </div>
+        </div>
+        <div className="ppp-bday-booking-shell ppp-bday-mid-cta">
+          <a href="#birthday-party-form">Check available dates</a>
         </div>
       </section>
 

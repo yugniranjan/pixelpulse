@@ -94,7 +94,7 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
         </label>
 
         <label>
-          <span>Year</span>
+          <span>Child&apos;s Age</span>
           <input
             type="number"
             name="childYear"
