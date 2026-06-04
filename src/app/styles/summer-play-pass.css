@@ -810,6 +810,23 @@
   font-weight: 800;
 }
 
+.ppp-summer-pass-summary__notice {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.4rem;
+}
+
+.ppp-summer-pass-summary__notice b {
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 1000;
+  line-height: 1.2;
+}
+
+.ppp-summer-pass-summary__notice small {
+  color: rgba(255, 255, 255, 0.72);
+}
+
 .ppp-summer-pass-summary__addons {
   display: grid;
   gap: 0.7rem;

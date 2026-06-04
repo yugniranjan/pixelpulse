@@ -877,19 +877,17 @@ const PricingPromosPage = async ({ params }) => {
                   <div className="ppp-summer-pass-summary">
                     <div className="ppp-summer-pass-summary__value">
                       <span>Applies to summer passes</span>
-                      <strong>{summerPlayPass.valueText}</strong>
-                      <small>{summerPlayPass.valueTitle}</small>
-                    </div>
-                    {summerPlayPass.addons.length > 0 && (
-                      <div className="ppp-summer-pass-summary__addons">
-                        <span>{summerPlayPass.addonsTitle}</span>
-                        <div>
+                      {summerPlayPass.valueText && <strong>{summerPlayPass.valueText}</strong>}
+                      {summerPlayPass.valueTitle && <small>{summerPlayPass.valueTitle}</small>}
+                      {(summerPlayPass.addonsTitle || summerPlayPass.addons.length > 0) && (
+                        <div className="ppp-summer-pass-summary__notice">
+                          {summerPlayPass.addonsTitle && <b>{summerPlayPass.addonsTitle}</b>}
                           {summerPlayPass.addons.map((addon, index) => (
-                            <strong key={`${addon}-${index}`}>{addon}</strong>
+                            <small key={`${addon}-${index}`}>{addon}</small>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                   {summerPlayPass.terms.length > 0 && (
                     <p className="ppp-summer-pass-terms">

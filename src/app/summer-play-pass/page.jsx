@@ -452,17 +452,15 @@ export default async function SummerPlayPassPage() {
             <div className="ppp-summer-pass-summary">
               <div className="ppp-summer-pass-summary__value">
                 <span>Applies to summer passes</span>
-                <strong>{summerPass.valueText}</strong>
-                <small>{summerPass.valueTitle}</small>
-              </div>
-              {summerPass.addons.length > 0 && (
-                <div className="ppp-summer-pass-summary__addons">
-                  <span>{summerPass.addonsTitle}</span>
-                  <div>
-                    {summerPass.addons.map((item) => <strong key={item}>{item}</strong>)}
+                {summerPass.valueText && <strong>{summerPass.valueText}</strong>}
+                {summerPass.valueTitle && <small>{summerPass.valueTitle}</small>}
+                {(summerPass.addonsTitle || summerPass.addons.length > 0) && (
+                  <div className="ppp-summer-pass-summary__notice">
+                    {summerPass.addonsTitle && <b>{summerPass.addonsTitle}</b>}
+                    {summerPass.addons.map((item) => <small key={item}>{item}</small>)}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             {summerPass.terms.length > 0 && (
               <p className="ppp-summer-pass-terms">
