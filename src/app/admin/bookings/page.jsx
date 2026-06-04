@@ -137,6 +137,30 @@ function InviteModal({ data, onClose }) {
   );
 }
 
+function buildPartyLinkMessage(source, data) {
+  const time = source.startTime ? formatTimeLabel(source.startTime) : "";
+  return [
+    "Hi {name},",
+    "",
+    `Your party links for ${source.childName}'s birthday at Pixel Pulse Play Zone are ready.`,
+    "",
+    `Party ID: ${data.partyId}`,
+    `Date: ${source.date}`,
+    time ? `Time: ${time}` : "",
+    "",
+    `Invite URL: ${data.inviteUrl}`,
+    `Waiver URL: ${data.waiverUrl}`,
+    data.qrCodeUrl ? `QR Code: ${data.qrCodeUrl}` : "",
+    "",
+    "You can share the invite link with guests and ask each participant to complete the waiver before arriving.",
+    "",
+    "SMS copy:",
+    data.smsText,
+    "",
+    "Pixel Pulse Play Zone",
+  ].filter(Boolean).join("\n");
+}
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -235,7 +259,16 @@ export default function AdminBookingsPage() {
         if (typeof window !== "undefined") window.alert(data.error || "Unable to create party link.");
         return;
       }
-      setInviteData(data);
+      if (source.email) {
+        setEmailTarget({
+          title: "Email party invite links",
+          recipients: [{ email: source.email, name: source.customerName }],
+          defaultSubject: `${source.childName}'s Pixel Pulse party links`,
+          defaultMessage: buildPartyLinkMessage(source, data),
+        });
+      } else {
+        setInviteData(data);
+      }
     } catch {
       if (typeof window !== "undefined") window.alert("Unable to create party link.");
     } finally {
@@ -822,7 +855,7 @@ export default function AdminBookingsPage() {
                 disabled={!booking.email}
                 title={booking.email ? "Email this contact" : "No email on this booking"}
               >
-                Email
+                Booking email
               </button>
               {booking.status === "cancelled" ? (
                 <button type="button" onClick={() => setStatus(booking, "confirmed")}>Restore</button>

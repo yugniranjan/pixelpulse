@@ -46,10 +46,22 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
-function childrenLabel(children = []) {
-  return children
-    .map((child) => (child.age !== "" && child.age != null ? `${child.name} (${child.age})` : child.name))
-    .join(", ");
+function ChildrenPanel({ childrenData = [] }) {
+  if (!childrenData.length) return "—";
+
+  return (
+    <details className="report-child-panel">
+      <summary>{childrenData.length} {childrenData.length === 1 ? "child" : "children"}</summary>
+      <ul>
+        {childrenData.map((child, index) => (
+          <li key={`${child.name}-${index}`}>
+            <span>{child.name}</span>
+            <strong>{child.age !== "" && child.age != null ? `Age ${child.age}` : "Age not provided"}</strong>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
 }
 
 export default function WaiverReportsPage() {
@@ -64,6 +76,7 @@ export default function WaiverReportsPage() {
   const [partyIdFilter, setPartyIdFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [emailTarget, setEmailTarget] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   async function loadReport(rangeFrom, rangeTo) {
     setLoading(true);
@@ -212,6 +225,32 @@ export default function WaiverReportsPage() {
     () => filteredRows.filter((row) => row.email).length,
     [filteredRows],
   );
+  const visibleRows = filteredRows.slice(0, RECORD_LIMIT);
+  const visibleIds = useMemo(() => visibleRows.map((row) => row.id), [visibleRows]);
+  const selectedRows = useMemo(
+    () => filteredRows.filter((row) => selectedIds.includes(row.id)),
+    [filteredRows, selectedIds],
+  );
+  const selectedParentsWithEmail = useMemo(
+    () => selectedRows.filter((row) => row.email).length,
+    [selectedRows],
+  );
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+
+  function toggleRow(rowId) {
+    setSelectedIds((current) =>
+      current.includes(rowId) ? current.filter((id) => id !== rowId) : [...current, rowId],
+    );
+  }
+
+  function toggleVisibleRows() {
+    setSelectedIds((current) => {
+      if (allVisibleSelected) {
+        return current.filter((id) => !visibleIds.includes(id));
+      }
+      return Array.from(new Set([...current, ...visibleIds]));
+    });
+  }
 
   function emailOneParent(row) {
     if (!row.email) return;
@@ -235,6 +274,24 @@ export default function WaiverReportsPage() {
     }
     setEmailTarget({
       title: "Follow-up to parents (current filter)",
+      recipients,
+      defaultSubject: FOLLOWUP_SUBJECT,
+      defaultMessage: FOLLOWUP_MESSAGE,
+    });
+  }
+
+  function emailSelectedParents() {
+    const recipients = selectedRows
+      .filter((row) => row.email)
+      .map((row) => ({ email: row.email, name: row.primaryName }));
+    if (!recipients.length) {
+      if (typeof window !== "undefined") {
+        window.alert("Select at least one parent with an email address.");
+      }
+      return;
+    }
+    setEmailTarget({
+      title: "Follow-up to selected parents",
       recipients,
       defaultSubject: FOLLOWUP_SUBJECT,
       defaultMessage: FOLLOWUP_MESSAGE,
@@ -268,7 +325,7 @@ export default function WaiverReportsPage() {
             <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
           </label>
           <button type="button" onClick={() => loadReport(from, to)}>Apply</button>
-          <button type="button" className="booking-admin-btn--ghost" onClick={exportByDate} disabled={!report?.byDate?.length}>
+          <button type="button" className="booking-admin-btn--ghost" onClick={exportByDate} disabled={!filteredByDate.length}>
             Export by-date CSV
           </button>
           <button type="button" className="booking-admin-btn--ghost" onClick={exportWaivers} disabled={!filteredRows.length}>
@@ -343,6 +400,19 @@ export default function WaiverReportsPage() {
                 >
                   ✉ Send follow-up to all ({parentsWithEmail})
                 </button>
+                <button
+                  type="button"
+                  className="report-followup-btn report-followup-btn--selected"
+                  onClick={emailSelectedParents}
+                  disabled={!selectedParentsWithEmail}
+                  title={
+                    selectedParentsWithEmail
+                      ? "Email selected parents"
+                      : "Select parents with email addresses"
+                  }
+                >
+                  Send selected ({selectedParentsWithEmail})
+                </button>
               </div>
             </div>
             <div className="report-record-filters">
@@ -378,9 +448,17 @@ export default function WaiverReportsPage() {
                   <table className="report-table">
                     <thead>
                       <tr>
+                        <th>
+                          <input
+                            type="checkbox"
+                            checked={allVisibleSelected}
+                            onChange={toggleVisibleRows}
+                            aria-label="Select visible waiver records"
+                          />
+                        </th>
                         <th>Date</th>
                         <th>Name</th>
-                        <th>Children (age)</th>
+                        <th>Children</th>
                         <th>Party ID</th>
                         <th>Email</th>
                         <th>Walk-in</th>
@@ -389,11 +467,19 @@ export default function WaiverReportsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredRows.slice(0, RECORD_LIMIT).map((row) => (
+                      {visibleRows.map((row) => (
                         <tr key={row.id}>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.includes(row.id)}
+                              onChange={() => toggleRow(row.id)}
+                              aria-label={`Select ${row.primaryName || "waiver record"}`}
+                            />
+                          </td>
                           <td>{row.date || "—"}</td>
                           <td>{row.primaryName || "—"}</td>
-                          <td>{childrenLabel(row.children) || "—"}</td>
+                          <td><ChildrenPanel childrenData={row.children || []} /></td>
                           <td>{row.partyId || "—"}</td>
                           <td>{row.email || "—"}</td>
                           <td>{row.type === "Walk-in" ? "Yes" : "No"}</td>
