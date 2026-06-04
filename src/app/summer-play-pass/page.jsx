@@ -293,10 +293,10 @@ function buildSummerPlayPassContent(configData = []) {
     bookingText: normalizeBuyNowText(getConfiguredValue(configData, ["summerPlayPassBookingText", "summerPassBookingText"], DEFAULT_SUMMER_PLAY_PASS.bookingText)),
     valueTitle: getConfiguredValue(configData, ["summerPlayPassValueTitle", "summerPassValueTitle"], DEFAULT_SUMMER_PLAY_PASS.valueTitle),
     valueText: getConfiguredValue(configData, ["summerPlayPassValueText", "summerPassValueText"], DEFAULT_SUMMER_PLAY_PASS.valueText),
-    addonsTitle: DEFAULT_SUMMER_PLAY_PASS.addonsTitle,
-    addons: DEFAULT_SUMMER_PLAY_PASS.addons,
+    addonsTitle: getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
+    addons: splitConfigList(getConfiguredValue(configData, ["summerPlayPassAddons", "summerPassAddons"], DEFAULT_SUMMER_PLAY_PASS.addons.join("|"))),
     termsTitle: getConfiguredValue(configData, ["summerPlayPassTermsTitle", "summerPassTermsTitle"], DEFAULT_SUMMER_PLAY_PASS.termsTitle),
-    terms: DEFAULT_SUMMER_PLAY_PASS.terms,
+    terms: splitConfigList(getConfiguredValue(configData, ["summerPlayPassTerms", "summerPassTerms"], DEFAULT_SUMMER_PLAY_PASS.terms.join("|"))),
     cta: getConfiguredValue(configData, ["summerPlayPassCta", "summerPassCta"], DEFAULT_SUMMER_PLAY_PASS.cta),
     show: parseBoolean(getConfiguredValue(configData, ["showSummerPlayPass", "summerPlayPassShow"], "true"), true),
   };

@@ -389,14 +389,26 @@ function buildSummerPlayPassContent(configData = [], pageData = {}) {
       keys: ["summerPlayPassValueText", "summerPassValueText"],
       fallback: DEFAULT_SUMMER_PLAY_PASS.valueText,
     }),
-    addonsTitle: DEFAULT_SUMMER_PLAY_PASS.addonsTitle,
-    addons: DEFAULT_SUMMER_PLAY_PASS.addons,
+    addonsTitle: resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.addonsTitle,
+    }),
+    addons: splitConfigList(resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassAddons", "summerPassAddons"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.addons.join("|"),
+    })),
     termsTitle: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassTermsTitle", "summerPassTermsTitle"],
       fallback: DEFAULT_SUMMER_PLAY_PASS.termsTitle,
     }),
-    terms: DEFAULT_SUMMER_PLAY_PASS.terms,
+    terms: splitConfigList(resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassTerms", "summerPassTerms"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.terms.join("|"),
+    })),
     cta: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassCta", "summerPassCta"],
