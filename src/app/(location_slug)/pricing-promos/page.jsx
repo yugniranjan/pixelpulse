@@ -664,11 +664,6 @@ const PricingPromosPage = async ({ params }) => {
       Object.entries(pageCta).filter(([, value]) => Boolean(value)),
     ),
   };
-  const pricingBookNowText = normalizeBuyNowText(ctaContent.bookNowText);
-  const pricingCardsWithBuyNowText = pricingCards.map((card) => ({
-    ...card,
-    ctaText: normalizeBuyNowText(card.ctaText),
-  }));
   const pricingPromoHeroLinkText = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: [
@@ -784,7 +779,7 @@ const PricingPromosPage = async ({ params }) => {
 
               {hasPricingCards ? (
                 <div className="ppp-pricing-grid">
-                  {pricingCardsWithBuyNowText.map((card, index) => (
+                  {pricingCards.map((card, index) => (
                     <article className="ppp-pricing-card" key={`${card.title}-${index}`}>
                       <div className="ppp-pricing-card__media">
                         <Image
@@ -815,9 +810,9 @@ const PricingPromosPage = async ({ params }) => {
                           ))}
                         </div>
 
-                        {card.bookable && (card.ctaText || pricingBookNowText) && (
+                        {card.bookable && (card.ctaText || ctaContent.bookNowText) && (
                           <div className="aero-btn-booknow ppp-pricing-card__cta">
-                            <BookingButton title={card.ctaText || pricingBookNowText} />
+                            <BookingButton title={card.ctaText || ctaContent.bookNowText} />
                           </div>
                         )}
                       </div>
@@ -827,9 +822,9 @@ const PricingPromosPage = async ({ params }) => {
               ) : (
                 <div className="ppp-empty-state">
                   {introText && <p>{introText}</p>}
-                  {pricingBookNowText && (
+                  {ctaContent.bookNowText && (
                     <div className="aero-btn-booknow ppp-pricing-card__cta">
-                      <BookingButton title={pricingBookNowText} />
+                      <BookingButton title={ctaContent.bookNowText} />
                     </div>
                   )}
                 </div>
