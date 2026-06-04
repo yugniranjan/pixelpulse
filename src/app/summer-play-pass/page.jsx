@@ -129,7 +129,7 @@ const DEFAULT_SUMMER_PLAY_PASS = {
   title: "Unlimited Summer. Unlimited Play.",
   subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
   bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php",
-  bookingText: "Book Now",
+  bookingText: "Buy Now",
   cards: [
     {
       title: "SUMMER PLAY PASS - 60",
@@ -168,19 +168,13 @@ const DEFAULT_SUMMER_PLAY_PASS = {
   ],
   valueTitle: "Regular price = $34-$49 per visit",
   valueText: "Save up to 40%",
-  addonsTitle: "Add-ons",
+  addonsTitle: "Buy your pass and enjoy the summer challenge",
   addons: [
-    "Bring a friend - $19",
-    "Arcade credits bonus",
-    "Upgrade to party anytime",
+    "Terms and Condituons Apply",
+    "All passes are valid upto August 31st 2026.",
   ],
   termsTitle: "Terms",
-  terms: [
-    "Valid June-Aug",
-    "Booking required",
-    "Non-transferable",
-    "Limited weekend slots",
-  ],
+  terms: [],
   cta: "Don't just play once. PLAY ALL SUMMER.",
 };
 
@@ -198,6 +192,10 @@ function splitConfigList(value = "") {
     .split(/[\n|]/)
     .map((item) => item.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+function normalizeBuyNowText(value = "") {
+  return String(value || "").trim().toLowerCase() === "book now" ? "Buy Now" : value;
 }
 
 function parseConfigMatrix(configData, key) {
@@ -292,7 +290,7 @@ function buildSummerPlayPassContent(configData = []) {
     subtitle: getConfiguredValue(configData, ["summerPlayPassSubtitle", "summerPassSubtitle"], DEFAULT_SUMMER_PLAY_PASS.subtitle),
     cards: cards.length > 0 ? cards : DEFAULT_SUMMER_PLAY_PASS.cards,
     bookingUrl: getConfiguredValue(configData, ["summerPlayPassBookingUrl", "summerPassBookingUrl"], DEFAULT_SUMMER_PLAY_PASS.bookingUrl),
-    bookingText: getConfiguredValue(configData, ["summerPlayPassBookingText", "summerPassBookingText"], DEFAULT_SUMMER_PLAY_PASS.bookingText),
+    bookingText: normalizeBuyNowText(getConfiguredValue(configData, ["summerPlayPassBookingText", "summerPassBookingText"], DEFAULT_SUMMER_PLAY_PASS.bookingText)),
     valueTitle: getConfiguredValue(configData, ["summerPlayPassValueTitle", "summerPassValueTitle"], DEFAULT_SUMMER_PLAY_PASS.valueTitle),
     valueText: getConfiguredValue(configData, ["summerPlayPassValueText", "summerPassValueText"], DEFAULT_SUMMER_PLAY_PASS.valueText),
     addonsTitle: getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], DEFAULT_SUMMER_PLAY_PASS.addonsTitle),

@@ -231,7 +231,7 @@ const DEFAULT_SUMMER_PLAY_PASS = {
   title: "Unlimited Summer. Unlimited Play.",
   subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
   bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php",
-  bookingText: "Book Now",
+  bookingText: "Buy Now",
   cards: [
     {
       title: "SUMMER PLAY PASS - 60",
@@ -269,19 +269,13 @@ const DEFAULT_SUMMER_PLAY_PASS = {
   ],
   valueTitle: "Regular price = $34-$49 per visit",
   valueText: "Save up to 40%",
-  addonsTitle: "Add-ons",
+  addonsTitle: "Buy your pass and enjoy the summer challenge",
   addons: [
-    "Bring a friend - $19",
-    "Arcade credits bonus",
-    "Upgrade to party anytime",
+    "Terms and Condituons Apply",
+    "All passes are valid upto August 31st 2026.",
   ],
   termsTitle: "Terms",
-  terms: [
-    "Valid June-Aug",
-    "Booking required",
-    "Non-transferable",
-    "Limited weekend slots",
-  ],
+  terms: [],
   cta: "Don't just play once. PLAY ALL SUMMER.",
 };
 
@@ -308,6 +302,10 @@ function splitConfigList(value = "") {
     .split(/[\n|]/)
     .map((item) => stripHtml(decodeHtmlEntities(item)).trim())
     .filter(Boolean);
+}
+
+function normalizeBuyNowText(value = "") {
+  return String(value || "").trim().toLowerCase() === "book now" ? "Buy Now" : value;
 }
 
 function parseSummerPassCards(configData = []) {
@@ -376,11 +374,11 @@ function buildSummerPlayPassContent(configData = [], pageData = {}) {
       keys: ["summerPlayPassBookingUrl", "summerPassBookingUrl"],
       fallback: DEFAULT_SUMMER_PLAY_PASS.bookingUrl,
     }),
-    bookingText: resolveConfiguredValue({
+    bookingText: normalizeBuyNowText(resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassBookingText", "summerPassBookingText"],
       fallback: DEFAULT_SUMMER_PLAY_PASS.bookingText,
-    }),
+    })),
     valueTitle: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassValueTitle", "summerPassValueTitle"],
@@ -651,6 +649,11 @@ const PricingPromosPage = async ({ params }) => {
       Object.entries(pageCta).filter(([, value]) => Boolean(value)),
     ),
   };
+  const pricingBookNowText = normalizeBuyNowText(ctaContent.bookNowText);
+  const pricingCardsWithBuyNowText = pricingCards.map((card) => ({
+    ...card,
+    ctaText: normalizeBuyNowText(card.ctaText),
+  }));
   const pricingPromoHeroLinkText = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: [
@@ -766,7 +769,7 @@ const PricingPromosPage = async ({ params }) => {
 
               {hasPricingCards ? (
                 <div className="ppp-pricing-grid">
-                  {pricingCards.map((card, index) => (
+                  {pricingCardsWithBuyNowText.map((card, index) => (
                     <article className="ppp-pricing-card" key={`${card.title}-${index}`}>
                       <div className="ppp-pricing-card__media">
                         <Image
@@ -797,9 +800,9 @@ const PricingPromosPage = async ({ params }) => {
                           ))}
                         </div>
 
-                        {card.bookable && (card.ctaText || ctaContent.bookNowText) && (
+                        {card.bookable && (card.ctaText || pricingBookNowText) && (
                           <div className="aero-btn-booknow ppp-pricing-card__cta">
-                            <BookingButton title={card.ctaText || ctaContent.bookNowText} />
+                            <BookingButton title={card.ctaText || pricingBookNowText} />
                           </div>
                         )}
                       </div>
@@ -809,9 +812,9 @@ const PricingPromosPage = async ({ params }) => {
               ) : (
                 <div className="ppp-empty-state">
                   {introText && <p>{introText}</p>}
-                  {ctaContent.bookNowText && (
+                  {pricingBookNowText && (
                     <div className="aero-btn-booknow ppp-pricing-card__cta">
-                      <BookingButton title={ctaContent.bookNowText} />
+                      <BookingButton title={pricingBookNowText} />
                     </div>
                   )}
                 </div>

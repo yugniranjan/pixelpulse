@@ -36,13 +36,25 @@ async function populateSheetCache() {
     let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
     if (name === 'config') {
-      sheetData = sheetData.map((m) => ({
-        ...m,
-        value:
-          typeof m.value === 'string'
-            ? m.value.replace(/\r?\n|\r/g, "<br/>")
-            : m.value || "",
-      }));
+      sheetData = sheetData.map((m) => {
+        const shiftedSummerPassRow =
+          /^(showSummerPlayPass|summerPlayPass|summerPass)/i.test(
+            String(m.location || "").trim()
+          ) &&
+          !String(m.value || "").trim() &&
+          String(m.key || "").trim();
+        const value = shiftedSummerPassRow ? m.key : m.value;
+
+        return {
+          ...m,
+          location: shiftedSummerPassRow ? "" : m.location,
+          key: shiftedSummerPassRow ? m.location : m.key,
+          value:
+            typeof value === 'string'
+              ? value.replace(/\r?\n|\r/g, "<br/>")
+              : value || "",
+        };
+      });
     }
 
     distinctLocations.forEach((loc) => {
