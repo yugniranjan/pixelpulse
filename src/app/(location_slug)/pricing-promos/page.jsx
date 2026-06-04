@@ -889,11 +889,6 @@ const PricingPromosPage = async ({ params }) => {
                     ))}
                   </div>
 
-                  {summerPlayPass.addons.length > 0 && (
-                    <p className="ppp-summer-pass-terms">
-                      {summerPlayPass.addons.join(" | ")}
-                    </p>
-                  )}
                   {summerPlayPass.terms.length > 0 && (
                     <p className="ppp-summer-pass-terms">
                       <strong>{summerPlayPass.termsTitle}:</strong> {summerPlayPass.terms.join(" | ")}
@@ -904,6 +899,11 @@ const PricingPromosPage = async ({ params }) => {
                     <div className="ppp-summer-pass-cta">
                       {summerPlayPass.cta}
                     </div>
+                  )}
+                  {summerPlayPass.addons.length > 0 && (
+                    <p className="ppp-summer-pass-terms">
+                      {summerPlayPass.addons.join(" | ")}
+                    </p>
                   )}
                 </article>
               )}

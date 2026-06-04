@@ -464,17 +464,17 @@ export default async function SummerPlayPassPage() {
                 </article>
               ))}
             </div>
-            {summerPass.addons.length > 0 && (
-              <p className="ppp-summer-pass-terms">
-                {summerPass.addons.join(" | ")}
-              </p>
-            )}
             {summerPass.terms.length > 0 && (
               <p className="ppp-summer-pass-terms">
                 <strong>{summerPass.termsTitle}:</strong> {summerPass.terms.join(" | ")}
               </p>
             )}
             {summerPass.cta && <div className="ppp-summer-pass-cta">{summerPass.cta}</div>}
+            {summerPass.addons.length > 0 && (
+              <p className="ppp-summer-pass-terms">
+                {summerPass.addons.join(" | ")}
+              </p>
+            )}
           </div>
         </section>
       )}
