@@ -673,7 +673,13 @@ export default function AdminBookingsPage() {
         </form>
 
         <aside className="booking-admin-day">
-          <h2>{form.date ? `Booked on ${form.date}` : "Pick a date"}</h2>
+          <h2>{form.date ? `Booked on ${form.date}` : "Availability"}</h2>
+          {!form.date ? (
+            <p className="booking-admin-day__hint">
+              Pick a <strong>Date</strong> in the form (or click a day in the Calendar view) to see the
+              bookings already on that day and avoid double-booking.
+            </p>
+          ) : null}
           {form.date && dayBookings.length === 0 ? (
             <p className="booking-admin-day__empty">No bookings yet — the day is wide open.</p>
           ) : null}
