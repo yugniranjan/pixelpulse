@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 
 const ADMIN_LINKS = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/bookings", label: "Party Bookings" },
   { href: "/admin/waivers", label: "Player Info" },
+  { href: "/admin/waivers/reports", label: "Waiver Reports" },
   { href: "/admin/invites", label: "Create Party Links" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/waiver-data", label: "Players Data" },
@@ -18,6 +20,11 @@ function isActiveLink(pathname, href) {
 
   if (href === "/admin/blogs") {
     return pathname === "/admin/blog" || pathname.startsWith("/admin/blogs");
+  }
+
+  // Keep "Player Info" from staying active on the nested reports route.
+  if (href === "/admin/waivers") {
+    return pathname === "/admin/waivers";
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);

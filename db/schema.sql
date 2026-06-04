@@ -74,3 +74,29 @@ create table if not exists party_waivers (
   updated_at timestamptz,
   raw jsonb not null default '{}'::jsonb
 );
+
+create table if not exists party_bookings (
+  id text primary key,
+  customer_name text not null default '',
+  phone text,
+  email text,
+  child_name text,
+  child_age text,
+  package text,
+  party_size integer,
+  booking_date text not null,
+  start_time text not null,
+  end_time text not null,
+  start_minutes integer not null,
+  end_minutes integer not null,
+  duration_minutes integer not null,
+  status text not null default 'confirmed',
+  notes text,
+  created_by text,
+  created_at timestamptz,
+  updated_at timestamptz,
+  raw jsonb not null default '{}'::jsonb
+);
+
+create index if not exists party_bookings_date_idx on party_bookings (booking_date);
+create index if not exists party_bookings_status_idx on party_bookings (status);
