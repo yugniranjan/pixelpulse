@@ -11,6 +11,28 @@ const PARTY_EXPR = "coalesce(nullif(w.visit->>'partyId',''), '') <> ''";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+function ageFromDob(dob) {
+  if (!dob) return "";
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return "";
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const monthDiff = now.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age -= 1;
+  return age >= 0 && age < 120 ? age : "";
+}
+
+function extractChildren(familyMembers) {
+  const members = Array.isArray(familyMembers) ? familyMembers : [];
+  return members
+    .filter((member) => member && member.type === "minor")
+    .map((member) => ({
+      name: (member.fullLegalName || [member.firstName, member.lastName].filter(Boolean).join(" ") || "").trim(),
+      age: ageFromDob(member.dob),
+    }))
+    .filter((child) => child.name);
+}
+
 export async function GET(req) {
   if (!hasPostgres()) {
     return NextResponse.json(
@@ -76,6 +98,7 @@ export async function GET(req) {
          coalesce(w.visit->>'partyId', '') as party_id,
          coalesce(w.primary_participant->>'email', '') as email,
          coalesce(w.primary_participant->>'phone', '') as phone,
+         w.family_members,
          w.submitted_at
        from waivers w
        ${clause}
@@ -111,6 +134,7 @@ export async function GET(req) {
         partyId: row.party_id || "",
         email: row.email || "",
         phone: row.phone || "",
+        children: extractChildren(row.family_members),
         submittedAt: row.submitted_at ? new Date(row.submitted_at).toISOString() : "",
       })),
     });

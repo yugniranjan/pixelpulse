@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "@/components/AdminShell";
+import EmailComposeModal from "@/components/admin/EmailComposeModal";
 import "../../styles/admin-waivers.css";
 import "../../styles/admin-bookings.css";
 
@@ -161,6 +162,37 @@ export default function AdminBookingsPage() {
 
   const [inviteData, setInviteData] = useState(null);
   const [invitingKey, setInvitingKey] = useState("");
+  const [emailTarget, setEmailTarget] = useState(null);
+
+  function openBookingEmail(booking) {
+    if (!booking.email) {
+      if (typeof window !== "undefined") {
+        window.alert("This booking has no email address. Add one via Edit first.");
+      }
+      return;
+    }
+    const when = `${booking.date} ${formatTimeLabel(booking.startTime)}–${formatTimeLabel(booking.endTime)}`;
+    const lines = [
+      "Hi {name},",
+      "",
+      "Here are your booking details at Pixel Pulse Play Zone:",
+      `Date & time: ${when}`,
+    ];
+    if (booking.package) lines.push(`Package: ${booking.package}`);
+    lines.push(
+      "",
+      "If you have any questions, just reply to this email.",
+      "",
+      "See you soon!",
+      "Pixel Pulse Play Zone",
+    );
+    setEmailTarget({
+      title: "Email booking contact",
+      recipients: [{ email: booking.email, name: booking.customerName }],
+      defaultSubject: "Your Pixel Pulse Play party details",
+      defaultMessage: lines.join("\n"),
+    });
+  }
 
   // Create a party invite link straight from a booking (or the current form),
   // reusing the existing /api/admin/invites endpoint. No navigation needed.
@@ -493,28 +525,28 @@ export default function AdminBookingsPage() {
             </label>
 
             <label>
-              <span>Phone</span>
-              <input name="phone" value={form.phone} onChange={updateField} inputMode="tel" />
+              <span>Phone *</span>
+              <input name="phone" value={form.phone} onChange={updateField} inputMode="tel" required />
             </label>
 
             <label>
-              <span>Email</span>
-              <input name="email" type="email" value={form.email} onChange={updateField} inputMode="email" />
+              <span>Email *</span>
+              <input name="email" type="email" value={form.email} onChange={updateField} inputMode="email" required />
             </label>
 
             <label>
-              <span>Child&apos;s name</span>
-              <input name="childName" value={form.childName} onChange={updateField} />
+              <span>Child&apos;s name *</span>
+              <input name="childName" value={form.childName} onChange={updateField} required />
             </label>
 
             <label>
-              <span>Child&apos;s age</span>
-              <input name="childAge" value={form.childAge} onChange={updateField} inputMode="numeric" />
+              <span>Child&apos;s age *</span>
+              <input name="childAge" value={form.childAge} onChange={updateField} inputMode="numeric" required />
             </label>
 
             <label>
-              <span>Package</span>
-              <input name="package" value={form.package} onChange={updateField} list="booking-packages" />
+              <span>Package *</span>
+              <input name="package" value={form.package} onChange={updateField} list="booking-packages" required />
               <datalist id="booking-packages">
                 {PACKAGE_OPTIONS.map((name) => (
                   <option value={name} key={name} />
@@ -523,13 +555,13 @@ export default function AdminBookingsPage() {
             </label>
 
             <label>
-              <span>Party ID</span>
-              <input name="partyId" value={form.partyId} onChange={updateField} placeholder="Link to waiver party ID" />
+              <span>Party ID *</span>
+              <input name="partyId" value={form.partyId} onChange={updateField} placeholder="Link to waiver party ID" required />
             </label>
 
             <label>
-              <span>Party size</span>
-              <input name="partySize" value={form.partySize} onChange={updateField} inputMode="numeric" />
+              <span>Party size *</span>
+              <input name="partySize" value={form.partySize} onChange={updateField} inputMode="numeric" required />
             </label>
 
             <label>
@@ -559,8 +591,8 @@ export default function AdminBookingsPage() {
             </div>
 
             <label className="booking-admin-field--wide">
-              <span>Notes</span>
-              <textarea name="notes" value={form.notes} onChange={updateField} rows={2} />
+              <span>Notes *</span>
+              <textarea name="notes" value={form.notes} onChange={updateField} rows={2} required />
             </label>
           </div>
 
@@ -784,6 +816,14 @@ export default function AdminBookingsPage() {
               >
                 {invitingKey === booking.id ? "…" : "Party link"}
               </button>
+              <button
+                type="button"
+                onClick={() => openBookingEmail(booking)}
+                disabled={!booking.email}
+                title={booking.email ? "Email this contact" : "No email on this booking"}
+              >
+                Email
+              </button>
               {booking.status === "cancelled" ? (
                 <button type="button" onClick={() => setStatus(booking, "confirmed")}>Restore</button>
               ) : (
@@ -810,6 +850,9 @@ export default function AdminBookingsPage() {
       ) : null}
 
       {inviteData ? <InviteModal data={inviteData} onClose={() => setInviteData(null)} /> : null}
+      {emailTarget ? (
+        <EmailComposeModal {...emailTarget} onClose={() => setEmailTarget(null)} />
+      ) : null}
     </AdminShell>
   );
 }

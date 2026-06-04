@@ -125,8 +125,27 @@ export function buildBookingValues(input = {}) {
   const date = String(input.date || "").trim();
   const startTime = String(input.startTime || "").trim();
   const durationMinutes = Number(input.durationMinutes);
+  const phone = String(input.phone || "").trim();
+  const email = String(input.email || "").trim();
+  const childName = String(input.childName || "").trim();
+  const childAge = String(input.childAge || "").trim();
+  const pkg = String(input.package || "").trim();
+  const partyId = String(input.partyId || "").trim();
+  const notes = String(input.notes || "").trim();
+  const partySizeRaw = Number(input.partySize);
 
+  // All fields are required for a party booking.
   if (!customerName) return { ok: false, error: "Customer name is required." };
+  if (!phone) return { ok: false, error: "Phone is required." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "A valid email is required." };
+  if (!childName) return { ok: false, error: "Child's name is required." };
+  if (!childAge) return { ok: false, error: "Child's age is required." };
+  if (!pkg) return { ok: false, error: "Package is required." };
+  if (!partyId) return { ok: false, error: "Party ID is required." };
+  if (!Number.isFinite(partySizeRaw) || partySizeRaw <= 0) {
+    return { ok: false, error: "A valid party size is required." };
+  }
+  if (!notes) return { ok: false, error: "Notes are required." };
   if (!isValidDate(date)) return { ok: false, error: "A valid date (YYYY-MM-DD) is required." };
 
   const startMinutes = timeToMinutes(startTime);
@@ -141,27 +160,24 @@ export function buildBookingValues(input = {}) {
     return { ok: false, error: "The booking can't extend past midnight. Shorten the duration or start earlier." };
   }
 
-  const partySizeRaw = Number(input.partySize);
-  const partySize = Number.isFinite(partySizeRaw) && partySizeRaw > 0 ? Math.round(partySizeRaw) : null;
-
   return {
     ok: true,
     value: {
       customerName,
-      phone: String(input.phone || "").trim(),
-      email: String(input.email || "").trim(),
-      childName: String(input.childName || "").trim(),
-      childAge: String(input.childAge || "").trim(),
-      package: String(input.package || "").trim(),
-      partyId: String(input.partyId || "").trim(),
-      partySize,
+      phone,
+      email,
+      childName,
+      childAge,
+      package: pkg,
+      partyId,
+      partySize: Math.round(partySizeRaw),
       date,
       startTime: minutesToTime(startMinutes),
       endTime: minutesToTime(endMinutes),
       startMinutes,
       endMinutes,
       durationMinutes: Math.round(durationMinutes),
-      notes: String(input.notes || "").trim(),
+      notes,
     },
   };
 }

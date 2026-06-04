@@ -3,8 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/AdminShell";
+import EmailComposeModal from "@/components/admin/EmailComposeModal";
 import "../../../styles/admin-waivers.css";
 import "../../../styles/admin-bookings.css";
+
+const FOLLOWUP_SUBJECT = "Thanks for visiting Pixel Pulse Play Zone!";
+const FOLLOWUP_MESSAGE = [
+  "Hi {name},",
+  "",
+  "Thanks for visiting Pixel Pulse Play Zone — we hope you had a blast!",
+  "",
+  "We'd love to see you again. Reply to this email or visit www.pixelpulseplay.ca to plan your next visit or book a birthday party.",
+  "",
+  "— Pixel Pulse Play Zone",
+].join("\n");
 
 const RECORD_LIMIT = 200;
 
@@ -34,6 +46,12 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
+function childrenLabel(children = []) {
+  return children
+    .map((child) => (child.age !== "" && child.age != null ? `${child.name} (${child.age})` : child.name))
+    .join(", ");
+}
+
 export default function WaiverReportsPage() {
   const initial = defaultRange();
   const [from, setFrom] = useState(initial.from);
@@ -45,6 +63,7 @@ export default function WaiverReportsPage() {
   const [emailFilter, setEmailFilter] = useState("");
   const [partyIdFilter, setPartyIdFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [emailTarget, setEmailTarget] = useState(null);
 
   async function loadReport(rangeFrom, rangeTo) {
     setLoading(true);
@@ -74,11 +93,6 @@ export default function WaiverReportsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const maxParticipants = useMemo(() => {
-    if (!report?.byDate?.length) return 0;
-    return report.byDate.reduce((max, row) => Math.max(max, row.participants), 0);
-  }, [report]);
-
   const summary = report?.summary || {};
   const filteredRows = useMemo(() => {
     const nameNeedle = nameFilter.trim().toLowerCase();
@@ -86,8 +100,11 @@ export default function WaiverReportsPage() {
     const partyNeedle = partyIdFilter.trim().toLowerCase();
 
     return (report?.rows || []).filter((row) => {
+      const childMatch = (row.children || []).some((child) =>
+        String(child.name || "").toLowerCase().includes(nameNeedle),
+      );
       const matchesName =
-        !nameNeedle || String(row.primaryName || "").toLowerCase().includes(nameNeedle);
+        !nameNeedle || String(row.primaryName || "").toLowerCase().includes(nameNeedle) || childMatch;
       const matchesEmail =
         !emailNeedle || String(row.email || "").toLowerCase().includes(emailNeedle);
       const matchesPartyId =
@@ -98,19 +115,56 @@ export default function WaiverReportsPage() {
     });
   }, [emailFilter, nameFilter, partyIdFilter, report, typeFilter]);
 
+  // By-date is derived from the SAME filtered rows as the waiver list, so the
+  // "Export by-date CSV" and "Export waiver list CSV" always reconcile.
+  const filteredByDate = useMemo(() => {
+    const map = new Map();
+    for (const row of filteredRows) {
+      const key = row.date || "—";
+      const entry = map.get(key) || { date: key, waivers: 0, participants: 0 };
+      entry.waivers += 1;
+      entry.participants += Number(row.participants) || 0;
+      map.set(key, entry);
+    }
+    return [...map.values()].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  }, [filteredRows]);
+
+  // Range KPIs reflect the current filters (week/month stay absolute from the API).
+  const derived = useMemo(() => {
+    let participants = 0;
+    let party = 0;
+    let walkIn = 0;
+    for (const row of filteredRows) {
+      participants += Number(row.participants) || 0;
+      if (row.type === "Party") party += 1;
+      else walkIn += 1;
+    }
+    return {
+      totalWaivers: filteredRows.length,
+      totalParticipants: participants,
+      partyCount: party,
+      walkInCount: walkIn,
+    };
+  }, [filteredRows]);
+
+  const maxParticipants = useMemo(
+    () => filteredByDate.reduce((max, row) => Math.max(max, row.participants), 0),
+    [filteredByDate],
+  );
+
   const kpis = [
-    { label: "Total waivers", value: summary.totalWaivers ?? 0 },
-    { label: "Total participants", value: summary.totalParticipants ?? 0 },
-    { label: "Party waivers", value: summary.partyCount ?? 0 },
-    { label: "Walk-in waivers", value: summary.walkInCount ?? 0 },
+    { label: "Total waivers", value: derived.totalWaivers },
+    { label: "Total participants", value: derived.totalParticipants },
+    { label: "Party waivers", value: derived.partyCount },
+    { label: "Walk-in waivers", value: derived.walkInCount },
     { label: "This week", value: summary.weekWaivers ?? 0 },
     { label: "This month", value: summary.monthWaivers ?? 0 },
   ];
 
   function exportByDate() {
-    if (!report?.byDate?.length) return;
+    if (!filteredByDate.length) return;
     const header = ["Date", "Waivers", "Participants"];
-    const rows = report.byDate.map((r) => [r.date, r.waivers, r.participants]);
+    const rows = filteredByDate.map((r) => [r.date, r.waivers, r.participants]);
     downloadCsv(`waiver-report-${from}_to_${to}.csv`, [header, ...rows]);
   }
 
@@ -119,6 +173,8 @@ export default function WaiverReportsPage() {
     const header = [
       "Date",
       "Name",
+      "Child names",
+      "Child ages",
       "Email",
       "Phone",
       "Party ID",
@@ -131,6 +187,8 @@ export default function WaiverReportsPage() {
     const rows = filteredRows.map((r) => [
       r.date,
       r.primaryName,
+      (r.children || []).map((c) => c.name).join("; "),
+      (r.children || []).map((c) => c.age).join("; "),
       r.email,
       r.phone,
       r.partyId,
@@ -148,6 +206,39 @@ export default function WaiverReportsPage() {
     setEmailFilter("");
     setPartyIdFilter("");
     setTypeFilter("all");
+  }
+
+  const parentsWithEmail = useMemo(
+    () => filteredRows.filter((row) => row.email).length,
+    [filteredRows],
+  );
+
+  function emailOneParent(row) {
+    if (!row.email) return;
+    setEmailTarget({
+      title: `Follow up with ${row.primaryName || "parent"}`,
+      recipients: [{ email: row.email, name: row.primaryName }],
+      defaultSubject: FOLLOWUP_SUBJECT,
+      defaultMessage: FOLLOWUP_MESSAGE,
+    });
+  }
+
+  function emailAllParents() {
+    const recipients = filteredRows
+      .filter((row) => row.email)
+      .map((row) => ({ email: row.email, name: row.primaryName }));
+    if (!recipients.length) {
+      if (typeof window !== "undefined") {
+        window.alert("No parents with an email address in the current filter.");
+      }
+      return;
+    }
+    setEmailTarget({
+      title: "Follow-up to parents (current filter)",
+      recipients,
+      defaultSubject: FOLLOWUP_SUBJECT,
+      defaultMessage: FOLLOWUP_MESSAGE,
+    });
   }
 
   return (
@@ -203,9 +294,9 @@ export default function WaiverReportsPage() {
           <div className="report-bydate">
             <div className="report-bydate__head">
               <h2>By date</h2>
-              <span>{report.byDate.length} {report.byDate.length === 1 ? "day" : "days"} with activity</span>
+              <span>{filteredByDate.length} {filteredByDate.length === 1 ? "day" : "days"} with activity</span>
             </div>
-            {report.byDate.length === 0 ? (
+            {filteredByDate.length === 0 ? (
               <p className="booking-admin-empty">No waivers in this range.</p>
             ) : (
               <table className="report-table">
@@ -218,7 +309,7 @@ export default function WaiverReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {report.byDate.map((row) => (
+                  {filteredByDate.map((row) => (
                     <tr key={row.date}>
                       <td>{row.date}</td>
                       <td>{row.waivers}</td>
@@ -239,9 +330,20 @@ export default function WaiverReportsPage() {
           <div className="report-records">
             <div className="report-bydate__head">
               <h2>Waiver records</h2>
-              <span>
-                {filteredRows.length} of {report.rows.length} {report.rows.length === 1 ? "record" : "records"}
-              </span>
+              <div className="report-records__headright">
+                <span>
+                  {filteredRows.length} of {report.rows.length} {report.rows.length === 1 ? "record" : "records"}
+                </span>
+                <button
+                  type="button"
+                  className="report-followup-btn"
+                  onClick={emailAllParents}
+                  disabled={!parentsWithEmail}
+                  title={parentsWithEmail ? "Email all parents in the current filter" : "No parents with an email"}
+                >
+                  ✉ Send follow-up to all ({parentsWithEmail})
+                </button>
+              </div>
             </div>
             <div className="report-record-filters">
               <label>
@@ -278,10 +380,12 @@ export default function WaiverReportsPage() {
                       <tr>
                         <th>Date</th>
                         <th>Name</th>
+                        <th>Children (age)</th>
                         <th>Party ID</th>
                         <th>Email</th>
                         <th>Walk-in</th>
                         <th>Type</th>
+                        <th aria-hidden="true" />
                       </tr>
                     </thead>
                     <tbody>
@@ -289,10 +393,22 @@ export default function WaiverReportsPage() {
                         <tr key={row.id}>
                           <td>{row.date || "—"}</td>
                           <td>{row.primaryName || "—"}</td>
+                          <td>{childrenLabel(row.children) || "—"}</td>
                           <td>{row.partyId || "—"}</td>
                           <td>{row.email || "—"}</td>
                           <td>{row.type === "Walk-in" ? "Yes" : "No"}</td>
                           <td>{row.type}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="report-row-email"
+                              onClick={() => emailOneParent(row)}
+                              disabled={!row.email}
+                              title={row.email ? "Email this parent" : "No email"}
+                            >
+                              Email
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -307,6 +423,10 @@ export default function WaiverReportsPage() {
             )}
           </div>
         </>
+      ) : null}
+
+      {emailTarget ? (
+        <EmailComposeModal {...emailTarget} onClose={() => setEmailTarget(null)} />
       ) : null}
     </AdminShell>
   );
