@@ -18,7 +18,8 @@ const FOLLOWUP_MESSAGE = [
   "— Pixel Pulse Play Zone",
 ].join("\n");
 
-const RECORD_LIMIT = 200;
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
+const DEFAULT_PAGE_SIZE = 50;
 
 function isoDate(date) {
   return date.toISOString().slice(0, 10);
@@ -77,6 +78,8 @@ export default function WaiverReportsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [emailTarget, setEmailTarget] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function loadReport(rangeFrom, rangeTo) {
     setLoading(true);
@@ -105,6 +108,11 @@ export default function WaiverReportsPage() {
     loadReport(initial.from, initial.to);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset to the first page whenever the filtered set changes underneath us.
+  useEffect(() => {
+    setPage(1);
+  }, [nameFilter, emailFilter, partyIdFilter, typeFilter, report]);
 
   const summary = report?.summary || {};
   const filteredRows = useMemo(() => {
@@ -225,7 +233,10 @@ export default function WaiverReportsPage() {
     () => filteredRows.filter((row) => row.email).length,
     [filteredRows],
   );
-  const visibleRows = filteredRows.slice(0, RECORD_LIMIT);
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * pageSize;
+  const visibleRows = filteredRows.slice(pageStart, pageStart + pageSize);
   const visibleIds = useMemo(() => visibleRows.map((row) => row.id), [visibleRows]);
   const selectedRows = useMemo(
     () => filteredRows.filter((row) => selectedIds.includes(row.id)),
@@ -500,11 +511,44 @@ export default function WaiverReportsPage() {
                     </tbody>
                   </table>
                 </div>
-                {filteredRows.length > RECORD_LIMIT ? (
-                  <p className="report-records__note">
-                    Showing first {RECORD_LIMIT} of {filteredRows.length}. Use “Export waiver list CSV” for the full filtered set.
-                  </p>
-                ) : null}
+                <div className="report-pagination">
+                  <span className="report-pagination__count">
+                    Showing {pageStart + 1}–{Math.min(pageStart + pageSize, filteredRows.length)} of {filteredRows.length}
+                  </span>
+                  <div className="report-pagination__controls">
+                    <label className="report-pagination__size">
+                      <span>Rows</span>
+                      <select
+                        value={pageSize}
+                        onChange={(event) => {
+                          setPageSize(Number(event.target.value));
+                          setPage(1);
+                        }}
+                      >
+                        {PAGE_SIZE_OPTIONS.map((size) => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      className="booking-admin-btn--ghost"
+                      onClick={() => setPage(safePage - 1)}
+                      disabled={safePage <= 1}
+                    >
+                      ← Prev
+                    </button>
+                    <span className="report-pagination__page">Page {safePage} of {totalPages}</span>
+                    <button
+                      type="button"
+                      className="booking-admin-btn--ghost"
+                      onClick={() => setPage(safePage + 1)}
+                      disabled={safePage >= totalPages}
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
               </>
             )}
           </div>

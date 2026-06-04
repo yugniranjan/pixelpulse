@@ -1231,6 +1231,52 @@
   color: #94a3b8;
 }
 
+.report-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.report-pagination__count {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.report-pagination__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-pagination__size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.report-pagination__size select {
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.report-pagination__page {
+  font-size: 0.8rem;
+  color: #cbd5f5;
+  min-width: 96px;
+  text-align: center;
+}
+
+.report-pagination__controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 900px) {
   .report-kpis {
     grid-template-columns: repeat(3, minmax(0, 1fr));
