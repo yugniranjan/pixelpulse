@@ -10,6 +10,9 @@ const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const SITE_URL = "https://www.pixelpulseplay.ca/";
+const PHONE_DISPLAY = "+1 (905) 760-2922";
+const PHONE_TEL = "+19057602922";
+const ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 
 function env(name) {
   const value = process.env[name];
@@ -46,18 +49,22 @@ function escapeHtml(value) {
 function brandedHtml(message) {
   const body = escapeHtml(message).replace(/\n/g, "<br/>");
   return `
-    <div style="margin:0;padding:24px 14px;background:#050810;font-family:Arial,sans-serif;color:#f8fafc;">
-      <div style="max-width:720px;margin:0 auto;border:1px solid rgba(164,207,95,0.16);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#121923 0%,#090e16 100%);box-shadow:0 18px 42px rgba(0,0,0,0.28);">
-        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(164,207,95,0.14),rgba(251,174,123,0.12));">
-          <img src="${LOGO_URL}" alt="Pixel Pulse Play" style="display:block;width:170px;max-width:100%;height:auto;" />
+    <div style="margin:0;padding:24px 14px;background:#f4f6fb;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+      <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+        <div style="height:4px;background:linear-gradient(90deg,#a4cf5f,#fbae7b,#f59e0b);"></div>
+        <div style="padding:20px 24px;border-bottom:1px solid #eef0f4;background:#ffffff;">
+          <img src="${LOGO_URL}" alt="Pixel Pulse Play Zone" style="display:block;width:180px;max-width:60%;height:auto;" />
         </div>
-        <div style="padding:22px;font-size:16px;line-height:1.8;color:#e7edf5;">
+        <div style="padding:24px;font-size:16px;line-height:1.7;color:#1f2937;">
           ${body}
         </div>
-        <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:14px;line-height:1.7;color:#94a3b8;">
-          <a href="${SITE_URL}" style="color:#fbae7b;text-decoration:none;">www.pixelpulseplay.ca</a>
+        <div style="padding:18px 24px;border-top:1px solid #eef0f4;background:#fafbfc;font-size:13px;line-height:1.7;color:#6b7280;">
+          <strong style="color:#111827;">${BUSINESS_NAME}</strong><br/>
+          ${ADDRESS}<br/>
+          Phone: <a href="tel:${PHONE_TEL}" style="color:#2563eb;text-decoration:none;">${PHONE_DISPLAY}</a>
           &nbsp;·&nbsp;
-          <a href="mailto:${CONTACT_EMAIL}" style="color:#fbae7b;text-decoration:none;">${CONTACT_EMAIL}</a>
+          <a href="mailto:${CONTACT_EMAIL}" style="color:#2563eb;text-decoration:none;">${CONTACT_EMAIL}</a><br/>
+          <a href="${SITE_URL}" style="color:#2563eb;text-decoration:none;">www.pixelpulseplay.ca</a>
         </div>
       </div>
     </div>

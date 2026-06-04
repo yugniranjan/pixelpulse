@@ -462,3 +462,141 @@ export async function deleteBooking(id) {
   const result = await query("delete from party_bookings where id = $1 returning id", [id]);
   return result.rows.length > 0;
 }
+
+export async function existingPartyIds(ids = []) {
+  await ensureTable();
+  const clean = [...new Set(ids.filter(Boolean))];
+  if (!clean.length) return new Set();
+  const result = await query(
+    "select distinct party_id from party_bookings where party_id = any($1)",
+    [clean],
+  );
+  return new Set(result.rows.map((row) => row.party_id));
+}
+
+export async function getBookingByPartyId(partyId) {
+  await ensureTable();
+  const result = await query(
+    "select * from party_bookings where party_id = $1 order by created_at asc nulls first limit 1",
+    [partyId],
+  );
+  return result.rows.length ? normalizeBookingRow(result.rows[0]) : null;
+}
+
+/**
+ * Bulk import/update bookings from a parsed spreadsheet.
+ * Each row: { customerName, email, phone, partyId, package, date, time, notes, durationMinutes? }.
+ * Upserts by Party ID — updates the sheet-provided fields on an existing row
+ * (keeping child name/age, party size, and status), otherwise inserts a new
+ * confirmed booking with sensible defaults (child TBD, party size 1).
+ * Bypasses the overlap/duplicate checks since this is a trusted batch import.
+ */
+export async function bulkImportBookings(rows = []) {
+  await ensureTable();
+
+  let inserted = 0;
+  let updated = 0;
+  let skipped = 0;
+  const errors = [];
+
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index] || {};
+    const customerName = String(row.customerName || "").trim();
+    const date = String(row.date || "").trim();
+
+    if (!customerName || !isValidDate(date)) {
+      skipped += 1;
+      continue;
+    }
+
+    const startMinutes = timeToMinutes(String(row.time || "").trim()) ?? 600; // default 10:00
+    const durationRaw = Number(row.durationMinutes);
+    const duration = Number.isFinite(durationRaw) && durationRaw > 0 ? Math.round(durationRaw) : 120;
+    let endMinutes = startMinutes + duration;
+    if (endMinutes > 1440) endMinutes = 1440;
+
+    const base = {
+      customerName,
+      email: String(row.email || "").trim(),
+      phone: String(row.phone || "").trim(),
+      package: String(row.package || "").trim(),
+      notes: String(row.notes || "").trim(),
+      partyId: String(row.partyId || "").trim(),
+      date,
+      startTime: minutesToTime(startMinutes),
+      endTime: minutesToTime(endMinutes),
+      startMinutes,
+      endMinutes,
+      durationMinutes: endMinutes - startMinutes,
+    };
+
+    try {
+      const existing = base.partyId ? await getBookingByPartyId(base.partyId) : null;
+      const now = new Date();
+
+      if (existing) {
+        const raw = { ...existing, ...base };
+        await query(
+          `update party_bookings set
+             customer_name = $2, email = $3, phone = $4, package = $5,
+             booking_date = $6, start_time = $7, end_time = $8,
+             start_minutes = $9, end_minutes = $10, duration_minutes = $11,
+             notes = $12, updated_at = $13, raw = $14::jsonb
+           where id = $1`,
+          [
+            existing.id,
+            base.customerName,
+            base.email,
+            base.phone,
+            base.package,
+            base.date,
+            base.startTime,
+            base.endTime,
+            base.startMinutes,
+            base.endMinutes,
+            base.durationMinutes,
+            base.notes,
+            now,
+            JSON.stringify(raw),
+          ],
+        );
+        updated += 1;
+      } else {
+        const id = crypto.randomUUID();
+        const raw = { ...base, childName: "TBD", childAge: "TBD", partySize: 1, status: "confirmed" };
+        await query(
+          `insert into party_bookings (
+            id, customer_name, phone, email, child_name, child_age, package, party_id, party_size,
+            booking_date, start_time, end_time, start_minutes, end_minutes, duration_minutes,
+            status, notes, created_by, created_at, updated_at, raw
+          ) values (
+            $1,$2,$3,$4,'TBD','TBD',$5,$6,1,$7,$8,$9,$10,$11,$12,'confirmed',$13,'import',$14,$15,$16::jsonb
+          )`,
+          [
+            id,
+            base.customerName,
+            base.phone,
+            base.email,
+            base.package,
+            base.partyId,
+            base.date,
+            base.startTime,
+            base.endTime,
+            base.startMinutes,
+            base.endMinutes,
+            base.durationMinutes,
+            base.notes,
+            now,
+            now,
+            JSON.stringify(raw),
+          ],
+        );
+        inserted += 1;
+      }
+    } catch (error) {
+      errors.push({ row: index + 1, partyId: base.partyId, error: error.message });
+    }
+  }
+
+  return { inserted, updated, skipped, errors, total: rows.length };
+}

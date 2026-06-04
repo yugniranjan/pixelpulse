@@ -161,6 +161,65 @@ function buildPartyLinkMessage(source, data) {
   ].filter(Boolean).join("\n");
 }
 
+function ImportPreviewModal({ preview, importing, onConfirm, onCancel }) {
+  const { counts = {}, total = 0, rows = [] } = preview || {};
+  const willWrite = (counts.insert || 0) + (counts.update || 0);
+
+  return (
+    <div className="email-compose-overlay" role="dialog" aria-modal="true" onClick={onCancel}>
+      <div className="email-compose-modal import-preview-modal" onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="email-compose__close" onClick={onCancel} aria-label="Close">
+          ×
+        </button>
+        <h2>Review import</h2>
+        <p className="email-compose__to">
+          {total} rows · <strong>{counts.insert || 0} new</strong>, {counts.update || 0} to update,{" "}
+          {counts.skip || 0} skipped
+        </p>
+
+        <div className="report-records__scroll import-preview-scroll">
+          <table className="report-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Customer</th>
+                <th>Party ID</th>
+                <th>Package</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, index) => (
+                <tr key={index}>
+                  <td><span className={`import-action import-action--${r.action}`}>{r.action}</span></td>
+                  <td>{r.date || "—"}</td>
+                  <td>{r.time || "—"}</td>
+                  <td>{r.customerName || "—"}</td>
+                  <td>{r.partyId || "—"}</td>
+                  <td>{r.package || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {total > rows.length ? (
+          <p className="report-records__note">Showing first {rows.length} of {total} rows.</p>
+        ) : null}
+
+        <div className="email-compose__actions">
+          <button type="button" className="email-compose__btn--ghost" onClick={onCancel} disabled={importing}>
+            Cancel
+          </button>
+          <button type="button" onClick={onConfirm} disabled={importing || willWrite === 0}>
+            {importing ? "Importing…" : `Confirm import (${willWrite})`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -187,8 +246,79 @@ export default function AdminBookingsPage() {
   const [inviteData, setInviteData] = useState(null);
   const [invitingKey, setInvitingKey] = useState("");
   const [emailTarget, setEmailTarget] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState("");
+  const [importFile, setImportFile] = useState(null);
+  const [importPreview, setImportPreview] = useState(null);
+
+  // Step 1: parse + classify (dry run) and show a preview before writing.
+  async function handlePickFile(event) {
+    const file = event.target.files?.[0];
+    event.target.value = ""; // allow re-picking the same file
+    if (!file) return;
+
+    setImporting(true);
+    setImportMsg("");
+    setImportPreview(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("dryRun", "1");
+      const response = await fetch("/api/admin/bookings/import", { method: "POST", body: formData });
+      const data = await response.json();
+      if (!response.ok) {
+        setImportMsg(data.error || "Could not read that file.");
+        return;
+      }
+      setImportFile(file);
+      setImportPreview(data);
+    } catch {
+      setImportMsg("Could not read that file.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  function cancelImport() {
+    setImportPreview(null);
+    setImportFile(null);
+  }
+
+  // Step 2: commit the import for real.
+  async function confirmImport() {
+    if (!importFile) return;
+    setImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+      const response = await fetch("/api/admin/bookings/import", { method: "POST", body: formData });
+      const data = await response.json();
+      if (!response.ok) {
+        setImportMsg(data.error || "Import failed.");
+        return;
+      }
+      const parts = [`${data.inserted} new`, `${data.updated} updated`];
+      if (data.skipped) parts.push(`${data.skipped} skipped`);
+      if (data.errors?.length) parts.push(`${data.errors.length} errors`);
+      setImportMsg(`Imported from ${data.total} rows: ${parts.join(", ")}.`);
+      cancelImport();
+      await loadBookings();
+    } catch {
+      setImportMsg("Import failed.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  function downloadTemplate() {
+    downloadCsv("party-bookings-template.csv", [
+      ["Name", "Email", "Phone", "Address", "SaleID", "PartyDate", "Products"],
+      ["Jane Doe", "jane@example.com", "9051234567", "", "1001", "2026-12-20 14:00", "Pixel Ultra"],
+    ]);
+  }
 
   function openBookingEmail(booking) {
+    if (isPast(booking)) return;
     if (!booking.email) {
       if (typeof window !== "undefined") {
         window.alert("This booking has no email address. Add one via Edit first.");
@@ -221,6 +351,7 @@ export default function AdminBookingsPage() {
   // Create a party invite link straight from a booking (or the current form),
   // reusing the existing /api/admin/invites endpoint. No navigation needed.
   async function createInvite(source) {
+    if (source?.id && isPast(source)) return;
     const missing = [];
     if (!source.childName) missing.push("child's name");
     if (!source.partyId) missing.push("Party ID");
@@ -378,6 +509,7 @@ export default function AdminBookingsPage() {
   }
 
   function startEdit(booking) {
+    if (isPast(booking)) return;
     setEditingId(booking.id);
     setForm({
       customerName: booking.customerName || "",
@@ -399,6 +531,7 @@ export default function AdminBookingsPage() {
   }
 
   async function setStatus(booking, status) {
+    if (isPast(booking)) return;
     try {
       const response = await fetch(`/api/admin/bookings?id=${encodeURIComponent(booking.id)}`, {
         method: "PUT",
@@ -412,6 +545,7 @@ export default function AdminBookingsPage() {
   }
 
   async function removeBooking(booking) {
+    if (isPast(booking)) return;
     if (typeof window !== "undefined" && !window.confirm(`Delete the booking for ${booking.customerName}?`)) {
       return;
     }
@@ -483,6 +617,9 @@ export default function AdminBookingsPage() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   }, []);
 
+  // Past parties are historical records: no edit / party link / email / cancel / delete.
+  const isPast = (booking) => Boolean(booking?.date) && booking.date < todayStr;
+
   function shiftMonth(delta) {
     setCalMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
   }
@@ -543,6 +680,22 @@ export default function AdminBookingsPage() {
           <h1>Birthday Party Bookings</h1>
           <p>Create and manage party bookings. Overlapping time slots on the same date are blocked automatically.</p>
         </div>
+        <div className="booking-admin-import">
+          <label className={`booking-admin-import__btn${importing ? " is-busy" : ""}`}>
+            {importing ? "Reading…" : "⬆ Import Excel / CSV"}
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              hidden
+              disabled={importing}
+              onChange={handlePickFile}
+            />
+          </label>
+          <button type="button" className="booking-admin-import__template" onClick={downloadTemplate}>
+            Download template
+          </button>
+          {importMsg ? <p className="booking-admin-import__msg">{importMsg}</p> : null}
+        </div>
       </header>
 
       {error ? <p className="waiver-admin-error">{error}</p> : null}
@@ -599,7 +752,7 @@ export default function AdminBookingsPage() {
 
             <label>
               <span>Date *</span>
-              <input name="date" type="date" value={form.date} onChange={updateField} required />
+              <input name="date" type="date" value={form.date} onChange={updateField} min={editingId ? undefined : todayStr} required />
             </label>
 
             <label>
@@ -792,20 +945,30 @@ export default function AdminBookingsPage() {
                 >
                   <span className="booking-cal__date">{cell.day}</span>
                   <div className="booking-cal__events">
-                    {cell.items.slice(0, 3).map((b) => (
-                      <button
-                        type="button"
-                        key={b.id}
-                        className={`booking-cal__event booking-cal__event--${b.status}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          startEdit(b);
-                        }}
-                        title={`${formatTimeLabel(b.startTime)}–${formatTimeLabel(b.endTime)} · ${b.customerName}`}
-                      >
-                        <em>{formatTimeLabel(b.startTime)}</em> {b.customerName}
-                      </button>
-                    ))}
+                    {cell.items.slice(0, 3).map((b) =>
+                      isPast(b) ? (
+                        <span
+                          key={b.id}
+                          className={`booking-cal__event booking-cal__event--${b.status} is-past`}
+                          title={`${formatTimeLabel(b.startTime)}–${formatTimeLabel(b.endTime)} · ${b.customerName} (past)`}
+                        >
+                          <em>{formatTimeLabel(b.startTime)}</em> {b.customerName}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          key={b.id}
+                          className={`booking-cal__event booking-cal__event--${b.status}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            startEdit(b);
+                          }}
+                          title={`${formatTimeLabel(b.startTime)}–${formatTimeLabel(b.endTime)} · ${b.customerName}`}
+                        >
+                          <em>{formatTimeLabel(b.startTime)}</em> {b.customerName}
+                        </button>
+                      ),
+                    )}
                     {cell.items.length > 3 ? (
                       <span className="booking-cal__more">+{cell.items.length - 3} more</span>
                     ) : null}
@@ -846,31 +1009,37 @@ export default function AdminBookingsPage() {
               {booking.notes ? <span className="booking-admin-card__notes">{booking.notes}</span> : null}
             </div>
             <div className="booking-admin-card__actions">
-              <button type="button" onClick={() => startEdit(booking)}>Edit</button>
-              <button
-                type="button"
-                onClick={() => createInvite(booking)}
-                disabled={invitingKey === booking.id}
-                title="Create a party invite link from this booking"
-              >
-                {invitingKey === booking.id ? "…" : "Party link"}
-              </button>
-              <button
-                type="button"
-                onClick={() => openBookingEmail(booking)}
-                disabled={!booking.email}
-                title={booking.email ? "Email this contact" : "No email on this booking"}
-              >
-                Booking email
-              </button>
-              {booking.status === "cancelled" ? (
-                <button type="button" onClick={() => setStatus(booking, "confirmed")}>Restore</button>
+              {isPast(booking) ? (
+                <span className="booking-admin-card__past">Past party · read-only</span>
               ) : (
-                <button type="button" onClick={() => setStatus(booking, "cancelled")}>Cancel</button>
+                <>
+                  <button type="button" onClick={() => startEdit(booking)}>Edit</button>
+                  <button
+                    type="button"
+                    onClick={() => createInvite(booking)}
+                    disabled={invitingKey === booking.id}
+                    title="Create a party invite link from this booking"
+                  >
+                    {invitingKey === booking.id ? "…" : "Party link"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openBookingEmail(booking)}
+                    disabled={!booking.email}
+                    title={booking.email ? "Email this contact" : "No email on this booking"}
+                  >
+                    Booking email
+                  </button>
+                  {booking.status === "cancelled" ? (
+                    <button type="button" onClick={() => setStatus(booking, "confirmed")}>Restore</button>
+                  ) : (
+                    <button type="button" onClick={() => setStatus(booking, "cancelled")}>Cancel</button>
+                  )}
+                  <button type="button" className="booking-admin-btn--danger" onClick={() => removeBooking(booking)}>
+                    Delete
+                  </button>
+                </>
               )}
-              <button type="button" className="booking-admin-btn--danger" onClick={() => removeBooking(booking)}>
-                Delete
-              </button>
             </div>
           </article>
         ))}
@@ -891,6 +1060,14 @@ export default function AdminBookingsPage() {
       {inviteData ? <InviteModal data={inviteData} onClose={() => setInviteData(null)} /> : null}
       {emailTarget ? (
         <EmailComposeModal {...emailTarget} onClose={() => setEmailTarget(null)} />
+      ) : null}
+      {importPreview ? (
+        <ImportPreviewModal
+          preview={importPreview}
+          importing={importing}
+          onConfirm={confirmImport}
+          onCancel={cancelImport}
+        />
       ) : null}
     </AdminShell>
   );
