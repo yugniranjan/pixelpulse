@@ -187,12 +187,15 @@ export default function AdminBookingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           childName: source.childName,
+          // Force the invite slug to be derived from the child's name.
+          slug: source.childName,
           partyId: source.partyId,
           date: source.date,
           time: source.startTime,
           rsvpName: source.customerName,
           phone: source.phone,
           title: `${source.childName}'s Birthday`,
+          venue: "Pixel Pulse Playzone",
         }),
       });
       const data = await response.json();

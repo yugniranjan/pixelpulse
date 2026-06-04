@@ -41,6 +41,10 @@ export default function WaiverReportsPage() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
+  const [partyIdFilter, setPartyIdFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
 
   async function loadReport(rangeFrom, rangeTo) {
     setLoading(true);
@@ -76,6 +80,23 @@ export default function WaiverReportsPage() {
   }, [report]);
 
   const summary = report?.summary || {};
+  const filteredRows = useMemo(() => {
+    const nameNeedle = nameFilter.trim().toLowerCase();
+    const emailNeedle = emailFilter.trim().toLowerCase();
+    const partyNeedle = partyIdFilter.trim().toLowerCase();
+
+    return (report?.rows || []).filter((row) => {
+      const matchesName =
+        !nameNeedle || String(row.primaryName || "").toLowerCase().includes(nameNeedle);
+      const matchesEmail =
+        !emailNeedle || String(row.email || "").toLowerCase().includes(emailNeedle);
+      const matchesPartyId =
+        !partyNeedle || String(row.partyId || "").toLowerCase().includes(partyNeedle);
+      const matchesType = typeFilter === "all" || String(row.type || "").toLowerCase() === typeFilter;
+
+      return matchesName && matchesEmail && matchesPartyId && matchesType;
+    });
+  }, [emailFilter, nameFilter, partyIdFilter, report, typeFilter]);
 
   const kpis = [
     { label: "Total waivers", value: summary.totalWaivers ?? 0 },
@@ -94,19 +115,39 @@ export default function WaiverReportsPage() {
   }
 
   function exportWaivers() {
-    if (!report?.rows?.length) return;
-    const header = ["Date", "Name", "Type", "Participants", "Party ID", "Email", "Phone", "Submitted"];
-    const rows = report.rows.map((r) => [
+    if (!filteredRows.length) return;
+    const header = [
+      "Date",
+      "Name",
+      "Email",
+      "Phone",
+      "Party ID",
+      "Walk-in",
+      "Party",
+      "Type",
+      "Participants",
+      "Submitted",
+    ];
+    const rows = filteredRows.map((r) => [
       r.date,
       r.primaryName,
-      r.type,
-      r.participants,
-      r.partyId,
       r.email,
       r.phone,
+      r.partyId,
+      r.type === "Walk-in" ? "Yes" : "No",
+      r.type === "Party" ? "Yes" : "No",
+      r.type,
+      r.participants,
       r.submittedAt,
     ]);
     downloadCsv(`waiver-list-${from}_to_${to}.csv`, [header, ...rows]);
+  }
+
+  function clearRecordFilters() {
+    setNameFilter("");
+    setEmailFilter("");
+    setPartyIdFilter("");
+    setTypeFilter("all");
   }
 
   return (
@@ -139,7 +180,7 @@ export default function WaiverReportsPage() {
           <button type="button" className="booking-admin-btn--ghost" onClick={exportByDate} disabled={!report?.byDate?.length}>
             Export by-date CSV
           </button>
-          <button type="button" className="booking-admin-btn--ghost" onClick={exportWaivers} disabled={!report?.rows?.length}>
+          <button type="button" className="booking-admin-btn--ghost" onClick={exportWaivers} disabled={!filteredRows.length}>
             Export waiver list CSV
           </button>
         </div>
@@ -198,9 +239,36 @@ export default function WaiverReportsPage() {
           <div className="report-records">
             <div className="report-bydate__head">
               <h2>Waiver records</h2>
-              <span>{report.rows.length} {report.rows.length === 1 ? "record" : "records"}</span>
+              <span>
+                {filteredRows.length} of {report.rows.length} {report.rows.length === 1 ? "record" : "records"}
+              </span>
             </div>
-            {report.rows.length === 0 ? (
+            <div className="report-record-filters">
+              <label>
+                <span>Name</span>
+                <input value={nameFilter} onChange={(event) => setNameFilter(event.target.value)} placeholder="Search name" />
+              </label>
+              <label>
+                <span>Email</span>
+                <input value={emailFilter} onChange={(event) => setEmailFilter(event.target.value)} placeholder="Search email" />
+              </label>
+              <label>
+                <span>Party ID</span>
+                <input value={partyIdFilter} onChange={(event) => setPartyIdFilter(event.target.value)} placeholder="Search Party ID" />
+              </label>
+              <label>
+                <span>Type</span>
+                <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+                  <option value="all">All</option>
+                  <option value="walk-in">Walk-in</option>
+                  <option value="party">Party</option>
+                </select>
+              </label>
+              <button type="button" className="booking-admin-btn--ghost" onClick={clearRecordFilters}>
+                Clear filters
+              </button>
+            </div>
+            {filteredRows.length === 0 ? (
               <p className="booking-admin-empty">No waivers in this range.</p>
             ) : (
               <>
@@ -212,25 +280,27 @@ export default function WaiverReportsPage() {
                         <th>Name</th>
                         <th>Party ID</th>
                         <th>Email</th>
+                        <th>Walk-in</th>
                         <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {report.rows.slice(0, RECORD_LIMIT).map((row) => (
+                      {filteredRows.slice(0, RECORD_LIMIT).map((row) => (
                         <tr key={row.id}>
                           <td>{row.date || "—"}</td>
                           <td>{row.primaryName || "—"}</td>
                           <td>{row.partyId || "—"}</td>
                           <td>{row.email || "—"}</td>
+                          <td>{row.type === "Walk-in" ? "Yes" : "No"}</td>
                           <td>{row.type}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                {report.rows.length > RECORD_LIMIT ? (
+                {filteredRows.length > RECORD_LIMIT ? (
                   <p className="report-records__note">
-                    Showing first {RECORD_LIMIT} of {report.rows.length}. Use “Export waiver list CSV” for the full set.
+                    Showing first {RECORD_LIMIT} of {filteredRows.length}. Use “Export waiver list CSV” for the full filtered set.
                   </p>
                 ) : null}
               </>
