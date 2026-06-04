@@ -308,6 +308,17 @@ function normalizeBuyNowText(value = "") {
   return String(value || "").trim().toLowerCase() === "book now" ? "Buy Now" : value;
 }
 
+function buildSummerPassNotice(addonsTitle = "", addons = []) {
+  const noticeItems = addons.filter(Boolean);
+  const firstItem = noticeItems[0] || "";
+  const firstItemIsTitle = /^buy your pass/i.test(firstItem);
+
+  return {
+    addonsTitle: addonsTitle || (firstItemIsTitle ? firstItem : DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
+    addons: firstItemIsTitle ? noticeItems.slice(1) : noticeItems,
+  };
+}
+
 function parseSummerPassCards(configData = []) {
   const jsonCards = getConfigValues(configData, "summerPlayPassCards")
     .flatMap((value) => {
@@ -346,6 +357,18 @@ function parseSummerPassCards(configData = []) {
 function buildSummerPlayPassContent(configData = [], pageData = {}) {
   const sources = [configData, pageData || {}];
   const cards = parseSummerPassCards(configData);
+  const notice = buildSummerPassNotice(
+    resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"],
+      fallback: "",
+    }),
+    splitConfigList(resolveConfiguredValue({
+      sources,
+      keys: ["summerPlayPassAddons", "summerPassAddons"],
+      fallback: DEFAULT_SUMMER_PLAY_PASS.addons.join("|"),
+    })),
+  );
 
   return {
     sectionLabel: resolveConfiguredValue({
@@ -389,16 +412,8 @@ function buildSummerPlayPassContent(configData = [], pageData = {}) {
       keys: ["summerPlayPassValueText", "summerPassValueText"],
       fallback: DEFAULT_SUMMER_PLAY_PASS.valueText,
     }),
-    addonsTitle: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.addonsTitle,
-    }),
-    addons: splitConfigList(resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassAddons", "summerPassAddons"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.addons.join("|"),
-    })),
+    addonsTitle: notice.addonsTitle,
+    addons: notice.addons,
     termsTitle: resolveConfiguredValue({
       sources,
       keys: ["summerPlayPassTermsTitle", "summerPassTermsTitle"],

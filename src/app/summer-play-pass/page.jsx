@@ -198,6 +198,17 @@ function normalizeBuyNowText(value = "") {
   return String(value || "").trim().toLowerCase() === "book now" ? "Buy Now" : value;
 }
 
+function buildSummerPassNotice(addonsTitle = "", addons = []) {
+  const noticeItems = addons.filter(Boolean);
+  const firstItem = noticeItems[0] || "";
+  const firstItemIsTitle = /^buy your pass/i.test(firstItem);
+
+  return {
+    addonsTitle: addonsTitle || (firstItemIsTitle ? firstItem : DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
+    addons: firstItemIsTitle ? noticeItems.slice(1) : noticeItems,
+  };
+}
+
 function parseConfigMatrix(configData, key) {
   const normalizedKey = String(key || "").trim().toLowerCase();
 
@@ -284,6 +295,10 @@ function parseSummerPassCards(configData = []) {
 
 function buildSummerPlayPassContent(configData = []) {
   const cards = parseSummerPassCards(configData);
+  const notice = buildSummerPassNotice(
+    getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], ""),
+    splitConfigList(getConfiguredValue(configData, ["summerPlayPassAddons", "summerPassAddons"], DEFAULT_SUMMER_PLAY_PASS.addons.join("|"))),
+  );
 
   return {
     title: getConfiguredValue(configData, ["summerPlayPassTitle", "summerPassTitle"], DEFAULT_SUMMER_PLAY_PASS.title),
@@ -293,8 +308,8 @@ function buildSummerPlayPassContent(configData = []) {
     bookingText: normalizeBuyNowText(getConfiguredValue(configData, ["summerPlayPassBookingText", "summerPassBookingText"], DEFAULT_SUMMER_PLAY_PASS.bookingText)),
     valueTitle: getConfiguredValue(configData, ["summerPlayPassValueTitle", "summerPassValueTitle"], DEFAULT_SUMMER_PLAY_PASS.valueTitle),
     valueText: getConfiguredValue(configData, ["summerPlayPassValueText", "summerPassValueText"], DEFAULT_SUMMER_PLAY_PASS.valueText),
-    addonsTitle: getConfiguredValue(configData, ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"], DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
-    addons: splitConfigList(getConfiguredValue(configData, ["summerPlayPassAddons", "summerPassAddons"], DEFAULT_SUMMER_PLAY_PASS.addons.join("|"))),
+    addonsTitle: notice.addonsTitle,
+    addons: notice.addons,
     termsTitle: getConfiguredValue(configData, ["summerPlayPassTermsTitle", "summerPassTermsTitle"], DEFAULT_SUMMER_PLAY_PASS.termsTitle),
     terms: splitConfigList(getConfiguredValue(configData, ["summerPlayPassTerms", "summerPassTerms"], DEFAULT_SUMMER_PLAY_PASS.terms.join("|"))),
     cta: getConfiguredValue(configData, ["summerPlayPassCta", "summerPassCta"], DEFAULT_SUMMER_PLAY_PASS.cta),
