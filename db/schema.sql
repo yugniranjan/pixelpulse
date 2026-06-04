@@ -83,6 +83,7 @@ create table if not exists party_bookings (
   child_name text,
   child_age text,
   package text,
+  party_id text,
   party_size integer,
   booking_date text not null,
   start_time text not null,
@@ -100,3 +101,4 @@ create table if not exists party_bookings (
 
 create index if not exists party_bookings_date_idx on party_bookings (booking_date);
 create index if not exists party_bookings_status_idx on party_bookings (status);
+create index if not exists party_bookings_party_id_idx on party_bookings (party_id);

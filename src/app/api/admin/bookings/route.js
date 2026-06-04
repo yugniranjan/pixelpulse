@@ -30,6 +30,17 @@ function conflictResponse(conflict) {
   );
 }
 
+function duplicateResponse(result) {
+  return NextResponse.json(
+    {
+      error: result.duplicateMessage || "A matching booking already exists.",
+      code: "BOOKING_DUPLICATE",
+      duplicate: result.duplicate,
+    },
+    { status: 409 },
+  );
+}
+
 export async function GET(req) {
   if (!hasPostgres()) return dbUnavailable();
 
@@ -62,6 +73,7 @@ export async function POST(req) {
   try {
     const result = await createBooking(body);
     if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
+    if (result.duplicate) return duplicateResponse(result);
     if (result.conflict) return conflictResponse(result.conflict);
     return NextResponse.json({ booking: result.booking }, { status: 201 });
   } catch (error) {
@@ -88,6 +100,7 @@ export async function PUT(req) {
     const result = await updateBooking(id, body);
     if (result.notFound) return NextResponse.json({ error: "Booking not found." }, { status: 404 });
     if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
+    if (result.duplicate) return duplicateResponse(result);
     if (result.conflict) return conflictResponse(result.conflict);
     return NextResponse.json({ booking: result.booking });
   } catch (error) {

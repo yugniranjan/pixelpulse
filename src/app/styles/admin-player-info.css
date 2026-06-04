@@ -1,0 +1,188 @@
+/* Modern refresh for the Player Info (waivers) dashboard.
+   Layered over admin-waivers.css and scoped to .waiver-admin-page--dashboard
+   so the shared admin shell and other admin pages are untouched. */
+
+.waiver-admin-page--dashboard {
+  --pi-green: #a4cf5f;
+  --pi-green-deep: #7fb43e;
+  --pi-ink: #0f172a;
+  --pi-muted: #64748b;
+  --pi-line: #e7eaf1;
+  --pi-soft: #f1f5f9;
+}
+
+/* ---- header ---- */
+.waiver-admin-page--dashboard .waiver-admin-header--dashboard {
+  padding: 22px 24px;
+  border: 1px solid var(--pi-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(620px 200px at 100% 0%, rgba(164, 207, 95, 0.16), transparent 70%),
+    #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.waiver-admin-page--dashboard .waiver-admin-kicker {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(164, 207, 95, 0.16);
+  color: var(--pi-green-deep);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-header h1 {
+  margin: 10px 0 4px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--pi-ink);
+}
+
+.waiver-admin-page--dashboard .waiver-admin-header p {
+  color: var(--pi-muted);
+}
+
+/* ---- tabs as a pill segmented control ---- */
+.waiver-admin-page--dashboard .waiver-admin-tabs {
+  gap: 4px;
+  margin: 20px 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pi-soft);
+  box-shadow: none;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-tabs button {
+  min-width: 130px;
+  border-radius: 999px;
+  color: var(--pi-muted);
+  font-weight: 700;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-tabs button:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--pi-ink);
+}
+
+.waiver-admin-page--dashboard .waiver-admin-tabs button.is-active {
+  background: var(--pi-green);
+  color: #0b1a05;
+  box-shadow: 0 6px 16px rgba(164, 207, 95, 0.4);
+}
+
+/* ---- KPI cards with cycling accent bars ---- */
+.waiver-admin-page--dashboard .waiver-admin-stats {
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-stats article {
+  position: relative;
+  padding: 18px 20px 18px 22px;
+  border: 1px solid var(--pi-line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  transition: transform 160ms ease, box-shadow 200ms ease;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-stats article::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent, var(--pi-green));
+}
+
+.waiver-admin-page--dashboard .waiver-admin-stats article:nth-child(1) { --accent: #a4cf5f; }
+.waiver-admin-page--dashboard .waiver-admin-stats article:nth-child(2) { --accent: #38bdf8; }
+.waiver-admin-page--dashboard .waiver-admin-stats article:nth-child(3) { --accent: #fbbf24; }
+.waiver-admin-page--dashboard .waiver-admin-stats article:nth-child(4) { --accent: #a78bfa; }
+
+.waiver-admin-page--dashboard .waiver-admin-stats article:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.1);
+}
+
+.waiver-admin-page--dashboard .waiver-admin-stats span {
+  color: var(--pi-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-stats strong {
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-weight: 800;
+  color: var(--pi-ink);
+}
+
+/* ---- party ID groups ---- */
+.waiver-admin-page--dashboard .waiver-party-groups {
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid article {
+  border: 1px solid var(--pi-line);
+  border-radius: 14px;
+  background: #ffffff;
+  transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid article:hover {
+  transform: translateY(-3px);
+  border-color: rgba(164, 207, 95, 0.6);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid strong {
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(164, 207, 95, 0.16);
+  color: var(--pi-green-deep);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid dd {
+  font-weight: 700;
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid button {
+  border-radius: 9px;
+  transition: filter 150ms ease;
+}
+
+.waiver-admin-page--dashboard .waiver-party-groups__grid button:hover {
+  filter: brightness(0.96);
+}
+
+/* ---- record cards (waivers/players) ---- */
+.waiver-admin-page--dashboard .waiver-admin-card {
+  border-radius: 14px;
+  border: 1px solid var(--pi-line);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.waiver-admin-page--dashboard .waiver-admin-card:hover {
+  border-color: rgba(164, 207, 95, 0.5);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* ---- toolbar / pagination polish ---- */
+.waiver-admin-page--dashboard .waiver-data-toolbar {
+  border-radius: 16px;
+}
+
+.waiver-admin-page--dashboard .waiver-data-pagination button {
+  border-radius: 9px;
+}

@@ -23,6 +23,7 @@ const EMPTY_FORM = {
   childName: "",
   childAge: "",
   package: "",
+  partyId: "",
   partySize: "",
   date: "",
   startTime: "",
@@ -71,6 +72,70 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
+function InviteModal({ data, onClose }) {
+  const [copied, setCopied] = useState("");
+
+  function copy(key, text) {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(
+        () => {
+          setCopied(key);
+          setTimeout(() => setCopied(""), 1500);
+        },
+        () => {},
+      );
+    }
+  }
+
+  return (
+    <div className="booking-invite-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="booking-invite-modal" onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="booking-invite-modal__close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
+        <h2>Party link ready</h2>
+        <p className="booking-invite-sub">Party ID {data.partyId} · /invite/{data.slug}</p>
+
+        <label className="booking-invite-field">
+          <span>Invite link</span>
+          <div className="booking-invite-row">
+            <input readOnly value={data.inviteUrl} onFocus={(event) => event.target.select()} />
+            <button type="button" onClick={() => copy("invite", data.inviteUrl)}>
+              {copied === "invite" ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </label>
+
+        <label className="booking-invite-field">
+          <span>Waiver link</span>
+          <div className="booking-invite-row">
+            <input readOnly value={data.waiverUrl} onFocus={(event) => event.target.select()} />
+            <button type="button" onClick={() => copy("waiver", data.waiverUrl)}>
+              {copied === "waiver" ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </label>
+
+        <label className="booking-invite-field">
+          <span>SMS text</span>
+          <textarea readOnly rows={6} value={data.smsText} />
+        </label>
+
+        <div className="booking-invite-actions">
+          <button type="button" onClick={() => copy("sms", data.smsText)}>
+            {copied === "sms" ? "Copied" : "Copy SMS"}
+          </button>
+          <a href={data.inviteUrl} target="_blank" rel="noreferrer">Open invite</a>
+        </div>
+
+        {data.qrCodeUrl ? (
+          <img className="booking-invite-qr" src={data.qrCodeUrl} alt="Invite QR code" width={180} height={180} />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +158,55 @@ export default function AdminBookingsPage() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+
+  const [inviteData, setInviteData] = useState(null);
+  const [invitingKey, setInvitingKey] = useState("");
+
+  // Create a party invite link straight from a booking (or the current form),
+  // reusing the existing /api/admin/invites endpoint. No navigation needed.
+  async function createInvite(source) {
+    const missing = [];
+    if (!source.childName) missing.push("child's name");
+    if (!source.partyId) missing.push("Party ID");
+    if (!source.customerName) missing.push("customer name");
+    if (!source.phone) missing.push("phone");
+    if (!source.date) missing.push("date");
+    if (!source.startTime) missing.push("start time");
+    if (missing.length) {
+      if (typeof window !== "undefined") {
+        window.alert(`To create a party link, add: ${missing.join(", ")}.`);
+      }
+      return;
+    }
+
+    const key = source.id || "form";
+    setInvitingKey(key);
+    try {
+      const response = await fetch("/api/admin/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          childName: source.childName,
+          partyId: source.partyId,
+          date: source.date,
+          time: source.startTime,
+          rsvpName: source.customerName,
+          phone: source.phone,
+          title: `${source.childName}'s Birthday`,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (typeof window !== "undefined") window.alert(data.error || "Unable to create party link.");
+        return;
+      }
+      setInviteData(data);
+    } catch {
+      if (typeof window !== "undefined") window.alert("Unable to create party link.");
+    } finally {
+      setInvitingKey("");
+    }
+  }
 
   async function loadBookings() {
     setLoading(true);
@@ -176,8 +290,9 @@ export default function AdminBookingsPage() {
       const data = await response.json();
 
       if (response.status === 409) {
-        setConflict(data.conflict || []);
-        setFormError(data.error || "That time is already booked.");
+        // Time overlap returns `conflict`; duplicate Party ID/email returns just a message.
+        setConflict(data.conflict || null);
+        setFormError(data.error || "That booking conflicts with an existing one.");
         return;
       }
       if (!response.ok) {
@@ -203,6 +318,7 @@ export default function AdminBookingsPage() {
       childName: booking.childName || "",
       childAge: booking.childAge || "",
       package: booking.package || "",
+      partyId: booking.partyId || "",
       partySize: booking.partySize ? String(booking.partySize) : "",
       date: booking.date || "",
       startTime: booking.startTime || "",
@@ -330,6 +446,7 @@ export default function AdminBookingsPage() {
       "Child",
       "Age",
       "Package",
+      "Party ID",
       "Party size",
       "Notes",
     ];
@@ -344,6 +461,7 @@ export default function AdminBookingsPage() {
       b.childName,
       b.childAge,
       b.package,
+      b.partyId || "",
       b.partySize || "",
       b.notes,
     ]);
@@ -399,6 +517,11 @@ export default function AdminBookingsPage() {
                   <option value={name} key={name} />
                 ))}
               </datalist>
+            </label>
+
+            <label>
+              <span>Party ID</span>
+              <input name="partyId" value={form.partyId} onChange={updateField} placeholder="Link to waiver party ID" />
             </label>
 
             <label>
@@ -469,6 +592,15 @@ export default function AdminBookingsPage() {
                 Cancel edit
               </button>
             ) : null}
+            <button
+              type="button"
+              className="booking-admin-btn--ghost"
+              onClick={() => createInvite(form)}
+              disabled={invitingKey === "form"}
+              title="Generate a party invite link from these details"
+            >
+              {invitingKey === "form" ? "Creating…" : "Create party link"}
+            </button>
           </div>
         </form>
 
@@ -630,7 +762,7 @@ export default function AdminBookingsPage() {
             <div className="booking-admin-card__who">
               <strong>{booking.customerName}</strong>
               <span>
-                {[booking.childName && `Child: ${booking.childName}`, booking.childAge && `Age ${booking.childAge}`, booking.package, booking.partySize && `${booking.partySize} guests`]
+                {[booking.childName && `Child: ${booking.childName}`, booking.childAge && `Age ${booking.childAge}`, booking.package, booking.partySize && `${booking.partySize} guests`, booking.partyId && `Party ID: ${booking.partyId}`]
                   .filter(Boolean)
                   .join(" · ")}
               </span>
@@ -641,6 +773,14 @@ export default function AdminBookingsPage() {
             </div>
             <div className="booking-admin-card__actions">
               <button type="button" onClick={() => startEdit(booking)}>Edit</button>
+              <button
+                type="button"
+                onClick={() => createInvite(booking)}
+                disabled={invitingKey === booking.id}
+                title="Create a party invite link from this booking"
+              >
+                {invitingKey === booking.id ? "…" : "Party link"}
+              </button>
               {booking.status === "cancelled" ? (
                 <button type="button" onClick={() => setStatus(booking, "confirmed")}>Restore</button>
               ) : (
@@ -665,6 +805,8 @@ export default function AdminBookingsPage() {
           </div>
         </div>
       ) : null}
+
+      {inviteData ? <InviteModal data={inviteData} onClose={() => setInviteData(null)} /> : null}
     </AdminShell>
   );
 }

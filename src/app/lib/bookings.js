@@ -20,6 +20,7 @@ const CREATE_TABLE_SQL = `
     child_name text,
     child_age text,
     package text,
+    party_id text,
     party_size integer,
     booking_date text not null,
     start_time text not null,
@@ -34,8 +35,10 @@ const CREATE_TABLE_SQL = `
     updated_at timestamptz,
     raw jsonb not null default '{}'::jsonb
   );
+  alter table party_bookings add column if not exists party_id text;
   create index if not exists party_bookings_date_idx on party_bookings (booking_date);
   create index if not exists party_bookings_status_idx on party_bookings (status);
+  create index if not exists party_bookings_party_id_idx on party_bookings (party_id);
 `;
 
 let tableReady;
@@ -97,6 +100,7 @@ function normalizeBookingRow(row = {}) {
     childName: row.child_name || raw.childName || "",
     childAge: row.child_age || raw.childAge || "",
     package: row.package || raw.package || "",
+    partyId: row.party_id || raw.partyId || "",
     partySize: row.party_size ?? raw.partySize ?? null,
     date: row.booking_date || raw.date || "",
     startTime: row.start_time || raw.startTime || "",
@@ -149,6 +153,7 @@ export function buildBookingValues(input = {}) {
       childName: String(input.childName || "").trim(),
       childAge: String(input.childAge || "").trim(),
       package: String(input.package || "").trim(),
+      partyId: String(input.partyId || "").trim(),
       partySize,
       date,
       startTime: minutesToTime(startMinutes),
@@ -159,6 +164,43 @@ export function buildBookingValues(input = {}) {
       notes: String(input.notes || "").trim(),
     },
   };
+}
+
+/**
+ * Find existing (non-cancelled) bookings that duplicate this one by Party ID
+ * or email. Runs on a transaction client so the check + insert are atomic.
+ */
+async function findDuplicateRows(client, { partyId, email, excludeId }) {
+  const conditions = [];
+  const params = [];
+  if (partyId) {
+    params.push(partyId);
+    conditions.push(`lower(coalesce(party_id,'')) = lower($${params.length})`);
+  }
+  if (email) {
+    params.push(email);
+    conditions.push(`lower(coalesce(email,'')) = lower($${params.length})`);
+  }
+  if (!conditions.length) return null;
+
+  let sql = `select * from party_bookings where status <> 'cancelled' and (${conditions.join(" or ")})`;
+  if (excludeId) {
+    params.push(excludeId);
+    sql += ` and id <> $${params.length}`;
+  }
+  const result = await client.query(sql, params);
+  return result.rows.length ? result.rows : null;
+}
+
+function describeDuplicate(rows, value) {
+  const row = rows[0];
+  if (value.partyId && row.party_id && row.party_id.toLowerCase() === value.partyId.toLowerCase()) {
+    return `A booking with Party ID "${value.partyId}" already exists (${row.customer_name}).`;
+  }
+  if (value.email && row.email && row.email.toLowerCase() === value.email.toLowerCase()) {
+    return `A booking with email "${value.email}" already exists (${row.customer_name}).`;
+  }
+  return "A matching booking already exists.";
 }
 
 /* ----------------------------------------------------------------- reads */
@@ -192,7 +234,7 @@ export async function listBookings({ from, to, status, q, date } = {}) {
     params.push(`%${q.trim().toLowerCase()}%`);
     const idx = `$${params.length}`;
     where.push(
-      `(lower(customer_name) like ${idx} or lower(coalesce(child_name,'')) like ${idx} or lower(coalesce(phone,'')) like ${idx} or lower(coalesce(email,'')) like ${idx})`,
+      `(lower(customer_name) like ${idx} or lower(coalesce(child_name,'')) like ${idx} or lower(coalesce(phone,'')) like ${idx} or lower(coalesce(email,'')) like ${idx} or lower(coalesce(party_id,'')) like ${idx})`,
     );
   }
 
@@ -235,6 +277,15 @@ export async function createBooking(input = {}) {
     // serialize concurrent inserts for the same date
     await client.query("select pg_advisory_xact_lock(hashtext($1))", [value.date]);
 
+    const duplicate = await findDuplicateRows(client, { partyId: value.partyId, email: value.email });
+    if (duplicate) {
+      await client.query("rollback");
+      return {
+        duplicate: duplicate.map(normalizeBookingRow),
+        duplicateMessage: describeDuplicate(duplicate, value),
+      };
+    }
+
     const conflict = await client.query(
       `select * from party_bookings
        where booking_date = $1 and status <> 'cancelled'
@@ -250,11 +301,11 @@ export async function createBooking(input = {}) {
 
     const inserted = await client.query(
       `insert into party_bookings (
-        id, customer_name, phone, email, child_name, child_age, package, party_size,
+        id, customer_name, phone, email, child_name, child_age, package, party_id, party_size,
         booking_date, start_time, end_time, start_minutes, end_minutes, duration_minutes,
         status, notes, created_by, created_at, updated_at, raw
       ) values (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'confirmed',$15,$16,$17,$18,$19::jsonb
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'confirmed',$16,$17,$18,$19,$20::jsonb
       ) returning *`,
       [
         id,
@@ -264,6 +315,7 @@ export async function createBooking(input = {}) {
         value.childName,
         value.childAge,
         value.package,
+        value.partyId,
         value.partySize,
         value.date,
         value.startTime,
@@ -322,6 +374,19 @@ export async function updateBooking(id, input = {}) {
     await client.query("select pg_advisory_xact_lock(hashtext($1))", [value.date]);
 
     if (status !== "cancelled") {
+      const duplicate = await findDuplicateRows(client, {
+        partyId: value.partyId,
+        email: value.email,
+        excludeId: id,
+      });
+      if (duplicate) {
+        await client.query("rollback");
+        return {
+          duplicate: duplicate.map(normalizeBookingRow),
+          duplicateMessage: describeDuplicate(duplicate, value),
+        };
+      }
+
       const conflict = await client.query(
         `select * from party_bookings
          where booking_date = $1 and status <> 'cancelled' and id <> $2
@@ -339,9 +404,9 @@ export async function updateBooking(id, input = {}) {
     const updated = await client.query(
       `update party_bookings set
         customer_name = $2, phone = $3, email = $4, child_name = $5, child_age = $6,
-        package = $7, party_size = $8, booking_date = $9, start_time = $10, end_time = $11,
-        start_minutes = $12, end_minutes = $13, duration_minutes = $14, status = $15,
-        notes = $16, updated_at = $17, raw = $18::jsonb
+        package = $7, party_id = $8, party_size = $9, booking_date = $10, start_time = $11, end_time = $12,
+        start_minutes = $13, end_minutes = $14, duration_minutes = $15, status = $16,
+        notes = $17, updated_at = $18, raw = $19::jsonb
        where id = $1 returning *`,
       [
         id,
@@ -351,6 +416,7 @@ export async function updateBooking(id, input = {}) {
         value.childName,
         value.childAge,
         value.package,
+        value.partyId,
         value.partySize,
         value.date,
         value.startTime,

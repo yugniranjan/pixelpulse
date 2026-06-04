@@ -6,6 +6,8 @@ import AdminShell from "@/components/AdminShell";
 import "../../../styles/admin-waivers.css";
 import "../../../styles/admin-bookings.css";
 
+const RECORD_LIMIT = 200;
+
 function isoDate(date) {
   return date.toISOString().slice(0, 10);
 }
@@ -190,6 +192,48 @@ export default function WaiverReportsPage() {
                   ))}
                 </tbody>
               </table>
+            )}
+          </div>
+
+          <div className="report-records">
+            <div className="report-bydate__head">
+              <h2>Waiver records</h2>
+              <span>{report.rows.length} {report.rows.length === 1 ? "record" : "records"}</span>
+            </div>
+            {report.rows.length === 0 ? (
+              <p className="booking-admin-empty">No waivers in this range.</p>
+            ) : (
+              <>
+                <div className="report-records__scroll">
+                  <table className="report-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Party ID</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.rows.slice(0, RECORD_LIMIT).map((row) => (
+                        <tr key={row.id}>
+                          <td>{row.date || "—"}</td>
+                          <td>{row.primaryName || "—"}</td>
+                          <td>{row.partyId || "—"}</td>
+                          <td>{row.email || "—"}</td>
+                          <td>{row.type}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {report.rows.length > RECORD_LIMIT ? (
+                  <p className="report-records__note">
+                    Showing first {RECORD_LIMIT} of {report.rows.length}. Use “Export waiver list CSV” for the full set.
+                  </p>
+                ) : null}
+              </>
             )}
           </div>
         </>

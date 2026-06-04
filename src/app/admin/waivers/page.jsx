@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import AdminShell from "@/components/AdminShell";
 import "../../styles/admin-waivers.css";
+import "../../styles/admin-player-info.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -635,21 +636,7 @@ export default function AdminWaiversPage() {
   }
 
   return (
-    <main className="waiver-dashboard-shell">
-      <aside className="waiver-dashboard-sidebar" aria-label="Dashboard navigation">
-        <div className="waiver-dashboard-brand">
-          <img src="/assets/images/logo.png" alt="Pixel Pulse Play" />
-          <span>Admin</span>
-        </div>
-        <nav>
-          <Link className="is-active" href="/admin/waivers">Player Info</Link>
-          <Link href="/admin/invites">Create Party Links</Link>
-          <Link href="/admin/blogs">Blogs</Link>
-          <Link href="/waiver-data">Players Data</Link>
-        </nav>
-      </aside>
-
-      <section className="waiver-admin-page waiver-admin-page--dashboard">
+    <AdminShell>
         <div className="waiver-admin-header waiver-admin-header--dashboard">
           <div>
             <span className="waiver-admin-kicker">Admin dashboard</span>
@@ -876,8 +863,6 @@ export default function AdminWaiversPage() {
             ) : null}
           </>
         )}
-      </section>
-
       {editingWaiver && editForm ? (
         <WaiverEditModal
           error={editError}
@@ -888,6 +873,6 @@ export default function AdminWaiversPage() {
           saving={savingEdit}
         />
       ) : null}
-    </main>
+    </AdminShell>
   );
 }
