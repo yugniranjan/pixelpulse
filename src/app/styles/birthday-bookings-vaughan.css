@@ -516,31 +516,53 @@
   min-height: 56px;
 }
 
-/* Keep the native date/time picker clickable and recolor its indicator for the dark form. */
+/* Date/time inputs use one visible custom icon; the native picker remains the full click target. */
 .ppp-bday-booking-page .ppp-birthday-hero-form input[type="date"] {
+  position: relative;
+  padding-right: 42px;
   background-color: rgba(6, 10, 22, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23bcff6b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v16H3V6a2 2 0 0 1 2-2Z'/%3E%3C/svg%3E");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
   color-scheme: dark;
 }
 
 .ppp-bday-booking-page
   .ppp-birthday-hero-form
   input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: transparent;
   cursor: pointer;
-  filter: invert(89%) sepia(97%) saturate(493%) hue-rotate(32deg) brightness(104%) contrast(104%);
-  opacity: 1;
+  opacity: 0;
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form input[type="time"] {
+  position: relative;
+  padding-right: 42px;
   background-color: rgba(6, 10, 22, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23bcff6b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
   color-scheme: dark;
 }
 
 .ppp-bday-booking-page
   .ppp-birthday-hero-form
   input[type="time"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: transparent;
   cursor: pointer;
-  filter: invert(89%) sepia(97%) saturate(493%) hue-rotate(32deg) brightness(104%) contrast(104%);
-  opacity: 1;
+  opacity: 0;
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form button {
