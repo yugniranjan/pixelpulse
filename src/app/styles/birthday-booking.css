@@ -19,6 +19,14 @@
   gap: 12px;
 }
 
+/* Mobile/stacked: lead with the booking form, push the marketing copy below. */
+@media (max-width: 980px) {
+  .ppp-bday-booking-hero__layout > .ppp-bday-book {
+    order: -1;
+    margin-bottom: 20px;
+  }
+}
+
 .ppp-bday-book {
   position: relative;
   width: 100%;
