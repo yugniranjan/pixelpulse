@@ -11,10 +11,6 @@
 }
 
 .invite-admin-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
   margin-bottom: 22px;
 }
 
@@ -82,8 +78,7 @@
 }
 
 .invite-admin-form button,
-.invite-admin-output button,
-.invite-admin-export {
+.invite-admin-output button {
   min-height: 42px;
   border: 0;
   border-radius: 8px;
@@ -95,25 +90,13 @@
 }
 
 .invite-admin-form button:disabled,
-.invite-admin-output button:disabled,
-.invite-admin-export:disabled {
+.invite-admin-output button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.invite-admin-export {
-  flex: 0 0 auto;
-  margin-top: 2px;
-}
-
 .invite-admin-output small {
   color: #667085;
-  font-weight: 800;
-}
-
-.invite-admin-status {
-  margin: 0;
-  color: #175cd3;
   font-weight: 800;
 }
 
@@ -149,108 +132,6 @@
   overflow-wrap: anywhere;
 }
 
-.invite-admin-list {
-  margin-top: 22px;
-}
-
-.invite-admin-list__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.invite-admin-list__header p {
-  margin: 6px 0 0;
-  color: #667085;
-}
-
-.invite-admin-list__header button,
-.invite-admin-followup button {
-  min-height: 38px;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 16px;
-  background: #101828;
-  color: #ffffff;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.invite-admin-list__header button:disabled,
-.invite-admin-followup button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.invite-admin-followup {
-  display: grid;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid #e4e7ec;
-  border-radius: 8px;
-  background: #f9fafb;
-}
-
-.invite-admin-followup textarea {
-  min-height: 128px;
-}
-
-.invite-admin-followup__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.invite-admin-followup__actions span,
-.invite-admin-muted {
-  color: #667085;
-  font-size: 0.85rem;
-  font-weight: 800;
-}
-
-.invite-admin-table-wrap {
-  overflow-x: auto;
-}
-
-.invite-admin-table {
-  width: 100%;
-  min-width: 860px;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.invite-admin-table th,
-.invite-admin-table td {
-  padding: 11px 10px;
-  border-bottom: 1px solid #eaecf0;
-  text-align: left;
-  vertical-align: top;
-}
-
-.invite-admin-table th {
-  color: #667085;
-  font-size: 0.74rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.invite-admin-table td {
-  color: #101828;
-}
-
-.invite-admin-table a {
-  color: #175cd3;
-  font-weight: 800;
-}
-
-.invite-admin-table input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-}
-
 .invite-admin-qr img {
   width: 220px;
   height: 220px;
@@ -259,14 +140,6 @@
 }
 
 @media (max-width: 760px) {
-  .invite-admin-header {
-    display: grid;
-  }
-
-  .invite-admin-list__header {
-    display: grid;
-  }
-
   .invite-admin-grid {
     grid-template-columns: 1fr;
   }

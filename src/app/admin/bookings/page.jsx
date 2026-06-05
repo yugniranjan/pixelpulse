@@ -381,7 +381,6 @@ export default function AdminBookingsPage() {
           time: source.startTime,
           rsvpName: source.customerName,
           phone: source.phone,
-          email: source.email,
           title: `${source.childName}'s Birthday`,
           venue: "Pixel Pulse Playzone",
         }),

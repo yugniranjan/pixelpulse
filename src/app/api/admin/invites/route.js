@@ -6,7 +6,6 @@ import { partyWaiverDocId } from "@/lib/partyWaivers";
 import {
   getPostgresInviteByPartyId,
   hasPostgres,
-  listPostgresInvites,
   postgresInviteSlugExists,
   upsertPostgresInvite,
   upsertPostgresPartyWaiver,
@@ -46,25 +45,6 @@ function titleWithoutChildName(title = "", childName = "") {
 
 function plainSheetText(value = "") {
   return cleanText(value).replace(/<br\s*\/?>/gi, "\n");
-}
-
-function serializeFirestoreInvite(snapshot) {
-  if (!snapshot.exists) return null;
-  const data = snapshot.data() || {};
-  const toIso = (value) => {
-    if (!value) return "";
-    if (typeof value.toDate === "function") return value.toDate().toISOString();
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "" : date.toISOString();
-  };
-
-  return {
-    id: snapshot.id,
-    ...data,
-    slug: data.slug || snapshot.id,
-    createdAt: toIso(data.createdAt),
-    updatedAt: toIso(data.updatedAt),
-  };
 }
 
 async function getInviteDefaults() {
@@ -122,32 +102,7 @@ function getOrigin(req) {
   return new URL(req.url).origin;
 }
 
-async function listInvites() {
-  if (hasPostgres()) {
-    return listPostgresInvites(2000);
-  }
-
-  if (!db) return [];
-
-  const snapshot = await db.collection("invites").limit(2000).get();
-  return snapshot.docs
-    .map(serializeFirestoreInvite)
-    .filter(Boolean)
-    .sort((first, second) => {
-      const firstTime = new Date(first.updatedAt || first.createdAt || 0).getTime();
-      const secondTime = new Date(second.updatedAt || second.createdAt || 0).getTime();
-      return secondTime - firstTime;
-    });
-}
-
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  if (searchParams.get("list") === "1") {
-    return NextResponse.json({
-      invites: await listInvites(),
-    });
-  }
-
+export async function GET() {
   return NextResponse.json({
     defaults: await getInviteDefaults(),
   });
@@ -168,7 +123,6 @@ export async function POST(req) {
   const time = cleanText(body.time);
   const rsvpName = cleanText(body.rsvpName);
   const phone = cleanText(body.phone);
-  const email = cleanText(body.email || body.rsvpEmail);
 
   if (!childName || !partyId || !date || !time || !rsvpName || !phone) {
     return NextResponse.json(
@@ -226,7 +180,6 @@ export async function POST(req) {
     rsvpName,
     rsvpText: cleanText(body.rsvpText),
     phone,
-    email,
     businessPhoneLabel: cleanText(body.businessPhoneLabel) || "Pixel Pulse Phone",
     businessPhone: cleanText(body.businessPhone),
     directionsLabel: cleanText(body.directionsLabel) || "Directions",

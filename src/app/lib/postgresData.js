@@ -83,9 +83,6 @@ function normalizeInviteRow(row = {}) {
     waiverLink: row.waiver_link || raw.waiverLink || "",
     inviteUrl: row.invite_url || raw.inviteUrl || "",
     smsText: row.sms_text || raw.smsText || "",
-    email: raw.email || raw.rsvpEmail || "",
-    rsvpName: raw.rsvpName || "",
-    phone: raw.phone || "",
     createdAt: iso(row.created_at || raw.createdAt),
     updatedAt: iso(row.updated_at || raw.updatedAt),
   };
@@ -316,14 +313,6 @@ export async function getPostgresInviteByPartyId(partyId) {
     [partyId],
   );
   return result.rows[0] ? normalizeInviteRow(result.rows[0]) : null;
-}
-
-export async function listPostgresInvites(limit = 1000) {
-  const result = await query(
-    "select * from invites order by updated_at desc nulls last limit $1",
-    [limit],
-  );
-  return result.rows.map(normalizeInviteRow);
 }
 
 export async function postgresInviteSlugExists(slug) {
