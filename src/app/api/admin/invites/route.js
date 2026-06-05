@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import fs from "node:fs";
+import path from "node:path";
+import * as XLSX from "xlsx";
 import { db } from "@/lib/firestore";
 import { listBookings } from "@/lib/bookings";
 import { getConfigValue } from "@/lib/ctaContent";
@@ -25,6 +28,8 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
+const CUSTOMER_REPORT_PATH = path.join(process.cwd(), "src/app/data/report-export-customers.csv");
+let customerReportCache = null;
 
 function cleanText(value = "") {
   return String(value || "").trim();
@@ -47,6 +52,122 @@ function titleWithoutChildName(title = "", childName = "") {
 
 function plainSheetText(value = "") {
   return cleanText(value).replace(/<br\s*\/?>/gi, "\n");
+}
+
+function normalizePhone(value = "") {
+  return String(value || "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
+}
+
+function normalizeLookupValue(value = "") {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function reportValue(row = {}, key = "") {
+  if (typeof row[key] === "number" && /birth|birthday/i.test(key)) {
+    return XLSX.SSF.format("dd-mmm-yyyy", row[key]);
+  }
+  return cleanText(row[key]).replace(/^"+|"+$/g, "");
+}
+
+function childNameFromReport(row = {}, index) {
+  return [reportValue(row, `C${index} First Name`), reportValue(row, `C${index} Last Name`)]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+}
+
+function normalizeCustomerReportRow(row = {}) {
+  const children = [1, 2, 3]
+    .map((index) => ({
+      name: childNameFromReport(row, index),
+      birthday: reportValue(row, `C${index} Birthday`),
+    }))
+    .filter((child) => child.name || child.birthday);
+
+  return {
+    email: reportValue(row, "Email"),
+    phone: reportValue(row, "Primary Phone") || reportValue(row, "Secondary Phone"),
+    parentName: [reportValue(row, "First Name"), reportValue(row, "Last Name")].filter(Boolean).join(" ").trim(),
+    children,
+  };
+}
+
+function loadCustomerReport() {
+  if (customerReportCache) return customerReportCache;
+  if (!fs.existsSync(CUSTOMER_REPORT_PATH)) {
+    customerReportCache = [];
+    return customerReportCache;
+  }
+
+  const workbook = XLSX.readFile(CUSTOMER_REPORT_PATH);
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  customerReportCache = XLSX.utils
+    .sheet_to_json(worksheet, { defval: "" })
+    .map(normalizeCustomerReportRow)
+    .filter((customer) => customer.email || customer.phone || customer.parentName || customer.children.length);
+  return customerReportCache;
+}
+
+function customerReportLookups() {
+  const byEmail = new Map();
+  const byPhone = new Map();
+  const byParentName = new Map();
+
+  loadCustomerReport().forEach((customer) => {
+    const email = normalizeLookupValue(customer.email);
+    const phone = normalizePhone(customer.phone);
+    const parentName = normalizeLookupValue(customer.parentName);
+    if (email && !byEmail.has(email)) byEmail.set(email, customer);
+    if (phone && !byPhone.has(phone)) byPhone.set(phone, customer);
+    if (parentName && !byParentName.has(parentName)) byParentName.set(parentName, customer);
+  });
+
+  return { byEmail, byPhone, byParentName };
+}
+
+function matchingCustomerForInvite(invite = {}, lookups) {
+  const email = normalizeLookupValue(invite.email);
+  const phone = normalizePhone(invite.phone);
+  const name = normalizeLookupValue(invite.rsvpName);
+
+  return (
+    (email && lookups.byEmail.get(email)) ||
+    (phone && lookups.byPhone.get(phone)) ||
+    (name && lookups.byParentName.get(name)) ||
+    null
+  );
+}
+
+function matchingChild(customer, invite = {}) {
+  if (!customer?.children?.length) return null;
+  const childName = normalizeLookupValue(invite.childName);
+  if (childName) {
+    const exact = customer.children.find((child) => normalizeLookupValue(child.name) === childName);
+    if (exact) return exact;
+    const partial = customer.children.find((child) => {
+      const reportChildName = normalizeLookupValue(child.name);
+      return reportChildName && (reportChildName.includes(childName) || childName.includes(reportChildName));
+    });
+    if (partial) return partial;
+  }
+  return customer.children[0];
+}
+
+function enrichInviteFromCustomerReport(invite = {}, lookups) {
+  const customer = matchingCustomerForInvite(invite, lookups);
+  if (!customer) return invite;
+  const child = matchingChild(customer, invite);
+
+  return {
+    ...invite,
+    email: invite.email || customer.email || "",
+    emailSource: invite.emailSource || (customer.email ? "customer sheet" : ""),
+    rsvpName: invite.rsvpName || customer.parentName || "",
+    phone: invite.phone || customer.phone || "",
+    childName: invite.childName || child?.name || "",
+    birthday: invite.birthday || child?.birthday || "",
+    customerReportMatch: true,
+  };
 }
 
 function serializeFirestoreInvite(snapshot) {
@@ -169,6 +290,7 @@ async function listInvites() {
       rsvpName: invite.rsvpName || booking.customerName || "",
       phone: invite.phone || booking.phone || "",
       childName: invite.childName || booking.childName || "",
+      birthday: invite.birthday || "",
       bookingId: booking.id || "",
     };
   });
@@ -193,12 +315,14 @@ async function listInvites() {
       rsvpName: booking.customerName || "",
       phone: booking.phone || "",
       bookingId: booking.id || "",
+      birthday: "",
       rowSource: "booking",
       createdAt: booking.createdAt || "",
       updatedAt: booking.updatedAt || "",
     }));
 
-  return [...enrichedInvites, ...bookingOnlyRows].sort((first, second) => {
+  const customerLookups = customerReportLookups();
+  return [...enrichedInvites, ...bookingOnlyRows].map((invite) => enrichInviteFromCustomerReport(invite, customerLookups)).sort((first, second) => {
     const firstTime = new Date(first.updatedAt || first.createdAt || first.date || 0).getTime();
     const secondTime = new Date(second.updatedAt || second.createdAt || second.date || 0).getTime();
     return secondTime - firstTime;
