@@ -3,7 +3,6 @@ import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
 import "../styles/birthday-booking.css";
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
-import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import BirthdayBookingWidget from "@/components/BirthdayBookingWidget";
 import { BIRTHDAY_PACKAGES } from "@/lib/birthdayBooking";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
@@ -354,10 +353,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </div>
           </div>
 
-          <BirthdayHeroContactForm
-            urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
-            packageOptions={packageList.map((pkg) => pkg.name).filter(Boolean)}
-          />
+          <BirthdayBookingWidget packages={BIRTHDAY_PACKAGES} />
         </div>
       </section>
 
@@ -521,16 +517,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               </article>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="ppp-bday-booking-section ppp-bday-booking-section--reserve" id="reserve">
-        <div className="ppp-bday-booking-shell">
-          <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
-            <p>Reserve your date</p>
-            <h2>Book your <em>birthday party</em> online.</h2>
-          </div>
-          <BirthdayBookingWidget packages={BIRTHDAY_PACKAGES} />
         </div>
       </section>
 
