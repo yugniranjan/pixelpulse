@@ -399,6 +399,12 @@
   box-shadow: 0 0 26px rgba(240, 234, 34, 0.28), inset 0 0 18px rgba(240, 234, 34, 0.12);
 }
 
+.ppp-bday-final__actions .ppp-bday-final__primary:hover {
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  box-shadow: 0 0 40px rgba(188, 255, 107, 0.6), 0 18px 38px rgba(247, 148, 79, 0.34);
+}
+
 /* hero stats */
 .ppp-bday-hero-stats {
   display: grid;
