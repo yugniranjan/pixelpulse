@@ -4,8 +4,11 @@ import { getConfigValue } from "@/lib/ctaContent";
 import { normalizeInviteSlug } from "@/lib/invites";
 import { partyWaiverDocId } from "@/lib/partyWaivers";
 import {
+  deletePostgresInvite,
   getPostgresInviteByPartyId,
+  getPostgresInviteBySlug,
   hasPostgres,
+  listPostgresInvites,
   postgresInviteSlugExists,
   upsertPostgresInvite,
   upsertPostgresPartyWaiver,
@@ -45,6 +48,25 @@ function titleWithoutChildName(title = "", childName = "") {
 
 function plainSheetText(value = "") {
   return cleanText(value).replace(/<br\s*\/?>/gi, "\n");
+}
+
+function serializeFirestoreInvite(snapshot) {
+  if (!snapshot.exists) return null;
+  const data = snapshot.data() || {};
+  const toIso = (value) => {
+    if (!value) return "";
+    if (typeof value.toDate === "function") return value.toDate().toISOString();
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+  };
+
+  return {
+    id: snapshot.id,
+    ...data,
+    slug: data.slug || snapshot.id,
+    createdAt: toIso(data.createdAt),
+    updatedAt: toIso(data.updatedAt),
+  };
 }
 
 async function getInviteDefaults() {
@@ -102,7 +124,40 @@ function getOrigin(req) {
   return new URL(req.url).origin;
 }
 
-export async function GET() {
+async function listInvites() {
+  if (hasPostgres()) {
+    return listPostgresInvites(2000);
+  }
+
+  if (!db) return [];
+  const snapshot = await db.collection("invites").limit(2000).get();
+  return snapshot.docs
+    .map(serializeFirestoreInvite)
+    .filter(Boolean)
+    .sort((first, second) => {
+      const firstTime = new Date(first.updatedAt || first.createdAt || 0).getTime();
+      const secondTime = new Date(second.updatedAt || second.createdAt || 0).getTime();
+      return secondTime - firstTime;
+    });
+}
+
+function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
+  return [
+    invite.intro,
+    `${invite.dateLabel || "Date"}: ${invite.date}`,
+    `${invite.timeLabel || "Time"}: ${invite.time}`,
+    `${invite.addressLabel || "Address"}: ${invite.address}`,
+    `Invite: ${inviteUrl}`,
+    `Waiver: ${waiverLink}`,
+  ].filter(Boolean).join("\n");
+}
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  if (searchParams.get("list") === "1") {
+    return NextResponse.json({ invites: await listInvites() });
+  }
+
   return NextResponse.json({
     defaults: await getInviteDefaults(),
   });
@@ -195,14 +250,7 @@ export async function POST(req) {
     updatedAt: now,
   };
 
-  const smsText = [
-    intro,
-    `${invite.dateLabel}: ${date}`,
-    `${invite.timeLabel}: ${time}`,
-    `${invite.addressLabel}: ${invite.address}`,
-    `Invite: ${inviteUrl}`,
-    `Waiver: ${waiverLink}`,
-  ].filter(Boolean).join("\n");
+  const smsText = buildSmsText(invite, inviteUrl, waiverLink);
 
   const inviteRecord = {
     ...invite,
@@ -250,4 +298,103 @@ export async function POST(req) {
     smsText,
     qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(inviteUrl)}&size=220`,
   });
+}
+
+export async function PUT(req) {
+  if (!db && !hasPostgres()) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 },
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const slug = normalizeInviteSlug(searchParams.get("slug"));
+  if (!slug) return NextResponse.json({ error: "Invite slug is required." }, { status: 400 });
+
+  const body = await req.json();
+  const existing = hasPostgres()
+    ? await getPostgresInviteBySlug(slug)
+    : serializeFirestoreInvite(await db.collection("invites").doc(slug).get());
+  if (!existing) return NextResponse.json({ error: "Invite not found." }, { status: 404 });
+
+  const origin = getOrigin(req);
+  const inviteUrl = existing.inviteUrl || `${origin}/invite/${slug}`;
+  const partyId = cleanText(body.partyId) || existing.partyId || "";
+  const waiverLink = partyId
+    ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
+    : existing.waiverLink || `${origin}/waiver`;
+  const updatedAt = new Date();
+  const invite = {
+    ...existing,
+    slug,
+    partyId,
+    active: cleanText(body.active) || existing.active || "1",
+    childName: cleanText(body.childName) || existing.childName || "",
+    title: titleWithoutChildName(cleanText(body.title) || existing.title || "Birthday Party", cleanText(body.childName) || existing.childName || "") || "Birthday Party",
+    titleSuffix: cleanText(body.titleSuffix) || existing.titleSuffix || cleanText(body.title) || existing.title || "Birthday Party",
+    greeting: cleanText(body.greeting) || existing.greeting || DEFAULT_GREETING,
+    guestName: cleanText(body.guestName) || existing.guestName || DEFAULT_GUEST_LINE,
+    intro: cleanText(body.intro) || existing.intro || DEFAULT_PARTY_INTRO,
+    dateLabel: existing.dateLabel || "Date",
+    date: cleanText(body.date) || existing.date || "",
+    timeLabel: existing.timeLabel || "Time",
+    time: cleanText(body.time) || existing.time || "",
+    venueLabel: existing.venueLabel || "Place",
+    venue: cleanText(body.venue) || existing.venue || "",
+    addressLabel: existing.addressLabel || "Address",
+    address: cleanText(body.address) || existing.address || DEFAULT_ADDRESS,
+    waiverLabel: existing.waiverLabel || "Waiver",
+    waiverText: cleanText(body.waiverText) || existing.waiverText || "",
+    waiverButton: cleanText(body.waiverButton) || existing.waiverButton || "Complete waiver",
+    waiverLink,
+    rsvpLabel: existing.rsvpLabel || "RSVP",
+    rsvpName: cleanText(body.rsvpName) || existing.rsvpName || "",
+    rsvpText: cleanText(body.rsvpText) || existing.rsvpText || "",
+    phone: cleanText(body.phone) || existing.phone || "",
+    businessPhoneLabel: existing.businessPhoneLabel || "Pixel Pulse Phone",
+    businessPhone: cleanText(body.businessPhone) || existing.businessPhone || "",
+    directionsLabel: existing.directionsLabel || "Directions",
+    directionsText: existing.directionsText || "Open map",
+    directionsLink: cleanText(body.directionsLink) || existing.directionsLink || DEFAULT_DIRECTIONS_LINK,
+    contactLinksLabel: existing.contactLinksLabel || "Pixel Pulse contact links",
+    footer: cleanText(body.footer) || existing.footer || "",
+    websiteText: cleanText(body.websiteText) || existing.websiteText || "",
+    websiteLink: cleanText(body.websiteLink) || existing.websiteLink || "",
+    logoAlt: existing.logoAlt || "Pixel Pulse Play logo",
+    metaTitle: existing.metaTitle || `${cleanText(body.title) || existing.title || "Birthday Party"} Invite`,
+    inviteUrl,
+    updatedAt,
+  };
+  invite.smsText = buildSmsText(invite, inviteUrl, waiverLink);
+
+  if (hasPostgres()) {
+    await upsertPostgresInvite(invite);
+  } else {
+    await db.collection("invites").doc(slug).set(invite, { merge: true });
+  }
+
+  return NextResponse.json({ success: true, invite });
+}
+
+export async function DELETE(req) {
+  if (!db && !hasPostgres()) {
+    return NextResponse.json(
+      { error: "Firestore is not configured locally" },
+      { status: 503 },
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const slug = normalizeInviteSlug(searchParams.get("slug"));
+  if (!slug) return NextResponse.json({ error: "Invite slug is required." }, { status: 400 });
+
+  if (hasPostgres()) {
+    const deleted = await deletePostgresInvite(slug);
+    if (!deleted) return NextResponse.json({ error: "Invite not found." }, { status: 404 });
+  } else {
+    await db.collection("invites").doc(slug).delete();
+  }
+
+  return NextResponse.json({ success: true });
 }

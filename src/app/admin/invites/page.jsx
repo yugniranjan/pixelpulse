@@ -65,6 +65,12 @@ export default function AdminInvitesPage() {
   const [emailTo, setEmailTo] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [invites, setInvites] = useState([]);
+  const [loadingInvites, setLoadingInvites] = useState(false);
+  const [editingInvite, setEditingInvite] = useState(null);
+  const [savingInvite, setSavingInvite] = useState(false);
+  const [deletingSlug, setDeletingSlug] = useState("");
+  const [inviteStatus, setInviteStatus] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
 
   const suggestedSlug = useMemo(
@@ -110,6 +116,35 @@ export default function AdminInvitesPage() {
     loadInviteDefaults();
   }, []);
 
+  async function loadInvites() {
+    setLoadingInvites(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/admin/invites?list=1", {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to load invites.");
+        return;
+      }
+
+      setInvites(data.invites || []);
+    } catch (loadError) {
+      setError("Unable to load invites.");
+    } finally {
+      setLoadingInvites(false);
+    }
+  }
+
+  useEffect(() => {
+    loadInvites();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
   }
@@ -146,6 +181,7 @@ export default function AdminInvitesPage() {
       setError(data.error || "Unable to create invite.");
     } else {
       setResult(data);
+      loadInvites();
     }
 
     setLoading(false);
@@ -186,6 +222,96 @@ export default function AdminInvitesPage() {
       setEmailStatus("Unable to send email.");
     } finally {
       setSendingEmail(false);
+    }
+  }
+
+  function beginEditInvite(invite) {
+    setEditingInvite({
+      slug: invite.slug || "",
+      childName: invite.childName || "",
+      partyId: invite.partyId || "",
+      title: invite.title || "",
+      greeting: invite.greeting || DEFAULT_GREETING,
+      guestName: invite.guestName || DEFAULT_GUEST_LINE,
+      intro: invite.intro || "",
+      date: invite.date || "",
+      time: invite.time || "",
+      venue: invite.venue || "",
+      address: invite.address || "",
+      waiverText: invite.waiverText || "",
+      waiverButton: invite.waiverButton || "Complete waiver",
+      rsvpText: invite.rsvpText || "",
+      rsvpName: invite.rsvpName || "",
+      phone: invite.phone || "",
+      businessPhone: invite.businessPhone || DEFAULT_BUSINESS_PHONE,
+      directionsLink: invite.directionsLink || DEFAULT_DIRECTIONS_LINK,
+      footer: invite.footer || "",
+      websiteText: invite.websiteText || "",
+      websiteLink: invite.websiteLink || "",
+    });
+    setInviteStatus("");
+  }
+
+  function updateEditingInvite(name, value) {
+    setEditingInvite((current) => ({ ...current, [name]: value }));
+  }
+
+  async function saveEditingInvite(event) {
+    event.preventDefault();
+    if (!editingInvite?.slug) return;
+    setSavingInvite(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/invites?slug=${encodeURIComponent(editingInvite.slug)}`, {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingInvite),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to update invite.");
+        return;
+      }
+
+      setEditingInvite(null);
+      setInviteStatus("Invite updated.");
+      loadInvites();
+    } catch (saveError) {
+      setError("Unable to update invite.");
+    } finally {
+      setSavingInvite(false);
+    }
+  }
+
+  async function deleteInvite(invite) {
+    const slug = invite.slug;
+    if (!slug) return;
+    if (typeof window !== "undefined" && !window.confirm(`Delete invite ${slug}?`)) return;
+    setDeletingSlug(slug);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/invites?slug=${encodeURIComponent(slug)}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to delete invite.");
+        return;
+      }
+
+      if (editingInvite?.slug === slug) setEditingInvite(null);
+      setInviteStatus("Invite deleted.");
+      loadInvites();
+    } catch (deleteError) {
+      setError("Unable to delete invite.");
+    } finally {
+      setDeletingSlug("");
     }
   }
 
@@ -327,6 +453,126 @@ export default function AdminInvitesPage() {
             </div>
           </section>
         ) : null}
+
+        {editingInvite ? (
+          <form className="invite-admin-form invite-admin-edit" onSubmit={saveEditingInvite}>
+            <section>
+              <div className="invite-admin-list__header">
+                <div>
+                  <h2>Edit Invite</h2>
+                  <p>Editing /invite/{editingInvite.slug}</p>
+                </div>
+                <button type="button" onClick={() => setEditingInvite(null)}>Cancel</button>
+              </div>
+              <div className="invite-admin-grid">
+                <Field label="Child name" required>
+                  <input required value={editingInvite.childName} onChange={(event) => updateEditingInvite("childName", event.target.value)} />
+                </Field>
+                <Field label="Party ID" required>
+                  <input required value={editingInvite.partyId} onChange={(event) => updateEditingInvite("partyId", event.target.value)} />
+                </Field>
+                <Field label="Title">
+                  <input value={editingInvite.title} onChange={(event) => updateEditingInvite("title", event.target.value)} />
+                </Field>
+                <Field label="Date" required>
+                  <input required type="date" value={editingInvite.date} onChange={(event) => updateEditingInvite("date", event.target.value)} />
+                </Field>
+                <Field label="Time" required>
+                  <input required type="time" value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} />
+                </Field>
+                <Field label="RSVP name" required>
+                  <input required value={editingInvite.rsvpName} onChange={(event) => updateEditingInvite("rsvpName", event.target.value)} />
+                </Field>
+                <Field label="RSVP phone" required>
+                  <input required value={editingInvite.phone} onChange={(event) => updateEditingInvite("phone", event.target.value)} />
+                </Field>
+                <Field label="Venue">
+                  <input value={editingInvite.venue} onChange={(event) => updateEditingInvite("venue", event.target.value)} />
+                </Field>
+                <Field label="Address">
+                  <input value={editingInvite.address} onChange={(event) => updateEditingInvite("address", event.target.value)} />
+                </Field>
+                <Field label="Greeting">
+                  <input value={editingInvite.greeting} onChange={(event) => updateEditingInvite("greeting", event.target.value)} />
+                </Field>
+                <Field label="Intro">
+                  <textarea value={editingInvite.intro} onChange={(event) => updateEditingInvite("intro", event.target.value)} />
+                </Field>
+                <Field label="Footer">
+                  <textarea value={editingInvite.footer} onChange={(event) => updateEditingInvite("footer", event.target.value)} />
+                </Field>
+              </div>
+            </section>
+            <button type="submit" disabled={savingInvite}>
+              {savingInvite ? "Saving..." : "Save Invite"}
+            </button>
+          </form>
+        ) : null}
+
+        <section className="invite-admin-result invite-admin-list">
+          <div className="invite-admin-list__header">
+            <div>
+              <h2>Invite Records</h2>
+              <p>View, edit, or delete party invite links created from admin.</p>
+            </div>
+            <button type="button" onClick={loadInvites} disabled={loadingInvites}>
+              {loadingInvites ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
+          {inviteStatus ? <p className="invite-admin-status">{inviteStatus}</p> : null}
+          <div className="invite-admin-table-wrap">
+            <table className="invite-admin-table">
+              <thead>
+                <tr>
+                  <th>Child</th>
+                  <th>Party ID</th>
+                  <th>Date</th>
+                  <th>RSVP</th>
+                  <th>Invite</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadingInvites ? (
+                  <tr>
+                    <td colSpan={6}>Loading invites...</td>
+                  </tr>
+                ) : invites.length ? (
+                  invites.map((invite) => (
+                    <tr key={invite.slug || invite.id || invite.inviteUrl}>
+                      <td>{invite.childName || "—"}</td>
+                      <td>{invite.partyId || "—"}</td>
+                      <td>{[invite.date, invite.time].filter(Boolean).join(" ") || "—"}</td>
+                      <td>{[invite.rsvpName, invite.phone].filter(Boolean).join(" · ") || "—"}</td>
+                      <td>
+                        {invite.inviteUrl ? (
+                          <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer">View</a>
+                        ) : "—"}
+                      </td>
+                      <td>
+                        <div className="invite-admin-table__actions">
+                          <button type="button" onClick={() => beginEditInvite(invite)}>Edit</button>
+                          <button
+                            type="button"
+                            className="invite-admin-table__delete"
+                            onClick={() => deleteInvite(invite)}
+                            disabled={deletingSlug === invite.slug}
+                          >
+                            {deletingSlug === invite.slug ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6}>No invite records found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </AdminShell>
   );

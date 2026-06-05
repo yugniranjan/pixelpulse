@@ -315,6 +315,14 @@ export async function getPostgresInviteByPartyId(partyId) {
   return result.rows[0] ? normalizeInviteRow(result.rows[0]) : null;
 }
 
+export async function listPostgresInvites(limit = 1000) {
+  const result = await query(
+    "select * from invites order by updated_at desc nulls last limit $1",
+    [limit],
+  );
+  return result.rows.map(normalizeInviteRow);
+}
+
 export async function postgresInviteSlugExists(slug) {
   const result = await query("select 1 from invites where slug = $1 limit 1", [slug]);
   return result.rowCount > 0;
@@ -352,4 +360,9 @@ export async function upsertPostgresInvite(invite) {
       json({ ...invite, updatedAt: now.toISOString() }, {}),
     ],
   );
+}
+
+export async function deletePostgresInvite(slug) {
+  const result = await query("delete from invites where slug = $1", [slug]);
+  return result.rowCount > 0;
 }
