@@ -288,7 +288,6 @@ export default function AdminInvitesPage() {
         "Title",
         "Date",
         "Time",
-        "Birthday",
         "RSVP Name",
         "RSVP Phone",
         "RSVP Email",
@@ -307,7 +306,6 @@ export default function AdminInvitesPage() {
         invite.title || "",
         invite.date || "",
         invite.time || "",
-        invite.birthday || "",
         invite.rsvpName || "",
         invite.phone || "",
         invite.email || "",
@@ -597,7 +595,6 @@ export default function AdminInvitesPage() {
                   <th>Child</th>
                   <th>Party ID</th>
                   <th>Date</th>
-                  <th>Birthday</th>
                   <th>RSVP</th>
                   <th>Email</th>
                   <th>Source</th>
@@ -608,7 +605,7 @@ export default function AdminInvitesPage() {
               <tbody>
                 {loadingInvites ? (
                   <tr>
-                    <td colSpan={10}>Loading invites...</td>
+                    <td colSpan={9}>Loading invites...</td>
                   </tr>
                 ) : invites.length ? (
                   invites.map((invite) => {
@@ -629,7 +626,6 @@ export default function AdminInvitesPage() {
                         <td>{invite.childName || "—"}</td>
                         <td>{invite.partyId || "—"}</td>
                         <td>{[invite.date, invite.time].filter(Boolean).join(" ") || "—"}</td>
-                        <td>{invite.birthday || "—"}</td>
                         <td>{invite.rsvpName || invite.phone || "—"}</td>
                         <td>{invite.email || <span className="invite-admin-muted">No email</span>}</td>
                         <td>{invite.emailSource || "—"}</td>
@@ -646,7 +642,7 @@ export default function AdminInvitesPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={10}>No invite records found.</td>
+                    <td colSpan={9}>No invite records found.</td>
                   </tr>
                 )}
               </tbody>
