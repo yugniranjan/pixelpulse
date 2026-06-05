@@ -369,8 +369,16 @@
   box-shadow: 0 0 28px rgba(188, 255, 107, 0.4), 0 14px 30px rgba(247, 148, 79, 0.24);
 }
 
+.ppp-bday-final__actions .ppp-bday-final__primary {
+  border: 0;
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  box-shadow: 0 0 28px rgba(188, 255, 107, 0.4), 0 14px 30px rgba(247, 148, 79, 0.24);
+}
+
 .ppp-bday-booking-actions button:hover,
-.ppp-bday-final__actions button:hover {
+.ppp-bday-final__actions button:hover,
+.ppp-bday-final__actions .ppp-bday-final__primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 40px rgba(188, 255, 107, 0.6), 0 18px 38px rgba(247, 148, 79, 0.34);
 }

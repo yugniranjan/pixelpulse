@@ -3,7 +3,6 @@ import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
-import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 
@@ -530,7 +529,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <span>Summer weekend spots fill quickly. Reserve your preferred party date today.</span>
           </div>
           <div className="ppp-bday-final__actions">
-            <BookingButton title="Book your party" bookingType="party" />
+            <a className="ppp-bday-final__primary" href="#birthday-party-form">
+              Book your party
+            </a>
             <a href={phoneUrl}>Call now</a>
           </div>
         </div>
