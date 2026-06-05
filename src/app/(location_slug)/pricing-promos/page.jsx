@@ -230,7 +230,7 @@ const DEFAULT_SUMMER_PLAY_PASS = {
   sectionTitle: "Choose Your Summer Play Pass",
   title: "Unlimited Summer. Unlimited Play.",
   subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
-  bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php",
+  bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlineproductsales/sales2.php?ptid=15",
   bookingText: "Buy Now",
   cards: [
     {
