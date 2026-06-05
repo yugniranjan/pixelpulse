@@ -340,7 +340,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               Interactive challenge rooms for kids, tweens, and teens.
             </p>
             <div className="ppp-bday-booking-actions">
-              <BookingButton title="Book your party" bookingType="party" />
               <a href="#packages">View party packages</a>
             </div>
             <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
@@ -380,7 +379,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
                     </li>
                   ))}
                 </ul>
-                <BookingButton title="Book this package" bookingType="party" />
+                <a className="ppp-bday-package-link" href="#birthday-party-form">
+                  Book this package
+                </a>
               </article>
             ))}
           </div>

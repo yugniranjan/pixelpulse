@@ -735,7 +735,8 @@
   line-height: 1.4;
 }
 
-.ppp-bday-package-grid button {
+.ppp-bday-package-grid button,
+.ppp-bday-package-link {
   margin-top: 6px;
   min-height: 46px;
   border: 0;
@@ -746,12 +747,15 @@
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
   box-shadow: 0 0 22px rgba(188, 255, 107, 0.28), 0 10px 22px rgba(247, 148, 79, 0.2);
   transition: transform 160ms ease, box-shadow 200ms ease;
 }
 
-.ppp-bday-package-grid button:hover {
+.ppp-bday-package-grid button:hover,
+.ppp-bday-package-link:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 34px rgba(188, 255, 107, 0.45), 0 14px 28px rgba(247, 148, 79, 0.3);
 }
