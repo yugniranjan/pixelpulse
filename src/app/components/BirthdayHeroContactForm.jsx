@@ -10,10 +10,12 @@ const INITIAL_FORM = {
   email: "",
   phone: "",
   date: "",
+  time: "",
+  selectedPackage: "",
   message: "",
 };
 
-export default function BirthdayHeroContactForm({ urgency = "" }) {
+export default function BirthdayHeroContactForm({ urgency = "", packageOptions = [] }) {
   const router = useRouter();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
@@ -39,8 +41,9 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
           ...formData,
           from: "birthday-party-landing",
           selectedEvent: "BirthDay Party",
+          selectedPackage: formData.selectedPackage,
           subject: `${formData.fullName} - Birthday Party Inquiry`,
-          time: "",
+          time: formData.time,
         }),
       });
 
@@ -142,6 +145,34 @@ export default function BirthdayHeroContactForm({ urgency = "" }) {
             onChange={updateField}
           />
         </label>
+
+        <label>
+          <span>Preferred time</span>
+          <input
+            type="time"
+            name="time"
+            value={formData.time}
+            onChange={updateField}
+          />
+        </label>
+
+        {packageOptions.length > 0 ? (
+          <label>
+            <span>Party package</span>
+            <select
+              name="selectedPackage"
+              value={formData.selectedPackage}
+              onChange={updateField}
+            >
+              <option value="">Select a package</option>
+              {packageOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
 
         <label className="ppp-birthday-hero-form__wide">
           <span>Party notes</span>

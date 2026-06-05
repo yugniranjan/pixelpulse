@@ -53,6 +53,7 @@ export async function POST(request) {
       time,
       message,
       selectedEvent,
+      selectedPackage,
       from,
     } = body || {};
 
@@ -109,6 +110,7 @@ export async function POST(request) {
       `Phone: ${visitorPhone}`,
       `Preferred Date: ${date || "Not provided"}`,
       `Preferred Time: ${time || "Not provided"}`,
+      `Party Package: ${selectedPackage || "Not provided"}`,
       "",
       "Message:",
       message || "No message provided",
@@ -126,6 +128,7 @@ export async function POST(request) {
         <p><strong>Phone:</strong> ${escapeHtml(visitorPhone)}</p>
         <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
         <p><strong>Preferred Time:</strong> ${escapeHtml(time || "Not provided")}</p>
+        <p><strong>Party Package:</strong> ${escapeHtml(selectedPackage || "Not provided")}</p>
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message || "No message provided")}</p>
       </div>

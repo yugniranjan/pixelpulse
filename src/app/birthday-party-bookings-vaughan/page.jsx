@@ -352,7 +352,10 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </div>
           </div>
 
-          <BirthdayHeroContactForm urgency="Summer weekend spots fill quickly. Reserve your preferred party date today." />
+          <BirthdayHeroContactForm
+            urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
+            packageOptions={packageList.map((pkg) => pkg.name).filter(Boolean)}
+          />
         </div>
       </section>
 
