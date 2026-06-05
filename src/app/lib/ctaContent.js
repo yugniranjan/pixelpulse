@@ -31,15 +31,20 @@ export function hasConfiguredKey(data = [], keys = []) {
 export function resolveConfiguredValue({
   sources = [],
   keys = [],
-  value = "",
+  value,
   fallback = "",
 }) {
-  const configured = (Array.isArray(sources) ? sources : [sources]).some((source) =>
-    hasConfiguredKey(source, keys),
-  );
+  const sourceList = Array.isArray(sources) ? sources : [sources];
+  const configuredSource = sourceList.find((source) => hasConfiguredKey(source, keys));
 
-  if (configured) {
-    return value || "";
+  if (configuredSource) {
+    if (value !== undefined) {
+      return value || "";
+    }
+
+    return Array.isArray(configuredSource)
+      ? getConfigValue(configuredSource, keys)
+      : getRowValue(configuredSource, keys);
   }
 
   return value || fallback;
