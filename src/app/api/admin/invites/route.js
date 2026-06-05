@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
-import { listBookings } from "@/lib/bookings";
 import { getConfigValue } from "@/lib/ctaContent";
 import { normalizeInviteSlug } from "@/lib/invites";
 import { partyWaiverDocId } from "@/lib/partyWaivers";
@@ -124,49 +123,21 @@ function getOrigin(req) {
 }
 
 async function listInvites() {
-  let invites = [];
-
   if (hasPostgres()) {
-    invites = await listPostgresInvites(2000);
-  } else if (db) {
-    const snapshot = await db.collection("invites").limit(2000).get();
-    invites = snapshot.docs
-      .map(serializeFirestoreInvite)
-      .filter(Boolean)
-      .sort((first, second) => {
-        const firstTime = new Date(first.updatedAt || first.createdAt || 0).getTime();
-        const secondTime = new Date(second.updatedAt || second.createdAt || 0).getTime();
-        return secondTime - firstTime;
-      });
+    return listPostgresInvites(2000);
   }
 
-  if (!invites.length || !hasPostgres()) {
-    return invites;
-  }
+  if (!db) return [];
 
-  const bookings = await listBookings({});
-  const bookingsByPartyId = new Map(
-    bookings
-      .filter((booking) => booking.partyId)
-      .map((booking) => [booking.partyId.toLowerCase(), booking]),
-  );
-
-  return invites.map((invite) => {
-    const booking = invite.partyId
-      ? bookingsByPartyId.get(String(invite.partyId).toLowerCase())
-      : null;
-    if (!booking) return invite;
-
-    return {
-      ...invite,
-      email: invite.email || booking.email || "",
-      emailSource: invite.email ? "invite" : booking.email ? "booking" : "",
-      rsvpName: invite.rsvpName || booking.customerName || "",
-      phone: invite.phone || booking.phone || "",
-      childName: invite.childName || booking.childName || "",
-      bookingId: booking.id || "",
-    };
-  });
+  const snapshot = await db.collection("invites").limit(2000).get();
+  return snapshot.docs
+    .map(serializeFirestoreInvite)
+    .filter(Boolean)
+    .sort((first, second) => {
+      const firstTime = new Date(first.updatedAt || first.createdAt || 0).getTime();
+      const secondTime = new Date(second.updatedAt || second.createdAt || 0).getTime();
+      return secondTime - firstTime;
+    });
 }
 
 export async function GET(req) {
