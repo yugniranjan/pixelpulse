@@ -438,6 +438,75 @@
   }
 }
 
+/* selected-package details card on the date & time step */
+.ppp-bday-book__pkgcard {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(16, 23, 46, 0.5);
+}
+
+.ppp-bday-book__pkgcard-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ppp-bday-book__pkgcard-head strong {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.ppp-bday-book__pkgcard-price {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.ppp-bday-book__changepkg {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--lime);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ppp-bday-book__pkgcard-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 4px 18px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-bday-book__pkgcard-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 0;
+  font-size: 0.82rem;
+}
+
+.ppp-bday-book__pkgcard-list span {
+  color: var(--muted);
+}
+
+.ppp-bday-book__pkgcard-list strong {
+  color: var(--ink);
+  font-weight: 600;
+  text-align: right;
+}
+
 /* "Choose start time" label above the slot grid */
 .ppp-bday-book__slotlabel {
   display: block;
