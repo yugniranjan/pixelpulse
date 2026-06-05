@@ -750,6 +750,9 @@
 
 .ppp-bday-package-grid button,
 .ppp-bday-package-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 6px;
   min-height: 46px;
   border: 0;
