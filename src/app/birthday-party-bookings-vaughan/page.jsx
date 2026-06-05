@@ -341,7 +341,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               Interactive challenge rooms for kids, tweens, and teens.
             </p>
             <div className="ppp-bday-booking-actions">
-              <a href="#packages">View party packages</a>
+              <a className="ppp-bday-hero-cta" href="#packages">View party packages</a>
             </div>
             <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
               {heroStats.map((item) => (

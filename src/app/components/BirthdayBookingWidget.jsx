@@ -150,7 +150,7 @@ export default function BirthdayBookingWidget({ packages = [], initialPackage = 
             {confirmed.date} · {confirmed.startTime}–{confirmed.endTime} · {confirmed.partySize} participants.
           </p>
           <p className="ppp-bday-book__muted">
-            A team member will reach out with the final details. See you soon!
+            Thanks! Our team will reach out within 24 hours to confirm your party details. See you soon!
           </p>
           <button
             type="button"
@@ -230,6 +230,8 @@ export default function BirthdayBookingWidget({ packages = [], initialPackage = 
                   <p className="ppp-bday-book__err">Fully booked on this date — please try another date.</p>
                 ) : null}
                 {slotsState === "ready" && slots.some((s) => s.available) ? (
+                  <>
+                  <span className="ppp-bday-book__slotlabel">Choose start time</span>
                   <div className="ppp-bday-book__slotgrid">
                     {slots.map((s) => (
                       <button
@@ -244,6 +246,7 @@ export default function BirthdayBookingWidget({ packages = [], initialPackage = 
                       </button>
                     ))}
                   </div>
+                  </>
                 ) : null}
               </div>
             ) : (
@@ -258,6 +261,10 @@ export default function BirthdayBookingWidget({ packages = [], initialPackage = 
             <div className="ppp-bday-book__summary">
               {selectedPackage?.name} · {date} · {slots.find((s) => s.time === time)?.label || time} · {selectedPackage?.totalDuration}
             </div>
+            <p className="ppp-bday-book__note">
+              Each additional participant beyond your package
+              {selectedPackage ? ` (over ${selectedPackage.capacity})` : ""} is charged <strong>$14.99</strong>, paid at the venue.
+            </p>
             <div className="ppp-bday-book__grid">
               <label className="ppp-bday-book__field">
                 <span>Your name</span>

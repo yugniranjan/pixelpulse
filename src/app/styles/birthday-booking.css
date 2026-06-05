@@ -409,3 +409,58 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Hero "View party packages" — promote to a glowing primary CTA.
+   Higher specificity than the default outline rule it overrides. */
+.ppp-bday-booking-actions a.ppp-bday-hero-cta {
+  border: 0;
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  box-shadow: 0 0 30px rgba(188, 255, 107, 0.5), 0 14px 30px rgba(247, 148, 79, 0.3);
+  animation: ppp-bday-cta-pulse 2.4s ease-in-out infinite;
+}
+
+.ppp-bday-booking-actions a.ppp-bday-hero-cta:hover {
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  color: #050810;
+  transform: translateY(-2px);
+  box-shadow: 0 0 46px rgba(188, 255, 107, 0.7), 0 18px 40px rgba(247, 148, 79, 0.4);
+}
+
+@keyframes ppp-bday-cta-pulse {
+  0%, 100% { box-shadow: 0 0 26px rgba(188, 255, 107, 0.45), 0 14px 30px rgba(247, 148, 79, 0.28); }
+  50% { box-shadow: 0 0 44px rgba(188, 255, 107, 0.7), 0 14px 30px rgba(247, 148, 79, 0.36); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppp-bday-booking-actions a.ppp-bday-hero-cta {
+    animation: none;
+  }
+}
+
+/* "Choose start time" label above the slot grid */
+.ppp-bday-book__slotlabel {
+  display: block;
+  margin: 4px 0 10px;
+  font-family: var(--display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* extra-participant pricing note */
+.ppp-bday-book__note {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--lime) 35%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--lime) 8%, transparent);
+  color: var(--ink);
+  font-size: 0.84rem;
+}
+
+.ppp-bday-book__note strong {
+  color: var(--lime);
+}
