@@ -44,10 +44,6 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
-function inviteRecordId(invite = {}) {
-  return invite.slug || invite.id || invite.bookingId || invite.partyId || invite.inviteUrl || "";
-}
-
 const DEFAULT_BUSINESS_PHONE = "+1 (905) 760-2922";
 const DEFAULT_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const DEFAULT_DIRECTIONS_LINK =
@@ -169,7 +165,7 @@ export default function AdminInvitesPage() {
 
       setInvites(data.invites || []);
       setSelectedIds((current) => {
-        const validIds = new Set((data.invites || []).map(inviteRecordId));
+        const validIds = new Set((data.invites || []).map((invite) => invite.slug || invite.id));
         return current.filter((id) => validIds.has(id));
       });
     } catch (loadError) {
@@ -292,7 +288,6 @@ export default function AdminInvitesPage() {
         "RSVP Phone",
         "RSVP Email",
         "Email Source",
-        "Record Source",
         "Invite URL",
         "Waiver URL",
         "SMS Text",
@@ -310,7 +305,6 @@ export default function AdminInvitesPage() {
         invite.phone || "",
         invite.email || "",
         invite.emailSource || "",
-        invite.rowSource || "invite",
         invite.inviteUrl || "",
         invite.waiverLink || invite.waiverUrl || "",
         invite.smsText || "",
@@ -325,7 +319,7 @@ export default function AdminInvitesPage() {
   }
 
   const selectedInvites = useMemo(
-    () => invites.filter((invite) => selectedIds.includes(inviteRecordId(invite))),
+    () => invites.filter((invite) => selectedIds.includes(invite.slug || invite.id)),
     [invites, selectedIds],
   );
   const emailableInvites = useMemo(
@@ -338,10 +332,10 @@ export default function AdminInvitesPage() {
   );
   const allEmailableSelected =
     emailableInvites.length > 0 &&
-    emailableInvites.every((invite) => selectedIds.includes(inviteRecordId(invite)));
+    emailableInvites.every((invite) => selectedIds.includes(invite.slug || invite.id));
 
   function toggleInvite(invite) {
-    const id = inviteRecordId(invite);
+    const id = invite.slug || invite.id;
     if (!id || !invite.email) return;
 
     setSelectedIds((current) =>
@@ -357,7 +351,7 @@ export default function AdminInvitesPage() {
       return;
     }
 
-    setSelectedIds(emailableInvites.map(inviteRecordId).filter(Boolean));
+    setSelectedIds(emailableInvites.map((invite) => invite.slug || invite.id).filter(Boolean));
   }
 
   async function sendFollowupEmail() {
@@ -598,18 +592,17 @@ export default function AdminInvitesPage() {
                   <th>RSVP</th>
                   <th>Email</th>
                   <th>Source</th>
-                  <th>Record</th>
                   <th>Invite</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingInvites ? (
                   <tr>
-                    <td colSpan={9}>Loading invites...</td>
+                    <td colSpan={8}>Loading invites...</td>
                   </tr>
                 ) : invites.length ? (
                   invites.map((invite) => {
-                    const id = inviteRecordId(invite);
+                    const id = invite.slug || invite.id;
                     const selected = selectedIds.includes(id);
 
                     return (
@@ -629,7 +622,6 @@ export default function AdminInvitesPage() {
                         <td>{invite.rsvpName || invite.phone || "—"}</td>
                         <td>{invite.email || <span className="invite-admin-muted">No email</span>}</td>
                         <td>{invite.emailSource || "—"}</td>
-                        <td>{invite.rowSource === "booking" ? "Booking only" : "Invite"}</td>
                         <td>
                           {invite.inviteUrl ? (
                             <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer">
@@ -642,7 +634,7 @@ export default function AdminInvitesPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={9}>No invite records found.</td>
+                    <td colSpan={8}>No invite records found.</td>
                   </tr>
                 )}
               </tbody>
