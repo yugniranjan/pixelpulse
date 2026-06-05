@@ -1277,6 +1277,23 @@
   cursor: not-allowed;
 }
 
+.party-hosts-toggle {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.party-hosts-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.party-hosts-srcflag {
+  color: #94a3b8;
+  font-style: normal;
+  cursor: help;
+}
+
 @media (max-width: 900px) {
   .report-kpis {
     grid-template-columns: repeat(3, minmax(0, 1fr));

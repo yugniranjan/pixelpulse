@@ -75,6 +75,17 @@ create table if not exists party_waivers (
   raw jsonb not null default '{}'::jsonb
 );
 
+-- Children per customer, imported from the LilYPad "Customer Emails By Sales"
+-- report (scripts/sales-children-import). Used as a last-resort fallback for a
+-- party host's child on the Party Hosts roster.
+create table if not exists customer_children (
+  email text primary key,
+  child_names text not null default '',
+  child_ages text not null default '',
+  source text not null default '',
+  updated_at timestamptz
+);
+
 create table if not exists party_bookings (
   id text primary key,
   customer_name text not null default '',
