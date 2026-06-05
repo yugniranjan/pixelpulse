@@ -265,17 +265,7 @@ async function listInvites() {
     return invites;
   }
 
-  let bookings = [];
-  try {
-    bookings = await listBookings({});
-  } catch (error) {
-    console.warn("Invite booking enrichment failed:", error?.message);
-  }
-
-  if (!bookings.length) {
-    return invites;
-  }
-
+  const bookings = await listBookings({});
   const bookingsByPartyId = new Map(
     bookings
       .filter((booking) => booking.partyId)
@@ -331,15 +321,8 @@ async function listInvites() {
       updatedAt: booking.updatedAt || "",
     }));
 
-  let enrichedRows = [...enrichedInvites, ...bookingOnlyRows];
-  try {
-    const customerLookups = customerReportLookups();
-    enrichedRows = enrichedRows.map((invite) => enrichInviteFromCustomerReport(invite, customerLookups));
-  } catch (error) {
-    console.warn("Invite customer report enrichment failed:", error?.message);
-  }
-
-  return enrichedRows.sort((first, second) => {
+  const customerLookups = customerReportLookups();
+  return [...enrichedInvites, ...bookingOnlyRows].map((invite) => enrichInviteFromCustomerReport(invite, customerLookups)).sort((first, second) => {
     const firstTime = new Date(first.updatedAt || first.createdAt || first.date || 0).getTime();
     const secondTime = new Date(second.updatedAt || second.createdAt || second.date || 0).getTime();
     return secondTime - firstTime;
@@ -349,14 +332,9 @@ async function listInvites() {
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   if (searchParams.get("list") === "1") {
-    try {
-      return NextResponse.json({
-        invites: await listInvites(),
-      });
-    } catch (error) {
-      console.error("list invites failed:", error);
-      return NextResponse.json({ error: "Unable to load invites." }, { status: 500 });
-    }
+    return NextResponse.json({
+      invites: await listInvites(),
+    });
   }
 
   return NextResponse.json({
