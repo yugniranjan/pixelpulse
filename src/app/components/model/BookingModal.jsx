@@ -89,6 +89,12 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
 
   const lilypadposParty = getConfigValue(dataconfig, ["lilypadpos_party"]);
   const lilypadposTicket = getConfigValue(dataconfig, ["lilypadpos_ticket"]);
+  const birthdayPartyBookingUrl =
+    getConfigValue(dataconfig, [
+      "bookingModalBirthdayPartyUrl",
+      "bookingModalPartyUrl",
+      "birthdayPartyBookingUrl",
+    ]) || "https://birthdays.pixelpulseplay.ca/";
 
   const isPartyPath = selectedBookingMode === "party";
   const iframeUrl = isPartyPath ? lilypadposParty : lilypadposTicket;
@@ -133,16 +139,27 @@ const BookingModal = ({ isOpen, onClose, bookingType }) => {
                   Reserve your spot in a few clicks. Pick a time, confirm your details,
                   and get ready for high-energy play.
                 </p>
-                {!isPartyPath && lilypadposParty && (
+                {!isPartyPath && (birthdayPartyBookingUrl || lilypadposParty) && (
                   <p className="booking-shell__party-inline">
                     Click here to{" "}
-                    <button
-                      type="button"
-                      className="booking-shell__party-cta"
-                      onClick={() => setSelectedBookingMode("party")}
-                    >
-                      Book A Birthday Party
-                    </button>
+                    {birthdayPartyBookingUrl ? (
+                      <a
+                        className="booking-shell__party-cta"
+                        href={birthdayPartyBookingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Book A Birthday Party
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="booking-shell__party-cta"
+                        onClick={() => setSelectedBookingMode("party")}
+                      >
+                        Book A Birthday Party
+                      </button>
+                    )}
                   </p>
                 )}
               </div>
