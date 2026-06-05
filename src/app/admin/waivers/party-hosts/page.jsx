@@ -70,6 +70,7 @@ export default function PartyHostsPage() {
   const [search, setSearch] = useState("");
   const [emailableOnly, setEmailableOnly] = useState(false);
   const [emailTarget, setEmailTarget] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -105,6 +106,36 @@ export default function PartyHostsPage() {
   }, [parties, search, emailableOnly]);
 
   const emailableHosts = useMemo(() => filtered.filter((p) => hasEmail(p.host)), [filtered]);
+
+  // Only hosts with a usable email are selectable. Selection is keyed by party ID.
+  const selectableIds = useMemo(() => emailableHosts.map((p) => p.partyId), [emailableHosts]);
+  const allVisibleSelected =
+    selectableIds.length > 0 && selectableIds.every((id) => selectedIds.includes(id));
+  const selectedHosts = useMemo(
+    () => emailableHosts.filter((p) => selectedIds.includes(p.partyId)),
+    [emailableHosts, selectedIds],
+  );
+
+  function toggleRow(id) {
+    setSelectedIds((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+  }
+
+  function toggleVisible() {
+    setSelectedIds((cur) => {
+      if (allVisibleSelected) return cur.filter((id) => !selectableIds.includes(id));
+      return Array.from(new Set([...cur, ...selectableIds]));
+    });
+  }
+
+  function emailSelected() {
+    if (!selectedHosts.length) return;
+    setEmailTarget({
+      title: `Email ${selectedHosts.length} selected ${selectedHosts.length === 1 ? "host" : "hosts"}`,
+      recipients: selectedHosts.map((p) => ({ email: p.host.email, name: p.host.name })),
+      defaultSubject: HOST_SUBJECT,
+      defaultMessage: HOST_MESSAGE,
+    });
+  }
 
   function emailHost(party) {
     if (!hasEmail(party.host)) return;
@@ -165,6 +196,15 @@ export default function PartyHostsPage() {
                 >
                   ✉ Email all hosts ({emailableHosts.length})
                 </button>
+                <button
+                  type="button"
+                  className="report-followup-btn report-followup-btn--selected"
+                  onClick={emailSelected}
+                  disabled={!selectedHosts.length}
+                  title={selectedHosts.length ? "Email the selected hosts" : "Select hosts with an email"}
+                >
+                  Email selected ({selectedHosts.length})
+                </button>
               </div>
             </div>
 
@@ -186,6 +226,15 @@ export default function PartyHostsPage() {
                 <table className="report-table">
                   <thead>
                     <tr>
+                      <th>
+                        <input
+                          type="checkbox"
+                          checked={allVisibleSelected}
+                          onChange={toggleVisible}
+                          disabled={!selectableIds.length}
+                          aria-label="Select all hosts with an email"
+                        />
+                      </th>
                       <th>Party ID</th>
                       <th>Date</th>
                       <th>Host</th>
@@ -199,6 +248,16 @@ export default function PartyHostsPage() {
                   <tbody>
                     {filtered.map((p) => (
                       <tr key={p.partyId}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(p.partyId)}
+                            onChange={() => toggleRow(p.partyId)}
+                            disabled={!hasEmail(p.host)}
+                            aria-label={`Select ${p.host.name || "host"}`}
+                            title={hasEmail(p.host) ? "Select this host" : "No usable email"}
+                          />
+                        </td>
                         <td>{p.partyId}</td>
                         <td>{p.visitDate || "—"}</td>
                         <td>{p.host.name || "—"}</td>
