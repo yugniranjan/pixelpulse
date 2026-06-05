@@ -140,7 +140,7 @@ async function listInvites() {
       });
   }
 
-  if (!invites.length || !hasPostgres()) {
+  if (!hasPostgres()) {
     return invites;
   }
 
@@ -150,8 +150,13 @@ async function listInvites() {
       .filter((booking) => booking.partyId)
       .map((booking) => [booking.partyId.toLowerCase(), booking]),
   );
+  const invitePartyIds = new Set(
+    invites
+      .map((invite) => String(invite.partyId || "").trim().toLowerCase())
+      .filter(Boolean),
+  );
 
-  return invites.map((invite) => {
+  const enrichedInvites = invites.map((invite) => {
     const booking = invite.partyId
       ? bookingsByPartyId.get(String(invite.partyId).toLowerCase())
       : null;
@@ -166,6 +171,37 @@ async function listInvites() {
       childName: invite.childName || booking.childName || "",
       bookingId: booking.id || "",
     };
+  });
+
+  const bookingOnlyRows = bookings
+    .filter((booking) => booking.partyId)
+    .filter((booking) => !invitePartyIds.has(String(booking.partyId).toLowerCase()))
+    .map((booking) => ({
+      id: `booking-${booking.id}`,
+      slug: "",
+      active: "1",
+      partyId: booking.partyId || "",
+      childName: booking.childName || "",
+      title: booking.package || "Birthday Party",
+      date: booking.date || "",
+      time: booking.startTime || "",
+      waiverLink: "",
+      inviteUrl: "",
+      smsText: "",
+      email: booking.email || "",
+      emailSource: booking.email ? "booking" : "",
+      rsvpName: booking.customerName || "",
+      phone: booking.phone || "",
+      bookingId: booking.id || "",
+      rowSource: "booking",
+      createdAt: booking.createdAt || "",
+      updatedAt: booking.updatedAt || "",
+    }));
+
+  return [...enrichedInvites, ...bookingOnlyRows].sort((first, second) => {
+    const firstTime = new Date(first.updatedAt || first.createdAt || first.date || 0).getTime();
+    const secondTime = new Date(second.updatedAt || second.createdAt || second.date || 0).getTime();
+    return secondTime - firstTime;
   });
 }
 
