@@ -287,6 +287,7 @@ export default function AdminInvitesPage() {
         "RSVP Name",
         "RSVP Phone",
         "RSVP Email",
+        "Email Source",
         "Invite URL",
         "Waiver URL",
         "SMS Text",
@@ -303,6 +304,7 @@ export default function AdminInvitesPage() {
         invite.rsvpName || "",
         invite.phone || "",
         invite.email || "",
+        invite.emailSource || "",
         invite.inviteUrl || "",
         invite.waiverLink || invite.waiverUrl || "",
         invite.smsText || "",
@@ -589,13 +591,14 @@ export default function AdminInvitesPage() {
                   <th>Date</th>
                   <th>RSVP</th>
                   <th>Email</th>
+                  <th>Source</th>
                   <th>Invite</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingInvites ? (
                   <tr>
-                    <td colSpan={7}>Loading invites...</td>
+                    <td colSpan={8}>Loading invites...</td>
                   </tr>
                 ) : invites.length ? (
                   invites.map((invite) => {
@@ -618,6 +621,7 @@ export default function AdminInvitesPage() {
                         <td>{[invite.date, invite.time].filter(Boolean).join(" ") || "—"}</td>
                         <td>{invite.rsvpName || invite.phone || "—"}</td>
                         <td>{invite.email || <span className="invite-admin-muted">No email</span>}</td>
+                        <td>{invite.emailSource || "—"}</td>
                         <td>
                           {invite.inviteUrl ? (
                             <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer">
@@ -630,7 +634,7 @@ export default function AdminInvitesPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={7}>No invite records found.</td>
+                    <td colSpan={8}>No invite records found.</td>
                   </tr>
                 )}
               </tbody>
