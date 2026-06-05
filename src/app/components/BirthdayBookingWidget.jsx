@@ -218,20 +218,12 @@ export default function BirthdayBookingWidget({ packages = [], initialPackage = 
         {step === 2 ? (
           <div className="ppp-bday-book__datetime">
             {selectedPackage ? (
-              <div className="ppp-bday-book__pkgcard">
-                <div className="ppp-bday-book__pkgcard-head">
-                  <strong>{selectedPackage.name}</strong>
-                  <span className="ppp-bday-book__pkgcard-price">{selectedPackage.price}</span>
-                  <button type="button" className="ppp-bday-book__changepkg" onClick={() => goStep(1)}>
-                    Change
-                  </button>
-                </div>
-                <ul className="ppp-bday-book__pkgcard-list">
-                  <li><span>Participants</span><strong>Up to {selectedPackage.capacity}</strong></li>
-                  <li><span>Game time</span><strong>{selectedPackage.gameTime}</strong></li>
-                  <li><span>Total duration</span><strong>{selectedPackage.totalDuration}</strong></li>
-                  <li><span>Refreshments</span><strong>{selectedPackage.refreshments}</strong></li>
-                </ul>
+              <div className="ppp-bday-book__pkgpick">
+                <span>Package</span>
+                <strong>{selectedPackage.name}</strong>
+                <button type="button" className="ppp-bday-book__changepkg" onClick={() => goStep(1)}>
+                  Change
+                </button>
               </div>
             ) : null}
 
