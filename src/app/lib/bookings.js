@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getPostgresPool, query } from "@/lib/postgres";
+import { OPEN_MINUTES, CLOSE_MINUTES, getPackage } from "@/lib/birthdayBooking";
 
 /**
  * Birthday party bookings data layer.
@@ -599,4 +600,136 @@ export async function bulkImportBookings(rows = []) {
   }
 
   return { inserted, updated, skipped, errors, total: rows.length };
+}
+
+/* ----------------------------------------------- public birthday booking */
+
+/** Non-cancelled booking windows for a date, as [{ start, end }] minutes. */
+export async function getBookedWindows(date) {
+  await ensureTable();
+  if (!isValidDate(date)) return [];
+  const result = await query(
+    `select start_minutes, end_minutes from party_bookings
+       where booking_date = $1 and status <> 'cancelled'
+       order by start_minutes asc`,
+    [date],
+  );
+  return result.rows.map((r) => ({ start: r.start_minutes, end: r.end_minutes }));
+}
+
+/**
+ * Create a booking from the public website. One room, one party at a time —
+ * the package's duration holds the room, and the same race-safe, advisory-locked
+ * overlap check as createBooking rejects double-bookings. Auto-confirmed.
+ *
+ * Returns: { booking } | { conflict: [...] } | { error }
+ */
+export async function createPublicBooking(input = {}) {
+  const customerName = String(input.customerName || "").trim();
+  const phone = String(input.phone || "").trim();
+  const email = String(input.email || "").trim();
+  const childName = String(input.childName || "").trim();
+  const childAge = String(input.childAge || "").trim();
+  const date = String(input.date || "").trim();
+  const startTime = String(input.startTime || "").trim();
+  const partySizeRaw = Number(input.partySize);
+
+  // The package is authoritative for duration + capacity — never trust the client.
+  const pkg = getPackage(input.package);
+  if (!pkg) return { error: "Please choose a valid party package." };
+
+  if (!customerName) return { error: "Your name is required." };
+  if (!/^[0-9()+\-.\s]{7,}$/.test(phone)) return { error: "A valid phone number is required." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "A valid email is required." };
+  if (!childName) return { error: "The birthday child's name is required." };
+  if (!isValidDate(date)) return { error: "Please choose a valid date." };
+  if (!Number.isFinite(partySizeRaw) || partySizeRaw <= 0) {
+    return { error: "Please enter the number of participants." };
+  }
+  if (partySizeRaw > pkg.capacity) {
+    return { error: `${pkg.name} is for up to ${pkg.capacity} participants. Choose a larger package.` };
+  }
+
+  const startMinutes = timeToMinutes(startTime);
+  if (startMinutes === null) return { error: "Please choose a valid start time." };
+  const endMinutes = startMinutes + pkg.durationMinutes;
+  if (startMinutes < OPEN_MINUTES || endMinutes > CLOSE_MINUTES) {
+    return { error: "That time is outside our party hours. Please choose another time." };
+  }
+
+  const id = crypto.randomUUID();
+  const now = new Date();
+  const value = {
+    customerName,
+    phone,
+    email,
+    childName,
+    childAge,
+    package: pkg.name,
+    partySize: Math.round(partySizeRaw),
+    date,
+    startTime: minutesToTime(startMinutes),
+    endTime: minutesToTime(endMinutes),
+    startMinutes,
+    endMinutes,
+    durationMinutes: pkg.durationMinutes,
+  };
+  const raw = { ...value, source: "web-booking" };
+
+  const pool = getPostgresPool();
+  const client = await pool.connect();
+  try {
+    await client.query("begin");
+    await client.query("select pg_advisory_xact_lock(hashtext($1))", [date]);
+
+    const conflict = await client.query(
+      `select * from party_bookings
+         where booking_date = $1 and status <> 'cancelled'
+           and start_minutes < $2 and end_minutes > $3
+         order by start_minutes asc`,
+      [date, endMinutes, startMinutes],
+    );
+    if (conflict.rows.length) {
+      await client.query("rollback");
+      return { conflict: conflict.rows.map(normalizeBookingRow) };
+    }
+
+    const inserted = await client.query(
+      `insert into party_bookings (
+         id, customer_name, phone, email, child_name, child_age, package, party_id, party_size,
+         booking_date, start_time, end_time, start_minutes, end_minutes, duration_minutes,
+         status, notes, created_by, created_at, updated_at, raw
+       ) values (
+         $1,$2,$3,$4,$5,$6,$7,'',$8,$9,$10,$11,$12,$13,$14,'confirmed',$15,'web',$16,$17,$18::jsonb
+       ) returning *`,
+      [
+        id,
+        value.customerName,
+        value.phone,
+        value.email,
+        value.childName,
+        value.childAge,
+        value.package,
+        value.partySize,
+        value.date,
+        value.startTime,
+        value.endTime,
+        value.startMinutes,
+        value.endMinutes,
+        value.durationMinutes,
+        String(input.notes || "").trim(),
+        now,
+        now,
+        JSON.stringify(raw),
+      ],
+    );
+
+    await client.query("commit");
+    return { booking: normalizeBookingRow(inserted.rows[0]) };
+  } catch (error) {
+    await client.query("rollback").catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
 }
