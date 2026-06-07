@@ -36,6 +36,8 @@ const MotionImage = ({ pageData, heroData = {} }) => {
   const heroTrustItems = Array.isArray(heroData.trust)
     ? heroData.trust.filter(Boolean)
     : [];
+  const hasPartyCta = Boolean(heroData.partyCtaText && heroData.partyCtaHref);
+  const isPartyCtaExternal = /^https?:\/\//i.test(heroData.partyCtaHref || "");
 
   const heroCopy = (
     <div className="ppp-hero-copy">
@@ -52,6 +54,21 @@ const MotionImage = ({ pageData, heroData = {} }) => {
         {heroData.ctaSecondary && (
           <Link href={heroData.ctaSecondaryHref || "/attractions"} className="ppp-btn ppp-btn--outline" prefetch>
             {heroData.ctaSecondary}
+          </Link>
+        )}
+        {hasPartyCta && isPartyCtaExternal && (
+          <a
+            href={heroData.partyCtaHref}
+            className="ppp-btn ppp-btn--outline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {heroData.partyCtaText}
+          </a>
+        )}
+        {hasPartyCta && !isPartyCtaExternal && (
+          <Link href={heroData.partyCtaHref} className="ppp-btn ppp-btn--outline" prefetch>
+            {heroData.partyCtaText}
           </Link>
         )}
       </div>

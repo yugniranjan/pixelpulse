@@ -323,6 +323,16 @@ const Page = async ({ params }) => {
     ),
     _sources: [data || {}, dataconfig || []],
   };
+  const birthdayHeroCtaText = getConfiguredValue(
+    ctaContent._sources,
+    ["birthdayHeroCtaText", "kidsBirthdayHeroCtaText", "partyHeroCtaText"],
+  );
+  const birthdayHeroCtaHref = getConfiguredValue(
+    ctaContent._sources,
+    ["birthdayHeroCtaHref", "kidsBirthdayHeroCtaHref", "partyHeroCtaHref"],
+  );
+  const hasBirthdayHeroCta = Boolean(birthdayHeroCtaText && birthdayHeroCtaHref);
+  const isBirthdayHeroCtaExternal = /^https?:\/\//i.test(birthdayHeroCtaHref);
   const partyHeroTrustBullets = Array.from(
     new Set([
       ...partyHeroBullets,
@@ -354,6 +364,16 @@ const Page = async ({ params }) => {
               <p className="ppp-party-hero__offer">
                 Weekday Special: Save $50 on Birthday Parties (Mon-Thu)
               </p>
+              {hasBirthdayHeroCta && (
+                <a
+                  href={birthdayHeroCtaHref}
+                  className="ppp-party-hero__btn"
+                  target={isBirthdayHeroCtaExternal ? "_blank" : undefined}
+                  rel={isBirthdayHeroCtaExternal ? "noopener noreferrer" : undefined}
+                >
+                  {birthdayHeroCtaText}
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -307,7 +307,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
   return (
     <main className="ppp-bday-booking-page">
       <nav className="ppp-bday-booking-nav" aria-label="Birthday party page navigation">
-        <a className="ppp-bday-booking-logo" href="/">
+        <a className="ppp-bday-booking-logo" href="https://pixelpulseplay.ca">
           <Image src="/assets/images/logoD.png" alt="Pixel Pulse Play" width={188} height={70} priority />
         </a>
         <div>
