@@ -174,6 +174,11 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
           </label>
         ) : null}
 
+        <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
+          Each additional participant beyond your package is charged{" "}
+          <strong>$14.99</strong>, paid at the venue.
+        </p>
+
         <label className="ppp-birthday-hero-form__wide">
           <span>Party notes</span>
           <textarea
