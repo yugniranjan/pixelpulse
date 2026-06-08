@@ -329,21 +329,51 @@ export default function AdminBookingsPage() {
     const lines = [
       "Hi {name},",
       "",
-      "Here are your booking details at Pixel Pulse Play Zone:",
-      `Date & time: ${when}`,
+      "Great news — your party at Pixel Pulse Play Zone is confirmed! We can't wait to host you. Here are your booking details:",
+      "",
+      "— YOUR BOOKING —",
     ];
+    if (booking.partyId) lines.push(`Party ID: ${booking.partyId}`);
+    lines.push(`Date & time: ${when}`);
     if (booking.package) lines.push(`Package: ${booking.package}`);
+    if (booking.childName) {
+      lines.push(`Birthday star: ${booking.childName}${booking.childAge ? ` (turning ${booking.childAge})` : ""}`);
+    }
+    if (booking.partySize) lines.push(`Party size: ${booking.partySize} guests`);
     lines.push(
       "",
-      "If you have any questions, just reply to this email.",
+      "— GOOD TO KNOW —",
+      "• Please arrive 15 minutes before your start time to check in and get settled.",
+      "• Every participant must have a signed waiver before play. You can complete it online ahead of time or at the front desk on arrival.",
+      "• Grippy/non-slip socks are required on the play areas (available for purchase if you forget).",
+      "• Your package time includes setup and cleanup, so play begins promptly at the start time.",
+      "",
+      "— LOCATION & CONTACT —",
+      "Pixel Pulse Play Zone",
+      "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4",
+      "Phone: +1 (905) 760-2922",
+      "Email: connect@pixelpulseplay.ca",
+      "",
+      "— TERMS & CONDITIONS —",
+      "• Deposit & payment: Your deposit secures the date and time and is non-refundable. The remaining balance is due on or before the party date.",
+      "• Rescheduling: Changes are subject to availability and must be requested at least 7 days in advance. Requests within 7 days cannot be guaranteed.",
+      "• Cancellation: Cancellations made within 7 days of the party may forfeit the deposit.",
+      "• Final guest count: Please confirm your final headcount at least 48 hours before the party. Charges are based on the confirmed package and guest count.",
+      "• Additional participants: Each participant beyond your package is charged $14.99, payable at the venue.",
+      "• Waivers & supervision: All guests must have a signed waiver. Children must be supervised by a parent or guardian at all times.",
+      "• Outside food: Outside food and beverages may be restricted — please check with us before bringing any.",
+      "• Liability: Play involves inherent risks. Pixel Pulse Play Zone is not responsible for personal injury, loss, or damage to personal property.",
+      "• Photography: We may capture photos/video during events for promotional use; let us know in advance if you'd prefer to opt out.",
+      "",
+      "If anything above looks incorrect, or you have any questions, just reply to this email and we'll be happy to help.",
       "",
       "See you soon!",
-      "Pixel Pulse Play Zone",
+      "The Pixel Pulse Play Zone Team",
     );
     setEmailTarget({
       title: "Email booking contact",
       recipients: [{ email: booking.email, name: booking.customerName }],
-      defaultSubject: "Your Pixel Pulse Play party details",
+      defaultSubject: `Your Pixel Pulse Play party is confirmed 🎉${booking.partyId ? ` (Party ID ${booking.partyId})` : ""}`,
       defaultMessage: lines.join("\n"),
     });
   }
