@@ -835,8 +835,10 @@ const Home = async () => {
   const whyUsCta = {
     text: getConfigValue(dataconfig, ["whyUsCtaText"]),
     button: getConfigValue(dataconfig, ["whyUsCtaButton"]),
+    href: getConfigValue(dataconfig, ["whyUsCtaHref"]),
     bookingType: getConfiguredValue(homepageConfigSources, ["whyUsCtaBookingType"], "ticket"),
   };
+  const isWhyUsCtaExternal = /^https?:\/\//i.test(whyUsCta.href);
   const pricingHref = ctaContent.pricingHref || "/pricing-promos";
   const articlesHref = ctaContent.articlesHref || "/blogs";
   const promotionMarqueeLimit = getPromotionMarqueeLimit(siteData.promotions, dataconfig);
@@ -1075,13 +1077,22 @@ const Home = async () => {
       <section className="ppp-mini-cta">
         <div className="aero-max-container ppp-mini-cta__inner">
           {whyUsCta.text && <p>{whyUsCta.text}</p>}
-          {whyUsCta.button && (
+          {whyUsCta.button && whyUsCta.href ? (
+            <a
+              href={whyUsCta.href}
+              className="ppp-btn ppp-btn--primary"
+              target={isWhyUsCtaExternal ? "_blank" : undefined}
+              rel={isWhyUsCtaExternal ? "noopener noreferrer" : undefined}
+            >
+              {whyUsCta.button}
+            </a>
+          ) : whyUsCta.button ? (
             <BookingButton
               title={whyUsCta.button}
               className="ppp-btn ppp-btn--primary"
               bookingType={whyUsCta.bookingType}
             />
-          )}
+          ) : null}
         </div>
       </section>
       )}
