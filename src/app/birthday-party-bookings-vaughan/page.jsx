@@ -1,10 +1,8 @@
 import Image from "next/image";
 import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
-import "../styles/birthday-booking.css";
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
-import BirthdayBookingWidget from "@/components/BirthdayBookingWidget";
-import { BIRTHDAY_PACKAGES } from "@/lib/birthdayBooking";
+import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 
@@ -309,7 +307,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
   return (
     <main className="ppp-bday-booking-page">
       <nav className="ppp-bday-booking-nav" aria-label="Birthday party page navigation">
-        <a className="ppp-bday-booking-logo" href="/">
+        <a className="ppp-bday-booking-logo" href="https://pixelpulseplay.ca">
           <Image src="/assets/images/logoD.png" alt="Pixel Pulse Play" width={188} height={70} priority />
         </a>
         <div>
@@ -341,7 +339,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               Interactive challenge rooms for kids, tweens, and teens.
             </p>
             <div className="ppp-bday-booking-actions">
-              <a className="ppp-bday-hero-cta" href="#packages">View party packages</a>
+              <a href="#packages">View party packages</a>
             </div>
             <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
               {heroStats.map((item) => (
@@ -353,7 +351,10 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </div>
           </div>
 
-          <BirthdayBookingWidget packages={BIRTHDAY_PACKAGES} />
+          <BirthdayHeroContactForm
+            urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
+            packageOptions={packageList.map((pkg) => pkg.name).filter(Boolean)}
+          />
         </div>
       </section>
 

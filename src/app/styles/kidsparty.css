@@ -687,6 +687,37 @@
   white-space: nowrap;
 }
 
+.ppp-party-hero__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  min-width: 132px;
+  margin-top: 1rem;
+  padding: 13px 26px;
+  border: 2px solid var(--ppp-lime);
+  border-radius: 8px;
+  background: var(--ppp-lime);
+  color: #050810;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(164, 207, 95, 0.2);
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.ppp-party-hero__btn:hover {
+  border-color: var(--ppp-peach);
+  background: var(--ppp-peach);
+  color: #050810;
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(251, 174, 123, 0.28);
+}
+
 .ppp-party-hero .ppp-about-hero-card ul {
   display: grid;
   width: fit-content;
@@ -772,6 +803,12 @@
     padding: 0.42rem 0.48rem;
     font-size: clamp(0.5rem, 2.45vw, 0.74rem);
     line-height: 1.28;
+  }
+
+  .ppp-party-hero__btn {
+    width: min(100%, 260px);
+    min-height: 48px;
+    margin-top: 0.85rem;
   }
 
   .ppp-party-hero .ppp-about-hero-card h2 {
