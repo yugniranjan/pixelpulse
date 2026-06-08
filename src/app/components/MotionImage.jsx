@@ -36,6 +36,8 @@ const MotionImage = ({ pageData, heroData = {} }) => {
   const heroTrustItems = Array.isArray(heroData.trust)
     ? heroData.trust.filter(Boolean)
     : [];
+  const hasPrimaryCtaHref = Boolean(heroData.ctaPrimaryHref);
+  const isPrimaryCtaExternal = /^https?:\/\//i.test(heroData.ctaPrimaryHref || "");
   const hasPartyCta = Boolean(heroData.partyCtaText && heroData.partyCtaHref);
   const isPartyCtaExternal = /^https?:\/\//i.test(heroData.partyCtaHref || "");
 
@@ -44,7 +46,22 @@ const MotionImage = ({ pageData, heroData = {} }) => {
       {heroTitle && <h1 className="ppp-hero-copy__title">{heroTitle}</h1>}
       {heroText && <p className="ppp-hero-copy__text">{heroText}</p>}
       <div className="ppp-hero-copy__actions">
-        {heroData.ctaPrimary && (
+        {heroData.ctaPrimary && hasPrimaryCtaHref && isPrimaryCtaExternal && (
+          <a
+            href={heroData.ctaPrimaryHref}
+            className="ppp-btn ppp-btn--primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {heroData.ctaPrimary}
+          </a>
+        )}
+        {heroData.ctaPrimary && hasPrimaryCtaHref && !isPrimaryCtaExternal && (
+          <Link href={heroData.ctaPrimaryHref} className="ppp-btn ppp-btn--primary" prefetch>
+            {heroData.ctaPrimary}
+          </Link>
+        )}
+        {heroData.ctaPrimary && !hasPrimaryCtaHref && (
           <BookingButton
             title={heroData.ctaPrimary}
             className="ppp-btn ppp-btn--primary"

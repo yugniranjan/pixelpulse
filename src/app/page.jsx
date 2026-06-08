@@ -102,6 +102,7 @@ const emptySiteData = {
     headlineSub: "",
     subheadline: "",
     ctaPrimary: "",
+    ctaPrimaryHref: "",
     ctaSecondary: "",
     partyCtaText: "",
     partyCtaHref: "",
@@ -743,6 +744,12 @@ const Home = async () => {
         ["heroCtaPrimary", "heroCtaButton", "homeHeroCtaPrimary"],
         ctaContent.bookNowText,
       ),
+    ctaPrimaryHref:
+      siteData.hero.ctaPrimaryHref ||
+      getConfiguredValue(
+        homepageConfigSources,
+        ["heroCtaPrimaryHref", "homeHeroCtaPrimaryHref", "heroCtaButtonHref"],
+      ),
     ctaSecondary:
       siteData.hero.ctaSecondary ||
       getConfigValue(dataconfig, ["heroCtaSecondary", "homeHeroCtaSecondary"]),
@@ -767,6 +774,7 @@ const Home = async () => {
       siteData.hero.urgencyStrip ||
       getConfigValue(dataconfig, ["heroUrgencyStrip", "homeHeroUrgencyStrip"]),
   };
+  const isHeroCtaPrimaryExternal = /^https?:\/\//i.test(heroData.ctaPrimaryHref);
   const howItWorksCta = {
     text:
       siteData.howItWorks.cta ||
@@ -881,9 +889,18 @@ const Home = async () => {
       <section className="ppp-mini-cta">
         <div className="aero-max-container ppp-mini-cta__inner">
           {heroData.urgencyStrip && <p>{heroData.urgencyStrip}</p>}
-          {heroData.ctaPrimary && (
+          {heroData.ctaPrimary && heroData.ctaPrimaryHref ? (
+            <a
+              href={heroData.ctaPrimaryHref}
+              className="ppp-btn ppp-btn--primary"
+              target={isHeroCtaPrimaryExternal ? "_blank" : undefined}
+              rel={isHeroCtaPrimaryExternal ? "noopener noreferrer" : undefined}
+            >
+              {heroData.ctaPrimary}
+            </a>
+          ) : heroData.ctaPrimary ? (
             <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="ticket" />
-          )}
+          ) : null}
         </div>
       </section>
       )}
@@ -1389,9 +1406,18 @@ const Home = async () => {
             {siteData.location.walkIn && <p className="ppp-cta-band__sub">{siteData.location.walkIn}</p>}
             {siteData.location.finalStrip && <p className="ppp-cta-band__sub">{siteData.location.finalStrip}</p>}
             <div className="ppp-cta-band__actions">
-              {heroData.ctaPrimary && (
+              {heroData.ctaPrimary && heroData.ctaPrimaryHref ? (
+                <a
+                  href={heroData.ctaPrimaryHref}
+                  className="ppp-btn ppp-btn--primary"
+                  target={isHeroCtaPrimaryExternal ? "_blank" : undefined}
+                  rel={isHeroCtaPrimaryExternal ? "noopener noreferrer" : undefined}
+                >
+                  {heroData.ctaPrimary}
+                </a>
+              ) : heroData.ctaPrimary ? (
                 <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="ticket" />
-              )}
+              ) : null}
               {siteData.location.mapsLink && ctaContent.findLocationText && (
                 <Link
                   href={siteData.location.mapsLink}
