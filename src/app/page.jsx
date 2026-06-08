@@ -103,6 +103,8 @@ const emptySiteData = {
     subheadline: "",
     ctaPrimary: "",
     ctaSecondary: "",
+    partyCtaText: "",
+    partyCtaHref: "",
     urgencyStrip: "",
     trust: [],
   },
@@ -749,6 +751,18 @@ const Home = async () => {
       ["heroCtaSecondaryHref", "homeHeroCtaSecondaryHref"],
       "/attractions",
     ),
+    partyCtaText:
+      siteData.hero.partyCtaText ||
+      getConfiguredValue(
+        homepageConfigSources,
+        ["heroPartyCtaText", "homeHeroPartyCtaText", "heroBookPartyText"],
+      ),
+    partyCtaHref:
+      siteData.hero.partyCtaHref ||
+      getConfiguredValue(
+        homepageConfigSources,
+        ["heroPartyCtaHref", "homeHeroPartyCtaHref", "heroBookPartyHref"],
+      ),
     urgencyStrip:
       siteData.hero.urgencyStrip ||
       getConfigValue(dataconfig, ["heroUrgencyStrip", "homeHeroUrgencyStrip"]),
