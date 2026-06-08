@@ -49,7 +49,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
         {heroData.ctaPrimary && hasPrimaryCtaHref && isPrimaryCtaExternal && (
           <a
             href={heroData.ctaPrimaryHref}
-            className="ppp-btn ppp-btn--primary"
+            className="ppp-btn ppp-btn--primary ppp-hero-copy__primary-cta"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -57,26 +57,26 @@ const MotionImage = ({ pageData, heroData = {} }) => {
           </a>
         )}
         {heroData.ctaPrimary && hasPrimaryCtaHref && !isPrimaryCtaExternal && (
-          <Link href={heroData.ctaPrimaryHref} className="ppp-btn ppp-btn--primary" prefetch>
+          <Link href={heroData.ctaPrimaryHref} className="ppp-btn ppp-btn--primary ppp-hero-copy__primary-cta" prefetch>
             {heroData.ctaPrimary}
           </Link>
         )}
         {heroData.ctaPrimary && !hasPrimaryCtaHref && (
           <BookingButton
             title={heroData.ctaPrimary}
-            className="ppp-btn ppp-btn--primary"
+            className="ppp-btn ppp-btn--primary ppp-hero-copy__primary-cta"
             bookingType="ticket"
           />
         )}
         {heroData.ctaSecondary && (
-          <Link href={heroData.ctaSecondaryHref || "/attractions"} className="ppp-btn ppp-btn--outline" prefetch>
+          <Link href={heroData.ctaSecondaryHref || "/attractions"} className="ppp-btn ppp-btn--outline ppp-hero-copy__secondary-cta" prefetch>
             {heroData.ctaSecondary}
           </Link>
         )}
         {hasPartyCta && isPartyCtaExternal && (
           <a
             href={heroData.partyCtaHref}
-            className="ppp-btn ppp-btn--outline"
+            className="ppp-btn ppp-btn--outline ppp-hero-copy__party-cta"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -84,7 +84,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
           </a>
         )}
         {hasPartyCta && !isPartyCtaExternal && (
-          <Link href={heroData.partyCtaHref} className="ppp-btn ppp-btn--outline" prefetch>
+          <Link href={heroData.partyCtaHref} className="ppp-btn ppp-btn--outline ppp-hero-copy__party-cta" prefetch>
             {heroData.partyCtaText}
           </Link>
         )}
