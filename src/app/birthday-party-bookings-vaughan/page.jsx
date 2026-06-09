@@ -415,6 +415,21 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         </div>
       </section>
 
+      <section className="ppp-bday-private-band" aria-labelledby="private-party-banner-title">
+        <div className="ppp-bday-booking-shell">
+          <div className="ppp-bday-private-band__inner">
+            <div className="ppp-bday-private-band__content">
+              <h2 id="private-party-banner-title">Planning a Private Party?</h2>
+              <p>Enjoy exclusive access to all challenge rooms, non-stop fun for your group.</p>
+            </div>
+            <div className="ppp-bday-private-band__actions">
+              <a href={phoneUrl}>Call: 905-760-2922</a>
+              <a href="#birthday-party-form">Book Private Party</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="ppp-bday-booking-section ppp-bday-booking-section--highlights" id="highlights">
         <div className="ppp-bday-booking-shell">
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">

@@ -838,6 +838,99 @@
   box-shadow: 0 0 34px rgba(188, 255, 107, 0.45), 0 14px 28px rgba(247, 148, 79, 0.3);
 }
 
+.ppp-bday-private-band {
+  padding: clamp(1.4rem, 3vw, 2.4rem) 0 clamp(2.2rem, 4vw, 3.3rem);
+}
+
+.ppp-bday-private-band__inner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 116px;
+  padding: 20px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: linear-gradient(90deg, #b2d55d 0%, #ffb184 100%);
+}
+
+.ppp-bday-private-band__inner::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--lime), var(--amber), var(--magenta));
+}
+
+.ppp-bday-private-band__content,
+.ppp-bday-private-band__actions {
+  position: relative;
+  z-index: 1;
+}
+
+.ppp-bday-private-band__content {
+  flex: 1 1 auto;
+}
+
+.ppp-bday-private-band h2 {
+  margin: 0;
+  color: #050810;
+  font-family: var(--display);
+  font-size: clamp(1.55rem, 3vw, 2.55rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-bday-private-band p {
+  margin: 0.45rem 0 0;
+  color: rgba(5, 8, 16, 0.82);
+  font-size: clamp(0.92rem, 1.35vw, 1.12rem);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.ppp-bday-private-band__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.ppp-bday-private-band__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  min-width: 220px;
+  padding: 18px 26px;
+  border: 2px solid #050810;
+  border-radius: 8px;
+  background: #050810;
+  color: #ffffff;
+  font-family: var(--display);
+  font-size: clamp(0.9rem, 1.15vw, 1.08rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 160ms ease, box-shadow 200ms ease, background 160ms ease;
+}
+
+.ppp-bday-private-band__actions a:hover {
+  transform: translateY(-2px);
+  background: #111827;
+  border-color: #111827;
+  box-shadow: 0 0 22px rgba(5, 8, 16, 0.32);
+}
+
 /* "Check available dates" band under the positioning section */
 .ppp-bday-mid-cta {
   display: flex;
@@ -1385,11 +1478,26 @@
   .ppp-bday-booking-actions,
   .ppp-bday-booking-actions button,
   .ppp-bday-booking-actions a,
+  .ppp-bday-private-band__actions,
+  .ppp-bday-private-band__actions a,
   .ppp-bday-final__actions,
   .ppp-bday-final__actions button,
   .ppp-bday-final__actions a,
   .ppp-bday-summer a {
     width: 100%;
+  }
+
+  .ppp-bday-private-band__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 0;
+    padding: 18px 20px;
+  }
+
+  .ppp-bday-private-band__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
   .ppp-bday-booking-page .ppp-birthday-hero-form__fields {
