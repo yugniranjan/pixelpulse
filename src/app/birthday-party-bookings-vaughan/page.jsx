@@ -280,6 +280,25 @@ function getBirthdayPackages(config = []) {
   return parsePackages(rows) || fallbackPackages;
 }
 
+function getBirthdayPackageOptions(packageList = [], configData = []) {
+  const privatePartyOptionText = getConfiguredValue(
+    [configData],
+    [
+      "birthdayPrivatePartyPackageOptionText",
+      "birthdayPrivatePartyPackageText",
+      "birthdayHeroPrivatePartyCtaText",
+      "birthdayPrivatePartyCtaText",
+      "birthdayBookingsPrivatePartyCtaText",
+    ],
+  );
+  const options = [
+    ...packageList.map((pkg) => pkg.name).filter(Boolean),
+    privatePartyOptionText,
+  ].filter(Boolean);
+
+  return Array.from(new Set(options));
+}
+
 function getAttractions(menuData = []) {
   const attractions = menuData.find((item) => item.path === "attractions");
   const children = Array.isArray(attractions?.children) ? attractions.children : [];
@@ -299,26 +318,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
     getBirthdayConfigData(),
   ]);
   const packageList = getBirthdayPackages(configData);
+  const packageOptions = getBirthdayPackageOptions(packageList, configData);
   const attractions = getAttractions(menuData);
   const gameCards = attractions.length ? attractions : fallbackAttractions;
-  const privatePartyCtaText = getConfiguredValue(
-    [configData],
-    [
-      "birthdayHeroPrivatePartyCtaText",
-      "birthdayPrivatePartyCtaText",
-      "birthdayBookingsPrivatePartyCtaText",
-    ],
-  );
-  const privatePartyCtaHref = getConfiguredValue(
-    [configData],
-    [
-      "birthdayHeroPrivatePartyCtaHref",
-      "birthdayPrivatePartyCtaHref",
-      "birthdayBookingsPrivatePartyCtaHref",
-    ],
-  );
-  const hasPrivatePartyCta = Boolean(privatePartyCtaText && privatePartyCtaHref);
-  const isPrivatePartyCtaExternal = /^https?:\/\//i.test(privatePartyCtaHref);
 
   const packageFeatureKeys = packageList.length
     ? Object.keys(packageList[0]).filter(
@@ -363,35 +365,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </p>
             <div className="ppp-bday-booking-actions">
               <a href="#packages">View party packages</a>
-              {hasPrivatePartyCta && (
-                <span className="ppp-bday-private-cta">
-                  <a
-                    href={privatePartyCtaHref}
-                    className="ppp-bday-private-cta__link"
-                    target={isPrivatePartyCtaExternal ? "_blank" : undefined}
-                    rel={isPrivatePartyCtaExternal ? "noopener noreferrer" : undefined}
-                  >
-                    {privatePartyCtaText}
-                  </a>
-                  <span className="ppp-bday-private-cta__info">
-                    <button
-                      type="button"
-                      className="ppp-bday-private-cta__icon"
-                      aria-label="Private party details"
-                      aria-describedby="birthday-private-party-tooltip"
-                    >
-                      i
-                    </button>
-                    <span
-                      id="birthday-private-party-tooltip"
-                      className="ppp-bday-private-cta__tooltip"
-                      role="tooltip"
-                    >
-                      Enjoy exclusive access to all challenge rooms, non-stop fun for your group.
-                    </span>
-                  </span>
-                </span>
-              )}
             </div>
             <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
               {heroStats.map((item) => (
@@ -405,7 +378,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
 
           <BirthdayHeroContactForm
             urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
-            packageOptions={packageList.map((pkg) => pkg.name).filter(Boolean)}
+            packageOptions={packageOptions}
           />
         </div>
       </section>

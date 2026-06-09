@@ -20,6 +20,9 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const isPrivatePartySelected = formData.selectedPackage
+    .toLowerCase()
+    .includes("private party");
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -175,8 +178,14 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         ) : null}
 
         <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
-          Each additional participant beyond your package is charged{" "}
-          <strong>$14.99</strong>, paid at the venue.
+          {isPrivatePartySelected ? (
+            "Enjoy exclusive access to all challenge rooms, non-stop fun for your group."
+          ) : (
+            <>
+              Each additional participant beyond your package is charged{" "}
+              <strong>$14.99</strong>, paid at the venue.
+            </>
+          )}
         </p>
 
         <label className="ppp-birthday-hero-form__wide">

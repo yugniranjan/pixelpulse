@@ -399,88 +399,6 @@
   box-shadow: 0 0 26px rgba(240, 234, 34, 0.28), inset 0 0 18px rgba(240, 234, 34, 0.12);
 }
 
-.ppp-bday-private-cta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ppp-bday-booking-actions .ppp-bday-private-cta__link {
-  flex: 0 1 auto;
-}
-
-.ppp-bday-private-cta__info {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.ppp-bday-booking-actions .ppp-bday-private-cta__icon {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  border: 1px solid rgba(240, 234, 34, 0.68);
-  border-radius: 50%;
-  background: rgba(5, 8, 16, 0.72);
-  color: var(--lime);
-  font-family: var(--display);
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: 0 0 18px rgba(240, 234, 34, 0.18);
-}
-
-.ppp-bday-booking-actions .ppp-bday-private-cta__icon:hover,
-.ppp-bday-booking-actions .ppp-bday-private-cta__icon:focus-visible {
-  transform: translateY(-1px);
-  background: rgba(240, 234, 34, 0.14);
-  box-shadow: 0 0 24px rgba(240, 234, 34, 0.32);
-  outline: none;
-}
-
-.ppp-bday-private-cta__tooltip {
-  position: absolute;
-  z-index: 6;
-  right: 0;
-  bottom: calc(100% + 12px);
-  width: min(280px, calc(100vw - 48px));
-  padding: 10px 12px;
-  border: 1px solid rgba(188, 255, 107, 0.3);
-  border-radius: 10px;
-  background: rgba(5, 8, 16, 0.96);
-  color: rgba(234, 242, 255, 0.92);
-  font-family: var(--body);
-  font-size: 0.86rem;
-  font-weight: 600;
-  line-height: 1.35;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(6px);
-  transition: opacity 150ms ease, transform 150ms ease;
-}
-
-.ppp-bday-private-cta__tooltip::after {
-  content: "";
-  position: absolute;
-  right: 12px;
-  bottom: -7px;
-  width: 12px;
-  height: 12px;
-  border-right: 1px solid rgba(188, 255, 107, 0.3);
-  border-bottom: 1px solid rgba(188, 255, 107, 0.3);
-  background: rgba(5, 8, 16, 0.96);
-  transform: rotate(45deg);
-}
-
-.ppp-bday-private-cta__info:hover .ppp-bday-private-cta__tooltip,
-.ppp-bday-private-cta__info:focus-within .ppp-bday-private-cta__tooltip {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .ppp-bday-final__actions .ppp-bday-final__primary:hover {
   background: linear-gradient(120deg, var(--cyan), var(--magenta));
   color: #050810;
@@ -1472,23 +1390,6 @@
   .ppp-bday-final__actions a,
   .ppp-bday-summer a {
     width: 100%;
-  }
-
-  .ppp-bday-private-cta {
-    width: 100%;
-  }
-
-  .ppp-bday-booking-actions .ppp-bday-private-cta__link {
-    flex: 1 1 auto;
-    width: auto;
-  }
-
-  .ppp-bday-booking-actions .ppp-bday-private-cta__icon {
-    flex: 0 0 32px;
-  }
-
-  .ppp-bday-private-cta__tooltip {
-    right: -4px;
   }
 
   .ppp-bday-booking-page .ppp-birthday-hero-form__fields {
