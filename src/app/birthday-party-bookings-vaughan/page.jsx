@@ -5,6 +5,7 @@ import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
+import { getConfiguredValue } from "@/lib/ctaContent";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
 const heroVideo = "/assets/videos/pixelgame.mp4";
@@ -244,6 +245,15 @@ async function getBirthdayMenuData() {
   }
 }
 
+async function getBirthdayConfigData() {
+  try {
+    return await fetchsheetdata("config", LOCATION_SLUG);
+  } catch (error) {
+    console.error("birthday bookings config failed:", error);
+    return [];
+  }
+}
+
 // Parse the "birthday_packages" config blob the same way the
 // kids-birthday-parties page does, then fall back to the static list.
 function parsePackages(rows = []) {
@@ -263,17 +273,11 @@ function parsePackages(rows = []) {
   }
 }
 
-async function getBirthdayPackages() {
-  try {
-    const config = await fetchsheetdata("config", LOCATION_SLUG);
-    const rows = Array.isArray(config)
-      ? config.filter((item) => item.key === "birthday_packages")
-      : [];
-    return parsePackages(rows) || fallbackPackages;
-  } catch (error) {
-    console.error("birthday packages fetch failed:", error);
-    return fallbackPackages;
-  }
+function getBirthdayPackages(config = []) {
+  const rows = Array.isArray(config)
+    ? config.filter((item) => item.key === "birthday_packages")
+    : [];
+  return parsePackages(rows) || fallbackPackages;
 }
 
 function getAttractions(menuData = []) {
@@ -290,12 +294,31 @@ function getAttractions(menuData = []) {
 }
 
 export default async function BirthdayPartyBookingsVaughanPage() {
-  const [menuData, packageList] = await Promise.all([
+  const [menuData, configData] = await Promise.all([
     getBirthdayMenuData(),
-    getBirthdayPackages(),
+    getBirthdayConfigData(),
   ]);
+  const packageList = getBirthdayPackages(configData);
   const attractions = getAttractions(menuData);
   const gameCards = attractions.length ? attractions : fallbackAttractions;
+  const privatePartyCtaText = getConfiguredValue(
+    [configData],
+    [
+      "birthdayHeroPrivatePartyCtaText",
+      "birthdayPrivatePartyCtaText",
+      "birthdayBookingsPrivatePartyCtaText",
+    ],
+  );
+  const privatePartyCtaHref = getConfiguredValue(
+    [configData],
+    [
+      "birthdayHeroPrivatePartyCtaHref",
+      "birthdayPrivatePartyCtaHref",
+      "birthdayBookingsPrivatePartyCtaHref",
+    ],
+  );
+  const hasPrivatePartyCta = Boolean(privatePartyCtaText && privatePartyCtaHref);
+  const isPrivatePartyCtaExternal = /^https?:\/\//i.test(privatePartyCtaHref);
 
   const packageFeatureKeys = packageList.length
     ? Object.keys(packageList[0]).filter(
@@ -340,6 +363,35 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </p>
             <div className="ppp-bday-booking-actions">
               <a href="#packages">View party packages</a>
+              {hasPrivatePartyCta && (
+                <span className="ppp-bday-private-cta">
+                  <a
+                    href={privatePartyCtaHref}
+                    className="ppp-bday-private-cta__link"
+                    target={isPrivatePartyCtaExternal ? "_blank" : undefined}
+                    rel={isPrivatePartyCtaExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {privatePartyCtaText}
+                  </a>
+                  <span className="ppp-bday-private-cta__info">
+                    <button
+                      type="button"
+                      className="ppp-bday-private-cta__icon"
+                      aria-label="Private party details"
+                      aria-describedby="birthday-private-party-tooltip"
+                    >
+                      i
+                    </button>
+                    <span
+                      id="birthday-private-party-tooltip"
+                      className="ppp-bday-private-cta__tooltip"
+                      role="tooltip"
+                    >
+                      Enjoy exclusive access to all challenge rooms, non-stop fun for your group.
+                    </span>
+                  </span>
+                </span>
+              )}
             </div>
             <div className="ppp-bday-hero-stats" aria-label="Birthday party highlights">
               {heroStats.map((item) => (
