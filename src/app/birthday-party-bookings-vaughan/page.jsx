@@ -280,25 +280,6 @@ function getBirthdayPackages(config = []) {
   return parsePackages(rows) || fallbackPackages;
 }
 
-function getBirthdayPackageOptions(packageList = [], configData = []) {
-  const privatePartyOptionText = getConfiguredValue(
-    [configData],
-    [
-      "birthdayPrivatePartyPackageOptionText",
-      "birthdayPrivatePartyPackageText",
-      "birthdayHeroPrivatePartyCtaText",
-      "birthdayPrivatePartyCtaText",
-      "birthdayBookingsPrivatePartyCtaText",
-    ],
-  );
-  const options = [
-    ...packageList.map((pkg) => pkg.name).filter(Boolean),
-    privatePartyOptionText,
-  ].filter(Boolean);
-
-  return Array.from(new Set(options));
-}
-
 function getAttractions(menuData = []) {
   const attractions = menuData.find((item) => item.path === "attractions");
   const children = Array.isArray(attractions?.children) ? attractions.children : [];
@@ -318,7 +299,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
     getBirthdayConfigData(),
   ]);
   const packageList = getBirthdayPackages(configData);
-  const packageOptions = getBirthdayPackageOptions(packageList, configData);
   const attractions = getAttractions(menuData);
   const gameCards = attractions.length ? attractions : fallbackAttractions;
 
@@ -378,7 +358,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
 
           <BirthdayHeroContactForm
             urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
-            packageOptions={packageOptions}
+            packageOptions={packageList.map((pkg) => pkg.name).filter(Boolean)}
           />
         </div>
       </section>
@@ -424,7 +404,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </div>
             <div className="ppp-bday-private-band__actions">
               <a href={phoneUrl}>Call: 905-760-2922</a>
-              <a href="#birthday-party-form">Book Private Party</a>
+              <a href="https://pixelpulseplay.ca/contactus">Inquire Now</a>
             </div>
           </div>
         </div>
