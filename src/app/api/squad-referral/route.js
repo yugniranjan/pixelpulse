@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { recordSquadReferrals } from "@/lib/squadReferrals";
 
 export const runtime = "nodejs";
 
@@ -102,27 +103,37 @@ export async function POST(request) {
     });
 
     const safeReferrerName = escapeHtml(referrerName);
-    const promoCode = createPromoCode(referrerName);
     const subject = `${referrerName} sent you 10% off Pixel Pulse Play`;
-    const text = [
-      `Hi there,`,
-      "",
-      `${referrerName} invited you to experience Pixel Pulse Playzone — Vaughan's all-new interactive challenge arena for teens, friends & families.`,
-      "",
-      "Think real-life games with immersive challenge rooms, glowing arenas, team missions, arcade action, and nonstop fun — perfect for birthdays, hangouts, and weekend adventures.",
-      "",
-      `Use promo code ${promoCode} for ${DISCOUNT_PERCENT}% off your visit.`,
-      STORE_VISIT_TEXT,
-      `Location: ${STORE_MAP_URL}`,
-      "",
-      "Want to invite your friends too?",
-      `Join the Squad and send your own invite: ${SQUAD_URL}`,
-      "",
-      "Pixel Pulse Play Zone",
-      CONTACT_EMAIL,
-    ].join("\n");
 
-    const html = `
+    // One unique promo code per friend so an in-store redemption can be traced
+    // back to the exact referral (and counted toward the referrer's award tier).
+    const referrals = friendEmails.map((friendEmail) => ({
+      email: friendEmail,
+      promoCode: createPromoCode(referrerName),
+    }));
+
+    function buildFriendText(promoCode) {
+      return [
+        `Hi there,`,
+        "",
+        `${referrerName} invited you to experience Pixel Pulse Playzone — Vaughan's all-new interactive challenge arena for teens, friends & families.`,
+        "",
+        "Think real-life games with immersive challenge rooms, glowing arenas, team missions, arcade action, and nonstop fun — perfect for birthdays, hangouts, and weekend adventures.",
+        "",
+        `Use promo code ${promoCode} for ${DISCOUNT_PERCENT}% off your visit.`,
+        STORE_VISIT_TEXT,
+        `Location: ${STORE_MAP_URL}`,
+        "",
+        "Want to invite your friends too?",
+        `Join the Squad and send your own invite: ${SQUAD_URL}`,
+        "",
+        "Pixel Pulse Play Zone",
+        CONTACT_EMAIL,
+      ].join("\n");
+    }
+
+    function buildFriendHtml(promoCode) {
+      return `
       <div style="margin:0;padding:24px 14px;background:#050810 url('${BACKGROUND_URL}') center/cover no-repeat;font-family:Arial,sans-serif;color:#f8fafc;">
         <div style="max-width:680px;margin:0 auto;border:1px solid rgba(95,234,255,0.2);border-radius:20px;overflow:hidden;background:linear-gradient(180deg,rgba(16,19,34,0.94) 0%,rgba(7,9,20,0.96) 100%);box-shadow:0 24px 70px rgba(0,0,0,0.46);">
           <div style="padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(255,40,232,0.16),rgba(95,234,255,0.12));">
@@ -160,25 +171,39 @@ export async function POST(request) {
         </div>
       </div>
     `;
+    }
 
     await Promise.all(
-      friendEmails.map((friendEmail) =>
+      referrals.map((referral) =>
         transporter.sendMail({
           from: {
             name: BUSINESS_NAME,
             address: authenticatedSender,
           },
-          to: friendEmail,
+          to: referral.email,
           replyTo: {
             name: referrerName,
             address: referrerEmail,
           },
           subject,
-          text,
-          html,
+          text: buildFriendText(referral.promoCode),
+          html: buildFriendHtml(referral.promoCode),
         }),
       ),
     );
+
+    // Persist the referrals for award tracking. Best-effort: a DB hiccup must not
+    // break the customer-facing referral emails that already went out.
+    try {
+      await recordSquadReferrals({
+        referrerName,
+        referrerEmail,
+        source: "squad-referral-card",
+        friends: referrals,
+      });
+    } catch (dbError) {
+      console.error("Failed to persist squad referrals:", dbError);
+    }
 
     await transporter.sendMail({
       from: {
@@ -194,13 +219,15 @@ export async function POST(request) {
       text: [
         `Referrer: ${referrerName}`,
         `Referrer Email: ${referrerEmail}`,
-        `Friends: ${friendEmails.join(", ")}`,
-        `Promo Code: ${promoCode}`,
+        "",
+        "Friends and their unique promo codes:",
+        ...referrals.map((r) => `- ${r.email}: ${r.promoCode}`),
+        "",
         `Discount: ${DISCOUNT_PERCENT}%`,
       ].join("\n"),
     });
 
-    return NextResponse.json({ success: true, sent: friendEmails.length, promoCode });
+    return NextResponse.json({ success: true, sent: referrals.length });
   } catch (error) {
     console.error("Squad referral send failed:", error);
     return NextResponse.json(

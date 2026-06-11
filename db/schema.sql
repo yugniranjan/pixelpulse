@@ -113,3 +113,26 @@ create table if not exists party_bookings (
 create index if not exists party_bookings_date_idx on party_bookings (booking_date);
 create index if not exists party_bookings_status_idx on party_bookings (status);
 create index if not exists party_bookings_party_id_idx on party_bookings (party_id);
+
+-- Squad friend referrals. One row per invited friend (keyed by referrer +
+-- friend email). A referral starts 'pending' and is marked 'confirmed' in admin
+-- once the friend actually visits/redeems their unique promo code. Award tiers
+-- (5/10/20) are computed from the count of confirmed referrals per referrer.
+create table if not exists squad_referrals (
+  id text primary key,
+  referrer_name text,
+  referrer_email text not null,
+  friend_name text,
+  friend_email text not null,
+  promo_code text not null,
+  status text not null default 'pending',
+  source text,
+  created_at timestamptz not null default now(),
+  confirmed_at timestamptz,
+  raw jsonb not null default '{}'::jsonb,
+  unique (referrer_email, friend_email)
+);
+
+create index if not exists squad_referrals_referrer_idx on squad_referrals (referrer_email);
+create index if not exists squad_referrals_status_idx on squad_referrals (status);
+create unique index if not exists squad_referrals_promo_code_idx on squad_referrals (promo_code);

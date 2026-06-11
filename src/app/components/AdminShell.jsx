@@ -10,6 +10,7 @@ const ADMIN_LINKS = [
   { href: "/admin/waivers/reports", label: "Waiver Reports" },
   { href: "/admin/waivers/party-hosts", label: "Party Hosts" },
   { href: "/admin/invites", label: "Create Party Links" },
+  { href: "/admin/squad-referrals", label: "Squad Referrals" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/waiver-data", label: "Players Data" },
 ];
