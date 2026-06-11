@@ -479,11 +479,13 @@ const Category = async ({ params }) => {
                     {(ctaContent.groupsHeroPrimaryText || ctaContent.groupsHeroSecondaryText) && (
                       <div className="ppp-groups-hero__actions">
                         {ctaContent.groupsHeroPrimaryText && (
-                          <BookingButton
-                            title={ctaContent.groupsHeroPrimaryText}
+                          <Link
+                            href={contactHref}
                             className="ppp-groups-hero__book-btn"
-                            bookingType={ctaContent.groupsHeroPrimaryBookingType}
-                          />
+                            prefetch
+                          >
+                            {ctaContent.groupsHeroPrimaryText}
+                          </Link>
                         )}
                         {ctaContent.groupsHeroSecondaryText && (
                           <Link
@@ -569,11 +571,13 @@ const Category = async ({ params }) => {
                     {groupsFinalCtaSubtitle}
                   </p>
                   <div className="ppp-groups-final-cta__actions">
-                    <BookingButton
-                      title={groupsFinalCtaPrimaryText}
+                    <Link
+                      href={contactHref}
                       className="ppp-groups-final-cta__btn"
-                      bookingType={ctaContent.groupsFinalCtaPrimaryBookingType || "party"}
-                    />
+                      prefetch
+                    >
+                      {groupsFinalCtaPrimaryText}
+                    </Link>
                     <Link
                       href={ctaContent.groupsFinalCtaSecondaryHref || contactHref}
                       className="ppp-groups-final-cta__btn"
