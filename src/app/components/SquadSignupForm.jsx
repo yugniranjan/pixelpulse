@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import TurnstileWidget from "./smallComponents/TurnstileWidget";
+
+const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 const INITIAL_FORM = {
   childName: "",
@@ -17,6 +20,7 @@ export default function SquadSignupForm({ content = {} }) {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const formContent = {
     eyebrow: content.eyebrow || "Parent sign-up",
     title: content.title || "Join the Squad",
@@ -55,6 +59,12 @@ export default function SquadSignupForm({ content = {} }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      setStatus("Please complete the verification check.");
+      return;
+    }
+
     setSubmitting(true);
     setStatus(formContent.sendingText);
 
@@ -72,6 +82,7 @@ export default function SquadSignupForm({ content = {} }) {
           time: "",
           from: formContent.source,
           selectedEvent: formContent.selectedEvent,
+          turnstileToken,
           message: [
             `Child Name: ${formData.childName}`,
             `Age: ${formData.age}`,
@@ -91,6 +102,7 @@ export default function SquadSignupForm({ content = {} }) {
       }
 
       setFormData(INITIAL_FORM);
+      setTurnstileToken("");
       setStatus(formContent.successText);
     } catch {
       setStatus(formContent.errorText);
@@ -201,7 +213,15 @@ export default function SquadSignupForm({ content = {} }) {
         <span>{formContent.termsText}</span>
       </label>
 
-      <button type="submit" disabled={submitting}>
+      {TURNSTILE_ENABLED ? (
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+          onError={() => setTurnstileToken("")}
+        />
+      ) : null}
+
+      <button type="submit" disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}>
         {submitting ? "Sending..." : formContent.submitText}
       </button>
 
