@@ -694,6 +694,15 @@ const PricingPromosPage = async ({ params }) => {
     value: ctaContent.pricingPromoInlineCtaButtonText,
     fallback: "Apply This Offer",
   });
+  // Where the inline-banner button points. Set in the sheet via
+  // pricingPromoInlineCtaHref; blank in the sheet = fall back to the booking
+  // popup, no row = the birthdays booking site.
+  const pricingPromoInlineCtaHref = resolveConfiguredValue({
+    sources: [configData, pageData || {}],
+    keys: ["pricingPromoInlineCtaHref", "pricingPromosInlineCtaHref"],
+    value: ctaContent.pricingPromoInlineCtaHref,
+    fallback: "https://birthdays.pixelpulseplay.ca/",
+  });
   const pricingPromoFinalCtaTitle = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: ["pricingPromoFinalCtaTitle", "pricingPromosFinalCtaTitle"],
@@ -991,10 +1000,16 @@ const PricingPromosPage = async ({ params }) => {
               </div>
               <div className="ppp-inline-cta__actions">
                 <div className="aero-btn-booknow">
-                  <BookingButton
-                    title={pricingPromoInlineCtaButtonText}
-                    bookingType={ctaContent.pricingPromoInlineCtaBookingType || "party"}
-                  />
+                  {pricingPromoInlineCtaHref ? (
+                    <a href={pricingPromoInlineCtaHref}>
+                      {pricingPromoInlineCtaButtonText}
+                    </a>
+                  ) : (
+                    <BookingButton
+                      title={pricingPromoInlineCtaButtonText}
+                      bookingType={ctaContent.pricingPromoInlineCtaBookingType || "party"}
+                    />
+                  )}
                 </div>
               </div>
             </article>
