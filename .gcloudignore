@@ -17,9 +17,3 @@
 
 # Node.js dependencies:
 node_modules/
-
-# Local-only VR page/assets. Keep out of App Engine deploys until approved.
-src/app/vr/
-src/app/styles/vr.css
-public/assets/images/vr-section-bg.jpg
-public/assets/videos/vr-hero.mp4
