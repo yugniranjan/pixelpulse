@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import TurnstileWidget from "./smallComponents/TurnstileWidget";
+
+const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 const INITIAL_FORM = {
   fullName: "",
@@ -18,6 +21,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -33,6 +37,12 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
       return;
     }
 
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      setStatus("Please complete the verification check.");
+      toast.error("Please complete the verification check.");
+      return;
+    }
+
     setSubmitting(true);
     setStatus("Sending your summer pass inquiry...");
 
@@ -42,11 +52,14 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          contactCompany: "",
+          websiteUrl: "",
           from: "Summer Play Pass",
           time: "",
           message:
             formData.message ||
             `Interested in ${formData.selectedEvent || "Summer Play Pass"}.`,
+          turnstileToken,
         }),
       });
 
@@ -55,6 +68,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
       }
 
       setFormData(INITIAL_FORM);
+      setTurnstileToken("");
       setStatus("Your inquiry was sent. We will follow up soon.");
       window.sessionStorage.setItem("pppContactEmail", formData.email);
       toast.success("Your inquiry was sent. We will follow up soon.");
@@ -69,6 +83,16 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
 
   return (
     <form className="ppp-summer-inquiry" onSubmit={handleSubmit} aria-busy={submitting}>
+      <div style={{ display: "none" }} aria-hidden="true">
+        <label>
+          Company
+          <input name="contactCompany" tabIndex="-1" autoComplete="off" />
+        </label>
+        <label>
+          Website
+          <input name="websiteUrl" tabIndex="-1" autoComplete="off" />
+        </label>
+      </div>
       <div>
         <span>Summer Pass Inquiry</span>
         <h2>Plan Your Pass</h2>
@@ -136,7 +160,17 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
           placeholder="Tell us who is playing and when you want to visit."
         />
       </label>
-      <button type="submit" disabled={submitting}>
+      {TURNSTILE_ENABLED ? (
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+          onError={() => setTurnstileToken("")}
+        />
+      ) : null}
+      <button
+        type="submit"
+        disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+      >
         {submitting ? "Sending..." : "Send Inquiry"}
       </button>
       {status && <p className="ppp-summer-inquiry__status">{status}</p>}

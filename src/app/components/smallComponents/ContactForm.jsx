@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation";
 import "../../styles/contactus.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { toast } from "sonner";
+import TurnstileWidget from "./TurnstileWidget";
 
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
+const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 function ContactForm() {
   const router = useRouter();
   const [currentLocation, setCurrentLocation] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [formData, setFormData] = useState({
     from: LOCATION_NAME,
     firstName: "",
@@ -45,15 +48,24 @@ function ContactForm() {
       return;
     }
 
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      toast.error("Please complete the verification check.");
+      setSubmitStatus("Please complete the verification check.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitStatus("Sending your inquiry...");
     try {
       const payload = {
         ...formData,
+        contactCompany: "",
+        websiteUrl: "",
         from: currentLocation || LOCATION_NAME,
         fullName: `${formData.firstName} ${formData.lastName}`.trim(),
         locationEmail: CONTACT_EMAIL,
         subject: `${formData.firstName} ${formData.lastName} - Pixel Pulse Play Zone (Inquiry)`.trim(),
+        turnstileToken,
       };
 
       const response = await fetch("/api/email", {
@@ -70,6 +82,7 @@ function ContactForm() {
 
       toast.success("Your message has been sent successfully.");
       setSubmitStatus("Your inquiry was sent successfully.");
+      setTurnstileToken("");
       window.sessionStorage.setItem("pppContactEmail", formData.email);
       router.push("/contactus/thank-you");
     } catch (error) {
@@ -84,6 +97,16 @@ function ContactForm() {
     <div className="ppp-contact-form-shell">
       <form className="contact-form" onSubmit={handleSubmit} aria-busy={submitting}>
         <p className="sr-only" aria-live="polite">{submitStatus}</p>
+        <div style={{ display: "none" }} aria-hidden="true">
+          <label>
+            Company
+            <input name="contactCompany" tabIndex="-1" autoComplete="off" />
+          </label>
+          <label>
+            Website
+            <input name="websiteUrl" tabIndex="-1" autoComplete="off" />
+          </label>
+        </div>
         <div className="ppp-contact-form__grid">
           <div className="form-group">
             <label htmlFor="firstName">First Name <span>*</span></label>
@@ -174,6 +197,7 @@ function ContactForm() {
             >
               <option value="">Select an event or inquiry type</option>
               <option value="BirthDay">BirthDay Party</option>
+              <option value="Private Party">Private Party</option>
               <option value="Group Booking">Group Booking</option>
               <option value="Fund Raisers">Fund Raisers</option>
               <option value="Others">Others</option>
@@ -193,7 +217,19 @@ function ContactForm() {
           </div>
         </div>
 
-        <button type="submit" className="submit-button" disabled={submitting}>
+        {TURNSTILE_ENABLED ? (
+          <TurnstileWidget
+            onVerify={setTurnstileToken}
+            onExpire={() => setTurnstileToken("")}
+            onError={() => setTurnstileToken("")}
+          />
+        ) : null}
+
+        <button
+          type="submit"
+          className="submit-button"
+          disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+        >
           {submitting ? "Sending..." : "Send Inquiry"}
         </button>
       </form>

@@ -7,6 +7,21 @@ const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitBuckets = new Map();
+
+const TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+const ALLOWED_HOSTS = new Set([
+  "pixelpulseplay.ca",
+  "www.pixelpulseplay.ca",
+  "birthdays.pixelpulseplay.ca",
+  "summer.pixelpulseplay.ca",
+  "parties.pixelpulseplay.ca",
+  "squad.pixelpulseplay.ca",
+]);
 
 function getRequiredEnv(name) {
   const value = process.env[name];
@@ -38,8 +53,102 @@ function escapeHtml(value) {
     ?.replace(/>/g, "&gt;");
 }
 
+function getRequestHost(value) {
+  try {
+    return new URL(value).host.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function isAllowedRequestSource(request) {
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+  const host = getRequestHost(origin || referer);
+  const hostname = host.split(":")[0];
+
+  return Boolean(
+    host &&
+      (ALLOWED_HOSTS.has(host) ||
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        hostname.endsWith(".vercel.app")),
+  );
+}
+
+function getClientIp(request) {
+  const forwardedFor = request.headers.get("x-forwarded-for") || "";
+  return (
+    forwardedFor.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    ""
+  );
+}
+
+async function verifyTurnstile(token, remoteIp) {
+  const secret = getRequiredEnv("TURNSTILE_SECRET_KEY");
+
+  // If the secret is not configured, skip verification so the form keeps
+  // working in environments where Turnstile has not been set up yet.
+  if (!secret) {
+    return true;
+  }
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const params = new URLSearchParams();
+    params.append("secret", secret);
+    params.append("response", token);
+    if (remoteIp) {
+      params.append("remoteip", remoteIp);
+    }
+
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params,
+    });
+
+    const data = await response.json();
+    return Boolean(data?.success);
+  } catch (error) {
+    console.error("Turnstile verification request failed:", error);
+    return false;
+  }
+}
+
+function getClientKey(request, email) {
+  const ip = getClientIp(request) || "unknown";
+  return `${ip}:${String(email || "").toLowerCase()}`;
+}
+
+function isRateLimited(key) {
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(key) || [];
+  const recent = bucket.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS);
+
+  if (recent.length >= RATE_LIMIT_MAX) {
+    rateLimitBuckets.set(key, recent);
+    return true;
+  }
+
+  recent.push(now);
+  rateLimitBuckets.set(key, recent);
+  return false;
+}
+
 export async function POST(request) {
   try {
+    if (!isAllowedRequestSource(request)) {
+      return NextResponse.json(
+        { error: "Invalid request source." },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json();
 
     const {
@@ -55,7 +164,26 @@ export async function POST(request) {
       selectedEvent,
       selectedPackage,
       from,
+      contactCompany,
+      websiteUrl,
+      turnstileToken,
     } = body || {};
+
+    if (contactCompany || websiteUrl) {
+      return NextResponse.json({ success: true });
+    }
+
+    const passedTurnstile = await verifyTurnstile(
+      turnstileToken,
+      getClientIp(request),
+    );
+
+    if (!passedTurnstile) {
+      return NextResponse.json(
+        { error: "Verification failed. Please try again." },
+        { status: 403 },
+      );
+    }
 
     const gmailUser = getRequiredEnv("GMAIL_USER");
     const gmailAppPassword = getRequiredEnv("GMAIL_APP_PASSWORD");
@@ -95,6 +223,13 @@ export async function POST(request) {
       return NextResponse.json(
         { error: "Please enter your phone number." },
         { status: 400 },
+      );
+    }
+
+    if (isRateLimited(getClientKey(request, visitorEmail))) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
       );
     }
 

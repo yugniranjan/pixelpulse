@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import TurnstileWidget from "./smallComponents/TurnstileWidget";
+
+const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 const INITIAL_FORM = {
   fullName: "",
@@ -20,6 +23,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const isPrivatePartySelected = formData.selectedPackage
     .toLowerCase()
     .includes("private party");
@@ -31,6 +35,12 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      setStatus("Please complete the verification check.");
+      return;
+    }
+
     setSubmitting(true);
     setStatus("Sending your party request...");
 
@@ -42,11 +52,14 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         },
         body: JSON.stringify({
           ...formData,
+          contactCompany: "",
+          websiteUrl: "",
           from: "birthday-party-landing",
           selectedEvent: "BirthDay Party",
           selectedPackage: formData.selectedPackage,
           subject: `${formData.fullName} - Birthday Party Inquiry`,
           time: formData.time,
+          turnstileToken,
         }),
       });
 
@@ -55,6 +68,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       }
 
       setFormData(INITIAL_FORM);
+      setTurnstileToken("");
       setStatus("Thanks. We received your birthday party request.");
       window.sessionStorage.setItem("pppContactEmail", formData.email);
       router.push("/contactus/thank-you");
@@ -72,6 +86,16 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       onSubmit={handleSubmit}
       aria-busy={submitting}
     >
+      <div style={{ display: "none" }} aria-hidden="true">
+        <label>
+          Company
+          <input name="contactCompany" tabIndex="-1" autoComplete="off" />
+        </label>
+        <label>
+          Website
+          <input name="websiteUrl" tabIndex="-1" autoComplete="off" />
+        </label>
+      </div>
       <div className="ppp-birthday-hero-form__head">
         <p>Plan the party</p>
         <h2>Get a birthday callback</h2>
@@ -200,7 +224,18 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         </label>
       </div>
 
-      <button type="submit" disabled={submitting}>
+      {TURNSTILE_ENABLED ? (
+        <TurnstileWidget
+          onVerify={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+          onError={() => setTurnstileToken("")}
+        />
+      ) : null}
+
+      <button
+        type="submit"
+        disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+      >
         {submitting ? "Sending..." : "Send Birthday Request"}
       </button>
 
