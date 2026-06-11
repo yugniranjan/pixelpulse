@@ -255,6 +255,16 @@ const Category = async ({ params }) => {
   };
   const ctaSources = [pageData || {}, configData];
   const contactHref = getConfiguredValue(ctaSources, ["cta_contact_href", "contactHref", "inquireHref"], "/contactus");
+  const groupsHeroPrimaryHref = getConfiguredValue(
+    ctaSources,
+    ["groupsHeroPrimaryHref", "groupHeroPrimaryHref"],
+    contactHref,
+  );
+  const groupsFinalCtaPrimaryHref = getConfiguredValue(
+    ctaSources,
+    ["groupsFinalCtaPrimaryHref", "groupFinalCtaPrimaryHref"],
+    contactHref,
+  );
   const aboutReadMoreText = getConfiguredValue(
     ctaSources,
     ["aboutReadMoreText", "aboutCardReadMoreText"],
@@ -480,7 +490,7 @@ const Category = async ({ params }) => {
                       <div className="ppp-groups-hero__actions">
                         {ctaContent.groupsHeroPrimaryText && (
                           <Link
-                            href={contactHref}
+                            href={groupsHeroPrimaryHref}
                             className="ppp-groups-hero__book-btn"
                             prefetch
                           >
@@ -572,7 +582,7 @@ const Category = async ({ params }) => {
                   </p>
                   <div className="ppp-groups-final-cta__actions">
                     <Link
-                      href={contactHref}
+                      href={groupsFinalCtaPrimaryHref}
                       className="ppp-groups-final-cta__btn"
                       prefetch
                     >
