@@ -33,6 +33,10 @@ function minorChildren(familyMembers) {
     .filter((c) => c.name);
 }
 
+function normalizePartyId(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
 export async function GET() {
   if (!hasPostgres()) {
     return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
@@ -81,7 +85,10 @@ export async function GET() {
     // Group signers by party.
     const signersByParty = new Map();
     for (const row of waiversResult.rows) {
-      const list = signersByParty.get(row.party_id) || [];
+      const normalizedPartyId = normalizePartyId(row.party_id);
+      if (!normalizedPartyId) continue;
+
+      const list = signersByParty.get(normalizedPartyId) || [];
       list.push({
         name: row.primary_name,
         email: row.email,
@@ -89,15 +96,16 @@ export async function GET() {
         phone: row.phone,
         children: minorChildren(row.family_members),
       });
-      signersByParty.set(row.party_id, list);
+      signersByParty.set(normalizedPartyId, list);
     }
 
-    const seedByParty = new Map(seedResult.rows.map((r) => [r.party_id, r]));
+    const seedByParty = new Map(seedResult.rows.map((r) => [normalizePartyId(r.party_id), r]));
 
     const parties = bookingsResult.rows.map((b) => {
       const partyId = b.party_id;
-      const signers = signersByParty.get(partyId) || [];
-      const seed = seedByParty.get(partyId);
+      const normalizedPartyId = normalizePartyId(partyId);
+      const signers = signersByParty.get(normalizedPartyId) || [];
+      const seed = seedByParty.get(normalizedPartyId);
       const hostEmailLower = String(b.email || "").trim().toLowerCase();
 
       // The host's own waiver = the signer whose email matches the booking email.
@@ -156,7 +164,7 @@ export async function GET() {
     parties.sort((a, b) => (b.visitDate || "").localeCompare(a.visitDate || ""));
 
     // Parties that have waivers but no booking row → no host to email.
-    const bookedIds = new Set(bookingsResult.rows.map((b) => b.party_id));
+    const bookedIds = new Set(bookingsResult.rows.map((b) => normalizePartyId(b.party_id)));
     const waiverOnlyParties = [...signersByParty.keys()].filter((id) => !bookedIds.has(id)).length;
 
     return NextResponse.json({

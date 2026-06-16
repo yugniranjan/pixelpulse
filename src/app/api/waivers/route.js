@@ -4,6 +4,7 @@ import {
   createPostgresWaiver,
   getPostgresWaiverByEmail,
   hasPostgres,
+  listPostgresWaiversByEmail,
 } from "@/lib/postgresData";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,10 @@ function cleanText(value = "") {
 }
 
 function cleanEmail(value = "") {
+  return cleanText(value).toLowerCase();
+}
+
+function normalizePartyId(value = "") {
   return cleanText(value).toLowerCase();
 }
 
@@ -90,50 +95,53 @@ function hasRequiredParticipantFields(participant) {
   return Boolean(participant.firstName && participant.lastName && participant.dob);
 }
 
-async function getExistingWaiverByEmail(email, originalEmail = email) {
+async function getExistingWaiversByEmail(email, originalEmail = email) {
   const normalizedEmail = cleanEmail(email);
   const cleanOriginalEmail = cleanText(originalEmail);
-  if (!normalizedEmail) return null;
+  if (!normalizedEmail) return [];
 
   if (hasPostgres()) {
-    return getPostgresWaiverByEmail(normalizedEmail);
+    if (typeof listPostgresWaiversByEmail === "function") {
+      return listPostgresWaiversByEmail(normalizedEmail);
+    }
+
+    const waiver = await getPostgresWaiverByEmail(normalizedEmail);
+    return waiver ? [waiver] : [];
   }
 
-  if (!db) return null;
+  if (!db) return [];
+
+  const matches = new Map();
+  const addSnapshot = (snapshot) => {
+    snapshot.docs.forEach((doc) => {
+      matches.set(doc.id, { id: doc.id, ...(doc.data() || {}) });
+    });
+  };
 
   const normalizedSnapshot = await db
     .collection("waivers")
     .where("primary.emailNormalized", "==", normalizedEmail)
-    .limit(1)
+    .limit(50)
     .get();
-
-  if (!normalizedSnapshot.empty) {
-    return { id: normalizedSnapshot.docs[0].id };
-  }
+  addSnapshot(normalizedSnapshot);
 
   const exactSnapshot = await db
     .collection("waivers")
     .where("primary.email", "==", normalizedEmail)
-    .limit(1)
+    .limit(50)
     .get();
-
-  if (!exactSnapshot.empty) {
-    return { id: exactSnapshot.docs[0].id };
-  }
+  addSnapshot(exactSnapshot);
 
   if (cleanOriginalEmail && cleanOriginalEmail !== normalizedEmail) {
     const originalSnapshot = await db
       .collection("waivers")
       .where("primary.email", "==", cleanOriginalEmail)
-      .limit(1)
+      .limit(50)
       .get();
-
-    if (!originalSnapshot.empty) {
-      return { id: originalSnapshot.docs[0].id };
-    }
+    addSnapshot(originalSnapshot);
   }
 
-  return null;
+  return [...matches.values()];
 }
 
 export async function POST(req) {
@@ -163,13 +171,19 @@ export async function POST(req) {
     );
   }
 
-  const existingWaiver = await getExistingWaiverByEmail(primary.email, body?.primary?.email);
-  if (existingWaiver) {
+  const existingWaivers = await getExistingWaiversByEmail(primary.email, body?.primary?.email);
+  const incomingPartyId = normalizePartyId(visit.partyId);
+  const duplicateWaiver = existingWaivers.find((waiver) => {
+    const existingPartyId = normalizePartyId(waiver?.visit?.partyId);
+    return !incomingPartyId || existingPartyId === incomingPartyId;
+  });
+
+  if (duplicateWaiver) {
     return NextResponse.json(
       {
         error: DUPLICATE_WAIVER_MESSAGE,
         code: "WAIVER_ALREADY_EXISTS",
-        waiverId: existingWaiver.id || "",
+        waiverId: duplicateWaiver.id || "",
       },
       { status: 409 },
     );
