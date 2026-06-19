@@ -1,0 +1,407 @@
+/* Living style guide for the Pixel Pulse design system (/design-system).
+   Everything here is built from the --pp-* tokens in design-tokens.css so the
+   page doubles as a usage example. */
+
+.ds-page {
+  min-height: 100vh;
+  background: var(--pp-bg);
+  color: var(--pp-text);
+  font-family: var(--pp-font-body);
+  padding: var(--pp-space-12) var(--pp-space-5);
+}
+
+.ds-shell {
+  max-width: var(--pp-container);
+  margin: 0 auto;
+}
+
+/* --- Header ------------------------------------------------------------- */
+.ds-header {
+  border-bottom: 1px solid var(--pp-border);
+  padding-bottom: var(--pp-space-8);
+  margin-bottom: var(--pp-space-12);
+}
+
+.ds-header__eyebrow {
+  display: inline-block;
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-eyebrow);
+  font-weight: var(--pp-weight-heavy);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pp-lime);
+  margin-bottom: var(--pp-space-3);
+}
+
+.ds-header__title {
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-hero);
+  font-weight: var(--pp-weight-heavy);
+  line-height: 0.95;
+  margin: 0 0 var(--pp-space-4);
+  text-wrap: balance;
+}
+
+.ds-header__title span {
+  background: var(--pp-gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ds-header__lead {
+  font-size: var(--pp-text-lead);
+  color: var(--pp-text-muted);
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* --- Sections ----------------------------------------------------------- */
+.ds-section {
+  margin-bottom: var(--pp-space-16);
+}
+
+.ds-section__title {
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-h2);
+  font-weight: var(--pp-weight-heavy);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--pp-space-2);
+}
+
+.ds-section__hint {
+  color: var(--pp-text-soft);
+  font-size: var(--pp-text-sm);
+  margin: 0 0 var(--pp-space-6);
+}
+
+.ds-section__rule {
+  height: 4px;
+  width: 64px;
+  border-radius: var(--pp-radius-pill);
+  background: var(--pp-gradient-brand);
+  margin-bottom: var(--pp-space-6);
+}
+
+/* --- Generic grid ------------------------------------------------------- */
+.ds-grid {
+  display: grid;
+  gap: var(--pp-space-5);
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+/* --- Color swatches ----------------------------------------------------- */
+.ds-swatch {
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-md);
+  overflow: hidden;
+  background: var(--pp-card);
+}
+
+.ds-swatch__chip {
+  height: 92px;
+}
+
+.ds-swatch__meta {
+  padding: var(--pp-space-3);
+}
+
+.ds-swatch__name {
+  font-weight: var(--pp-weight-bold);
+  font-size: var(--pp-text-sm);
+  margin-bottom: 2px;
+}
+
+.ds-swatch__var {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--pp-text-soft);
+  word-break: break-all;
+}
+
+.ds-swatch__hex {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--pp-text-muted);
+  text-transform: uppercase;
+}
+
+/* --- Gradient tiles ----------------------------------------------------- */
+.ds-gradient {
+  border-radius: var(--pp-radius-md);
+  border: 1px solid var(--pp-border);
+  overflow: hidden;
+}
+
+.ds-gradient__band {
+  height: 84px;
+}
+
+.ds-gradient__meta {
+  padding: var(--pp-space-3);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--pp-text-muted);
+}
+
+/* --- Type specimens ----------------------------------------------------- */
+.ds-type-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pp-space-6);
+  padding: var(--pp-space-4) 0;
+  border-bottom: 1px solid var(--pp-border);
+  flex-wrap: wrap;
+}
+
+.ds-type-row__label {
+  flex: 0 0 150px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  color: var(--pp-text-soft);
+}
+
+.ds-type-row__sample {
+  font-family: var(--pp-font-display);
+  font-weight: var(--pp-weight-heavy);
+  line-height: 1.05;
+}
+
+.ds-type-row--body .ds-type-row__sample {
+  font-family: var(--pp-font-body);
+  font-weight: var(--pp-weight-regular);
+}
+
+.ds-fonts {
+  display: grid;
+  gap: var(--pp-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-bottom: var(--pp-space-8);
+}
+
+.ds-font-card {
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-lg);
+  background: var(--pp-card);
+  padding: var(--pp-space-6);
+}
+
+.ds-font-card__display {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: var(--pp-space-3);
+}
+
+.ds-font-card__name {
+  font-weight: var(--pp-weight-bold);
+}
+
+.ds-font-card__meta {
+  color: var(--pp-text-soft);
+  font-size: var(--pp-text-sm);
+}
+
+/* --- Spacing scale ------------------------------------------------------ */
+.ds-space-row {
+  display: flex;
+  align-items: center;
+  gap: var(--pp-space-4);
+  margin-bottom: var(--pp-space-3);
+}
+
+.ds-space-row__bar {
+  height: 16px;
+  background: var(--pp-gradient-button);
+  border-radius: var(--pp-radius-sm);
+}
+
+.ds-space-row__label {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  color: var(--pp-text-soft);
+}
+
+/* --- Radius & shadow tiles --------------------------------------------- */
+.ds-tile {
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 110px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  color: var(--pp-text-muted);
+  text-align: center;
+  padding: var(--pp-space-3);
+}
+
+.ds-shadow-tile {
+  background: var(--pp-surface);
+  border-radius: var(--pp-radius-lg);
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  color: var(--pp-text-muted);
+}
+
+/* --- Component demos ---------------------------------------------------- */
+.ds-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pp-space-4);
+  align-items: center;
+}
+
+.ds-btn {
+  font-family: var(--pp-font-display);
+  font-weight: var(--pp-weight-heavy);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--pp-transition);
+}
+
+.ds-btn--primary {
+  background: var(--pp-gradient-button);
+  color: var(--pp-text-on-brand);
+  border: 2px solid var(--pp-lime);
+  border-radius: var(--pp-radius-pill);
+  padding: 0.75rem 1.5rem;
+  box-shadow: var(--pp-glow-lime);
+}
+
+.ds-btn--primary:hover {
+  transform: translateY(-3px);
+}
+
+.ds-btn--secondary {
+  background: transparent;
+  color: var(--pp-peach);
+  border: 2px solid var(--pp-peach);
+  border-radius: var(--pp-radius-sm);
+  padding: 0.65rem 1.25rem;
+}
+
+.ds-btn--secondary:hover {
+  background: rgba(251, 174, 123, 0.08);
+  box-shadow: var(--pp-glow-peach);
+}
+
+.ds-btn--ghost {
+  background: rgba(10, 15, 31, 0.55);
+  color: var(--pp-text);
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius-sm);
+  padding: 0.65rem 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+.ds-btn--ghost:hover {
+  border-color: var(--pp-lime);
+}
+
+.ds-btn--dark {
+  background: var(--pp-bg-deep);
+  color: var(--pp-text);
+  border: 2px solid var(--pp-bg-deep);
+  border-radius: var(--pp-radius-sm);
+  padding: 0.8rem 1.5rem;
+}
+
+.ds-btn--dark:hover {
+  background: var(--pp-surface);
+  border-color: var(--pp-surface);
+}
+
+.ds-eyebrow {
+  display: inline-flex;
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-eyebrow);
+  font-weight: var(--pp-weight-heavy);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pp-lime);
+  background: rgba(164, 207, 95, 0.1);
+  border: 1px solid var(--pp-border-lime);
+  border-radius: var(--pp-radius-pill);
+  padding: 0.4rem 0.9rem;
+}
+
+.ds-demo-card {
+  position: relative;
+  border: 1px solid var(--pp-border-lime);
+  border-radius: var(--pp-radius-sm);
+  background: var(--pp-gradient-card), var(--pp-surface);
+  box-shadow: var(--pp-shadow-lg);
+  padding: var(--pp-space-6);
+  max-width: 360px;
+  overflow: hidden;
+}
+
+.ds-demo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: var(--pp-gradient-brand);
+}
+
+.ds-demo-card__title {
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-h3);
+  font-weight: var(--pp-weight-heavy);
+  margin: var(--pp-space-2) 0 var(--pp-space-2);
+}
+
+.ds-demo-card__text {
+  color: var(--pp-text-muted);
+  font-size: var(--pp-text-sm);
+  margin: 0;
+}
+
+.ds-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pp-space-5);
+  flex-wrap: wrap;
+  background: var(--pp-gradient-banner);
+  border: 1px solid var(--pp-border-lime);
+  border-radius: var(--pp-radius-sm);
+  padding: var(--pp-space-5) var(--pp-space-6);
+  overflow: hidden;
+}
+
+.ds-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: var(--pp-gradient-brand);
+}
+
+.ds-banner__title {
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-text-h3);
+  font-weight: var(--pp-weight-black);
+  text-transform: uppercase;
+  color: var(--pp-text-on-brand);
+  margin: 0;
+}
+
+.ds-banner__sub {
+  color: rgba(5, 8, 16, 0.78);
+  font-weight: var(--pp-weight-semibold);
+  font-size: var(--pp-text-sm);
+}

@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Pixel Pulse Design Tokens — single source of truth
+   --------------------------------------------------------------------------
+   All design primitives live here as --pp-* custom properties. Prefer these
+   over hard-coded values in new CSS. Legacy page-scoped variables
+   (--primary-color, --ppp-lime, --vr-cyan, etc.) describe the same brand and
+   can be migrated to reference these over time.
+
+   See the live reference at /design-system.
+   ========================================================================== */
+
+:root {
+  /* --- Brand colors ----------------------------------------------------- */
+  --pp-lime: #a4cf5f;          /* secondary brand — accents, highlights */
+  --pp-lime-bright: #b7dd5f;   /* button-gradient start */
+  --pp-peach: #fbae7b;         /* primary brand — CTAs */
+  --pp-peach-deep: #f7b27d;    /* button-gradient end */
+  --pp-magenta: #ff2d78;       /* tertiary accent — gradient line, promos */
+
+  /* --- Surfaces & neutrals --------------------------------------------- */
+  --pp-bg: #0b0f14;            /* page background */
+  --pp-bg-deep: #050810;       /* deepest panels, text-on-brand */
+  --pp-surface: #111827;       /* cards */
+  --pp-surface-soft: #1f2937;  /* raised surfaces */
+  --pp-card: rgba(255, 255, 255, 0.04);
+  --pp-card-strong: rgba(255, 255, 255, 0.08);
+
+  /* --- Borders ---------------------------------------------------------- */
+  --pp-border: rgba(255, 255, 255, 0.1);
+  --pp-border-lime: rgba(164, 207, 95, 0.28);
+  --pp-border-peach: rgba(251, 174, 123, 0.35);
+
+  /* --- Text ------------------------------------------------------------- */
+  --pp-text: #f8fafc;
+  --pp-text-muted: #cbd5e1;
+  --pp-text-soft: #94a3b8;
+  --pp-text-on-brand: #050810; /* dark text over lime/peach fills */
+
+  /* --- Typography ------------------------------------------------------- */
+  --pp-font-display: "Barlow Condensed", Impact, sans-serif;
+  --pp-font-body: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --pp-text-hero: clamp(2.2rem, 4.8vw, 4.9rem);
+  --pp-text-h1: clamp(2rem, 4vw, 3rem);
+  --pp-text-h2: clamp(1.6rem, 3vw, 2.2rem);
+  --pp-text-h3: clamp(1.35rem, 2.4vw, 1.85rem);
+  --pp-text-lead: clamp(1.05rem, 1.5vw, 1.25rem);
+  --pp-text-body: 1rem;
+  --pp-text-sm: 0.875rem;
+  --pp-text-eyebrow: 0.8rem;
+
+  --pp-weight-regular: 400;
+  --pp-weight-medium: 500;
+  --pp-weight-semibold: 600;
+  --pp-weight-bold: 700;
+  --pp-weight-heavy: 800;
+  --pp-weight-black: 900;
+
+  /* --- Spacing scale (4px base) ---------------------------------------- */
+  --pp-space-1: 0.25rem;  /* 4 */
+  --pp-space-2: 0.5rem;   /* 8 */
+  --pp-space-3: 0.75rem;  /* 12 */
+  --pp-space-4: 1rem;     /* 16 */
+  --pp-space-5: 1.25rem;  /* 20 */
+  --pp-space-6: 1.5rem;   /* 24 */
+  --pp-space-8: 2rem;     /* 32 */
+  --pp-space-10: 2.5rem;  /* 40 */
+  --pp-space-12: 3rem;    /* 48 */
+  --pp-space-16: 4rem;    /* 64 */
+
+  /* --- Radius ----------------------------------------------------------- */
+  --pp-radius-sm: 8px;
+  --pp-radius-md: 12px;
+  --pp-radius-lg: 16px;
+  --pp-radius-xl: 24px;
+  --pp-radius-pill: 999px;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --pp-container: 1160px;
+
+  /* --- Shadows & glows -------------------------------------------------- */
+  --pp-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --pp-shadow-card: 0 14px 40px rgba(0, 0, 0, 0.22);
+  --pp-shadow-lg: 0 20px 56px rgba(0, 0, 0, 0.28);
+  --pp-glow-lime: 0 0 30px rgba(164, 207, 95, 0.22);
+  --pp-glow-peach: 0 0 24px rgba(251, 174, 123, 0.38);
+
+  /* --- Gradients -------------------------------------------------------- */
+  --pp-gradient-brand: linear-gradient(90deg, #a4cf5f, #fbae7b, #ff2d78);
+  --pp-gradient-button: linear-gradient(135deg, #b7dd5f 0%, #f7b27d 100%);
+  --pp-gradient-card: linear-gradient(
+    145deg,
+    rgba(164, 207, 95, 0.14),
+    rgba(251, 174, 123, 0.1) 42%,
+    rgba(17, 24, 39, 0.98)
+  );
+  --pp-gradient-banner: linear-gradient(
+    90deg,
+    rgb(181, 220, 114),
+    rgb(164, 207, 95) 55%,
+    rgb(145, 188, 80)
+  );
+
+  /* --- Motion ----------------------------------------------------------- */
+  --pp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pp-transition: 0.25s var(--pp-ease);
+}
