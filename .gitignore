@@ -20,10 +20,7 @@
 .DS_Store
 *.pem
 .vscode/
-<<<<<<< HEAD
 .claude/
-=======
->>>>>>> 5fdf67e (first commit)
 
 # debug
 npm-debug.log*
@@ -31,11 +28,13 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-<<<<<<< HEAD
 .env
-=======
->>>>>>> 5fdf67e (first commit)
 .env*.local
+
+# local import/export data
+/*.session.sql
+scripts/**/*.csv
+scripts/waiver-import/
 
 # vercel
 .vercel
@@ -43,7 +42,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-<<<<<<< HEAD
-/src/app/api/sitemap.xml/route.js
-=======
->>>>>>> 5fdf67e (first commit)
