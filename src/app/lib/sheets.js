@@ -1,5 +1,3 @@
-// lib/sheet.js
-import axios from "axios";
 import * as XLSX from "xlsx";
 import { getConfigValue } from "@/lib/ctaContent";
 import { DEFAULT_SEO_IMAGE, canonicalUrl, getCanonicalSiteUrl, safeImageUrl } from "@/lib/seo";
@@ -13,8 +11,16 @@ let workbookLoadPromise = null;
 
 async function populateSheetCache() {
   const now = Date.now();
-  const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
-  const workbook = XLSX.read(response.data, { type: 'buffer' });
+  const response = await fetch(SHEET_URL, {
+    next: { revalidate: CACHE_TTL / 1000 },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Google Sheet workbook request failed: ${response.status}`);
+  }
+
+  const workbookBuffer = Buffer.from(await response.arrayBuffer());
+  const workbook = XLSX.read(workbookBuffer, { type: 'buffer' });
 
   const worksheetLocationsData = workbook.Sheets['locations'];
   const jsonLocationsData = XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' });
@@ -111,8 +117,14 @@ export async function fetchsheetdata(sheetName, location) {
 
 export async function fetchsheetdataNoCache(sheetName) {
   try {
-    const response = await axios.get(SHEET_URL, { responseType: 'arraybuffer' });
-    const workbook = XLSX.read(response.data, { type: 'buffer' });
+    const response = await fetch(SHEET_URL, { cache: 'no-store' });
+
+    if (!response.ok) {
+      throw new Error(`Google Sheet workbook request failed: ${response.status}`);
+    }
+
+    const workbookBuffer = Buffer.from(await response.arrayBuffer());
+    const workbook = XLSX.read(workbookBuffer, { type: 'buffer' });
 
     const worksheetLocationsData = workbook.Sheets[sheetName];
     if (!worksheetLocationsData) {

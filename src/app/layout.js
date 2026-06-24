@@ -7,15 +7,15 @@ import Footer from "./components/Footer";
 import ChromeVisibility from "./components/ChromeVisibility";
 import FloatingWaiverButton from "./components/FloatingWaiverButton";
 import TrackingPageViews from "./components/TrackingPageViews";
+import TrackingVisibility from "./components/TrackingVisibility";
 import { fetchMenuData, fetchsheetdata } from "./lib/sheets";
-import { cookies } from "next/headers";
-import { headers } from "next/headers";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
 import { getConfiguredValue, getRowValue, normalizeValue } from "./lib/ctaContent";
 import Breadcrumbs from "./components/Breadcrumb";
 import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
+export const revalidate = 900;
 
 const DEFAULT_GTM_ID = "GTM-53N567VP";
 const GTM_KEYS = [
@@ -77,42 +77,6 @@ function getGoogleTagIds(sources = []) {
     .filter(Boolean);
 }
 
-function normalizePath(path = "/") {
-  if (!path) return "/";
-  return path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
-}
-
-function isTrackingExcludedPath(path = "/") {
-  const pathname = normalizePath(path);
-
-  return (
-    pathname === "/concessions-tv" ||
-    pathname === "/waiver" ||
-    pathname.startsWith("/waiver/") ||
-    pathname === "/waiver-data" ||
-    pathname.startsWith("/invite") ||
-    pathname === "/admin" ||
-    pathname.startsWith("/admin/")
-  );
-}
-
-function isChromeExcludedPath(path = "/") {
-  const pathname = normalizePath(path);
-
-  return (
-    pathname === "/birthday-party-landing" ||
-    pathname === "/birthday-party-bookings-vaughan" ||
-    pathname === "/concessions-tv" ||
-    pathname === "/private-party" ||
-    pathname === "/squad" ||
-    pathname === "/summer-play-pass" ||
-    pathname === "/waiver" ||
-    pathname.startsWith("/invite") ||
-    pathname === "/admin" ||
-    pathname.startsWith("/admin/")
-  );
-}
-
 function HeadTrackingScripts({ gtmId = "", googleTagIds = [], metaPixelId = "" }) {
   const cleanGtm = cleanGtmId(gtmId);
   const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
@@ -129,7 +93,7 @@ function HeadTrackingScripts({ gtmId = "", googleTagIds = [], metaPixelId = "" }
         <>
           <Script
             id="google-tag-manager"
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -283,12 +247,6 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
-  const cookieStore = await cookies();
-  const headerStore = await headers();
-  const token = cookieStore.get("admin_token")?.value;
-  const pathname = headerStore.get("x-pathname") || "/";
-  const showTracking = !isTrackingExcludedPath(pathname);
-  const showChrome = !isChromeExcludedPath(pathname);
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
@@ -316,18 +274,14 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      {showTracking ? (
-        <head>
-          <HeadTrackingScripts
-            gtmId={gtmId}
-            googleTagIds={googleTagIds}
-            metaPixelId={metaPixelId}
-          />
-        </head>
-      ) : null}
       <body suppressHydrationWarning>
-        {showTracking ? (
+        <TrackingVisibility>
           <>
+            <HeadTrackingScripts
+              gtmId={gtmId}
+              googleTagIds={googleTagIds}
+              metaPixelId={metaPixelId}
+            />
             <BodyTrackingNoScripts
               gtmId={gtmId}
               metaPixelId={metaPixelId}
@@ -336,25 +290,21 @@ export default async function RootLayout({ children }) {
               <TrackingPageViews />
             </Suspense>
           </>
-        ) : null}
+        </TrackingVisibility>
         <Toaster position="top-right" />
-        {showChrome ? (
-          <ChromeVisibility>
-            <Header location_slug={location_slug} menudata={menudata} configdata={configdata} token={token} />
-            <Breadcrumbs />
-            <FloatingWaiverButton />
-          </ChromeVisibility>
-        ) : null}
+        <ChromeVisibility>
+          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
+          <Breadcrumbs />
+          <FloatingWaiverButton />
+        </ChromeVisibility>
         <Suspense fallback={<Loading />}>{children}</Suspense>
-        {showChrome ? (
-          <ChromeVisibility>
-            <Footer
-              location_slug={location_slug}
-              configdata={configdata}
-              menudata={menudata}
-            />
-          </ChromeVisibility>
-        ) : null}
+        <ChromeVisibility>
+          <Footer
+            location_slug={location_slug}
+            configdata={configdata}
+            menudata={menudata}
+          />
+        </ChromeVisibility>
         <div id="modal-root"></div>
       </body>
     </html>

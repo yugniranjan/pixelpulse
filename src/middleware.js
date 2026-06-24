@@ -37,30 +37,10 @@ export function middleware(request) {
     .split(":")[0]
     .toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
-  const next = (pathnameForLayout = pathname) => {
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-pathname", pathnameForLayout);
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  };
-  const rewrite = (url, pathnameForLayout = url.pathname) => {
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-pathname", pathnameForLayout);
-
-    return NextResponse.rewrite(url, {
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  };
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
-    return next();
+    return NextResponse.next();
   }
 
   if (SUMMER_PLAY_PASS_HOSTS.has(requestHostname)) {
@@ -75,7 +55,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/summer-play-pass";
-      return rewrite(url, "/summer-play-pass");
+      return NextResponse.rewrite(url);
     }
   }
 
@@ -91,7 +71,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/squad";
-      return rewrite(url, "/squad");
+      return NextResponse.rewrite(url);
     }
   }
 
@@ -107,7 +87,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/birthday-party-bookings-vaughan";
-      return rewrite(url, "/birthday-party-bookings-vaughan");
+      return NextResponse.rewrite(url);
     }
   }
 
@@ -121,14 +101,14 @@ export function middleware(request) {
 
   // ✅ Allow auth APIs
   if (pathname.startsWith("/api/auth")) {
-    return next();
+    return NextResponse.next();
   }
 
   // 🔁 Logged-in admin should not see login page
   if (pathname === "/admin/login") {
     return token
       ? NextResponse.redirect(new URL("/admin/waivers", request.url))
-      : next();
+      : NextResponse.next();
   }
 
   // 🔐 Protect admin pages
@@ -146,7 +126,7 @@ export function middleware(request) {
     );
   }
 
-  return next();
+  return NextResponse.next();
 }
 
 export const config = {

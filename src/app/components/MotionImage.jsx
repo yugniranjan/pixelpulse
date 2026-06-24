@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
 import BookingButton from "./smallComponents/BookingButton";
@@ -27,6 +27,8 @@ function getVideoPoster(item = {}) {
 const MotionImage = ({ pageData, heroData = {} }) => {
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   const item = Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : pageData;
   const hasVideo = Boolean(item?.video);
@@ -40,6 +42,29 @@ const MotionImage = ({ pageData, heroData = {} }) => {
   const isPrimaryCtaExternal = /^https?:\/\//i.test(heroData.ctaPrimaryHref || "");
   const hasPartyCta = Boolean(heroData.partyCtaText && heroData.partyCtaHref);
   const isPartyCtaExternal = /^https?:\/\//i.test(heroData.partyCtaHref || "");
+
+  useEffect(() => {
+    if (!hasVideo) return undefined;
+
+    if (!videoPoster) {
+      setShouldLoadVideo(true);
+      return undefined;
+    }
+
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+      return undefined;
+    }
+
+    const loadVideo = () => setShouldLoadVideo(true);
+
+    if ("requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(loadVideo, { timeout: 1600 });
+      return () => window.cancelIdleCallback?.(idleId);
+    }
+
+    const timeoutId = window.setTimeout(loadVideo, 1200);
+    return () => window.clearTimeout(timeoutId);
+  }, [hasVideo, videoPoster]);
 
   const heroCopy = (
     <div className="ppp-hero-copy">
@@ -125,17 +150,41 @@ const MotionImage = ({ pageData, heroData = {} }) => {
     <section className="aero_home-headerimg-wrapper">
       {hasVideo ? (
         <section className="aero_home_video-container">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted={isMuted}
-            loop
-            playsInline
-            poster={videoPoster || undefined}
-            width="100%"
-          >
-            <source src={item.video} type="video/mp4" />
-          </video>
+          {videoPoster ? (
+            <Image
+              src={videoPoster}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              aria-hidden="true"
+              style={{
+                objectFit: "cover",
+                filter: "opacity(0.58) saturate(1.14) contrast(1.05)",
+              }}
+            />
+          ) : null}
+          {shouldLoadVideo ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted={isMuted}
+              loop
+              playsInline
+              preload="metadata"
+              poster={videoPoster || undefined}
+              width="100%"
+              onCanPlay={() => setVideoReady(true)}
+              style={{
+                position: videoPoster ? "absolute" : undefined,
+                inset: videoPoster ? 0 : undefined,
+                opacity: videoPoster && !videoReady ? 0 : undefined,
+                transition: videoPoster ? "opacity 400ms ease" : undefined,
+              }}
+            >
+              <source src={item.video} type="video/mp4" />
+            </video>
+          ) : null}
           {heroCopy}
           <button
             type="button"
@@ -149,7 +198,6 @@ const MotionImage = ({ pageData, heroData = {} }) => {
         </section>
       ) : (
         <section className="aero_home_video-container ppp-hero-fallback">
-          <motion.div />
           {heroCopy}
         </section>
       )}

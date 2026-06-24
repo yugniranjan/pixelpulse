@@ -19,7 +19,7 @@ import PromotionModal from "./components/model/PromotionModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
 import { safeImageUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 const SITE_DATA_GOOGLE_SHEET_ID = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 const SITE_DATA_SHEET_NAMES = [
@@ -160,7 +160,7 @@ const emptySiteData = {
 };
 
 function googleSheetCsvUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SITE_DATA_GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&cachebust=${Date.now()}`;
+  return `https://docs.google.com/spreadsheets/d/${SITE_DATA_GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
 }
 
 function parseCsv(csv) {
@@ -210,7 +210,9 @@ function parseCsv(csv) {
 }
 
 async function fetchGoogleSheetRows(sheetName) {
-  const response = await fetch(googleSheetCsvUrl(sheetName), { cache: "no-store" });
+  const response = await fetch(googleSheetCsvUrl(sheetName), {
+    next: { revalidate: 900 },
+  });
   if (!response.ok) {
     console.warn(`Optional Google Sheet tab not loaded: ${sheetName}`);
     return [];

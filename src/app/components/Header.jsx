@@ -71,7 +71,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
                   width={98}
                   height={98}
                   alt="Pixel Pulse Play"
-                  unoptimized
+                  priority
                 />
               </picture>
             </Link>
