@@ -116,6 +116,19 @@ const nextConfig = {
       ...socialRedirects,
     ];
   },
+  async headers() {
+    return [
+      {
+        source: "/assets/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "storage.googleapis.com", port: "" },

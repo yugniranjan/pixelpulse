@@ -13,7 +13,7 @@ const LOCATION_SLUG = "vaughan";
 const LANDING_PAGES_SHEET = "landing pages";
 const HERO_IMAGE = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.webp";
 const ATTRACTION_FALLBACK_IMAGE =
-  "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
+  "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 
 const FALLBACK_META_TITLE = "Birthday Party Offer | Pixel Pulse Play Vaughan";
 const FALLBACK_META_DESCRIPTION =

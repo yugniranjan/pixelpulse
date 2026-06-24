@@ -870,7 +870,7 @@
   background:
     linear-gradient(90deg, rgba(5, 8, 16, 0.94) 0%, rgba(5, 8, 16, 0.82) 44%, rgba(5, 8, 16, 0.42) 100%),
     radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center / cover no-repeat,
+    url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.webp") center / cover no-repeat,
     var(--ppp-card);
 }
 
@@ -880,7 +880,7 @@
     background:
       linear-gradient(180deg, rgba(5, 8, 16, 0.76) 0%, rgba(5, 8, 16, 0.54) 48%, rgba(5, 8, 16, 0.86) 100%),
       radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
-      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center center / cover no-repeat,
+      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.webp") center center / cover no-repeat,
       var(--ppp-card);
   }
 }
@@ -895,7 +895,7 @@
     background:
       linear-gradient(180deg, rgba(5, 8, 16, 0.76) 0%, rgba(5, 8, 16, 0.54) 46%, rgba(5, 8, 16, 0.88) 100%),
       radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
-      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.png") center center / cover no-repeat,
+      url("https://storage.googleapis.com/pixel-pulse-play/web/birthdayparty.webp") center center / cover no-repeat,
       var(--ppp-card);
   }
 }

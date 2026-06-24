@@ -9,7 +9,7 @@ import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 const siteUrl = getCanonicalSiteUrl();
 const LOCATION_SLUG = "vaughan";
 const SQUAD_SHEET = "squadlanding";
-const FALLBACK_HERO_IMAGE = "/assets/images/floorchallenge.jpg";
+const FALLBACK_HERO_IMAGE = "/assets/images/floorchallenge.webp";
 const FALLBACK_MAIN_LOGO = "/assets/images/logoD.png";
 const FALLBACK_BOOKING_LOGO = "/assets/images/logo.png";
 
@@ -160,7 +160,7 @@ function getSquadContent(rows = []) {
       "Join the Pixel Pulse Squad in Vaughan. Bring friends, play arcade challenges, earn rewards, and compete on leaderboards in a safe supervised program for ages 11-17.",
     ),
     canonical: getConfiguredValue(rows, ["squadCanonical", "canonical"], canonicalUrl("/squad")),
-    ogImage: absoluteUrl(localOrRemoteImage(getConfiguredValue(rows, ["squadOgImage", "ogImage"], "/assets/images/arcade.JPG"), "/assets/images/arcade.JPG")),
+    ogImage: absoluteUrl(localOrRemoteImage(getConfiguredValue(rows, ["squadOgImage", "ogImage"], "/assets/images/arcade.webp"), "/assets/images/arcade.webp")),
     mainLogo: localOrRemoteImage(getConfiguredValue(rows, ["squadMainLogo", "mainLogo"], FALLBACK_MAIN_LOGO), FALLBACK_MAIN_LOGO),
     mainLogoAlt: getConfiguredValue(rows, ["squadMainLogoAlt", "mainLogoAlt"], "Pixel Pulse Play n Party"),
     emblemTop: getConfiguredValue(rows, ["squadEmblemTop", "emblemTop"], "Pixel"),

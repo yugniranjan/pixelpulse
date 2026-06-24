@@ -1435,7 +1435,7 @@ const Home = async () => {
           </div>
           <figure className="ppp-cta-band__media">
             <Image
-              src="https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.png"
+              src="https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.webp"
               alt="Pixel Pulse Play reception area"
               width={1200}
               height={800}

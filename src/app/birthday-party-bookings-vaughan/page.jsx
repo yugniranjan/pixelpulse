@@ -9,10 +9,10 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
 const heroVideo = "/assets/videos/pixelgame.mp4";
-const localFloorImage = "/assets/images/floorchallenge.jpg";
-const localShootingImage = "/assets/images/shootinggame.jpg";
+const localFloorImage = "/assets/images/floorchallenge.webp";
+const localShootingImage = "/assets/images/shootinggame.webp";
 const LOCATION_SLUG = "vaughan";
-const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
+const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 const phoneUrl = "tel:+19057602922";
 const pageUrl = "https://birthdays.pixelpulseplay.ca";
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;

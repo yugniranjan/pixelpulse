@@ -7,10 +7,10 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 import SummerPlayPassInquiryForm from "@/components/SummerPlayPassInquiryForm";
 
 const logo = "/assets/images/logoD.png";
-const arcadeImage = "/assets/images/arcade.JPG";
-const floorImage = "/assets/images/floorchallenge.jpg";
-const shootingImage = "/assets/images/shootinggame.jpg";
-const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
+const arcadeImage = "/assets/images/arcade.webp";
+const floorImage = "/assets/images/floorchallenge.webp";
+const shootingImage = "/assets/images/shootinggame.webp";
+const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 const siteUrl = getCanonicalSiteUrl();
 
 export const dynamic = "force-dynamic";

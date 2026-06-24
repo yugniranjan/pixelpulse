@@ -207,7 +207,7 @@ const DEFAULT_PRICING_CARD_META = [
   {
     title: "Game Rooms",
     eyebrow: "Session Time",
-    image: "/assets/images/floorchallenge.jpg",
+    image: "/assets/images/floorchallenge.webp",
     imageAlt: "Game rooms at Pixel Pulse Play",
     bookable: true,
   },
@@ -215,7 +215,7 @@ const DEFAULT_PRICING_CARD_META = [
     title: "Arcade+",
     eyebrow: "Arcade Card",
     duration: "Choose Your Card",
-    image: "/assets/images/arcade.JPG",
+    image: "/assets/images/arcade.webp",
     imageAlt: "Arcade at Pixel Pulse Play",
     details: [
       { label: "Arcade Card", value: "$10" },

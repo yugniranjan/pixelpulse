@@ -3,7 +3,7 @@ import "../styles/private-party.css";
 import { canonicalUrl } from "@/lib/seo";
 
 const logo = "/assets/images/logoD.png";
-const heroImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png";
+const heroImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 const arenaImage = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.webp";
 const contactUrl = "/contactus";
 const phoneUrl = "tel:+19057602922";

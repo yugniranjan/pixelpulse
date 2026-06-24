@@ -927,19 +927,19 @@
 .ppp-use-case-card--corporate::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/CorporateParty.png");
+    url("https://storage.googleapis.com/pixel-pulse-play/web/CorporateParty.webp");
 }
 
 .ppp-use-case-card--school-trips::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.png");
+    url("https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.webp");
 }
 
 .ppp-use-case-card--friends-date::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.png");
+    url("https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.webp");
 }
 
 .ppp-use-case-card--birthday > *,

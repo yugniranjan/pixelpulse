@@ -2193,7 +2193,7 @@
   background:
     linear-gradient(90deg, rgba(5, 8, 16, 0.94) 0%, rgba(5, 8, 16, 0.8) 42%, rgba(5, 8, 16, 0.38) 100%),
     radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.png") center / cover no-repeat,
+    url("https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.webp") center / cover no-repeat,
     var(--ppp-card);
 }
 
@@ -2655,6 +2655,6 @@
   background:
     linear-gradient(90deg, rgba(5, 8, 16, 0.94) 0%, rgba(5, 8, 16, 0.8) 42%, rgba(5, 8, 16, 0.38) 100%),
     radial-gradient(circle at 18% 28%, rgba(164, 207, 95, 0.18), transparent 36%),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.png") center / cover no-repeat,
+    url("https://storage.googleapis.com/pixel-pulse-play/web/pixelreception.webp") center / cover no-repeat,
     var(--ppp-card) !important;
 }
