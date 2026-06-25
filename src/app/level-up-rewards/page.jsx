@@ -11,6 +11,7 @@ import {
   FaTicket,
   FaWallet,
 } from "react-icons/fa6";
+import RewardLookupForm from "@/components/RewardLookupForm";
 import "../styles/level-up-rewards.css";
 import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
@@ -163,18 +164,21 @@ export default function LevelUpRewardsPage() {
             </a>
           </div>
         </div>
-        <aside className="ppp-level-pass" aria-label="Sample Level Up Rewards status">
-          <div className="ppp-level-pass__top">
-            <span>Level 3</span>
-            <FaIdCardClip aria-hidden="true" />
-          </div>
-          <strong>60-minute pass unlocked</strong>
-          <p>Keep playing to reach store credit, premium merch, and the birthday party reward.</p>
-          <div className="ppp-level-pass__meter" aria-hidden="true">
-            <span />
-          </div>
-          <small>Next up: Pixel Pulse water bottle</small>
-        </aside>
+        <div className="ppp-level-hero__side">
+          <RewardLookupForm />
+          <aside className="ppp-level-pass" aria-label="Sample Level Up Rewards status">
+            <div className="ppp-level-pass__top">
+              <span>Level 3</span>
+              <FaIdCardClip aria-hidden="true" />
+            </div>
+            <strong>60-minute pass unlocked</strong>
+            <p>Keep playing to reach store credit, premium merch, and the birthday party reward.</p>
+            <div className="ppp-level-pass__meter" aria-hidden="true">
+              <span />
+            </div>
+            <small>Next up: Pixel Pulse water bottle</small>
+          </aside>
+        </div>
       </section>
 
       <section className="ppp-level-section ppp-level-how" id="app">

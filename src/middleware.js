@@ -92,9 +92,7 @@ export function middleware(request) {
     ) {
       const url = request.nextUrl.clone();
       url.protocol = "https";
-      if (requestHostname === "www.rewards.pixelpulseplay.ca") {
-        url.hostname = "rewards.pixelpulseplay.ca";
-      }
+      url.hostname = "rewards.pixelpulseplay.ca";
       url.port = "";
       return NextResponse.redirect(url, 308);
     }

@@ -193,9 +193,19 @@ export async function unlockRewardsForPlayer(playerId) {
       from reward_levels rl
       where rl.active = true
         and rl.threshold_points <= (
-          select coalesce(sum(points_delta), 0)
-          from reward_point_ledger
-          where player_id = $1
+          select
+            coalesce((
+              select sum(coalesce(ps."Points", 0))
+              from public."PlayerScores" ps
+              where ps."PlayerID" = $1
+            ), 0)
+            +
+            coalesce((
+              select sum(rpl.points_delta)
+              from reward_point_ledger rpl
+              where rpl.player_id = $1
+                and coalesce(rpl.source_type, '') <> 'scoreboard'
+            ), 0)
         )
       on conflict (player_id, level_number) do nothing
     `,
@@ -211,13 +221,37 @@ export async function listRewardPlayers({ search = "", limit = 100 } = {}) {
   const q = `%${String(search || "").trim().toLowerCase()}%`;
   const result = await query(
     `
-      with point_totals as (
+      with scoreboard as (
         select
-          player_id,
-          coalesce(sum(points_delta), 0)::integer as lifetime_points,
-          max(earned_at) as last_earned_at
-        from reward_point_ledger
-        group by player_id
+          ps."PlayerID" as player_id,
+          coalesce(sum(coalesce(ps."Points", 0)), 0)::integer as scoreboard_points,
+          max(coalesce(ps."EndTime", ps."StartTime", ps."createdAt")) as last_earned_at
+        from public."PlayerScores" ps
+        group by ps."PlayerID"
+      ),
+      manual_adjustments as (
+        select
+          rpl.player_id,
+          coalesce(sum(rpl.points_delta), 0)::integer as adjustment_points,
+          max(rpl.earned_at) as last_adjustment_at
+        from reward_point_ledger rpl
+        where coalesce(rpl.source_type, '') <> 'scoreboard'
+        group by rpl.player_id
+      ),
+      point_totals as (
+        select
+          coalesce(scoreboard.player_id, manual_adjustments.player_id) as player_id,
+          coalesce(scoreboard.scoreboard_points, 0) + coalesce(manual_adjustments.adjustment_points, 0) as lifetime_points,
+          nullif(
+            greatest(
+              coalesce(scoreboard.last_earned_at, 'epoch'::timestamptz),
+              coalesce(manual_adjustments.last_adjustment_at, 'epoch'::timestamptz)
+            ),
+            'epoch'::timestamptz
+          ) as last_earned_at
+        from scoreboard
+        full outer join manual_adjustments
+          on manual_adjustments.player_id = scoreboard.player_id
       )
       select
         pt.player_id,
@@ -406,8 +440,26 @@ export async function getRewardStats() {
 
   const result = await query(`
     select
-      (select count(distinct player_id) from reward_point_ledger)::integer as players,
-      (select coalesce(sum(points_delta), 0) from reward_point_ledger)::integer as lifetime_points,
+      (
+        select count(distinct source.player_id)
+        from (
+          select ps."PlayerID" as player_id
+          from public."PlayerScores" ps
+          union
+          select rpl.player_id
+          from reward_point_ledger rpl
+          where coalesce(rpl.source_type, '') <> 'scoreboard'
+        ) source
+      )::integer as players,
+      (
+        coalesce((select sum(coalesce(ps."Points", 0)) from public."PlayerScores" ps), 0)
+        +
+        coalesce((
+          select sum(rpl.points_delta)
+          from reward_point_ledger rpl
+          where coalesce(rpl.source_type, '') <> 'scoreboard'
+        ), 0)
+      )::integer as lifetime_points,
       (select count(*) from reward_redemptions where status = 'available')::integer as available_rewards,
       (select count(*) from reward_redemptions where status = 'redeemed')::integer as redeemed_rewards
   `);

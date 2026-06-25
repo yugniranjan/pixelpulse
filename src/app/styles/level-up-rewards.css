@@ -197,6 +197,182 @@
   padding: clamp(1.2rem, 3vw, 1.7rem);
 }
 
+.ppp-level-hero__side {
+  display: grid;
+  gap: 1rem;
+  width: min(390px, 100%);
+  margin-left: auto;
+}
+
+.ppp-level-hero__side .ppp-level-pass {
+  width: 100%;
+  margin-left: 0;
+}
+
+.ppp-level-lookup {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.15rem, 3vw, 1.55rem);
+  border: 1px solid rgba(75, 215, 208, 0.32);
+  border-radius: 8px;
+  background:
+    linear-gradient(155deg, rgba(75, 215, 208, 0.18), rgba(16, 26, 32, 0.9) 46%),
+    rgba(16, 26, 32, 0.9);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+}
+
+.ppp-level-lookup__head {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ppp-level-lookup__head span {
+  color: var(--level-cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ppp-level-lookup__head strong {
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.ppp-level-lookup form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ppp-level-lookup label {
+  color: rgba(248, 251, 243, 0.74);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.ppp-level-lookup form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+}
+
+.ppp-level-lookup input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(248, 251, 243, 0.18);
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  color: var(--level-ink);
+  background: rgba(8, 13, 16, 0.72);
+  outline: none;
+}
+
+.ppp-level-lookup input:focus {
+  border-color: var(--level-cyan);
+  box-shadow: 0 0 0 3px rgba(75, 215, 208, 0.16);
+}
+
+.ppp-level-lookup button {
+  min-width: 82px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 1rem;
+  color: #10170c;
+  background: var(--level-lime);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ppp-level-lookup button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.ppp-level-lookup__error,
+.ppp-level-lookup__empty,
+.ppp-level-lookup__results article > p {
+  margin: 0;
+  color: var(--level-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.ppp-level-lookup__error {
+  color: #ffb1a4;
+}
+
+.ppp-level-lookup__results {
+  display: grid;
+  gap: 0.75rem;
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.ppp-level-lookup__results article {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(248, 251, 243, 0.12);
+  border-radius: 8px;
+  background: rgba(8, 13, 16, 0.45);
+}
+
+.ppp-level-lookup__results article > div:first-child,
+.ppp-level-lookup__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ppp-level-lookup__results article > div:first-child strong,
+.ppp-level-lookup__score strong {
+  color: var(--level-ink);
+}
+
+.ppp-level-lookup__results article > div:first-child span,
+.ppp-level-lookup__score span,
+.ppp-level-lookup__meta span {
+  color: rgba(248, 251, 243, 0.66);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ppp-level-lookup__score {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: rgba(164, 207, 95, 0.12);
+}
+
+.ppp-level-lookup__score strong {
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 2.25rem;
+  line-height: 0.95;
+}
+
+.ppp-level-lookup__meta span:first-child {
+  color: var(--level-gold);
+}
+
+.ppp-level-lookup ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppp-level-lookup li {
+  color: var(--level-lime);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
 .ppp-level-pass__top {
   display: flex;
   align-items: center;
@@ -531,6 +707,7 @@
     grid-template-columns: 1fr;
   }
 
+  .ppp-level-hero__side,
   .ppp-level-pass {
     margin: 0;
   }
@@ -574,6 +751,14 @@
 
   .ppp-level-hero h1 {
     font-size: clamp(3rem, 18vw, 4.9rem);
+  }
+
+  .ppp-level-lookup form > div {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-lookup button {
+    width: 100%;
   }
 
   .ppp-level-highlight-grid,

@@ -61,6 +61,36 @@ export async function GET(req) {
 
   const result = await query(
     `
+      WITH scoreboard AS (
+        SELECT
+          ps."PlayerID" AS player_id,
+          coalesce(sum(coalesce(ps."Points", 0)), 0) AS scoreboard_points,
+          count(*) AS score_events,
+          count(distinct coalesce(ps."StartTime", ps."createdAt")::date) AS repeat_visits,
+          max(coalesce(ps."EndTime", ps."StartTime", ps."createdAt")) AS last_score_at
+        FROM public."PlayerScores" ps
+        WHERE ps."LocationID" = $2
+        GROUP BY ps."PlayerID"
+      ),
+      manual_adjustments AS (
+        SELECT
+          rpl.player_id,
+          coalesce(sum(rpl.points_delta), 0) AS adjustment_points
+        FROM reward_point_ledger rpl
+        WHERE coalesce(rpl.source_type, '') <> 'scoreboard'
+        GROUP BY rpl.player_id
+      ),
+      scorecards AS (
+        SELECT
+          coalesce(scoreboard.player_id, manual_adjustments.player_id) AS player_id,
+          coalesce(scoreboard.scoreboard_points, 0) + coalesce(manual_adjustments.adjustment_points, 0) AS lifetime_points,
+          coalesce(scoreboard.repeat_visits, 0) AS repeat_visits,
+          coalesce(scoreboard.score_events, 0) AS score_events,
+          scoreboard.last_score_at
+        FROM scoreboard
+        FULL OUTER JOIN manual_adjustments
+          ON manual_adjustments.player_id = scoreboard.player_id
+      )
       SELECT
         p."PlayerID",
         p."FirstName",
@@ -89,15 +119,7 @@ export async function GET(req) {
         coalesce(reward_counts.redeemed_rewards, 0)::integer AS redeemed_rewards
       FROM public."Players" p
       LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
-      LEFT JOIN LATERAL (
-        SELECT
-          coalesce(sum(rpl.points_delta), 0) AS lifetime_points,
-          count(*) AS score_events,
-          count(distinct rpl.earned_at::date) AS repeat_visits,
-          max(rpl.earned_at) AS last_score_at
-        FROM reward_point_ledger rpl
-        WHERE rpl.player_id = p."PlayerID"
-      ) scorecard ON true
+      LEFT JOIN scorecards scorecard ON scorecard.player_id = p."PlayerID"
       LEFT JOIN LATERAL (
         SELECT *
         FROM reward_levels rl
