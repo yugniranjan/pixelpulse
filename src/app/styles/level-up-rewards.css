@@ -1,0 +1,592 @@
+.ppp-level-page {
+  --level-bg: #091014;
+  --level-panel: #101a20;
+  --level-ink: #f8fbf3;
+  --level-muted: #b7c7bf;
+  --level-lime: #a4cf5f;
+  --level-cyan: #4bd7d0;
+  --level-coral: #ff7a66;
+  --level-gold: #ffd15c;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 16% 6%, rgba(75, 215, 208, 0.16), transparent 25rem),
+    linear-gradient(180deg, #091014 0%, #0d151a 42%, #111513 100%);
+  color: var(--level-ink);
+  font-family: "DM Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ppp-level-page * {
+  box-sizing: border-box;
+}
+
+.ppp-level-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.85rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid rgba(164, 207, 95, 0.22);
+  background: rgba(9, 16, 20, 0.86);
+  backdrop-filter: blur(16px);
+}
+
+.ppp-level-logo img {
+  width: clamp(122px, 13vw, 174px);
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(164, 207, 95, 0.18));
+}
+
+.ppp-level-nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.85rem);
+}
+
+.ppp-level-nav__links a {
+  color: rgba(248, 251, 243, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-level-nav__links a:hover {
+  color: var(--level-lime);
+}
+
+.ppp-level-nav__links .ppp-level-nav__cta {
+  border: 1px solid rgba(164, 207, 95, 0.7);
+  border-radius: 999px;
+  padding: 0.58rem 1.1rem;
+  color: #10170c;
+  background: var(--level-lime);
+}
+
+.ppp-level-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  min-height: 92vh;
+  padding: 9rem clamp(1.25rem, 5vw, 4rem) 4rem;
+  overflow: hidden;
+}
+
+.ppp-level-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 34%;
+  background: linear-gradient(180deg, transparent, var(--level-bg));
+}
+
+.ppp-level-hero__image {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  opacity: 0.34;
+}
+
+.ppp-level-hero__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(9, 16, 20, 0.9), rgba(9, 16, 20, 0.58) 46%, rgba(9, 16, 20, 0.82)),
+    radial-gradient(circle at 78% 34%, rgba(255, 122, 102, 0.2), transparent 24rem);
+}
+
+.ppp-level-hero__image img {
+  object-fit: cover;
+}
+
+.ppp-level-hero__content {
+  width: min(760px, 100%);
+}
+
+.ppp-level-kicker,
+.ppp-level-section__header span,
+.ppp-level-section__intro span,
+.ppp-level-visual-band span,
+.ppp-level-cta span {
+  display: inline-flex;
+  color: var(--level-cyan);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.ppp-level-hero h1 {
+  max-width: 780px;
+  margin: 1.15rem 0 1.2rem;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(3rem, 8vw, 7.4rem);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-level-hero p,
+.ppp-level-section__header p,
+.ppp-level-section__intro p,
+.ppp-level-cta p {
+  max-width: 660px;
+  color: var(--level-muted);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.7;
+}
+
+.ppp-level-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.ppp-level-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 52px;
+  padding: 0.9rem 1.45rem;
+  border-radius: 999px;
+  font-weight: 900;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.ppp-level-button:hover {
+  transform: translateY(-2px);
+}
+
+.ppp-level-button--primary {
+  color: #10170c;
+  background: var(--level-lime);
+  box-shadow: 0 16px 34px rgba(164, 207, 95, 0.22);
+}
+
+.ppp-level-button--secondary {
+  border: 1px solid rgba(248, 251, 243, 0.36);
+  color: var(--level-ink);
+}
+
+.ppp-level-pass,
+.ppp-level-app-card,
+.ppp-level-highlight,
+.ppp-level-tier {
+  border: 1px solid rgba(248, 251, 243, 0.11);
+  border-radius: 8px;
+  background: rgba(16, 26, 32, 0.82);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+}
+
+.ppp-level-pass {
+  width: min(390px, 100%);
+  margin-left: auto;
+  padding: clamp(1.2rem, 3vw, 1.7rem);
+}
+
+.ppp-level-pass__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--level-gold);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ppp-level-pass__top svg {
+  font-size: 1.45rem;
+}
+
+.ppp-level-pass strong {
+  display: block;
+  margin-top: 1.4rem;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.ppp-level-pass p {
+  margin: 1rem 0 1.35rem;
+  color: var(--level-muted);
+  line-height: 1.55;
+}
+
+.ppp-level-pass__meter,
+.ppp-level-app-card__progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(248, 251, 243, 0.1);
+}
+
+.ppp-level-pass__meter span,
+.ppp-level-app-card__progress span {
+  display: block;
+  height: 100%;
+  width: 64%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--level-lime), var(--level-cyan), var(--level-gold));
+}
+
+.ppp-level-pass small {
+  display: block;
+  margin-top: 0.85rem;
+  color: rgba(248, 251, 243, 0.68);
+}
+
+.ppp-level-section {
+  padding: clamp(4rem, 8vw, 7rem) 1.25rem;
+}
+
+.ppp-level-inner {
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+.ppp-level-section__header {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  margin-bottom: clamp(2rem, 5vw, 3.4rem);
+  text-align: center;
+}
+
+.ppp-level-section__header h2,
+.ppp-level-section__intro h2,
+.ppp-level-visual-band strong,
+.ppp-level-cta h2 {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2.25rem, 5vw, 4.2rem);
+  line-height: 0.96;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-level-how {
+  background:
+    linear-gradient(180deg, rgba(16, 26, 32, 0.32), transparent),
+    radial-gradient(circle at 88% 10%, rgba(164, 207, 95, 0.12), transparent 24rem);
+}
+
+.ppp-level-how__grid,
+.ppp-level-rules__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 430px);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.ppp-level-app-card {
+  padding: 1rem;
+  transform: rotate(1.2deg);
+}
+
+.ppp-level-app-card__screen {
+  min-height: 290px;
+  border-radius: 8px;
+  padding: 1.2rem;
+  background:
+    linear-gradient(160deg, rgba(75, 215, 208, 0.2), transparent 48%),
+    #0b1217;
+}
+
+.ppp-level-app-card__screen span {
+  color: var(--level-cyan);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ppp-level-app-card__screen strong {
+  display: block;
+  margin: 0.35rem 0 1.5rem;
+  font-size: clamp(3.1rem, 7vw, 5.2rem);
+  line-height: 1;
+}
+
+.ppp-level-app-card__screen p {
+  margin-top: 1rem;
+  color: var(--level-muted);
+  font-weight: 800;
+}
+
+.ppp-level-app-card__reward {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(164, 207, 95, 0.12);
+}
+
+.ppp-level-app-card__reward svg {
+  color: var(--level-lime);
+  font-size: 1.6rem;
+  flex: 0 0 auto;
+}
+
+.ppp-level-app-card__reward strong,
+.ppp-level-app-card__reward span {
+  display: block;
+}
+
+.ppp-level-app-card__reward span {
+  color: var(--level-muted);
+  margin-top: 0.2rem;
+}
+
+.ppp-level-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+.ppp-level-highlight {
+  padding: 1.25rem;
+}
+
+.ppp-level-highlight svg {
+  color: var(--level-lime);
+  font-size: 1.35rem;
+}
+
+.ppp-level-highlight h3 {
+  margin: 1rem 0 0.55rem;
+  font-size: 1.06rem;
+}
+
+.ppp-level-highlight p,
+.ppp-level-tier p,
+.ppp-level-visual-band p,
+.ppp-level-rules__list p {
+  color: var(--level-muted);
+  line-height: 1.58;
+}
+
+.ppp-level-visual-band {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(180px, 0.85fr) minmax(280px, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  padding: 1.25rem;
+  background: #111a1d;
+}
+
+.ppp-level-visual-band img {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.ppp-level-visual-band div {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(255, 122, 102, 0.18), rgba(75, 215, 208, 0.1));
+}
+
+.ppp-level-ladder {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ppp-level-tier {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 208px;
+  padding: 1.25rem;
+}
+
+.ppp-level-tier__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  color: #10170c;
+  background: var(--level-lime);
+}
+
+.ppp-level-tier__icon svg {
+  font-size: 1.35rem;
+}
+
+.ppp-level-tier span {
+  color: var(--level-cyan);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ppp-level-tier h3 {
+  margin: 0.35rem 0 0.2rem;
+  font-size: 1.15rem;
+}
+
+.ppp-level-tier small {
+  display: block;
+  color: var(--level-gold);
+  font-weight: 800;
+}
+
+.ppp-level-tier p {
+  margin-top: 0.85rem;
+}
+
+.ppp-level-rules {
+  background: linear-gradient(180deg, transparent, rgba(16, 26, 32, 0.72));
+}
+
+.ppp-level-rules__list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.ppp-level-rules__list p {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid rgba(248, 251, 243, 0.11);
+  border-radius: 8px;
+  background: rgba(248, 251, 243, 0.04);
+}
+
+.ppp-level-rules__list svg {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: var(--level-lime);
+}
+
+.ppp-level-cta {
+  padding: clamp(4rem, 8vw, 6rem) 1.25rem;
+  text-align: center;
+  background:
+    linear-gradient(90deg, rgba(164, 207, 95, 0.13), rgba(75, 215, 208, 0.12), rgba(255, 122, 102, 0.13)),
+    #0b1216;
+}
+
+.ppp-level-cta div {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  width: min(850px, 100%);
+  margin: 0 auto;
+}
+
+.ppp-level-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+  color: rgba(248, 251, 243, 0.64);
+  background: #080d10;
+}
+
+.ppp-level-footer img {
+  width: 138px;
+  height: auto;
+}
+
+.ppp-level-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--level-ink);
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  .ppp-level-hero,
+  .ppp-level-how__grid,
+  .ppp-level-rules__grid,
+  .ppp-level-visual-band {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-pass {
+    margin: 0;
+  }
+
+  .ppp-level-highlight-grid,
+  .ppp-level-ladder {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ppp-level-visual-band img {
+    min-height: 240px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ppp-level-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .ppp-level-nav__links {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.45rem;
+  }
+
+  .ppp-level-nav__links a {
+    font-size: 0.7rem;
+  }
+
+  .ppp-level-nav__links .ppp-level-nav__cta {
+    padding: 0.45rem 0.75rem;
+  }
+
+  .ppp-level-hero {
+    min-height: 0;
+    padding-top: 10.5rem;
+  }
+
+  .ppp-level-hero h1 {
+    font-size: clamp(3rem, 18vw, 4.9rem);
+  }
+
+  .ppp-level-highlight-grid,
+  .ppp-level-ladder {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-tier {
+    min-height: 0;
+  }
+
+  .ppp-level-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -21,6 +21,7 @@ const ALLOWED_HOSTS = new Set([
   "summer.pixelpulseplay.ca",
   "parties.pixelpulseplay.ca",
   "squad.pixelpulseplay.ca",
+  "rewards.pixelpulseplay.ca",
 ]);
 
 function getRequiredEnv(name) {

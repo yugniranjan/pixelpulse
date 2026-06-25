@@ -9,6 +9,10 @@ const SQUAD_HOSTS = new Set([
   "squad.pixelpulseplay.ca",
   "www.squad.pixelpulseplay.ca",
 ]);
+const REWARDS_HOSTS = new Set([
+  "rewards.pixelpulseplay.ca",
+  "www.rewards.pixelpulseplay.ca",
+]);
 const BIRTHDAY_HOSTS = new Set([
   "birthdays.pixelpulseplay.ca",
 ]);
@@ -71,6 +75,22 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/squad";
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  if (REWARDS_HOSTS.has(requestHostname)) {
+    if (requestHostname === "www.rewards.pixelpulseplay.ca") {
+      const url = request.nextUrl.clone();
+      url.protocol = "https";
+      url.hostname = "rewards.pixelpulseplay.ca";
+      url.port = "";
+      return NextResponse.redirect(url, 308);
+    }
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/level-up-rewards";
       return NextResponse.rewrite(url);
     }
   }

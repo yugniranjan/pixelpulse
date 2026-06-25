@@ -136,3 +136,55 @@ create table if not exists squad_referrals (
 create index if not exists squad_referrals_referrer_idx on squad_referrals (referrer_email);
 create index if not exists squad_referrals_status_idx on squad_referrals (status);
 create unique index if not exists squad_referrals_promo_code_idx on squad_referrals (promo_code);
+
+-- Level Up Rewards. Scoreboard/game events should be copied into the ledger
+-- once, keyed by source_score_id where available. Levels are calculated from
+-- lifetime ledger points; redeeming a reward does not subtract level status.
+create table if not exists reward_levels (
+  level_number integer primary key,
+  threshold_points integer not null,
+  reward_name text not null,
+  reward_type text not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists reward_point_ledger (
+  id uuid primary key default gen_random_uuid(),
+  player_id bigint not null,
+  source_score_id text,
+  source_type text not null default 'scoreboard',
+  points_delta integer not null,
+  reason text,
+  location_id integer,
+  earned_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  raw jsonb not null default '{}'::jsonb
+);
+
+create unique index if not exists reward_point_ledger_source_score_idx
+  on reward_point_ledger (source_score_id)
+  where source_score_id is not null;
+create index if not exists reward_point_ledger_player_idx
+  on reward_point_ledger (player_id, earned_at desc);
+create index if not exists reward_point_ledger_earned_idx
+  on reward_point_ledger (earned_at desc);
+
+create table if not exists reward_redemptions (
+  id uuid primary key default gen_random_uuid(),
+  player_id bigint not null,
+  level_number integer not null references reward_levels(level_number),
+  reward_name text not null,
+  status text not null default 'available',
+  unlocked_at timestamptz not null default now(),
+  redeemed_at timestamptz,
+  redeemed_by text,
+  expires_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (player_id, level_number)
+);
+
+create index if not exists reward_redemptions_player_idx
+  on reward_redemptions (player_id, status, unlocked_at desc);
