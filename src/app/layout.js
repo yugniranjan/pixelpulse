@@ -1,5 +1,6 @@
 import "./globals.css";
 import Script from "next/script";
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
@@ -42,6 +43,10 @@ const META_PIXEL_KEYS = [
   "fbPixelId",
   "pixelId",
 ];
+const STANDALONE_HOSTS = new Set([
+  "rewards.pixelpulseplay.ca",
+  "www.rewards.pixelpulseplay.ca",
+]);
 
 function cleanGtmId(value = "") {
   const id = String(value || "").trim().toUpperCase();
@@ -249,6 +254,15 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
+  const requestHeaders = headers();
+  const requestHostname = (
+    requestHeaders.get("x-forwarded-host") ||
+    requestHeaders.get("host") ||
+    ""
+  )
+    .split(":")[0]
+    .toLowerCase();
+  const isStandaloneHost = STANDALONE_HOSTS.has(requestHostname);
 
   let menudata = [];
   let configdata = [];
@@ -292,19 +306,23 @@ export default async function RootLayout({ children }) {
           </>
         </TrackingVisibility>
         <Toaster position="top-right" />
-        <ChromeVisibility>
-          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
-          <Breadcrumbs />
-          <FloatingWaiverButton />
-        </ChromeVisibility>
+        {isStandaloneHost ? null : (
+          <ChromeVisibility>
+            <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
+            <Breadcrumbs />
+            <FloatingWaiverButton />
+          </ChromeVisibility>
+        )}
         <Suspense fallback={<Loading />}>{children}</Suspense>
-        <ChromeVisibility>
-          <Footer
-            location_slug={location_slug}
-            configdata={configdata}
-            menudata={menudata}
-          />
-        </ChromeVisibility>
+        {isStandaloneHost ? null : (
+          <ChromeVisibility>
+            <Footer
+              location_slug={location_slug}
+              configdata={configdata}
+              menudata={menudata}
+            />
+          </ChromeVisibility>
+        )}
         <div id="modal-root"></div>
       </body>
     </html>

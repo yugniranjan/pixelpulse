@@ -53,10 +53,18 @@ export async function POST(request) {
   const identifier = String(body?.identifier || "").trim();
   const email = normalizeEmail(identifier);
   const phone = normalizePhone(identifier);
+  const playerId = /^\d{1,8}$/.test(identifier) ? identifier : "";
+  const nameSearch = !identifier.includes("@") && !playerId && /[a-zA-Z]/.test(identifier)
+    ? identifier.toLowerCase().replace(/\s+/g, " ").trim()
+    : "";
 
-  if (!identifier || (identifier.includes("@") && !email.includes("@")) || (!email.includes("@") && phone.length < 7)) {
+  if (
+    !identifier ||
+    (identifier.includes("@") && !email.includes("@")) ||
+    (!email.includes("@") && !playerId && !nameSearch && phone.length < 7)
+  ) {
     return NextResponse.json(
-      { error: "Enter the email or phone number used for your player profile." },
+      { error: "Enter your name, email, phone number, or Player ID." },
       { status: 400 },
     );
   }
@@ -65,20 +73,54 @@ export async function POST(request) {
 
   const matchedPlayers = await query(
     `
-      with matched_emails as (
-        select lower(p."email") as email
-        from public."Players" p
-        where lower(coalesce(p."email", '')) = $1
-
-        union
-
-        select lower(w.primary_participant->>'email') as email
+      with waiver_people as (
+        select
+          lower(coalesce(w.primary_participant->>'email', '')) as email,
+          regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') as phone,
+          lower(coalesce(
+            w.primary_participant->>'firstName',
+            w.primary_participant->>'first_name',
+            split_part(coalesce(w.primary_participant->>'name', ''), ' ', 1),
+            ''
+          )) as first_name,
+          lower(coalesce(
+            w.primary_participant->>'lastName',
+            w.primary_participant->>'last_name',
+            nullif(regexp_replace(coalesce(w.primary_participant->>'name', ''), '^\\S+\\s*', ''), ''),
+            ''
+          )) as last_name
         from waivers w
-        where (
-          lower(coalesce(w.primary_participant->>'email', '')) = $1
-          or regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') = $2
-        )
-        and coalesce(w.primary_participant->>'email', '') <> ''
+
+        union all
+
+        select
+          lower(coalesce(member->>'email', w.primary_participant->>'email', '')) as email,
+          regexp_replace(coalesce(member->>'phone', w.primary_participant->>'phone', ''), '\\D', '', 'g') as phone,
+          lower(coalesce(
+            member->>'firstName',
+            member->>'first_name',
+            split_part(coalesce(member->>'name', ''), ' ', 1),
+            ''
+          )) as first_name,
+          lower(coalesce(
+            member->>'lastName',
+            member->>'last_name',
+            nullif(regexp_replace(coalesce(member->>'name', ''), '^\\S+\\s*', ''), ''),
+            ''
+          )) as last_name
+        from waivers w
+        cross join lateral jsonb_array_elements(
+          case
+            when jsonb_typeof(w.family_members) = 'array' then w.family_members
+            else '[]'::jsonb
+          end
+        ) member
+      ),
+      matched_people as (
+        select distinct *
+        from waiver_people
+        where ($1 <> '' and email = $1)
+          or ($2 <> '' and phone = $2)
       )
       select distinct
         p."PlayerID" as player_id,
@@ -87,6 +129,8 @@ export async function POST(request) {
         p."email" as email,
         coalesce(scorecard.lifetime_points, 0)::integer as lifetime_points,
         coalesce(scorecard.repeat_visits, 0)::integer as repeat_visits,
+        coalesce(scorecard.score_events, 0)::integer as score_events,
+        scorecard.last_score_at,
         current_level.level_number as current_level,
         current_level.threshold_points as current_threshold,
         current_level.reward_name as current_reward_name,
@@ -99,11 +143,15 @@ export async function POST(request) {
       left join lateral (
         select
           coalesce(scoreboard.scoreboard_points, 0) + coalesce(adjustments.adjustment_points, 0) as lifetime_points,
-          coalesce(scoreboard.repeat_visits, 0) as repeat_visits
+          coalesce(scoreboard.repeat_visits, 0) as repeat_visits,
+          coalesce(scoreboard.score_events, 0) as score_events,
+          scoreboard.last_score_at
         from (
           select
             coalesce(sum(coalesce(ps."Points", 0)), 0) as scoreboard_points,
-            count(distinct coalesce(ps."StartTime", ps."createdAt")::date) as repeat_visits
+            count(distinct coalesce(ps."StartTime", ps."createdAt")::date) as repeat_visits,
+            count(*) as score_events,
+            max(coalesce(ps."EndTime", ps."StartTime", ps."createdAt")) as last_score_at
           from public."PlayerScores" ps
           where ps."PlayerID" = p."PlayerID"
         ) scoreboard
@@ -130,12 +178,33 @@ export async function POST(request) {
         order by rl.threshold_points asc
         limit 1
       ) next_level on true
-      where lower(coalesce(p."email", '')) = $1
-        or lower(coalesce(p."email", '')) in (select email from matched_emails where email is not null)
+      where ($1 <> '' and lower(coalesce(p."email", '')) = $1)
+        or ($3 <> '' and p."PlayerID"::text = $3)
+        or (
+          $4 <> ''
+          and (
+            lower(trim(concat(coalesce(p."FirstName", ''), ' ', coalesce(p."LastName", '')))) like $5
+            or lower(coalesce(p."FirstName", '')) like $5
+            or lower(coalesce(p."LastName", '')) like $5
+          )
+        )
+        or lower(coalesce(p."email", '')) in (
+          select email from matched_people where email <> ''
+        )
+        or exists (
+          select 1
+          from matched_people mp
+          where mp.first_name <> ''
+            and lower(coalesce(p."FirstName", '')) = mp.first_name
+            and (
+              mp.last_name = ''
+              or lower(trim(coalesce(p."LastName", ''))) = mp.last_name
+            )
+        )
       order by lifetime_points desc, p."PlayerID" desc
       limit 10
     `,
-    [email.includes("@") ? email : "", phone],
+    [email.includes("@") ? email : "", phone, playerId, nameSearch, `%${nameSearch}%`],
   );
 
   await Promise.all(matchedPlayers.rows.map((player) => unlockRewardsForPlayer(player.player_id)));
@@ -172,6 +241,8 @@ export async function POST(request) {
       fullName: fullName || `Player ${playerId}`,
       lifetimePoints: Number(player.lifetime_points || 0),
       repeatVisits: Number(player.repeat_visits || 0),
+      scoreEvents: Number(player.score_events || 0),
+      lastScoreAt: iso(player.last_score_at),
       currentLevel: normalizeLevel(player, "current"),
       nextLevel: normalizeLevel(player, "next"),
       availableRewards: rewardsByPlayer.get(playerId) || [],

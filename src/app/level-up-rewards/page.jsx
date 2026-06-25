@@ -5,7 +5,6 @@ import {
   FaCakeCandles,
   FaCircleCheck,
   FaGift,
-  FaIdCardClip,
   FaMedal,
   FaShirt,
   FaTicket,
@@ -13,13 +12,12 @@ import {
 } from "react-icons/fa6";
 import RewardLookupForm from "@/components/RewardLookupForm";
 import "../styles/level-up-rewards.css";
-import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
 const logo = "/assets/images/logoD.png";
 const arcadeImage = "/assets/images/arcade.webp";
 const floorImage = "/assets/images/floorchallenge.webp";
 const shootingImage = "/assets/images/shootinggame.webp";
-const siteUrl = getCanonicalSiteUrl();
+const rewardsSiteUrl = "https://rewards.pixelpulseplay.ca";
 
 const rewardLadder = [
   {
@@ -113,18 +111,38 @@ const rules = [
   "Play passes should state duration, player limits, and same-day or future-valid rules.",
 ];
 
+const calibrationRows = [
+  {
+    label: "A",
+    value: "Average points earned by one normal guest in a 60-minute visit.",
+  },
+  {
+    label: "Level 1 threshold",
+    value: "Set at 3 x A so the first reward feels reachable without being instant.",
+  },
+  {
+    label: "Data to exclude",
+    value: "Test players, staff runs, broken sessions, duplicate score events, and tournament outliers.",
+  },
+  {
+    label: "Review cadence",
+    value: "Recalculate monthly until the program stabilizes, then review quarterly.",
+  },
+];
+
 export const metadata = {
   title: "Level Up Rewards | Pixel Pulse Play",
   description:
     "Explore Pixel Pulse Level Up Rewards: earn points when you play, level up, and unlock play passes, merchandise, store credit, VIP bundles, and birthday party rewards.",
   alternates: {
-    canonical: canonicalUrl("/level-up-rewards"),
+    canonical: rewardsSiteUrl,
   },
   openGraph: {
     title: "Level Up Rewards | Pixel Pulse Play",
     description:
       "Earn points, level up, and unlock Pixel Pulse rewards across play passes, merchandise, store credit, and premium experiences.",
-    images: [`${siteUrl}${arcadeImage}`],
+    url: rewardsSiteUrl,
+    images: [`${rewardsSiteUrl}${arcadeImage}`],
   },
 };
 
@@ -136,10 +154,10 @@ export default function LevelUpRewardsPage() {
           <Image src={logo} alt="Pixel Pulse Play" width={174} height={78} priority />
         </a>
         <div className="ppp-level-nav__links">
-          <a href="#app">App</a>
+          <a href="#top">Dashboard</a>
           <a href="#ladder">Rewards</a>
+          <a href="#calibration">Calibration</a>
           <a href="#rules">Rules</a>
-          <a className="ppp-level-nav__cta" href="#join">Join</a>
         </div>
       </nav>
 
@@ -148,12 +166,11 @@ export default function LevelUpRewardsPage() {
           <Image src={arcadeImage} alt="" fill priority sizes="100vw" />
         </div>
         <div className="ppp-level-hero__content">
-          <span className="ppp-level-kicker">Coming Soon | Guest Rewards Program</span>
-          <h1>Play. Earn. Level up at Pixel Pulse.</h1>
+          <span className="ppp-level-kicker">Level Up Rewards App</span>
+          <h1>Your Pixel Pulse rewards dashboard.</h1>
           <p>
-            Level Up Rewards turns every visit into progress. Players earn points when they play,
-            climb the reward ladder, and unlock play passes, merch, store credit, VIP bundles, and
-            birthday party rewards.
+            Search your profile, check lifetime points, track your level progress, and see unlocked
+            rewards from one web app built around the Pixel Pulse scoreboard.
           </p>
           <div className="ppp-level-actions">
             <a className="ppp-level-button ppp-level-button--primary" href="#ladder">
@@ -166,18 +183,6 @@ export default function LevelUpRewardsPage() {
         </div>
         <div className="ppp-level-hero__side">
           <RewardLookupForm />
-          <aside className="ppp-level-pass" aria-label="Sample Level Up Rewards status">
-            <div className="ppp-level-pass__top">
-              <span>Level 3</span>
-              <FaIdCardClip aria-hidden="true" />
-            </div>
-            <strong>60-minute pass unlocked</strong>
-            <p>Keep playing to reach store credit, premium merch, and the birthday party reward.</p>
-            <div className="ppp-level-pass__meter" aria-hidden="true">
-              <span />
-            </div>
-            <small>Next up: Pixel Pulse water bottle</small>
-          </aside>
         </div>
       </section>
 
@@ -219,6 +224,27 @@ export default function LevelUpRewardsPage() {
               <p>{item.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="ppp-level-section ppp-level-calibration" id="calibration">
+        <div className="ppp-level-inner ppp-level-calibration__grid">
+          <div className="ppp-level-section__intro">
+            <span>Reward Calibration Principle</span>
+            <h2>Ground the ladder in real visit behavior.</h2>
+            <p>
+              Rewards should feel exciting without becoming arbitrary. The ladder starts with the
+              actual average points earned by a normal guest in a standard 60-minute visit.
+            </p>
+          </div>
+          <div className="ppp-level-calibration__table" role="table" aria-label="Reward calibration principle">
+            {calibrationRows.map((row) => (
+              <div role="row" key={row.label}>
+                <strong role="cell">{row.label}</strong>
+                <span role="cell">{row.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

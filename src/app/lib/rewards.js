@@ -186,7 +186,7 @@ export async function unlockRewardsForPlayer(playerId) {
         expires_at
       )
       select
-        $1,
+        $1::bigint,
         rl.level_number,
         rl.reward_name,
         now() + interval '90 days'
@@ -197,13 +197,13 @@ export async function unlockRewardsForPlayer(playerId) {
             coalesce((
               select sum(coalesce(ps."Points", 0))
               from public."PlayerScores" ps
-              where ps."PlayerID" = $1
+              where ps."PlayerID" = $1::integer
             ), 0)
             +
             coalesce((
               select sum(rpl.points_delta)
               from reward_point_ledger rpl
-              where rpl.player_id = $1
+              where rpl.player_id = $1::bigint
                 and coalesce(rpl.source_type, '') <> 'scoreboard'
             ), 0)
         )

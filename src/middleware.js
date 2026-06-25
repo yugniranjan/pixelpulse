@@ -90,11 +90,11 @@ export function middleware(request) {
       requestHostname === "www.rewards.pixelpulseplay.ca" ||
       forwardedProto === "http"
     ) {
-      const url = request.nextUrl.clone();
-      url.protocol = "https";
-      url.hostname = "rewards.pixelpulseplay.ca";
-      url.port = "";
-      return NextResponse.redirect(url, 308);
+      const url = new URL(
+        `${request.nextUrl.pathname}${request.nextUrl.search}`,
+        "https://rewards.pixelpulseplay.ca",
+      );
+      return NextResponse.redirect(url, 307);
     }
 
     if (pathname === "/") {
