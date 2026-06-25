@@ -11,7 +11,6 @@ const ADMIN_LINKS = [
   { href: "/admin/waivers/party-hosts", label: "Party Hosts" },
   { href: "/admin/invites", label: "Create Party Links" },
   { href: "/admin/squad-referrals", label: "Squad Referrals" },
-  { href: "/admin/rewards", label: "Level Up Rewards" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/waiver-data", label: "Players Data" },
 ];

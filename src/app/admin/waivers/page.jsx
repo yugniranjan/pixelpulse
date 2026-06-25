@@ -6,6 +6,15 @@ import "../../styles/admin-waivers.css";
 import "../../styles/admin-player-info.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+const PLAYER_SORT_OPTIONS = [
+  { value: "newest", label: "Newest players" },
+  { value: "points-desc", label: "Score: high to low" },
+  { value: "points-asc", label: "Score: low to high" },
+  { value: "repeat-desc", label: "Repeat visits: high to low" },
+  { value: "rewards-desc", label: "Available rewards" },
+];
+
+const numberFormatter = new Intl.NumberFormat("en-US");
 
 function formatDate(value) {
   if (!value) return "Not recorded";
@@ -20,6 +29,16 @@ function formatDateTime(value) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatNumber(value) {
+  return numberFormatter.format(Number(value) || 0);
+}
+
+function nextRewardSummary(player = {}) {
+  if (!player.nextLevel) return "Top level reached";
+  const remaining = Math.max(0, Number(player.nextLevel.thresholdPoints || 0) - Number(player.lifetimePoints || 0));
+  return `${formatNumber(remaining)} pts to Level ${player.nextLevel.levelNumber}`;
 }
 
 function participantName(person = {}) {
@@ -279,6 +298,8 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
 
 function PlayerCard({ player }) {
   const [open, setOpen] = useState(false);
+  const currentLevel = player.currentLevel;
+  const nextLevel = player.nextLevel;
 
   return (
     <article className="waiver-admin-card">
@@ -292,8 +313,20 @@ function PlayerCard({ player }) {
           <em>Player ID</em>
         </span>
         <span>
-          <strong>{player.signeeId || "-"}</strong>
-          <em>Signee ID</em>
+          <strong>{formatNumber(player.lifetimePoints)}</strong>
+          <em>Lifetime points</em>
+        </span>
+        <span>
+          <strong>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level"}</strong>
+          <em>{currentLevel?.rewardName || nextRewardSummary(player)}</em>
+        </span>
+        <span>
+          <strong>{formatNumber(player.repeatVisits)}</strong>
+          <em>Repeat visits</em>
+        </span>
+        <span>
+          <strong>{player.availableRewards || 0}</strong>
+          <em>Available rewards</em>
         </span>
         <span>
           <strong>{formatDateTime(player.createdAt)}</strong>
@@ -324,6 +357,22 @@ function PlayerCard({ player }) {
               <div><dt>Updated</dt><dd>{formatDateTime(player.updatedAt)}</dd></div>
             </dl>
           </section>
+
+          <section className="player-scorecard">
+            <h2>Scorecard</h2>
+            <dl>
+              <div><dt>Lifetime points</dt><dd>{formatNumber(player.lifetimePoints)}</dd></div>
+              <div><dt>Current level</dt><dd>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level yet"}</dd></div>
+              <div><dt>Current reward</dt><dd>{currentLevel?.rewardName || "Not unlocked"}</dd></div>
+              <div><dt>Next reward</dt><dd>{nextLevel ? `Level ${nextLevel.levelNumber}: ${nextLevel.rewardName}` : "Top level reached"}</dd></div>
+              <div><dt>Next milestone</dt><dd>{nextRewardSummary(player)}</dd></div>
+              <div><dt>Repeat visits</dt><dd>{formatNumber(player.repeatVisits)}</dd></div>
+              <div><dt>Score events</dt><dd>{formatNumber(player.scoreEvents)}</dd></div>
+              <div><dt>Last score</dt><dd>{formatDateTime(player.lastScoreAt)}</dd></div>
+              <div><dt>Available rewards</dt><dd>{formatNumber(player.availableRewards)}</dd></div>
+              <div><dt>Redeemed rewards</dt><dd>{formatNumber(player.redeemedRewards)}</dd></div>
+            </dl>
+          </section>
         </div>
       ) : null}
     </article>
@@ -351,6 +400,7 @@ export default function AdminWaiversPage() {
   const [playerQuery, setPlayerQuery] = useState("");
   const [playerDateFrom, setPlayerDateFrom] = useState("");
   const [playerDateTo, setPlayerDateTo] = useState("");
+  const [playerSort, setPlayerSort] = useState("points-desc");
   const [playerPageSize, setPlayerPageSize] = useState(25);
   const [playerPage, setPlayerPage] = useState(1);
 
@@ -520,7 +570,7 @@ export default function AdminWaiversPage() {
   const filteredPlayers = useMemo(() => {
     const needle = playerQuery.trim().toLowerCase();
 
-    return players.filter((player) => {
+    const filtered = players.filter((player) => {
       const matchesSearch = !needle || [
         player.playerId,
         player.fullName,
@@ -538,7 +588,24 @@ export default function AdminWaiversPage() {
 
       return matchesSearch && matchesFrom && matchesTo;
     });
-  }, [playerDateFrom, playerDateTo, playerQuery, players]);
+
+    return filtered.sort((a, b) => {
+      if (playerSort === "points-desc") {
+        return (b.lifetimePoints || 0) - (a.lifetimePoints || 0) || (b.repeatVisits || 0) - (a.repeatVisits || 0);
+      }
+      if (playerSort === "points-asc") {
+        return (a.lifetimePoints || 0) - (b.lifetimePoints || 0) || (a.repeatVisits || 0) - (b.repeatVisits || 0);
+      }
+      if (playerSort === "repeat-desc") {
+        return (b.repeatVisits || 0) - (a.repeatVisits || 0) || (b.lifetimePoints || 0) - (a.lifetimePoints || 0);
+      }
+      if (playerSort === "rewards-desc") {
+        return (b.availableRewards || 0) - (a.availableRewards || 0) || (b.lifetimePoints || 0) - (a.lifetimePoints || 0);
+      }
+
+      return (b.createdAt || "").localeCompare(a.createdAt || "") || (b.playerId || 0) - (a.playerId || 0);
+    });
+  }, [playerDateFrom, playerDateTo, playerQuery, playerSort, players]);
   const playerTotalPages = Math.max(1, Math.ceil(filteredPlayers.length / playerPageSize));
   const currentPlayerPage = Math.min(playerPage, playerTotalPages);
   const playerPageStart = (currentPlayerPage - 1) * playerPageSize;
@@ -547,10 +614,20 @@ export default function AdminWaiversPage() {
   const firstVisiblePlayer = filteredPlayers.length ? playerPageStart + 1 : 0;
   const lastVisiblePlayer = Math.min(playerPageEnd, filteredPlayers.length);
   const latestPlayer = players[0];
+  const topPlayer = useMemo(
+    () => players.reduce((leader, player) => (
+      (player.lifetimePoints || 0) > (leader?.lifetimePoints || 0) ? player : leader
+    ), null),
+    [players],
+  );
+  const repeatVisitors = useMemo(
+    () => players.filter((player) => Number(player.repeatVisits || 0) > 1).length,
+    [players],
+  );
 
   useEffect(() => {
     setPlayerPage(1);
-  }, [playerDateFrom, playerDateTo, playerPageSize, playerQuery]);
+  }, [playerDateFrom, playerDateTo, playerPageSize, playerQuery, playerSort]);
 
   function clearFilters() {
     setQuery("");
@@ -790,8 +867,12 @@ export default function AdminWaiversPage() {
                 <strong>{filteredPlayers.length}</strong>
               </article>
               <article>
-                <span>Location</span>
-                <strong>Vaughan</strong>
+                <span>Repeat Visitors</span>
+                <strong>{repeatVisitors}</strong>
+              </article>
+              <article>
+                <span>Top Score</span>
+                <strong>{topPlayer ? formatNumber(topPlayer.lifetimePoints) : "0"}</strong>
               </article>
               <article>
                 <span>Latest</span>
@@ -806,7 +887,7 @@ export default function AdminWaiversPage() {
               <div className="waiver-admin-list waiver-admin-list--dashboard">
                 <div className="waiver-data-toolbar">
                   <div>
-                    <h2>Vaughan Players</h2>
+                    <h2>Vaughan Players Scorecards</h2>
                     <p>
                       Showing {firstVisiblePlayer}-{lastVisiblePlayer} of {filteredPlayers.length}
                       {filteredPlayers.length === players.length ? " records" : ` filtered records from ${players.length} total`}
@@ -828,6 +909,14 @@ export default function AdminWaiversPage() {
                     <label>
                       <span>Signed To</span>
                       <input type="date" value={playerDateTo} onChange={(event) => setPlayerDateTo(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Sort</span>
+                      <select value={playerSort} onChange={(event) => setPlayerSort(event.target.value)}>
+                        {PLAYER_SORT_OPTIONS.map((option) => (
+                          <option value={option.value} key={option.value}>{option.label}</option>
+                        ))}
+                      </select>
                     </label>
                     <label>
                       <span>Show</span>

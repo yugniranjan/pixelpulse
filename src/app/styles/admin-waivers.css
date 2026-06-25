@@ -229,11 +229,19 @@
 }
 
 .player-data-filters {
-  grid-template-columns: minmax(220px, 1.4fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(92px, 0.45fr) auto;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(140px, 0.75fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr) minmax(92px, 0.45fr) auto;
 }
 
 .player-admin-card__summary {
-  grid-template-columns: 1.2fr 0.8fr 0.55fr 1fr;
+  grid-template-columns: minmax(180px, 1.25fr) minmax(92px, 0.65fr) minmax(120px, 0.75fr) minmax(140px, 0.9fr) minmax(96px, 0.55fr) minmax(110px, 0.55fr) minmax(150px, 0.9fr);
+}
+
+.player-scorecard {
+  grid-column: 1 / -1;
+}
+
+.player-scorecard dl {
+  grid-template-columns: repeat(5, minmax(130px, 1fr));
 }
 
 .waiver-data-pagination {

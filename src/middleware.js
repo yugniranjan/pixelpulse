@@ -80,10 +80,21 @@ export function middleware(request) {
   }
 
   if (REWARDS_HOSTS.has(requestHostname)) {
-    if (requestHostname === "www.rewards.pixelpulseplay.ca") {
+    const forwardedProto = (
+      request.headers.get("x-forwarded-proto") ||
+      request.nextUrl.protocol.replace(":", "") ||
+      ""
+    ).toLowerCase();
+
+    if (
+      requestHostname === "www.rewards.pixelpulseplay.ca" ||
+      forwardedProto === "http"
+    ) {
       const url = request.nextUrl.clone();
       url.protocol = "https";
-      url.hostname = "rewards.pixelpulseplay.ca";
+      if (requestHostname === "www.rewards.pixelpulseplay.ca") {
+        url.hostname = "rewards.pixelpulseplay.ca";
+      }
       url.port = "";
       return NextResponse.redirect(url, 308);
     }

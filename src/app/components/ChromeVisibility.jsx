@@ -13,6 +13,11 @@ const STANDALONE_PATHS = new Set([
   "/waiver",
 ]);
 
+const STANDALONE_HOSTS = new Set([
+  "rewards.pixelpulseplay.ca",
+  "www.rewards.pixelpulseplay.ca",
+]);
+
 function normalizePath(path = "/") {
   if (!path) return "/";
   return path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
@@ -20,8 +25,11 @@ function normalizePath(path = "/") {
 
 export default function ChromeVisibility({ children }) {
   const pathname = normalizePath(usePathname() || "/");
+  const hostname =
+    typeof window === "undefined" ? "" : window.location.hostname.toLowerCase();
 
   if (
+    STANDALONE_HOSTS.has(hostname) ||
     STANDALONE_PATHS.has(pathname) ||
     pathname.startsWith("/invite") ||
     pathname === "/admin" ||

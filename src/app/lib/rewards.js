@@ -31,7 +31,7 @@ function iso(value) {
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
 
-async function ensureRewardsTables() {
+export async function ensureRewardsTables() {
   if (tablesReady) return;
 
   await query(`
