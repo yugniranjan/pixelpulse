@@ -1,5 +1,8 @@
 import { getPostgresPool, query } from "@/lib/postgres";
-import { ensureRewardsTables, unlockRewardsForPlayer } from "@/lib/rewards";
+import { ensureRewardsTables, unlockRewardsForPlayers } from "@/lib/rewards";
+
+const LOOKUP_CACHE_TTL_MS = Number(process.env.REWARD_LOOKUP_CACHE_TTL_MS || 60_000);
+const lookupCache = new Map();
 
 function normalizePhone(value = "") {
   return String(value || "").replace(/\D/g, "");
@@ -37,6 +40,38 @@ function normalizeReward(row = {}) {
   };
 }
 
+function getCacheKey(identifier = "") {
+  return String(identifier || "").trim().toLowerCase();
+}
+
+function getCachedLookup(cacheKey) {
+  if (!LOOKUP_CACHE_TTL_MS || !cacheKey) return null;
+
+  const cached = lookupCache.get(cacheKey);
+  if (!cached) return null;
+
+  if (Date.now() - cached.createdAt > LOOKUP_CACHE_TTL_MS) {
+    lookupCache.delete(cacheKey);
+    return null;
+  }
+
+  return cached.players;
+}
+
+function setCachedLookup(cacheKey, players) {
+  if (!LOOKUP_CACHE_TTL_MS || !cacheKey) return;
+
+  lookupCache.set(cacheKey, {
+    createdAt: Date.now(),
+    players,
+  });
+
+  if (lookupCache.size > 250) {
+    const oldestKey = lookupCache.keys().next().value;
+    if (oldestKey) lookupCache.delete(oldestKey);
+  }
+}
+
 export async function lookupRewardPlayers(identifierValue = "") {
   if (!getPostgresPool()) {
     const error = new Error("Rewards lookup is not available right now.");
@@ -45,6 +80,13 @@ export async function lookupRewardPlayers(identifierValue = "") {
   }
 
   const identifier = String(identifierValue || "").trim();
+  const cacheKey = getCacheKey(identifier);
+  const cachedPlayers = getCachedLookup(cacheKey);
+
+  if (cachedPlayers) {
+    return cachedPlayers;
+  }
+
   const email = normalizeEmail(identifier);
   const phone = normalizePhone(identifier);
   const playerId = /^\d{1,8}$/.test(identifier) ? identifier : "";
@@ -67,7 +109,27 @@ export async function lookupRewardPlayers(identifierValue = "") {
 
   const matchedPlayers = await query(
     `
-      with waiver_people as (
+      with matched_waivers as (
+        select w.*
+        from waivers w
+        where ($1 <> '' and lower(coalesce(w.primary_participant->>'email', '')) = $1)
+          or ($2 <> '' and regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') = $2)
+          or (
+            ($1 <> '' or $2 <> '')
+            and exists (
+              select 1
+              from jsonb_array_elements(
+                case
+                  when jsonb_typeof(w.family_members) = 'array' then w.family_members
+                  else '[]'::jsonb
+                end
+              ) member
+              where ($1 <> '' and lower(coalesce(member->>'email', '')) = $1)
+                or ($2 <> '' and regexp_replace(coalesce(member->>'phone', ''), '\\D', '', 'g') = $2)
+            )
+          )
+      ),
+      waiver_people as (
         select
           lower(coalesce(w.primary_participant->>'email', '')) as email,
           regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') as phone,
@@ -83,7 +145,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
             nullif(regexp_replace(coalesce(w.primary_participant->>'name', ''), '^\\S+\\s*', ''), ''),
             ''
           )) as last_name
-        from waivers w
+        from matched_waivers w
 
         union all
 
@@ -102,7 +164,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
             nullif(regexp_replace(coalesce(member->>'name', ''), '^\\S+\\s*', ''), ''),
             ''
           )) as last_name
-        from waivers w
+        from matched_waivers w
         cross join lateral jsonb_array_elements(
           case
             when jsonb_typeof(w.family_members) = 'array' then w.family_members
@@ -115,6 +177,33 @@ export async function lookupRewardPlayers(identifierValue = "") {
         from waiver_people
         where ($1 <> '' and email = $1)
           or ($2 <> '' and phone = $2)
+      ),
+      candidate_players as (
+        select distinct p."PlayerID" as player_id
+        from public."Players" p
+        where ($1 <> '' and lower(coalesce(p."email", '')) = $1)
+          or ($3 <> '' and p."PlayerID"::text = $3)
+          or (
+            $4 <> ''
+            and (
+              lower(trim(concat(coalesce(p."FirstName", ''), ' ', coalesce(p."LastName", '')))) like $5
+              or lower(coalesce(p."FirstName", '')) like $5
+              or lower(coalesce(p."LastName", '')) like $5
+            )
+          )
+          or lower(coalesce(p."email", '')) in (
+            select email from matched_people where email <> ''
+          )
+          or exists (
+            select 1
+            from matched_people mp
+            where mp.first_name <> ''
+              and lower(coalesce(p."FirstName", '')) = mp.first_name
+              and (
+                mp.last_name = ''
+                or lower(trim(coalesce(p."LastName", ''))) = mp.last_name
+              )
+          )
       )
       select distinct
         p."PlayerID" as player_id,
@@ -133,7 +222,8 @@ export async function lookupRewardPlayers(identifierValue = "") {
         next_level.threshold_points as next_threshold,
         next_level.reward_name as next_reward_name,
         next_level.reward_type as next_reward_type
-      from public."Players" p
+      from candidate_players cp
+      join public."Players" p on p."PlayerID" = cp.player_id
       left join lateral (
         select
           coalesce(scoreboard.scoreboard_points, 0) + coalesce(adjustments.adjustment_points, 0) as lifetime_points,
@@ -172,41 +262,18 @@ export async function lookupRewardPlayers(identifierValue = "") {
         order by rl.threshold_points asc
         limit 1
       ) next_level on true
-      where ($1 <> '' and lower(coalesce(p."email", '')) = $1)
-        or ($3 <> '' and p."PlayerID"::text = $3)
-        or (
-          $4 <> ''
-          and (
-            lower(trim(concat(coalesce(p."FirstName", ''), ' ', coalesce(p."LastName", '')))) like $5
-            or lower(coalesce(p."FirstName", '')) like $5
-            or lower(coalesce(p."LastName", '')) like $5
-          )
-        )
-        or lower(coalesce(p."email", '')) in (
-          select email from matched_people where email <> ''
-        )
-        or exists (
-          select 1
-          from matched_people mp
-          where mp.first_name <> ''
-            and lower(coalesce(p."FirstName", '')) = mp.first_name
-            and (
-              mp.last_name = ''
-              or lower(trim(coalesce(p."LastName", ''))) = mp.last_name
-            )
-        )
       order by lifetime_points desc, p."PlayerID" desc
       limit 10
     `,
     [email.includes("@") ? email : "", phone, playerId, nameSearch, `%${nameSearch}%`],
   );
 
-  await Promise.all(matchedPlayers.rows.map((player) => unlockRewardsForPlayer(player.player_id)));
-
   const playerIds = matchedPlayers.rows.map((player) => Number(player.player_id));
   const rewardsByPlayer = new Map();
 
   if (playerIds.length) {
+    await unlockRewardsForPlayers(playerIds);
+
     const rewards = await query(
       `
         select *
@@ -226,7 +293,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
     });
   }
 
-  return matchedPlayers.rows.map((player) => {
+  const players = matchedPlayers.rows.map((player) => {
     const playerId = Number(player.player_id);
     const fullName = [player.first_name, player.last_name].filter(Boolean).join(" ").trim();
 
@@ -242,4 +309,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
       availableRewards: rewardsByPlayer.get(playerId) || [],
     };
   });
+
+  setCachedLookup(cacheKey, players);
+  return players;
 }

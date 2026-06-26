@@ -92,6 +92,22 @@ export async function ensureRewardsTables() {
     create index if not exists reward_redemptions_player_idx
       on reward_redemptions (player_id, status, unlocked_at desc)
   `);
+  await query(`
+    create index if not exists player_scores_player_idx
+      on public."PlayerScores" ("PlayerID")
+  `);
+  await query(`
+    create index if not exists players_email_lower_idx
+      on public."Players" (lower(coalesce("email", '')))
+  `);
+  await query(`
+    create index if not exists players_first_name_lower_idx
+      on public."Players" (lower(coalesce("FirstName", '')))
+  `);
+  await query(`
+    create index if not exists players_last_name_lower_idx
+      on public."Players" (lower(coalesce("LastName", '')))
+  `);
 
   for (const level of DEFAULT_LEVELS) {
     await query(
@@ -173,7 +189,17 @@ function normalizeRewardPlayer(row = {}) {
 }
 
 export async function unlockRewardsForPlayer(playerId) {
-  if (!hasPostgres() || !playerId) return;
+  await unlockRewardsForPlayers([playerId]);
+}
+
+export async function unlockRewardsForPlayers(playerIds = []) {
+  const cleanPlayerIds = [...new Set(
+    (Array.isArray(playerIds) ? playerIds : [playerIds])
+      .map((playerId) => Number(playerId))
+      .filter((playerId) => Number.isInteger(playerId) && playerId > 0),
+  )];
+
+  if (!hasPostgres() || !cleanPlayerIds.length) return;
 
   await ensureRewardsTables();
 
@@ -186,30 +212,36 @@ export async function unlockRewardsForPlayer(playerId) {
         expires_at
       )
       select
-        $1::bigint,
+        player_points.player_id::bigint,
         rl.level_number,
         rl.reward_name,
         now() + interval '90 days'
-      from reward_levels rl
-      where rl.active = true
-        and rl.threshold_points <= (
+      from (
+        select
+          player_id,
+          coalesce(scoreboard_points, 0) + coalesce(adjustment_points, 0) as lifetime_points
+        from (
           select
-            coalesce((
-              select sum(coalesce(ps."Points", 0))
+            ids.player_id,
+            (
+              select coalesce(sum(coalesce(ps."Points", 0)), 0)
               from public."PlayerScores" ps
-              where ps."PlayerID" = $1::integer
-            ), 0)
-            +
-            coalesce((
-              select sum(rpl.points_delta)
+              where ps."PlayerID" = ids.player_id::integer
+            ) as scoreboard_points,
+            (
+              select coalesce(sum(rpl.points_delta), 0)
               from reward_point_ledger rpl
-              where rpl.player_id = $1::bigint
+              where rpl.player_id = ids.player_id::bigint
                 and coalesce(rpl.source_type, '') <> 'scoreboard'
-            ), 0)
-        )
+            ) as adjustment_points
+          from unnest($1::bigint[]) as ids(player_id)
+        ) totals
+      ) player_points
+      join reward_levels rl on rl.active = true
+        and rl.threshold_points <= player_points.lifetime_points
       on conflict (player_id, level_number) do nothing
     `,
-    [playerId],
+    [cleanPlayerIds],
   );
 }
 
