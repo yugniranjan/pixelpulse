@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const TABS = [
   { id: "status", label: "Status" },
@@ -34,6 +34,15 @@ function formatDate(value) {
 
 function getLevelLabel(level) {
   return level ? `Level ${level.levelNumber}` : "Getting started";
+}
+
+function getLevelNumber(level) {
+  return level?.levelNumber || 0;
+}
+
+function getInitials(name = "") {
+  const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+  return (parts[0]?.[0] || "P") + (parts[1]?.[0] || "");
 }
 
 function getProgress(player) {
@@ -86,7 +95,10 @@ function StatusPanel({ player }) {
         <span style={{ width: `${progress.percent}%` }} />
       </div>
       <div className="ppp-level-app__progress-copy">
-        <strong>{getLevelLabel(player.currentLevel)}</strong>
+        <strong className="ppp-level-app__level-chip">
+          <span>{getLevelNumber(player.currentLevel)}</span>
+          {getLevelLabel(player.currentLevel)}
+        </strong>
         <span>{progress.label}</span>
       </div>
       <div className="ppp-level-app__stats">
@@ -176,6 +188,7 @@ export default function RewardLookupForm({
   const [searched, setSearched] = useState(initiallySearched);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(initialError);
+  const appRef = useRef(null);
 
   const selectedPlayer = useMemo(() => {
     if (!players.length) return null;
@@ -228,14 +241,30 @@ export default function RewardLookupForm({
     return query ? `?${query}` : "?";
   }
 
+  function syncLookupUrl({ playerId = selectedPlayer?.playerId, view = activeTab } = {}) {
+    if (typeof window === "undefined") return;
+    window.history.replaceState(null, "", getLookupHref({ playerId, view }));
+  }
+
   return (
-    <section className="ppp-level-app" aria-label="Level Up Rewards app">
+    <section
+      ref={appRef}
+      className={`ppp-level-app ${selectedPlayer ? "ppp-level-app--has-results" : "ppp-level-app--empty"}`}
+      aria-label="Level Up Rewards app"
+    >
       <div className="ppp-level-app__topbar">
         <div>
           <span>Level Up Rewards</span>
           <strong>Player app</strong>
         </div>
-        <small>{selectedPlayer ? getLevelLabel(selectedPlayer.currentLevel) : "Guest"}</small>
+        {selectedPlayer ? (
+          <small className="ppp-level-app__level-badge">
+            <span>{getLevelNumber(selectedPlayer.currentLevel)}</span>
+            {getLevelLabel(selectedPlayer.currentLevel)}
+          </small>
+        ) : (
+          <small>Guest</small>
+        )}
       </div>
 
       <form className="ppp-level-app__search" method="get" onSubmit={handleSubmit}>
@@ -258,52 +287,65 @@ export default function RewardLookupForm({
       {error ? <p className="ppp-level-app__error">{error}</p> : null}
 
       {players.length > 1 ? (
-        <div className="ppp-level-app__players" aria-label="Select player">
-          {players.map((player) => (
-            <a
-              href={getLookupHref({ playerId: player.playerId, view: activeTab })}
-              key={player.playerId}
-              className={player.playerId === selectedPlayer?.playerId ? "is-active" : ""}
-              onClick={(event) => {
-                event.preventDefault();
-                setSelectedPlayerId(player.playerId);
-              }}
-            >
-              {player.fullName}
-            </a>
-          ))}
+        <div>
+          <div className="ppp-level-app__chips-label">Players on account</div>
+          <div className="ppp-level-app__players" aria-label="Select player">
+            {players.map((player) => (
+              <a
+                href={getLookupHref({ playerId: player.playerId, view: activeTab })}
+                key={player.playerId}
+                className={player.playerId === selectedPlayer?.playerId ? "is-active" : ""}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setSelectedPlayerId(player.playerId);
+                }}
+              >
+                {player.fullName}
+              </a>
+            ))}
+          </div>
         </div>
       ) : null}
 
       {selectedPlayer ? (
         <>
           <div className="ppp-level-app__identity">
-            <div>
-              <span>Player</span>
-              <strong>{selectedPlayer.fullName}</strong>
+            <div className="ppp-level-app__identity-main">
+              <div className="ppp-level-app__avatar" aria-hidden="true">
+                {getInitials(selectedPlayer.fullName)}
+              </div>
+              <div>
+                <span>Player</span>
+                <strong>{selectedPlayer.fullName}</strong>
+              </div>
             </div>
             <small>#{selectedPlayer.playerId}</small>
           </div>
 
           <div className="ppp-level-app__tabs" role="tablist" aria-label="Reward views">
             {TABS.map((tab) => (
-              <a
-                href={getLookupHref({ playerId: selectedPlayer.playerId, view: tab.id })}
+              <button
+                type="button"
                 key={tab.id}
                 className={activeTab === tab.id ? "is-active" : ""}
-                onClick={(event) => {
-                  event.preventDefault();
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => {
                   setActiveTab(tab.id);
+                  syncLookupUrl({ playerId: selectedPlayer.playerId, view: tab.id });
+                  appRef.current?.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               >
                 {tab.label}
-              </a>
+              </button>
             ))}
           </div>
 
-          {activeTab === "status" ? <StatusPanel player={selectedPlayer} /> : null}
-          {activeTab === "wallet" ? <WalletPanel player={selectedPlayer} /> : null}
-          {activeTab === "rules" ? <RulesPanel /> : null}
+          <div className="ppp-level-app__view" key={activeTab}>
+            {activeTab === "status" ? <StatusPanel player={selectedPlayer} /> : null}
+            {activeTab === "wallet" ? <WalletPanel player={selectedPlayer} /> : null}
+            {activeTab === "rules" ? <RulesPanel /> : null}
+          </div>
         </>
       ) : (
         <EmptyState searched={searched} />

@@ -105,6 +105,19 @@ const appHighlights = [
   },
 ];
 
+const heroStats = [
+  { label: "Scoreboard sync", value: "Live" },
+  { label: "Reward ladder", value: "9 levels" },
+  { label: "Guest lookup", value: "Name, email, phone" },
+];
+
+const heroRewardFlow = [
+  { label: "Points", value: "+850" },
+  { label: "Level 3", value: "Pass" },
+  { label: "Level 5", value: "Credit" },
+  { label: "Level 9", value: "Party" },
+];
+
 const rules = [
   "Rewards unlock from lifetime points, so redeeming does not erase level status.",
   "Every reward should show expiry, valid-for language, and simple redemption instructions.",
@@ -187,13 +200,70 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         <div className="ppp-level-hero__image" aria-hidden="true">
           <Image src={arcadeImage} alt="" fill priority sizes="100vw" />
         </div>
+        <div className="ppp-level-reward-motion" aria-hidden="true">
+          <div className="ppp-level-reward-track">
+            {Array.from({ length: 9 }, (_, index) => (
+              <span key={index}>L{index + 1}</span>
+            ))}
+          </div>
+          <div className="ppp-level-reward-pulse ppp-level-reward-pulse--one">Score saved</div>
+          <div className="ppp-level-reward-pulse ppp-level-reward-pulse--two">Reward unlocked</div>
+          <div className="ppp-level-reward-flow">
+            {heroRewardFlow.map((item) => (
+              <div key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="ppp-level-hero__content">
           <span className="ppp-level-kicker">Level Up Rewards App</span>
-          <h1>Your Pixel Pulse rewards dashboard.</h1>
+          <h1>
+            Your Pixel Pulse <span>Rewards.</span>
+          </h1>
           <p>
             Search your profile, check lifetime points, track your level progress, and see unlocked
             rewards from one web app built around the Pixel Pulse scoreboard.
           </p>
+          <div className="ppp-level-overview" aria-label="Example level progress">
+            <div className="ppp-level-ring" aria-hidden="true">
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <circle cx="38" cy="38" r="31" fill="none" stroke="rgba(248,251,243,0.1)" strokeWidth="5" />
+                <circle
+                  cx="38"
+                  cy="38"
+                  r="31"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="5"
+                  strokeDasharray="178 194"
+                  strokeDashoffset="-14"
+                  strokeLinecap="round"
+                />
+                <text x="38" y="35" textAnchor="middle" dominantBaseline="middle">9</text>
+                <text className="ppp-level-ring__label" x="38" y="52" textAnchor="middle">LEVEL</text>
+              </svg>
+            </div>
+            <div>
+              <strong>Level 9 status</strong>
+              <span>Top level reached</span>
+              <small>Next: VIP status</small>
+            </div>
+          </div>
+          <div className="ppp-level-score-preview">
+            <span>Lifetime points</span>
+            <strong>83,736</strong>
+            <small>Sample player dashboard</small>
+          </div>
+          <div className="ppp-level-command-strip" aria-label="Rewards app highlights">
+            {heroStats.map((item) => (
+              <div key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
+          </div>
           <div className="ppp-level-actions">
             <a className="ppp-level-button ppp-level-button--primary" href="#ladder">
               See rewards <FaArrowRight aria-hidden="true" />

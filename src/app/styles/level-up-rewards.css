@@ -4,14 +4,18 @@
   --level-ink: #f8fbf3;
   --level-muted: #b7c7bf;
   --level-lime: #a4cf5f;
-  --level-cyan: #4bd7d0;
+  --level-cyan: #f47b20;
   --level-coral: #ff7a66;
   --level-gold: #ffd15c;
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 16% 6%, rgba(75, 215, 208, 0.16), transparent 25rem),
+    linear-gradient(rgba(244, 123, 32, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 123, 32, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, transparent 0 43%, rgba(164, 207, 95, 0.08) 43% 44%, transparent 44% 100%),
+    linear-gradient(35deg, transparent 0 51%, rgba(244, 123, 32, 0.07) 51% 52%, transparent 52% 100%),
     linear-gradient(180deg, #091014 0%, #0d151a 42%, #111513 100%);
+  background-size: 34px 34px, 34px 34px, 420px 420px, 520px 520px, auto;
   color: var(--level-ink);
   font-family: "DM Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -21,7 +25,7 @@
 }
 
 .ppp-level-nav {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
@@ -30,14 +34,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 0.85rem clamp(1rem, 4vw, 3rem);
-  border-bottom: 1px solid rgba(164, 207, 95, 0.22);
-  background: rgba(9, 16, 20, 0.86);
+  height: 56px;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  border-bottom: 1px solid rgba(248, 251, 243, 0.06);
+  background: rgba(9, 16, 20, 0.92);
   backdrop-filter: blur(16px);
 }
 
 .ppp-level-logo img {
-  width: clamp(122px, 13vw, 174px);
+  width: clamp(104px, 10vw, 138px);
   height: auto;
   filter: drop-shadow(0 0 18px rgba(164, 207, 95, 0.18));
 }
@@ -72,12 +77,12 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(280px, 0.8fr) minmax(460px, 1.12fr);
-  align-items: center;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
-  min-height: 100vh;
-  padding: 8.6rem clamp(1.25rem, 5vw, 4rem) 3.25rem;
-  overflow: hidden;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(520px, 1fr);
+  align-items: start;
+  gap: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
 }
 
 .ppp-level-hero::after {
@@ -92,8 +97,8 @@
 .ppp-level-hero__image {
   position: absolute;
   inset: 0;
-  z-index: -3;
-  opacity: 0.34;
+  z-index: -4;
+  opacity: 0.3;
 }
 
 .ppp-level-hero__image::after {
@@ -101,7 +106,7 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(9, 16, 20, 0.9), rgba(9, 16, 20, 0.58) 46%, rgba(9, 16, 20, 0.82)),
+    linear-gradient(90deg, rgba(9, 16, 20, 0.94), rgba(9, 16, 20, 0.62) 46%, rgba(9, 16, 20, 0.9)),
     radial-gradient(circle at 78% 34%, rgba(255, 122, 102, 0.2), transparent 24rem);
 }
 
@@ -110,7 +115,158 @@
 }
 
 .ppp-level-hero__content {
-  width: min(650px, 100%);
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: auto;
+  padding: clamp(1.15rem, 2.2vw, 2rem);
+  border-right: 1px solid rgba(248, 251, 243, 0.06);
+  background: rgba(8, 13, 16, 0.64);
+}
+
+.ppp-level-reward-motion {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ppp-level-reward-motion::before {
+  content: "";
+  position: absolute;
+  inset: 9% 6% auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(244, 123, 32, 0.68), rgba(164, 207, 95, 0.42), transparent);
+  transform: skewY(-8deg);
+  opacity: 0.72;
+  animation: ppp-level-track-glow 4.8s ease-in-out infinite;
+}
+
+.ppp-level-reward-motion::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 72px, rgba(248, 251, 243, 0.035) 72px 73px),
+    repeating-linear-gradient(0deg, transparent 0 72px, rgba(248, 251, 243, 0.028) 72px 73px);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  opacity: 0.8;
+}
+
+.ppp-level-reward-track {
+  position: absolute;
+  top: clamp(2.1rem, 5vw, 4.8rem);
+  left: clamp(1.25rem, 4vw, 4.5rem);
+  right: clamp(1.25rem, 4vw, 4.5rem);
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  align-items: center;
+  gap: 0.45rem;
+  opacity: 0.72;
+}
+
+.ppp-level-reward-track span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  border: 1px solid rgba(244, 123, 32, 0.32);
+  border-radius: 8px;
+  color: rgba(248, 251, 243, 0.68);
+  background: rgba(8, 13, 16, 0.66);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ppp-level-reward-track span:nth-child(3n) {
+  border-color: rgba(164, 207, 95, 0.35);
+  color: rgba(164, 207, 95, 0.86);
+}
+
+.ppp-level-reward-flow {
+  position: absolute;
+  right: max(2.5rem, 9vw);
+  bottom: clamp(1.4rem, 7vw, 5rem);
+  display: grid;
+  grid-template-columns: repeat(2, 96px);
+  gap: 0.65rem;
+  opacity: 0.7;
+  transform: rotate(-3deg);
+}
+
+.ppp-level-reward-flow div,
+.ppp-level-reward-pulse {
+  border: 1px solid rgba(244, 123, 32, 0.24);
+  border-radius: 8px;
+  background: rgba(8, 13, 16, 0.72);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+}
+
+.ppp-level-reward-flow div {
+  display: grid;
+  gap: 0.2rem;
+  min-height: 68px;
+  padding: 0.7rem;
+  animation: ppp-level-reward-card 5.4s ease-in-out infinite;
+}
+
+.ppp-level-reward-flow div:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.ppp-level-reward-flow div:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+.ppp-level-reward-flow div:nth-child(4) {
+  animation-delay: 2.4s;
+}
+
+.ppp-level-reward-flow span {
+  color: var(--level-cyan);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ppp-level-reward-flow strong {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.45rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.ppp-level-reward-pulse {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 0.85rem;
+  color: rgba(248, 251, 243, 0.78);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: ppp-level-token-travel 6.5s linear infinite;
+}
+
+.ppp-level-reward-pulse--one {
+  top: 22%;
+  left: -12rem;
+}
+
+.ppp-level-reward-pulse--two {
+  top: 44%;
+  left: -14rem;
+  animation-delay: 3.1s;
 }
 
 .ppp-level-kicker,
@@ -127,14 +283,18 @@
 }
 
 .ppp-level-hero h1 {
-  max-width: 680px;
-  margin: 1.15rem 0 1.2rem;
+  max-width: 300px;
+  margin: 0.65rem 0 0.65rem;
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(3rem, 6.5vw, 6.4rem);
+  font-size: clamp(2.35rem, 4vw, 3.55rem);
   font-weight: 800;
   line-height: 0.88;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.ppp-level-hero h1 span {
+  color: var(--level-cyan);
 }
 
 .ppp-level-hero p,
@@ -143,15 +303,129 @@
 .ppp-level-cta p {
   max-width: 660px;
   color: var(--level-muted);
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
-  line-height: 1.7;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.45;
+}
+
+.ppp-level-command-strip {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: min(690px, 100%);
+  margin-top: 1.4rem;
+}
+
+.ppp-level-command-strip div {
+  min-height: 76px;
+  padding: 0.8rem;
+  border: 1px solid rgba(244, 123, 32, 0.22);
+  border-radius: 8px;
+  background: rgba(8, 13, 16, 0.58);
+  box-shadow: inset 0 1px 0 rgba(248, 251, 243, 0.06);
+}
+
+.ppp-level-command-strip span {
+  display: block;
+  color: var(--level-cyan);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ppp-level-command-strip strong {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.5rem, 2.7vw, 2.35rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.ppp-level-overview {
+  display: none;
+  align-items: center;
+  gap: 1.15rem;
+  margin-top: 2rem;
+}
+
+.ppp-level-ring {
+  color: var(--level-cyan);
+  filter: drop-shadow(0 0 12px rgba(244, 123, 32, 0.28));
+}
+
+.ppp-level-ring text {
+  fill: currentColor;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.ppp-level-ring .ppp-level-ring__label {
+  fill: rgba(248, 251, 243, 0.42);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+}
+
+.ppp-level-overview strong,
+.ppp-level-score-preview strong {
+  display: block;
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ppp-level-overview strong {
+  font-size: 1.55rem;
+}
+
+.ppp-level-overview span {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgba(248, 251, 243, 0.44);
+  font-size: 0.82rem;
+}
+
+.ppp-level-overview small,
+.ppp-level-score-preview small {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  color: var(--level-cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-level-score-preview {
+  display: none;
+  margin-top: 1.45rem;
+}
+
+.ppp-level-score-preview span {
+  display: block;
+  color: rgba(248, 251, 243, 0.42);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ppp-level-score-preview strong {
+  margin-top: 0.15rem;
+  font-size: clamp(4rem, 8vw, 6.6rem);
+  line-height: 0.95;
+  letter-spacing: 0;
 }
 
 .ppp-level-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem;
-  margin-top: 2rem;
+  margin-top: 0.95rem;
+  padding-top: 0;
 }
 
 .ppp-level-button {
@@ -159,9 +433,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  min-height: 52px;
-  padding: 0.9rem 1.45rem;
+  min-height: 44px;
+  padding: 0.72rem 1.05rem;
   border-radius: 999px;
+  font-size: 0.9rem;
   font-weight: 900;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -172,8 +447,8 @@
 
 .ppp-level-button--primary {
   color: #10170c;
-  background: var(--level-lime);
-  box-shadow: 0 16px 34px rgba(164, 207, 95, 0.22);
+  background: var(--level-cyan);
+  box-shadow: 0 16px 34px rgba(244, 123, 32, 0.22);
 }
 
 .ppp-level-button--secondary {
@@ -198,10 +473,15 @@
 }
 
 .ppp-level-hero__side {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 1rem;
-  width: min(760px, 100%);
-  margin-left: auto;
+  width: 100%;
+  min-height: 0;
+  padding: clamp(1rem, 2vw, 1.55rem);
+  overflow: visible;
+  background: rgba(16, 26, 32, 0.86);
 }
 
 .ppp-level-hero__side .ppp-level-pass {
@@ -213,10 +493,10 @@
   display: grid;
   gap: 1rem;
   padding: clamp(1.15rem, 3vw, 1.55rem);
-  border: 1px solid rgba(75, 215, 208, 0.32);
+  border: 1px solid rgba(244, 123, 32, 0.32);
   border-radius: 8px;
   background:
-    linear-gradient(155deg, rgba(75, 215, 208, 0.18), rgba(16, 26, 32, 0.9) 46%),
+    linear-gradient(155deg, rgba(244, 123, 32, 0.18), rgba(16, 26, 32, 0.9) 46%),
     rgba(16, 26, 32, 0.9);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
 }
@@ -271,7 +551,7 @@
 
 .ppp-level-lookup input:focus {
   border-color: var(--level-cyan);
-  box-shadow: 0 0 0 3px rgba(75, 215, 208, 0.16);
+  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.16);
 }
 
 .ppp-level-lookup button {
@@ -375,17 +655,36 @@
 
 .ppp-level-app {
   display: grid;
-  gap: 1.1rem;
+  gap: 1rem;
   width: 100%;
-  min-height: min(680px, calc(100vh - 12rem));
+  min-height: 0;
+  max-height: none;
   align-content: start;
-  padding: clamp(1.15rem, 3vw, 1.85rem);
-  border: 1px solid rgba(75, 215, 208, 0.34);
-  border-radius: 8px;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background:
-    linear-gradient(155deg, rgba(75, 215, 208, 0.2), rgba(16, 26, 32, 0.93) 44%),
-    rgba(16, 26, 32, 0.94);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+    linear-gradient(rgba(248, 251, 243, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 251, 243, 0.025) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
+  box-shadow: none;
+}
+
+.ppp-level-app--empty {
+  gap: 0.85rem;
+  max-width: 1040px;
+}
+
+.ppp-level-app--empty .ppp-level-app__empty {
+  min-height: 92px;
+  padding: 0.2rem 0 0.4rem;
+}
+
+.ppp-level-app--has-results {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0.35rem;
 }
 
 .ppp-level-app__topbar,
@@ -413,9 +712,9 @@
 
 .ppp-level-app__topbar strong {
   display: block;
-  margin-top: 0.2rem;
+  margin-top: 0.12rem;
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  font-size: clamp(1.7rem, 2.4vw, 2.1rem);
   line-height: 1;
   text-transform: uppercase;
 }
@@ -428,14 +727,60 @@
   font-weight: 900;
 }
 
+.ppp-level-app__level-badge,
+.ppp-level-app__level-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(244, 123, 32, 0.78);
+  border-radius: 999px;
+  color: #fffaf0;
+  background:
+    linear-gradient(135deg, rgba(244, 123, 32, 0.24), rgba(255, 209, 92, 0.1)),
+    rgba(8, 13, 16, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 3px rgba(244, 123, 32, 0.14),
+    0 12px 30px rgba(244, 123, 32, 0.18);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+  text-transform: uppercase;
+}
+
+.ppp-level-app__level-badge {
+  padding: 0.36rem 0.7rem 0.36rem 0.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.ppp-level-app__level-chip {
+  padding: 0.28rem 0.7rem 0.28rem 0.34rem;
+  font-size: 0.86rem;
+}
+
+.ppp-level-app__level-badge span,
+.ppp-level-app__level-chip span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(248, 251, 243, 0.62);
+  border-radius: 50%;
+  color: #10170c;
+  background: linear-gradient(180deg, #fffdf1, #ffe9b4);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-shadow: none;
+}
+
 .ppp-level-app__search {
   display: grid;
   gap: 0.55rem;
 }
 
 .ppp-level-app__search label {
-  color: rgba(248, 251, 243, 0.76);
-  font-size: 0.82rem;
+  color: rgba(248, 251, 243, 0.56);
+  font-size: 0.76rem;
   font-weight: 800;
 }
 
@@ -447,18 +792,18 @@
 
 .ppp-level-app__search input {
   width: 100%;
-  min-height: 48px;
-  border: 1px solid rgba(248, 251, 243, 0.2);
+  min-height: 44px;
+  border: 1px solid rgba(248, 251, 243, 0.1);
   border-radius: 8px;
   padding: 0 0.85rem;
   color: var(--level-ink);
-  background: rgba(8, 13, 16, 0.72);
+  background: rgba(8, 13, 16, 0.82);
   outline: none;
 }
 
 .ppp-level-app__search input:focus {
   border-color: var(--level-cyan);
-  box-shadow: 0 0 0 3px rgba(75, 215, 208, 0.16);
+  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.16);
 }
 
 .ppp-level-app__search button,
@@ -479,10 +824,10 @@
 
 .ppp-level-app__search button {
   min-width: 82px;
-  min-height: 48px;
+  min-height: 44px;
   padding: 0 1rem;
   color: #10170c;
-  background: var(--level-lime);
+  background: var(--level-cyan);
 }
 
 .ppp-level-app__search button:disabled {
@@ -500,9 +845,32 @@
 .ppp-level-app__players,
 .ppp-level-app__tabs {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.4rem;
   overflow-x: auto;
   padding-bottom: 0.1rem;
+}
+
+.ppp-level-app__tabs {
+  position: relative;
+  z-index: 2;
+  padding: 0.1rem 0 0.2rem;
+}
+
+.ppp-level-app__view {
+  min-height: 0;
+  max-height: clamp(260px, calc(100vh - 390px), 560px);
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  scrollbar-gutter: stable;
+}
+
+.ppp-level-app__chips-label {
+  margin-bottom: 0.5rem;
+  color: rgba(248, 251, 243, 0.36);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .ppp-level-app__players button,
@@ -510,9 +878,9 @@
 .ppp-level-app__tabs a,
 .ppp-level-app__tabs button {
   flex: 0 0 auto;
-  padding: 0 0.85rem;
-  color: rgba(248, 251, 243, 0.76);
-  background: rgba(248, 251, 243, 0.08);
+  padding: 0 0.8rem;
+  color: rgba(248, 251, 243, 0.58);
+  background: rgba(248, 251, 243, 0.06);
 }
 
 .ppp-level-app__players button.is-active,
@@ -524,10 +892,31 @@
 }
 
 .ppp-level-app__identity {
-  padding: 0.85rem;
-  border: 1px solid rgba(248, 251, 243, 0.1);
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(248, 251, 243, 0.08);
   border-radius: 8px;
-  background: rgba(8, 13, 16, 0.38);
+  background: rgba(8, 13, 16, 0.74);
+}
+
+.ppp-level-app__identity-main {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.ppp-level-app__avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(244, 123, 32, 0.42);
+  border-radius: 50%;
+  color: var(--level-cyan);
+  background: rgba(244, 123, 32, 0.12);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .ppp-level-app__identity strong {
@@ -540,10 +929,10 @@
 .ppp-level-app__empty {
   display: grid;
   gap: 0.9rem;
-  padding: 0.95rem;
-  border: 1px solid rgba(248, 251, 243, 0.11);
+  padding: 0;
+  border: 0;
   border-radius: 8px;
-  background: rgba(8, 13, 16, 0.44);
+  background: transparent;
 }
 
 .ppp-level-app__empty strong {
@@ -553,7 +942,7 @@
 .ppp-level-app__empty p {
   margin: 0;
   color: var(--level-muted);
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .ppp-level-app__empty--inline {
@@ -565,7 +954,7 @@
   display: block;
   margin-top: 0.1rem;
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(3.2rem, 6vw, 5.4rem);
+  font-size: clamp(2.6rem, 4vw, 3.4rem);
   line-height: 0.95;
 }
 
@@ -591,22 +980,23 @@
   font-size: 0.92rem;
 }
 
-.ppp-level-app__progress-copy strong {
+.ppp-level-app__progress-copy strong:not(.ppp-level-app__level-chip) {
   color: var(--level-gold);
 }
 
 .ppp-level-app__stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
 }
 
 .ppp-level-app__stats div,
 .ppp-level-app__rewards article {
-  min-height: 82px;
-  padding: 0.75rem;
+  min-height: 72px;
+  padding: 0.85rem;
   border-radius: 8px;
-  background: rgba(248, 251, 243, 0.06);
+  border: 1px solid rgba(248, 251, 243, 0.07);
+  background: rgba(8, 13, 16, 0.74);
 }
 
 .ppp-level-app__stats strong,
@@ -789,7 +1179,7 @@
   border-radius: 8px;
   padding: 1.2rem;
   background:
-    linear-gradient(160deg, rgba(75, 215, 208, 0.2), transparent 48%),
+    linear-gradient(160deg, rgba(244, 123, 32, 0.2), transparent 48%),
     #0b1217;
 }
 
@@ -891,7 +1281,7 @@
   gap: 1rem;
   padding: clamp(1.5rem, 4vw, 3rem);
   border-radius: 8px;
-  background: linear-gradient(145deg, rgba(255, 122, 102, 0.18), rgba(75, 215, 208, 0.1));
+  background: linear-gradient(145deg, rgba(255, 122, 102, 0.18), rgba(244, 123, 32, 0.1));
 }
 
 .ppp-level-ladder {
@@ -976,7 +1366,7 @@
   padding: clamp(4rem, 8vw, 6rem) 1.25rem;
   text-align: center;
   background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.13), rgba(75, 215, 208, 0.12), rgba(255, 122, 102, 0.13)),
+    linear-gradient(90deg, rgba(164, 207, 95, 0.13), rgba(244, 123, 32, 0.12), rgba(255, 122, 102, 0.13)),
     #0b1216;
 }
 
@@ -1011,6 +1401,59 @@
   font-weight: 800;
 }
 
+@keyframes ppp-level-track-glow {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: skewY(-8deg) translateX(-2%);
+  }
+  50% {
+    opacity: 0.86;
+    transform: skewY(-8deg) translateX(2%);
+  }
+}
+
+@keyframes ppp-level-token-travel {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) skewX(-8deg);
+  }
+  14% {
+    opacity: 0.76;
+  }
+  76% {
+    opacity: 0.76;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(112vw) translateY(-5.8rem) skewX(-8deg);
+  }
+}
+
+@keyframes ppp-level-reward-card {
+  0%,
+  100% {
+    border-color: rgba(244, 123, 32, 0.2);
+    transform: translateY(0);
+  }
+  45% {
+    border-color: rgba(164, 207, 95, 0.36);
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppp-level-reward-motion::before,
+  .ppp-level-reward-pulse,
+  .ppp-level-reward-flow div {
+    animation: none;
+  }
+
+  .ppp-level-reward-pulse {
+    display: none;
+  }
+}
+
 @media (max-width: 980px) {
   .ppp-level-hero,
   .ppp-level-how__grid,
@@ -1032,6 +1475,15 @@
 
   .ppp-level-visual-band img {
     min-height: 240px;
+  }
+
+  .ppp-level-reward-flow {
+    right: 1.25rem;
+    bottom: 1rem;
+    grid-template-columns: repeat(4, minmax(72px, 1fr));
+    width: calc(100% - 2.5rem);
+    opacity: 0.38;
+    transform: none;
   }
 }
 
@@ -1059,11 +1511,37 @@
 
   .ppp-level-hero {
     min-height: 0;
-    padding-top: 10.5rem;
+    padding: 0;
+  }
+
+  .ppp-level-hero__content,
+  .ppp-level-hero__side {
+    min-height: 0;
+    height: auto;
+    padding: 1.25rem;
   }
 
   .ppp-level-hero h1 {
-    font-size: clamp(3rem, 18vw, 4.9rem);
+    font-size: clamp(2.5rem, 14vw, 3.8rem);
+  }
+
+  .ppp-level-reward-track {
+    top: 1.25rem;
+    left: 1rem;
+    right: 1rem;
+    gap: 0.25rem;
+    opacity: 0.32;
+  }
+
+  .ppp-level-reward-track span {
+    min-width: 24px;
+    height: 24px;
+    font-size: 0.72rem;
+  }
+
+  .ppp-level-reward-flow,
+  .ppp-level-reward-pulse {
+    display: none;
   }
 
   .ppp-level-lookup form > div {
@@ -1072,6 +1550,10 @@
 
   .ppp-level-lookup button {
     width: 100%;
+  }
+
+  .ppp-level-command-strip {
+    grid-template-columns: 1fr;
   }
 
   .ppp-level-app__search > div,
