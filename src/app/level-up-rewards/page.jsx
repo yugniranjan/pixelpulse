@@ -152,6 +152,12 @@ export const runtime = "nodejs";
 
 export default async function LevelUpRewardsPage({ searchParams = {} }) {
   const initialIdentifier = String(searchParams.lookup || "").trim();
+  const initialSelectedPlayerId = /^\d+$/.test(String(searchParams.player || ""))
+    ? Number(searchParams.player)
+    : null;
+  const initialActiveTab = ["status", "wallet", "rules"].includes(searchParams.view)
+    ? searchParams.view
+    : "status";
   let initialPlayers = [];
   let initialError = "";
 
@@ -203,6 +209,8 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             initialPlayers={initialPlayers}
             initialError={initialError}
             initiallySearched={Boolean(initialIdentifier)}
+            initialSelectedPlayerId={initialSelectedPlayerId}
+            initialActiveTab={initialActiveTab}
           />
         </div>
       </section>

@@ -15,6 +15,8 @@ const RULES = [
   "Rewards can have expiry dates, blackout dates, or player limits.",
 ];
 
+const VALID_TAB_IDS = new Set(TABS.map((tab) => tab.id));
+
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(Number(value) || 0);
 }
@@ -158,12 +160,19 @@ export default function RewardLookupForm({
   initialPlayers = [],
   initialError = "",
   initiallySearched = false,
+  initialSelectedPlayerId = null,
+  initialActiveTab = "status",
 } = {}) {
   const safeInitialPlayers = Array.isArray(initialPlayers) ? initialPlayers : [];
+  const safeInitialPlayerId =
+    safeInitialPlayers.find((player) => player.playerId === Number(initialSelectedPlayerId))?.playerId ||
+    safeInitialPlayers[0]?.playerId ||
+    null;
+  const safeInitialTab = VALID_TAB_IDS.has(initialActiveTab) ? initialActiveTab : "status";
   const [identifier, setIdentifier] = useState(initialIdentifier);
   const [players, setPlayers] = useState(safeInitialPlayers);
-  const [selectedPlayerId, setSelectedPlayerId] = useState(safeInitialPlayers[0]?.playerId || null);
-  const [activeTab, setActiveTab] = useState("status");
+  const [selectedPlayerId, setSelectedPlayerId] = useState(safeInitialPlayerId);
+  const [activeTab, setActiveTab] = useState(safeInitialTab);
   const [searched, setSearched] = useState(initiallySearched);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(initialError);
@@ -208,6 +217,17 @@ export default function RewardLookupForm({
     }
   }
 
+  function getLookupHref({ playerId = selectedPlayer?.playerId, view = activeTab } = {}) {
+    const params = new URLSearchParams();
+
+    if (identifier.trim()) params.set("lookup", identifier.trim());
+    if (playerId) params.set("player", String(playerId));
+    if (view && view !== "status") params.set("view", view);
+
+    const query = params.toString();
+    return query ? `?${query}` : "?";
+  }
+
   return (
     <section className="ppp-level-app" aria-label="Level Up Rewards app">
       <div className="ppp-level-app__topbar">
@@ -240,14 +260,17 @@ export default function RewardLookupForm({
       {players.length > 1 ? (
         <div className="ppp-level-app__players" aria-label="Select player">
           {players.map((player) => (
-            <button
-              type="button"
+            <a
+              href={getLookupHref({ playerId: player.playerId, view: activeTab })}
               key={player.playerId}
               className={player.playerId === selectedPlayer?.playerId ? "is-active" : ""}
-              onClick={() => setSelectedPlayerId(player.playerId)}
+              onClick={(event) => {
+                event.preventDefault();
+                setSelectedPlayerId(player.playerId);
+              }}
             >
               {player.fullName}
-            </button>
+            </a>
           ))}
         </div>
       ) : null}
@@ -264,14 +287,17 @@ export default function RewardLookupForm({
 
           <div className="ppp-level-app__tabs" role="tablist" aria-label="Reward views">
             {TABS.map((tab) => (
-              <button
-                type="button"
+              <a
+                href={getLookupHref({ playerId: selectedPlayer.playerId, view: tab.id })}
                 key={tab.id}
                 className={activeTab === tab.id ? "is-active" : ""}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setActiveTab(tab.id);
+                }}
               >
                 {tab.label}
-              </button>
+              </a>
             ))}
           </div>
 

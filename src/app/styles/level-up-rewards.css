@@ -462,13 +462,19 @@
 }
 
 .ppp-level-app__search button,
+.ppp-level-app__players a,
+.ppp-level-app__tabs a,
 .ppp-level-app__players button,
 .ppp-level-app__tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 42px;
   border: 0;
   border-radius: 8px;
   font-weight: 900;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .ppp-level-app__search button {
@@ -500,6 +506,8 @@
 }
 
 .ppp-level-app__players button,
+.ppp-level-app__players a,
+.ppp-level-app__tabs a,
 .ppp-level-app__tabs button {
   flex: 0 0 auto;
   padding: 0 0.85rem;
@@ -508,6 +516,8 @@
 }
 
 .ppp-level-app__players button.is-active,
+.ppp-level-app__players a.is-active,
+.ppp-level-app__tabs a.is-active,
 .ppp-level-app__tabs button.is-active {
   color: #10170c;
   background: var(--level-cyan);
