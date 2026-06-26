@@ -10,7 +10,7 @@ const TABS = [
 
 const RULES = [
   "Points are based on lifetime gameplay scores.",
-  "Redeeming a reward does not reset your level.",
+  "Redeeming a reward reduces your points.",
   "Unlocked rewards are confirmed by Pixel Pulse staff.",
   "Rewards can have expiry dates, blackout dates, or player limits.",
 ];

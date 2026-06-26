@@ -118,32 +118,6 @@ const heroRewardFlow = [
   { label: "Level 9", value: "Party" },
 ];
 
-const rules = [
-  "Rewards unlock from lifetime points, so redeeming does not erase level status.",
-  "Every reward should show expiry, valid-for language, and simple redemption instructions.",
-  "Store credit is not cash and applies only to approved categories.",
-  "Play passes should state duration, player limits, and same-day or future-valid rules.",
-];
-
-const calibrationRows = [
-  {
-    label: "A",
-    value: "Average points earned by one normal guest in a 60-minute visit.",
-  },
-  {
-    label: "Level 1 threshold",
-    value: "Set at 3 x A so the first reward feels reachable without being instant.",
-  },
-  {
-    label: "Data to exclude",
-    value: "Test players, staff runs, broken sessions, duplicate score events, and tournament outliers.",
-  },
-  {
-    label: "Review cadence",
-    value: "Recalculate monthly until the program stabilizes, then review quarterly.",
-  },
-];
-
 export const metadata = {
   title: "Level Up Rewards | Pixel Pulse Play",
   description:
@@ -191,8 +165,8 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         <div className="ppp-level-nav__links">
           <a href="#top">Dashboard</a>
           <a href="#ladder">Rewards</a>
-          <a href="#calibration">Calibration</a>
-          <a href="#rules">Rules</a>
+          <a href="#app">How it works</a>
+          <a href="#join">Join</a>
         </div>
       </nav>
 
@@ -326,36 +300,15 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         </div>
       </section>
 
-      <section className="ppp-level-section ppp-level-calibration" id="calibration">
-        <div className="ppp-level-inner ppp-level-calibration__grid">
-          <div className="ppp-level-section__intro">
-            <span>Reward Calibration Principle</span>
-            <h2>Ground the ladder in real visit behavior.</h2>
-            <p>
-              Rewards should feel exciting without becoming arbitrary. The ladder starts with the
-              actual average points earned by a normal guest in a standard 60-minute visit.
-            </p>
-          </div>
-          <div className="ppp-level-calibration__table" role="table" aria-label="Reward calibration principle">
-            {calibrationRows.map((row) => (
-              <div role="row" key={row.label}>
-                <strong role="cell">{row.label}</strong>
-                <span role="cell">{row.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="ppp-level-visual-band" aria-label="Pixel Pulse play experiences">
         <Image src={floorImage} alt="Interactive floor challenge at Pixel Pulse Play" width={520} height={360} />
         <Image src={shootingImage} alt="Target game at Pixel Pulse Play" width={520} height={360} />
         <div>
           <span>Every score counts</span>
-          <strong>Rewards are calibrated from real 60-minute visit behavior.</strong>
+          <strong>Keep earning points every time you play.</strong>
           <p>
-            Final point numbers should be clean and easy to display, but the ladder starts from the
-            real average points a normal guest earns in a standard visit.
+            Your scoreboard history powers your rewards profile, so return visits move you closer
+            to the next unlock.
           </p>
         </div>
       </section>
@@ -366,8 +319,7 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <span>Reward Ladder</span>
             <h2>From first win to birthday party reward.</h2>
             <p>
-              Thresholds are shown as calibration units until Pixel Pulse calculates the final public
-              point numbers from recent visit data.
+              Move through nine reward levels as your lifetime Pixel Pulse points grow.
             </p>
           </div>
           <div className="ppp-level-ladder">
@@ -387,27 +339,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
                 </article>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-level-section ppp-level-rules" id="rules">
-        <div className="ppp-level-inner ppp-level-rules__grid">
-          <div className="ppp-level-section__intro">
-            <span>Simple Rules</span>
-            <h2>Clear enough for guests. Controlled enough for staff.</h2>
-            <p>
-              The program should feel generous and exciting while keeping redemption rules visible,
-              consistent, and easy for the front desk to confirm.
-            </p>
-          </div>
-          <div className="ppp-level-rules__list">
-            {rules.map((rule) => (
-              <p key={rule}>
-                <FaCircleCheck aria-hidden="true" />
-                {rule}
-              </p>
-            ))}
           </div>
         </div>
       </section>
