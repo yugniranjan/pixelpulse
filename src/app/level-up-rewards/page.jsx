@@ -11,6 +11,7 @@ import {
   FaWallet,
 } from "react-icons/fa6";
 import RewardLookupForm from "@/components/RewardLookupForm";
+import { lookupRewardPlayers } from "@/lib/rewardLookup";
 import "../styles/level-up-rewards.css";
 
 const logo = "/assets/images/logoD.png";
@@ -146,7 +147,22 @@ export const metadata = {
   },
 };
 
-export default function LevelUpRewardsPage() {
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export default async function LevelUpRewardsPage({ searchParams = {} }) {
+  const initialIdentifier = String(searchParams.lookup || "").trim();
+  let initialPlayers = [];
+  let initialError = "";
+
+  if (initialIdentifier) {
+    try {
+      initialPlayers = await lookupRewardPlayers(initialIdentifier);
+    } catch (error) {
+      initialError = error.message || "Unable to find rewards.";
+    }
+  }
+
   return (
     <main className="ppp-level-page">
       <nav className="ppp-level-nav" aria-label="Level Up Rewards navigation">
@@ -182,7 +198,12 @@ export default function LevelUpRewardsPage() {
           </div>
         </div>
         <div className="ppp-level-hero__side">
-          <RewardLookupForm />
+          <RewardLookupForm
+            initialIdentifier={initialIdentifier}
+            initialPlayers={initialPlayers}
+            initialError={initialError}
+            initiallySearched={Boolean(initialIdentifier)}
+          />
         </div>
       </section>
 

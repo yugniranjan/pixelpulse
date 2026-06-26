@@ -153,14 +153,20 @@ function RulesPanel() {
   );
 }
 
-export default function RewardLookupForm() {
-  const [identifier, setIdentifier] = useState("");
-  const [players, setPlayers] = useState([]);
-  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+export default function RewardLookupForm({
+  initialIdentifier = "",
+  initialPlayers = [],
+  initialError = "",
+  initiallySearched = false,
+} = {}) {
+  const safeInitialPlayers = Array.isArray(initialPlayers) ? initialPlayers : [];
+  const [identifier, setIdentifier] = useState(initialIdentifier);
+  const [players, setPlayers] = useState(safeInitialPlayers);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(safeInitialPlayers[0]?.playerId || null);
   const [activeTab, setActiveTab] = useState("status");
-  const [searched, setSearched] = useState(false);
+  const [searched, setSearched] = useState(initiallySearched);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError);
 
   const selectedPlayer = useMemo(() => {
     if (!players.length) return null;
@@ -212,11 +218,12 @@ export default function RewardLookupForm() {
         <small>{selectedPlayer ? getLevelLabel(selectedPlayer.currentLevel) : "Guest"}</small>
       </div>
 
-      <form className="ppp-level-app__search" onSubmit={handleSubmit}>
+      <form className="ppp-level-app__search" method="get" onSubmit={handleSubmit}>
         <label htmlFor="reward-lookup-input">Name, email, phone, or Player ID</label>
         <div>
           <input
             id="reward-lookup-input"
+            name="lookup"
             value={identifier}
             onChange={(event) => setIdentifier(event.target.value)}
             placeholder="Player name, email, phone, or ID"
