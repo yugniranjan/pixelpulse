@@ -1455,6 +1455,36 @@
 }
 
 @media (max-width: 980px) {
+  .ppp-level-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+    height: auto;
+    padding: 1rem clamp(1rem, 5vw, 1.6rem);
+  }
+
+  .ppp-level-logo img {
+    width: clamp(128px, 26vw, 174px);
+  }
+
+  .ppp-level-nav__links {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
+  }
+
+  .ppp-level-nav__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ppp-level-nav__links a {
+    flex: 0 0 auto;
+    font-size: clamp(0.72rem, 2vw, 0.95rem);
+  }
+
   .ppp-level-hero,
   .ppp-level-how__grid,
   .ppp-level-calibration__grid,
@@ -1468,6 +1498,57 @@
     margin: 0;
   }
 
+  .ppp-level-hero__content,
+  .ppp-level-hero__side {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    padding: clamp(1.15rem, 5vw, 2.2rem);
+  }
+
+  .ppp-level-hero h1 {
+    max-width: 620px;
+    font-size: clamp(3.25rem, 12vw, 6rem);
+  }
+
+  .ppp-level-hero p {
+    max-width: 680px;
+    font-size: clamp(1rem, 3.2vw, 1.28rem);
+  }
+
+  .ppp-level-actions {
+    gap: 0.8rem;
+  }
+
+  .ppp-level-button {
+    min-width: min(280px, 100%);
+    min-height: 50px;
+  }
+
+  .ppp-level-app {
+    overflow-x: hidden;
+  }
+
+  .ppp-level-app__search > div,
+  .ppp-level-app__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-app__search button {
+    width: 100%;
+  }
+
+  .ppp-level-app__players,
+  .ppp-level-app__tabs {
+    max-width: 100%;
+  }
+
+  .ppp-level-app__view {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
   .ppp-level-highlight-grid,
   .ppp-level-ladder {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1478,26 +1559,26 @@
   }
 
   .ppp-level-reward-flow {
-    right: 1.25rem;
-    bottom: 1rem;
-    grid-template-columns: repeat(4, minmax(72px, 1fr));
-    width: calc(100% - 2.5rem);
-    opacity: 0.38;
-    transform: none;
+    display: none;
+  }
+
+  .ppp-level-reward-track,
+  .ppp-level-reward-pulse {
+    display: none;
+  }
+
+  .ppp-level-reward-motion::before {
+    opacity: 0.18;
   }
 }
 
 @media (max-width: 700px) {
   .ppp-level-nav {
-    align-items: flex-start;
-    flex-direction: column;
     gap: 0.75rem;
     padding: 0.8rem 1rem;
   }
 
   .ppp-level-nav__links {
-    width: 100%;
-    justify-content: space-between;
     gap: 0.45rem;
   }
 
@@ -1514,29 +1595,9 @@
     padding: 0;
   }
 
-  .ppp-level-hero__content,
-  .ppp-level-hero__side {
-    min-height: 0;
-    height: auto;
-    padding: 1.25rem;
-  }
-
   .ppp-level-hero h1 {
-    font-size: clamp(2.5rem, 14vw, 3.8rem);
-  }
-
-  .ppp-level-reward-track {
-    top: 1.25rem;
-    left: 1rem;
-    right: 1rem;
-    gap: 0.25rem;
-    opacity: 0.32;
-  }
-
-  .ppp-level-reward-track span {
-    min-width: 24px;
-    height: 24px;
-    font-size: 0.72rem;
+    max-width: 360px;
+    font-size: clamp(2.75rem, 16vw, 4.25rem);
   }
 
   .ppp-level-reward-flow,
@@ -1554,15 +1615,6 @@
 
   .ppp-level-command-strip {
     grid-template-columns: 1fr;
-  }
-
-  .ppp-level-app__search > div,
-  .ppp-level-app__stats {
-    grid-template-columns: 1fr;
-  }
-
-  .ppp-level-app__search button {
-    width: 100%;
   }
 
   .ppp-level-app__topbar,
