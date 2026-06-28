@@ -224,6 +224,10 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
         ))}
       </div>
 
+      <div className="ppp-party-private-disclaimer">
+        <strong>Birthday package note:</strong> Birthday party packages should not be treated as private parties. They do not include private-party privileges or reserve the entire facility/play area.
+      </div>
+
       {parsedData.standard_rules?.length > 0 && (
         <>
         <section className="ppp-party-cta-band">
