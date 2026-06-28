@@ -556,6 +556,19 @@
   margin-top: 8px;
 }
 
+.ppp-bday-booking-page .ppp-birthday-hero-form__note a {
+  display: inline-block;
+  margin: 4px 0 0 4px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--lime, #bcff6b) 48%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lime, #bcff6b) 16%, transparent);
+  color: var(--lime, #bcff6b);
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
 /* Date/time inputs use one visible custom icon; the native picker remains the full click target. */
 .ppp-bday-booking-page .ppp-birthday-hero-form input[type="date"] {
   position: relative;

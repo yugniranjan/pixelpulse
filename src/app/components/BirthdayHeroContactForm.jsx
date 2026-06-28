@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-const PRIVATE_PARTY_EMAIL = "connect@pixelpulseplay.ca";
-const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
+const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
 const birthdayPackageNotice =
   "Birthday party packages do not include private-party privileges or reserve the entire facility/play area.";
 
@@ -207,7 +206,10 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
         <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
           {isPrivatePartySelected ? (
-            `Looking for a private party? Please call ${PRIVATE_PARTY_PHONE} or email ${PRIVATE_PARTY_EMAIL} so our team can confirm availability and details directly.`
+            <>
+              Looking for a private party?{" "}
+              <a href={CONTACT_FORM_URL}>Send a private-party request</a>
+            </>
           ) : (
             <>
               <span>
@@ -216,8 +218,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
               </span>
               <span>
                 <strong>Birthday package note:</strong> {birthdayPackageNotice}{" "}
-                For a private party, please call {PRIVATE_PARTY_PHONE} or email{" "}
-                {PRIVATE_PARTY_EMAIL}.
+                <a href={CONTACT_FORM_URL}>Send a private-party request</a>
               </span>
             </>
           )}
