@@ -7,6 +7,10 @@ const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
+const PRIVATE_PARTY_EMAIL = CONTACT_EMAIL;
+const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
+const BIRTHDAY_PACKAGE_NOTICE =
+  "Disclaimer: Birthday party packages should not be treated as private parties. They do not include private-party privileges and do not reserve the entire facility or play area.";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitBuckets = new Map();
@@ -52,6 +56,10 @@ function escapeHtml(value) {
     ?.replace(/&/g, "&amp;")
     ?.replace(/</g, "&lt;")
     ?.replace(/>/g, "&gt;");
+}
+
+function includesText(value, needle) {
+  return String(value || "").toLowerCase().includes(needle);
 }
 
 function getRequestHost(value) {
@@ -253,6 +261,33 @@ export async function POST(request) {
     ].join("\n");
 
     const safeName = escapeHtml(fullName || "there");
+    const isBirthdayInquiry =
+      includesText(selectedEvent, "birthday") ||
+      includesText(selectedEvent, "birth") ||
+      includesText(from, "birthday");
+    const isPrivatePartyInquiry =
+      includesText(selectedEvent, "private") ||
+      includesText(selectedPackage, "private") ||
+      includesText(message, "private party");
+    const isBirthdayPackageInquiry = isBirthdayInquiry && !isPrivatePartyInquiry;
+    const autoReplyPrivatePartyText = isBirthdayPackageInquiry
+      ? [
+          "",
+          "Are you looking for a private party?",
+          BIRTHDAY_PACKAGE_NOTICE,
+          `For private-party access, please contact us directly at ${PRIVATE_PARTY_PHONE} or ${PRIVATE_PARTY_EMAIL} so our team can confirm availability and details.`,
+        ]
+      : [];
+    const autoReplyPrivatePartyHtml = isBirthdayPackageInquiry
+      ? `
+              <div style="margin:18px 0 14px;padding:16px;border-radius:18px;background:rgba(251,174,123,0.1);border:1px solid rgba(251,174,123,0.24);">
+                <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fbae7b;font-weight:800;">Are you looking for a private party?</div>
+                <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
+                  ${BIRTHDAY_PACKAGE_NOTICE} For private-party access, please contact us directly at <a href="tel:+19057602922" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_PHONE}</a> or <a href="mailto:${PRIVATE_PARTY_EMAIL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_EMAIL}</a> so our team can confirm availability and details.
+                </p>
+              </div>
+        `
+      : "";
 
     const html = `
       <div>
@@ -301,6 +336,7 @@ export async function POST(request) {
         "- We review your message",
         "- We follow up with the right next steps or booking details",
         "- We help you plan the smoothest visit possible",
+        ...autoReplyPrivatePartyText,
         "",
         `Explore attractions: ${ATTRACTIONS_URL}`,
         "",
@@ -325,11 +361,11 @@ export async function POST(request) {
               <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
                 Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play Zone</strong>.
               </p>
-                   <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
+              <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
                We will get back to you within 24 hours.
               </p>
 
-             
+              ${autoReplyPrivatePartyHtml}
 
               <div style="margin-top:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
                 <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Explore the experience</div>

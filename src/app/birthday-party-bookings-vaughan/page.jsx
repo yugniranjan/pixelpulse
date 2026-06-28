@@ -22,14 +22,14 @@ export const revalidate = 900;
 export const metadata = {
   title: "Kids & Teens Birthday Party Bookings Vaughan | Pixel Pulse Play",
   description:
-    "Book a kids, tweens, or teens birthday party in Vaughan with interactive challenge rooms, hosted gameplay, private party rooms, and high-energy indoor fun.",
+    "Book a kids, tweens, or teens birthday party in Vaughan with interactive challenge rooms, hosted gameplay, dedicated party rooms, and high-energy indoor fun.",
   alternates: {
     canonical: pageUrl,
   },
   openGraph: {
     title: "Kids & Teens Birthday Party Bookings Vaughan | Pixel Pulse Play",
     description:
-      "A high-energy birthday party in Vaughan with real-life gaming, interactive challenge rooms, hosted competitions, and private party rooms.",
+      "A high-energy birthday party in Vaughan with real-life gaming, interactive challenge rooms, hosted competitions, and dedicated party rooms.",
     url: pageUrl,
     images: [
       {
@@ -76,7 +76,7 @@ const highlights = [
     text: "Hosted gameplay keeps the group organized, moving, and fully engaged.",
   },
   {
-    title: "Private party rooms",
+    title: "Dedicated party rooms",
     text: "Celebrate, eat, open gifts, and take photos together after the games.",
   },
   {
@@ -368,6 +368,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
           <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
             <p>Party packages</p>
             <h2>Pick the birthday <em>package</em> that fits your group.</h2>
+            <span className="ppp-bday-package-note">
+              Birthday party packages include the listed party experience and room time. They do not reserve the entire facility or play area for private use.
+            </span>
           </div>
           <div className="ppp-bday-package-grid">
             {packageList.map((pkg, index) => (
@@ -400,7 +403,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
           <div className="ppp-bday-private-band__inner">
             <div className="ppp-bday-private-band__content">
               <h2 id="private-party-banner-title">Planning a Private Party?</h2>
-              <p>Enjoy exclusive access to all challenge rooms, non-stop fun for your group.</p>
+              <p>Private-party access is handled by direct request so our team can confirm availability, timing, and group details with you.</p>
             </div>
             <div className="ppp-bday-private-band__actions">
               <a href={phoneUrl}>Call: 905-760-2922</a>

@@ -8,7 +8,10 @@ import { toast } from "sonner";
 import TurnstileWidget from "./TurnstileWidget";
 
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
+const CONTACT_PHONE = "+1 (905) 760-2922";
 const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+const birthdayPackageNotice =
+  "Birthday party packages include a hosted party experience and party room time, but they do not reserve the entire facility or play area for private use.";
 
 function ContactForm() {
   const router = useRouter();
@@ -27,6 +30,8 @@ function ContactForm() {
     message: "",
     selectedEvent: "",
   });
+  const isBirthdayInquiry = formData.selectedEvent === "BirthDay";
+  const isPrivatePartyInquiry = formData.selectedEvent === "Private Party";
   useEffect(() => {
     const currentUrl = window.location.href;
     const pathSegments = new URL(currentUrl).pathname.split("/");
@@ -202,6 +207,16 @@ function ContactForm() {
               <option value="Fund Raisers">Fund Raisers</option>
               <option value="Others">Others</option>
             </select>
+            {isBirthdayInquiry ? (
+              <p className="ppp-contact-form__note">
+                <strong>Birthday package note:</strong> {birthdayPackageNotice} If you are looking for a private party, choose Private Party or contact us directly by phone or email.
+              </p>
+            ) : null}
+            {isPrivatePartyInquiry ? (
+              <p className="ppp-contact-form__note">
+                For private-party access, send us your preferred date, group size, and timing. You can also call {CONTACT_PHONE} or email {CONTACT_EMAIL}.
+              </p>
+            ) : null}
           </div>
 
           <div className="form-group form-group--full">

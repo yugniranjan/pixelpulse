@@ -23,7 +23,7 @@ const page = () => {
             <h1 className="aero_contact-mainheading">Let&apos;s Plan Your Visit</h1>
             <p className="ppp-contact-hero__text">
               Reach out for birthday parties, group bookings, fundraisers,
-              or anything else you want to plan with the Pixel Pulse Play team.
+              private-party requests, or anything else you want to plan with the Pixel Pulse Play team.
             </p>
             <div className="ppp-contact-hero__details" aria-label="Contact details">
               <div className="ppp-contact-hero__detail">
@@ -56,7 +56,7 @@ const page = () => {
               Contact <span>Us</span>
             </SectionHeading>
             <p className="ppp-contact-card__text">
-              Fields marked with * are required. Please include as much detail as you can so we can help faster.
+              Fields marked with * are required. Birthday packages are not private facility bookings; for private-party access, choose Private Party and include your group size, date, and timing.
             </p>
             <ContactForm />
           </article>

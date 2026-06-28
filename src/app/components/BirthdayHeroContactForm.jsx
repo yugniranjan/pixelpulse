@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+const PRIVATE_PARTY_EMAIL = "connect@pixelpulseplay.ca";
+const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
+const birthdayPackageNotice =
+  "Birthday party packages do not include private-party privileges or reserve the entire facility/play area.";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -203,11 +207,18 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
         <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
           {isPrivatePartySelected ? (
-            "Enjoy exclusive access to all challenge rooms, non-stop fun for your group."
+            `Looking for a private party? Please call ${PRIVATE_PARTY_PHONE} or email ${PRIVATE_PARTY_EMAIL} so our team can confirm availability and details directly.`
           ) : (
             <>
-              Each additional participant beyond your package is charged{" "}
-              <strong>$14.99</strong>, paid at the venue.
+              <span>
+                Each additional participant beyond your package is charged{" "}
+                <strong>$14.99</strong>, paid at the venue.
+              </span>
+              <span>
+                <strong>Birthday package note:</strong> {birthdayPackageNotice}{" "}
+                For a private party, please call {PRIVATE_PARTY_PHONE} or email{" "}
+                {PRIVATE_PARTY_EMAIL}.
+              </span>
             </>
           )}
         </p>
