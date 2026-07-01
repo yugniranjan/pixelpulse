@@ -51,6 +51,7 @@ export default function AdminInvitesPage() {
     intro: DEFAULT_PARTY_INTRO,
     date: "",
     time: "",
+    partyEndTime: "",
     venue: "Pixel Pulse Playzone",
     address: DEFAULT_ADDRESS,
     directionsLink: DEFAULT_DIRECTIONS_LINK,
@@ -283,6 +284,7 @@ export default function AdminInvitesPage() {
       intro: invite.intro || "",
       date: invite.date || "",
       time: invite.time || "",
+      partyEndTime: invite.partyEndTime || "",
       venue: invite.venue || "",
       address: invite.address || "",
       waiverText: invite.waiverText || "",
@@ -392,8 +394,11 @@ export default function AdminInvitesPage() {
             <Field label="Date" required>
               <input required type="date" value={form.date} onChange={(event) => updateField("date", event.target.value)} />
             </Field>
-            <Field label="Time" required>
+            <Field label="Party Start Time" required>
               <input required type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
+            </Field>
+            <Field label="Party End Time">
+              <input type="time" value={form.partyEndTime} onChange={(event) => updateField("partyEndTime", event.target.value)} />
             </Field>
             <Field label="Play Duration">
               <input value={form.playDuration} onChange={(event) => updateField("playDuration", event.target.value)} placeholder="60 / 90 / 120 Minutes" />
@@ -554,8 +559,11 @@ export default function AdminInvitesPage() {
                 <Field label="Date" required>
                   <input required type="date" value={editingInvite.date} onChange={(event) => updateEditingInvite("date", event.target.value)} />
                 </Field>
-                <Field label="Time" required>
+                <Field label="Party Start Time" required>
                   <input required type="time" value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} />
+                </Field>
+                <Field label="Party End Time">
+                  <input type="time" value={editingInvite.partyEndTime} onChange={(event) => updateEditingInvite("partyEndTime", event.target.value)} />
                 </Field>
                 <Field label="Play Duration">
                   <input value={editingInvite.playDuration} onChange={(event) => updateEditingInvite("playDuration", event.target.value)} />
