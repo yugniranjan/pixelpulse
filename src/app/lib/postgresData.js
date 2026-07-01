@@ -49,9 +49,9 @@ function normalizeBlogRow(row = {}) {
   };
 }
 
-function normalizeWaiverRow(row = {}) {
+function normalizeWaiverRow(row = {}, { includeSignature = true } = {}) {
   const raw = row.raw || {};
-  return {
+  const waiver = {
     id: row.id,
     ...raw,
     primary: row.primary_participant || raw.primary || {},
@@ -59,7 +59,7 @@ function normalizeWaiverRow(row = {}) {
     visit: row.visit || raw.visit || {},
     checks: row.checks || raw.checks || {},
     attractions: row.attractions || raw.attractions || [],
-    signatureDataUrl: row.signature_data_url || raw.signatureDataUrl || "",
+    signatureDataUrl: includeSignature ? row.signature_data_url || raw.signatureDataUrl || "" : "",
     participantCount: row.participant_count || raw.participantCount || 1,
     primaryName: row.primary_name || raw.primaryName || "",
     source: row.source || raw.source || "",
@@ -67,6 +67,13 @@ function normalizeWaiverRow(row = {}) {
     submittedAt: iso(row.submitted_at || raw.submittedAt),
     updatedAt: iso(row.updated_at || raw.updatedAt),
   };
+
+  if (!includeSignature) {
+    delete waiver.signatureDataUrl;
+    if (waiver.raw?.signatureDataUrl) delete waiver.raw.signatureDataUrl;
+  }
+
+  return waiver;
 }
 
 function normalizeInviteRow(row = {}) {
@@ -182,12 +189,17 @@ export async function getPostgresAdminByEmail(email) {
   };
 }
 
-export async function listPostgresWaivers(limit = 1000) {
+export async function listPostgresWaivers(limit = 300, { includeSignature = false } = {}) {
   const result = await query(
     "select * from waivers order by submitted_at desc nulls last limit $1",
     [limit],
   );
-  return result.rows.map(normalizeWaiverRow);
+  return result.rows.map((row) => normalizeWaiverRow(row, { includeSignature }));
+}
+
+export async function getPostgresWaiverById(id) {
+  const result = await query("select * from waivers where id = $1", [id]);
+  return result.rows[0] ? normalizeWaiverRow(result.rows[0], { includeSignature: true }) : null;
 }
 
 export async function getPostgresWaiverByEmail(email) {

@@ -378,7 +378,7 @@ export default function AdminInvitesPage() {
             <Field label="Address">
               <input value={form.address} onChange={(event) => updateField("address", event.target.value)} />
             </Field>
-            <Field label="RSVP name" required>
+            <Field label="Parent / Party Host Name" required>
               <input required value={form.rsvpName} onChange={(event) => updateField("rsvpName", event.target.value)} placeholder="Parent or guardian name" />
             </Field>
             <Field label="RSVP phone" required>
@@ -480,7 +480,7 @@ export default function AdminInvitesPage() {
                 <Field label="Time" required>
                   <input required type="time" value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} />
                 </Field>
-                <Field label="RSVP name" required>
+                <Field label="Parent / Party Host Name" required>
                   <input required value={editingInvite.rsvpName} onChange={(event) => updateEditingInvite("rsvpName", event.target.value)} />
                 </Field>
                 <Field label="RSVP phone" required>

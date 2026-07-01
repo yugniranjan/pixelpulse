@@ -142,13 +142,48 @@ async function listInvites() {
 }
 
 function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
+  const hostName = invite.rsvpName || "Party Host";
+  const childName = invite.childName || "the birthday child";
+  const partyPackage = invite.titleSuffix || invite.title || "Birthday Party Package";
+  const venue = invite.venue || "Pixel Pulse PlayZone";
+  const address = invite.address || DEFAULT_ADDRESS;
+  const website = invite.websiteLink || "https://www.pixelpulseplay.ca";
+  const phone = invite.businessPhone || "+1 (905) 760-2922";
+
   return [
-    invite.intro,
-    `${invite.dateLabel || "Date"}: ${invite.date}`,
-    `${invite.timeLabel || "Time"}: ${invite.time}`,
-    `${invite.addressLabel || "Address"}: ${invite.address}`,
+    "Subject: Your Pixel Pulse Birthday Party is Confirmed",
+    "",
+    `Dear ${hostName},`,
+    `Thank you for choosing Pixel Pulse Play to celebrate ${childName}'s special day. We cannot wait to make it unforgettable!`,
+    "",
+    "Your Party Details",
+    `Party ID: ${invite.partyId || "As confirmed"}`,
+    `Party Date: ${invite.date || "As confirmed"}`,
+    `Party Start Time: ${invite.time || "As confirmed"}`,
+    `Party Package: ${partyPackage}`,
+    "Play Duration / Children Included / Food & Add-ons: As confirmed in your booking.",
     `Invite: ${inviteUrl}`,
     `Waiver: ${waiverLink}`,
+    "",
+    "Important Information - Please Read",
+    "1. Scheduled party package: This booking is during regular operating hours and is not a private facility rental. Other guests or walk-in visitors may be in the facility. For private-party pricing and availability, please contact us.",
+    "2. Challenge rooms run one group at a time. Children stay with their own group and may wait briefly if a room is occupied. Staff will guide rotations.",
+    "3. Safety: Our team supervises activities, monitors the facility, and helps children throughout the experience.",
+    "4. Equipment & behaviour: Please follow staff instructions, use equipment appropriately, keep food/drinks in designated areas, and avoid unsafe or disruptive behaviour. Deliberate damage may result in repair or replacement charges to the party host.",
+    "5. Waivers & arrival: Please complete waivers before arrival and arrive 15 minutes early. Late arrivals may reduce play time because parties run on schedule.",
+    "6. Clothing: Comfortable clothing and closed-toe shoes are recommended for active play.",
+    "",
+    "Questions?",
+    "FAQs: https://www.pixelpulseplay.ca/faqs",
+    `Website: ${website}`,
+    `Phone: ${phone}`,
+    `${venue}`,
+    address,
+    "",
+    `We look forward to welcoming ${childName} and your guests for an exciting day of challenges, games, and unforgettable memories!`,
+    "Warm regards,",
+    "The Pixel Pulse Team",
+    '"Leave the Screen. Enter the Challenge."',
   ].filter(Boolean).join("\n");
 }
 

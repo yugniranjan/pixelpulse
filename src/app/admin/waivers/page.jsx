@@ -172,64 +172,98 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
 
 function WaiverCard({ waiver, onDelete, onEdit }) {
   const [open, setOpen] = useState(false);
-  const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
+  const [fullWaiver, setFullWaiver] = useState(waiver);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
+  const activeWaiver = fullWaiver || waiver;
+  const familyMembers = Array.isArray(activeWaiver.familyMembers) ? activeWaiver.familyMembers : [];
   const { children, additionalAdults } = splitFamilyMembers(familyMembers);
-  const attractions = Array.isArray(waiver.attractions) ? waiver.attractions : [];
+  const attractions = Array.isArray(activeWaiver.attractions) ? activeWaiver.attractions : [];
+
+  async function toggleOpen() {
+    const nextOpen = !open;
+    setOpen(nextOpen);
+
+    if (!nextOpen || activeWaiver.signatureDataUrl || loadingDetails) return;
+
+    setLoadingDetails(true);
+    setDetailsError("");
+
+    try {
+      const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(waiver.id)}`, {
+        cache: "no-store",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setDetailsError(data.error || "Unable to load waiver details.");
+        return;
+      }
+
+      setFullWaiver(data.waiver || waiver);
+    } catch (error) {
+      setDetailsError("Unable to load waiver details.");
+    } finally {
+      setLoadingDetails(false);
+    }
+  }
 
   return (
     <article className="waiver-admin-card">
-      <button type="button" className="waiver-admin-card__summary" onClick={() => setOpen((current) => !current)}>
+      <button type="button" className="waiver-admin-card__summary" onClick={toggleOpen}>
         <span>
-          <strong>Parent / Guardian: {waiver.primaryName || participantName(waiver.primary)}</strong>
-          <em>{waiver.primary?.email || "No email"}</em>
+          <strong>Parent / Guardian: {activeWaiver.primaryName || participantName(activeWaiver.primary)}</strong>
+          <em>{activeWaiver.primary?.email || "No email"}</em>
         </span>
         <span>
           <strong>{children.length || "No"} child{children.length === 1 ? "" : "ren"}</strong>
           <em>{relationshipSummary(children)}</em>
         </span>
         <span>
-          <strong>{waiver.visit?.partyId || "No party ID"}</strong>
-          <em>{waiver.visit?.visitDate || "No visit date"}</em>
+          <strong>{activeWaiver.visit?.partyId || "No party ID"}</strong>
+          <em>{activeWaiver.visit?.visitDate || "No visit date"}</em>
         </span>
         <span>
-          <strong>{waiver.participantCount || 1}</strong>
+          <strong>{activeWaiver.participantCount || 1}</strong>
           <em>Participants</em>
         </span>
         <span>
-          <strong>{formatDateTime(waiver.submittedAt)}</strong>
+          <strong>{formatDateTime(activeWaiver.submittedAt)}</strong>
           <em>Submitted</em>
         </span>
       </button>
 
       {open ? (
         <div className="waiver-admin-card__details">
+          {loadingDetails ? <p className="waiver-admin-state">Loading signature details...</p> : null}
+          {detailsError ? <p className="waiver-admin-error">{detailsError}</p> : null}
           <section>
             <h2>Parent / Guardian</h2>
             <dl>
-              <div><dt>Full legal name</dt><dd>{participantName(waiver.primary)}</dd></div>
-              <div><dt>DOB</dt><dd>{waiver.primary?.dob || "Not provided"}</dd></div>
-              <div><dt>Gender</dt><dd>{waiver.primary?.gender || "Not provided"}</dd></div>
-              <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
-              <div><dt>Phone</dt><dd>{waiver.primary?.phone || "Not provided"}</dd></div>
-              <div><dt>City</dt><dd>{waiver.primary?.city || "Not provided"}</dd></div>
-              <div><dt>Health condition</dt><dd>{waiver.primary?.healthCondition || "Not Applicable"}</dd></div>
-              <div><dt>Medical notes</dt><dd>{waiver.primary?.medicalNotes || "None"}</dd></div>
+              <div><dt>Full legal name</dt><dd>{participantName(activeWaiver.primary)}</dd></div>
+              <div><dt>DOB</dt><dd>{activeWaiver.primary?.dob || "Not provided"}</dd></div>
+              <div><dt>Gender</dt><dd>{activeWaiver.primary?.gender || "Not provided"}</dd></div>
+              <div><dt>Email</dt><dd>{activeWaiver.primary?.email || "Not provided"}</dd></div>
+              <div><dt>Phone</dt><dd>{activeWaiver.primary?.phone || "Not provided"}</dd></div>
+              <div><dt>City</dt><dd>{activeWaiver.primary?.city || "Not provided"}</dd></div>
+              <div><dt>Health condition</dt><dd>{activeWaiver.primary?.healthCondition || "Not Applicable"}</dd></div>
+              <div><dt>Medical notes</dt><dd>{activeWaiver.primary?.medicalNotes || "None"}</dd></div>
             </dl>
           </section>
 
           <section>
             <h2>Visit</h2>
             <dl>
-              <div><dt>Pass</dt><dd>{waiver.visit?.passType || "Not provided"}</dd></div>
-              <div><dt>Party ID</dt><dd>{waiver.visit?.partyId || "Not provided"}</dd></div>
-              <div><dt>Party name</dt><dd>{waiver.visit?.partyName || "Not provided"}</dd></div>
-              <div><dt>Visit date</dt><dd>{waiver.visit?.visitDate || "Not provided"}</dd></div>
-              <div><dt>Party time</dt><dd>{waiver.visit?.visitTime || "Not provided"}</dd></div>
-              <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
-              <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
-              <div><dt>Emergency phone</dt><dd>{waiver.visit?.emergencyPhone || "Not provided"}</dd></div>
-              <div><dt>Printed name</dt><dd>{waiver.visit?.printName || "Not provided"}</dd></div>
-              <div><dt>Signed date</dt><dd>{waiver.visit?.signDate || "Not provided"}</dd></div>
+              <div><dt>Pass</dt><dd>{activeWaiver.visit?.passType || "Not provided"}</dd></div>
+              <div><dt>Party ID</dt><dd>{activeWaiver.visit?.partyId || "Not provided"}</dd></div>
+              <div><dt>Party name</dt><dd>{activeWaiver.visit?.partyName || "Not provided"}</dd></div>
+              <div><dt>Visit date</dt><dd>{activeWaiver.visit?.visitDate || "Not provided"}</dd></div>
+              <div><dt>Party time</dt><dd>{activeWaiver.visit?.visitTime || "Not provided"}</dd></div>
+              <div><dt>Emergency contact</dt><dd>{activeWaiver.visit?.emergencyName || "Not provided"}</dd></div>
+              <div><dt>Relationship</dt><dd>{activeWaiver.visit?.emergencyRelation || "Not provided"}</dd></div>
+              <div><dt>Emergency phone</dt><dd>{activeWaiver.visit?.emergencyPhone || "Not provided"}</dd></div>
+              <div><dt>Printed name</dt><dd>{activeWaiver.visit?.printName || "Not provided"}</dd></div>
+              <div><dt>Signed date</dt><dd>{activeWaiver.visit?.signDate || "Not provided"}</dd></div>
             </dl>
           </section>
 
@@ -276,18 +310,18 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
 
           <section className="waiver-admin-card__wide">
             <h2>Signature</h2>
-            {waiver.signatureDataUrl ? (
-              <img className="waiver-admin-signature" src={waiver.signatureDataUrl} alt={`Signature for ${waiver.primaryName || "waiver"}`} />
+            {activeWaiver.signatureDataUrl ? (
+              <img className="waiver-admin-signature" src={activeWaiver.signatureDataUrl} alt={`Signature for ${activeWaiver.primaryName || "waiver"}`} />
             ) : (
-              <p>No signature image saved.</p>
+              <p>{loadingDetails ? "Checking signature..." : "No signature image saved."}</p>
             )}
           </section>
 
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Record Actions</h2>
             <div>
-              <button type="button" onClick={() => onEdit(waiver)}>Edit Record</button>
-              <button type="button" className="is-danger" onClick={() => onDelete(waiver)}>Delete Record</button>
+              <button type="button" onClick={() => onEdit(activeWaiver)}>Edit Record</button>
+              <button type="button" className="is-danger" onClick={() => onDelete(activeWaiver)}>Delete Record</button>
             </div>
           </section>
         </div>
@@ -410,7 +444,7 @@ export default function AdminWaiversPage() {
       setError("");
 
       try {
-        const response = await fetch("/api/admin/waivers", { cache: "no-store" });
+        const response = await fetch("/api/admin/waivers?limit=300", { cache: "no-store" });
         const data = await response.json();
 
         if (!response.ok) {
@@ -731,7 +765,7 @@ export default function AdminWaiversPage() {
           <>
             <div className="waiver-admin-stats" aria-label="Waiver summary">
               <article>
-                <span>Total Waivers</span>
+                <span>Loaded Waivers</span>
                 <strong>{waivers.length}</strong>
               </article>
               <article>
@@ -788,7 +822,7 @@ export default function AdminWaiversPage() {
                     <h2>Recent Waiver Submissions</h2>
                     <p>
                       Showing {firstVisibleRecord}-{lastVisibleRecord} of {filteredWaivers.length}
-                      {filteredWaivers.length === waivers.length ? " records" : ` filtered records from ${waivers.length} total`}
+                      {filteredWaivers.length === waivers.length ? " loaded records" : ` filtered records from ${waivers.length} loaded`}
                     </p>
                   </div>
                   <div className="waiver-data-filters">

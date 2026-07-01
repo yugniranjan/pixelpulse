@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import {
   deletePostgresWaiver,
+  getPostgresWaiverById,
   hasPostgres,
   listPostgresWaivers,
   updatePostgresWaiver,
@@ -17,14 +18,21 @@ function serializeDate(value) {
   return String(value);
 }
 
-function serializeWaiver(doc) {
+function serializeWaiver(doc, { includeSignature = true } = {}) {
   const data = doc.data();
-  return {
+  const waiver = {
     id: doc.id,
     ...data,
+    signatureDataUrl: includeSignature ? data.signatureDataUrl || "" : undefined,
     submittedAt: serializeDate(data.submittedAt),
     updatedAt: serializeDate(data.updatedAt),
   };
+
+  if (!includeSignature) {
+    delete waiver.signatureDataUrl;
+  }
+
+  return waiver;
 }
 
 function cleanText(value = "") {
@@ -39,9 +47,20 @@ function getWaiverId(req) {
   return new URL(req.url).searchParams.get("id")?.trim();
 }
 
-export async function GET() {
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id")?.trim();
+  const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 300, 1), 1000);
+
   if (hasPostgres()) {
-    return NextResponse.json({ waivers: await listPostgresWaivers(1000) });
+    if (id) {
+      const waiver = await getPostgresWaiverById(id);
+      return waiver
+        ? NextResponse.json({ waiver })
+        : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ waivers: await listPostgresWaivers(limit, { includeSignature: false }) });
   }
 
   if (!db) {
@@ -51,14 +70,21 @@ export async function GET() {
     );
   }
 
+  if (id) {
+    const snapshot = await db.collection("waivers").doc(id).get();
+    return snapshot.exists
+      ? NextResponse.json({ waiver: serializeWaiver(snapshot, { includeSignature: true }) })
+      : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
+  }
+
   const snapshot = await db
     .collection("waivers")
     .orderBy("submittedAt", "desc")
-    .limit(1000)
+    .limit(limit)
     .get();
 
   return NextResponse.json({
-    waivers: snapshot.docs.map(serializeWaiver),
+    waivers: snapshot.docs.map((doc) => serializeWaiver(doc, { includeSignature: false })),
   });
 }
 
@@ -141,6 +167,11 @@ export async function PUT(req) {
 }
 
 export async function DELETE(req) {
+  const id = getWaiverId(req);
+  if (!id) {
+    return NextResponse.json({ error: "Waiver ID is required." }, { status: 400 });
+  }
+
   if (hasPostgres()) {
     const deleted = await deletePostgresWaiver(id);
     return deleted
@@ -153,11 +184,6 @@ export async function DELETE(req) {
       { error: "Firestore is not configured." },
       { status: 503 },
     );
-  }
-
-  const id = getWaiverId(req);
-  if (!id) {
-    return NextResponse.json({ error: "Waiver ID is required." }, { status: 400 });
   }
 
   const ref = db.collection("waivers").doc(id);

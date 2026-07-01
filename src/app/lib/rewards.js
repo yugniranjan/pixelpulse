@@ -1,20 +1,20 @@
 import { getPostgresPool, query } from "@/lib/postgres";
-
-const DEFAULT_AVERAGE_VISIT_POINTS = Number(process.env.REWARD_AVG_VISIT_POINTS || 1000);
+import crypto from "crypto";
 
 const DEFAULT_LEVELS = [
-  [1, 3, "Pixel Pulse starter reward", "starter"],
-  [2, 5, "Merchandise item", "merch"],
-  [3, 8, "60-minute visit pass", "play_pass"],
-  [4, 12, "Pixel Pulse water bottle", "merch"],
-  [5, 18, "Store credit reward", "store_credit"],
-  [6, 25, "80-minute visit pass", "play_pass"],
-  [7, 35, "Premium merchandise", "merch"],
-  [8, 50, "VIP rewards bundle", "vip_bundle"],
-  [9, 75, "Birthday party reward", "birthday_party"],
-].map(([levelNumber, multiplier, rewardName, rewardType]) => ({
+  [1, 5_000, "10 Arcade Credits", "arcade_credits"],
+  [2, 12_000, "20 Arcade Credits", "arcade_credits"],
+  [3, 20_000, "Free Slushie or Snack", "snack"],
+  [4, 35_000, "30 Bonus Minutes (Weekday Only)", "bonus_minutes"],
+  [5, 50_000, "FREE VR Game 30 mins", "vr_game"],
+  [6, 70_000, "Friend Pass (Bring a Friend for 30 mins)", "friend_pass"],
+  [7, 90_000, "Free Upgrade to 90-Min Pass", "upgrade"],
+  [8, 120_000, "FREE 60-Minute Pass", "play_pass"],
+  [9, 160_000, "FREE 90-Minute Pass", "play_pass"],
+  [10, 250_000, "Pixel Pulse VIP Member", "vip_status"],
+].map(([levelNumber, thresholdPoints, rewardName, rewardType]) => ({
   levelNumber,
-  thresholdPoints: Math.round(DEFAULT_AVERAGE_VISIT_POINTS * multiplier),
+  thresholdPoints,
   rewardName,
   rewardType,
 }));
@@ -108,19 +108,228 @@ export async function ensureRewardsTables() {
     create index if not exists players_last_name_lower_idx
       on public."Players" (lower(coalesce("LastName", '')))
   `);
+  await query(`
+    create table if not exists reward_members (
+      id bigserial primary key,
+      full_name text not null,
+      email text not null,
+      phone text,
+      age integer,
+      email_verified boolean not null default false,
+      email_verified_at timestamptz,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now(),
+      raw jsonb not null default '{}'::jsonb
+    )
+  `);
+  await query(`
+    create unique index if not exists reward_members_email_lower_idx
+      on reward_members (lower(email))
+  `);
+  await query(`
+    create index if not exists reward_members_phone_idx
+      on reward_members (phone)
+  `);
+  await query(`
+    create table if not exists reward_email_verifications (
+      id uuid primary key default gen_random_uuid(),
+      member_id bigint not null references reward_members(id) on delete cascade,
+      email text not null,
+      code_hash text not null,
+      expires_at timestamptz not null,
+      consumed_at timestamptz,
+      created_at timestamptz not null default now()
+    )
+  `);
+  await query(`
+    create index if not exists reward_email_verifications_member_idx
+      on reward_email_verifications (member_id, created_at desc)
+  `);
 
   for (const level of DEFAULT_LEVELS) {
     await query(
       `
         insert into reward_levels (level_number, threshold_points, reward_name, reward_type)
         values ($1, $2, $3, $4)
-        on conflict (level_number) do nothing
+        on conflict (level_number) do update set
+          threshold_points = excluded.threshold_points,
+          reward_name = excluded.reward_name,
+          reward_type = excluded.reward_type,
+          active = true,
+          updated_at = now()
       `,
       [level.levelNumber, level.thresholdPoints, level.rewardName, level.rewardType],
     );
   }
 
   tablesReady = true;
+}
+
+function normalizePhone(value = "") {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function normalizeEmail(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
+function hashVerificationCode(code = "") {
+  return crypto.createHash("sha256").update(String(code)).digest("hex");
+}
+
+function normalizeRewardMember(row = {}) {
+  return {
+    id: Number(row.id || 0),
+    fullName: row.full_name || "",
+    email: row.email || "",
+    phone: row.phone || "",
+    age: row.age === null || row.age === undefined ? null : Number(row.age),
+    emailVerified: Boolean(row.email_verified),
+    emailVerifiedAt: iso(row.email_verified_at),
+    createdAt: iso(row.created_at),
+    updatedAt: iso(row.updated_at),
+  };
+}
+
+export async function registerRewardMember({ fullName = "", email = "", phone = "", age = null } = {}) {
+  if (!hasPostgres()) {
+    const error = new Error("Rewards registration is not available right now.");
+    error.status = 503;
+    throw error;
+  }
+
+  await ensureRewardsTables();
+
+  const cleanName = String(fullName || "").replace(/\s+/g, " ").trim();
+  const cleanEmail = normalizeEmail(email);
+  const cleanPhone = String(phone || "").trim();
+  const cleanAge = Number(age);
+
+  if (!cleanName || cleanName.length < 2) {
+    const error = new Error("Please enter your name.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    const error = new Error("Please enter a valid email address.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!Number.isInteger(cleanAge) || cleanAge < 1 || cleanAge > 120) {
+    const error = new Error("Please enter a valid age.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (cleanPhone && normalizePhone(cleanPhone).length < 7) {
+    const error = new Error("Please enter a valid phone number or leave it blank.");
+    error.status = 400;
+    throw error;
+  }
+
+  const result = await query(
+    `
+      insert into reward_members (full_name, email, phone, age, raw)
+      values ($1, $2, $3, $4, $5::jsonb)
+      on conflict (lower(email)) do update set
+        full_name = excluded.full_name,
+        phone = coalesce(nullif(excluded.phone, ''), reward_members.phone),
+        age = excluded.age,
+        updated_at = now(),
+        raw = reward_members.raw || excluded.raw
+      returning *
+    `,
+    [
+      cleanName,
+      cleanEmail,
+      cleanPhone || null,
+      cleanAge,
+      JSON.stringify({ source: "level-up-rewards", registeredAt: new Date().toISOString() }),
+    ],
+  );
+
+  return normalizeRewardMember(result.rows[0]);
+}
+
+export async function createRewardEmailVerification(memberId, email) {
+  if (!hasPostgres() || !memberId || !email) return null;
+
+  await ensureRewardsTables();
+
+  const code = String(crypto.randomInt(100000, 1000000));
+  const result = await query(
+    `
+      insert into reward_email_verifications (member_id, email, code_hash, expires_at)
+      values ($1, $2, $3, now() + interval '30 minutes')
+      returning id, expires_at
+    `,
+    [memberId, normalizeEmail(email), hashVerificationCode(code)],
+  );
+
+  return {
+    id: result.rows[0]?.id || "",
+    code,
+    expiresAt: iso(result.rows[0]?.expires_at),
+  };
+}
+
+export async function verifyRewardMemberEmail({ email = "", code = "" } = {}) {
+  if (!hasPostgres()) {
+    const error = new Error("Rewards verification is not available right now.");
+    error.status = 503;
+    throw error;
+  }
+
+  await ensureRewardsTables();
+
+  const cleanEmail = normalizeEmail(email);
+  const cleanCode = String(code || "").trim();
+
+  if (!cleanEmail || !cleanCode) {
+    const error = new Error("Enter the email and verification code.");
+    error.status = 400;
+    throw error;
+  }
+
+  const result = await query(
+    `
+      with latest as (
+        select *
+        from reward_email_verifications
+        where lower(email) = $1
+          and consumed_at is null
+          and expires_at > now()
+        order by created_at desc
+        limit 1
+      ),
+      consumed as (
+        update reward_email_verifications rev
+        set consumed_at = now()
+        from latest
+        where rev.id = latest.id
+          and latest.code_hash = $2
+        returning rev.member_id
+      )
+      update reward_members rm
+      set email_verified = true,
+          email_verified_at = now(),
+          updated_at = now()
+      from consumed
+      where rm.id = consumed.member_id
+      returning rm.*
+    `,
+    [cleanEmail, hashVerificationCode(cleanCode)],
+  );
+
+  if (!result.rows[0]) {
+    const error = new Error("That verification code is invalid or expired.");
+    error.status = 400;
+    throw error;
+  }
+
+  return normalizeRewardMember(result.rows[0]);
 }
 
 function normalizeLevel(row = {}) {
