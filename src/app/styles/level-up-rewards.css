@@ -1,18 +1,24 @@
 .ppp-level-page {
-  --level-bg: #091014;
-  --level-panel: #101a20;
-  --level-ink: #f8fbf3;
-  --level-muted: #b7c7bf;
+  --level-bg: #071015;
+  --level-bg-soft: #0d1b22;
+  --level-panel: #13242c;
+  --level-panel-strong: #172f37;
+  --level-ink: #f8fbff;
+  --level-muted: #bad0d1;
   --level-lime: #a4cf5f;
-  --level-cyan: #f47b20;
-  --level-coral: #ff7a66;
+  --level-cyan: #29c4b2;
+  --level-peach: #fbae7b;
+  --level-coral: #ff4f8b;
   --level-gold: #ffd15c;
+  --level-action: linear-gradient(135deg, var(--level-lime), var(--level-cyan));
+  --level-warm-action: linear-gradient(135deg, var(--level-peach), var(--level-gold));
+  --level-card: linear-gradient(145deg, rgba(41, 196, 178, 0.11), rgba(19, 36, 44, 0.9));
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% 8%, rgba(244, 123, 32, 0.12), transparent 22rem),
-    radial-gradient(circle at 88% 10%, rgba(164, 207, 95, 0.08), transparent 24rem),
-    linear-gradient(180deg, #091014 0%, #0d151a 42%, #111513 100%);
+    radial-gradient(circle at 12% 8%, rgba(41, 196, 178, 0.14), transparent 22rem),
+    radial-gradient(circle at 88% 10%, rgba(251, 174, 123, 0.1), transparent 24rem),
+    linear-gradient(180deg, #071015 0%, #0c1a21 42%, #111816 100%);
   color: var(--level-ink);
   font-family: "DM Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -34,7 +40,7 @@
   height: 56px;
   padding: 0 clamp(1.25rem, 4vw, 2.5rem);
   border-bottom: 1px solid rgba(248, 251, 243, 0.06);
-  background: rgba(9, 16, 20, 0.92);
+  background: rgba(7, 16, 21, 0.92);
   backdrop-filter: blur(16px);
 }
 
@@ -66,8 +72,8 @@
   border: 1px solid rgba(164, 207, 95, 0.7);
   border-radius: 999px;
   padding: 0.58rem 1.1rem;
-  color: #10170c;
-  background: var(--level-lime);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-hero {
@@ -93,8 +99,8 @@
     linear-gradient(rgba(248, 251, 243, 0.028) 1px, transparent 1px),
     linear-gradient(90deg, rgba(248, 251, 243, 0.026) 1px, transparent 1px),
     linear-gradient(135deg, transparent 0 46%, rgba(164, 207, 95, 0.1) 46% 47%, transparent 47% 100%),
-    linear-gradient(35deg, transparent 0 53%, rgba(244, 123, 32, 0.12) 53% 54%, transparent 54% 100%),
-    radial-gradient(circle at 26% 28%, rgba(244, 123, 32, 0.14), transparent 20rem),
+    linear-gradient(35deg, transparent 0 53%, rgba(41, 196, 178, 0.12) 53% 54%, transparent 54% 100%),
+    radial-gradient(circle at 26% 28%, rgba(251, 174, 123, 0.14), transparent 20rem),
     linear-gradient(180deg, rgba(17, 24, 25, 0.24), rgba(9, 16, 20, 0.34));
   background-size: 34px 34px, 34px 34px, 520px 520px, 620px 620px, auto, auto;
 }
@@ -107,19 +113,19 @@
   height: 86px;
   pointer-events: none;
   background:
-    linear-gradient(180deg, transparent, #0b1215 72%),
-    linear-gradient(90deg, transparent, rgba(244, 123, 32, 0.38), transparent);
-  border-bottom: 1px solid rgba(244, 123, 32, 0.18);
+    linear-gradient(180deg, transparent, #0b151b 72%),
+    linear-gradient(90deg, transparent, rgba(41, 196, 178, 0.34), rgba(251, 174, 123, 0.24), transparent);
+  border-bottom: 1px solid rgba(41, 196, 178, 0.18);
 }
 
 .ppp-level-hero__stage {
   position: absolute;
   inset: clamp(1.2rem, 4vw, 3rem) -4vw clamp(1.4rem, 4vw, 3rem);
   z-index: -1;
-  border: 1px solid rgba(244, 123, 32, 0.16);
+  border: 1px solid rgba(41, 196, 178, 0.18);
   border-radius: 8px;
   background:
-    linear-gradient(90deg, rgba(244, 123, 32, 0.04), transparent 28%, transparent 72%, rgba(164, 207, 95, 0.03)),
+    linear-gradient(90deg, rgba(41, 196, 178, 0.05), transparent 28%, transparent 72%, rgba(251, 174, 123, 0.05)),
     rgba(5, 9, 11, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(248, 251, 243, 0.05),
@@ -139,8 +145,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(9, 16, 20, 0.48), rgba(9, 16, 20, 0.16) 48%, rgba(9, 16, 20, 0.52)),
-    radial-gradient(circle at 72% 28%, rgba(244, 123, 32, 0.08), transparent 24rem);
+    linear-gradient(90deg, rgba(7, 16, 21, 0.5), rgba(7, 16, 21, 0.18) 48%, rgba(7, 16, 21, 0.58)),
+    radial-gradient(circle at 72% 28%, rgba(164, 207, 95, 0.08), transparent 24rem);
 }
 
 .ppp-level-hero__image img {
@@ -160,8 +166,8 @@
   border: 1px solid rgba(248, 251, 243, 0.1);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(244, 123, 32, 0.12), rgba(16, 26, 32, 0.68) 46%),
-    rgba(8, 13, 16, 0.72);
+    linear-gradient(145deg, rgba(41, 196, 178, 0.16), rgba(19, 36, 44, 0.78) 46%),
+    rgba(8, 17, 23, 0.78);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
 
@@ -195,7 +201,7 @@
 }
 
 .ppp-level-hero h1 span {
-  color: var(--level-cyan);
+  color: var(--level-lime);
 }
 
 .ppp-level-hero p,
@@ -219,7 +225,7 @@
 .ppp-level-command-strip div {
   min-height: 68px;
   padding: 0.75rem;
-  border: 1px solid rgba(244, 123, 32, 0.22);
+  border: 1px solid rgba(41, 196, 178, 0.24);
   border-radius: 8px;
   background: rgba(8, 13, 16, 0.58);
   box-shadow: inset 0 1px 0 rgba(248, 251, 243, 0.06);
@@ -253,7 +259,7 @@
 
 .ppp-level-ring {
   color: var(--level-cyan);
-  filter: drop-shadow(0 0 12px rgba(244, 123, 32, 0.28));
+  filter: drop-shadow(0 0 12px rgba(41, 196, 178, 0.28));
 }
 
 .ppp-level-ring text {
@@ -347,9 +353,9 @@
 }
 
 .ppp-level-button--primary {
-  color: #10170c;
-  background: var(--level-cyan);
-  box-shadow: 0 16px 34px rgba(244, 123, 32, 0.22);
+  color: #071015;
+  background: var(--level-action);
+  box-shadow: 0 16px 34px rgba(41, 196, 178, 0.22);
 }
 
 .ppp-level-button--secondary {
@@ -363,7 +369,7 @@
 .ppp-level-tier {
   border: 1px solid rgba(248, 251, 243, 0.11);
   border-radius: 8px;
-  background: rgba(16, 26, 32, 0.82);
+  background: rgba(19, 36, 44, 0.84);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
 }
 
@@ -388,8 +394,8 @@
   background:
     linear-gradient(rgba(248, 251, 243, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(248, 251, 243, 0.025) 1px, transparent 1px),
-    linear-gradient(145deg, rgba(244, 123, 32, 0.06), rgba(16, 26, 32, 0.68) 40%),
-    rgba(16, 26, 32, 0.72);
+    linear-gradient(145deg, rgba(41, 196, 178, 0.08), rgba(19, 36, 44, 0.7) 40%),
+    rgba(19, 36, 44, 0.74);
   background-size: 28px 28px, 28px 28px, auto, auto;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
@@ -403,11 +409,11 @@
   display: grid;
   gap: 1rem;
   padding: clamp(1.15rem, 3vw, 1.55rem);
-  border: 1px solid rgba(244, 123, 32, 0.32);
+  border: 1px solid rgba(41, 196, 178, 0.34);
   border-radius: 8px;
   background:
-    linear-gradient(155deg, rgba(244, 123, 32, 0.18), rgba(16, 26, 32, 0.9) 46%),
-    rgba(16, 26, 32, 0.9);
+    linear-gradient(155deg, rgba(41, 196, 178, 0.18), rgba(19, 36, 44, 0.92) 46%),
+    rgba(19, 36, 44, 0.92);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
 }
 
@@ -461,7 +467,7 @@
 
 .ppp-level-lookup input:focus {
   border-color: var(--level-cyan);
-  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.16);
+  box-shadow: 0 0 0 3px rgba(41, 196, 178, 0.18);
 }
 
 .ppp-level-lookup button {
@@ -470,8 +476,8 @@
   border: 0;
   border-radius: 8px;
   padding: 0 1rem;
-  color: #10170c;
-  background: var(--level-lime);
+  color: #071015;
+  background: var(--level-action);
   font-weight: 900;
   cursor: pointer;
 }
@@ -536,7 +542,8 @@
   gap: 0.1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: rgba(164, 207, 95, 0.12);
+  border: 1px solid rgba(164, 207, 95, 0.2);
+  background: rgba(164, 207, 95, 0.11);
 }
 
 .ppp-level-lookup__score strong {
@@ -644,16 +651,16 @@
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  border: 1px solid rgba(244, 123, 32, 0.78);
+  border: 1px solid rgba(251, 174, 123, 0.68);
   border-radius: 999px;
   color: #fffaf0;
   background:
-    linear-gradient(135deg, rgba(244, 123, 32, 0.24), rgba(255, 209, 92, 0.1)),
+    linear-gradient(135deg, rgba(251, 174, 123, 0.22), rgba(255, 209, 92, 0.1)),
     rgba(8, 13, 16, 0.92);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 0 3px rgba(244, 123, 32, 0.14),
-    0 12px 30px rgba(244, 123, 32, 0.18);
+    0 0 0 3px rgba(251, 174, 123, 0.12),
+    0 12px 30px rgba(251, 174, 123, 0.16);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
   text-transform: uppercase;
 }
@@ -677,7 +684,7 @@
   height: 30px;
   border: 1px solid rgba(248, 251, 243, 0.62);
   border-radius: 50%;
-  color: #10170c;
+  color: #071015;
   background: linear-gradient(180deg, #fffdf1, #ffe9b4);
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: 1.2rem;
@@ -760,8 +767,8 @@
 }
 
 .ppp-level-app__mode-tabs button.is-active {
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-app__search input,
@@ -781,7 +788,7 @@
 .ppp-level-app__register input:focus,
 .ppp-level-app__verify input:focus {
   border-color: var(--level-cyan);
-  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.16);
+  box-shadow: 0 0 0 3px rgba(41, 196, 178, 0.18);
 }
 
 .ppp-level-app__search button,
@@ -806,16 +813,16 @@
   min-width: 82px;
   min-height: 44px;
   padding: 0 1rem;
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-app__register button,
 .ppp-level-app__verify button {
   min-height: 46px;
   padding: 0 1rem;
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-app__register button {
@@ -901,8 +908,8 @@
 .ppp-level-app__players a.is-active,
 .ppp-level-app__tabs a.is-active,
 .ppp-level-app__tabs button.is-active {
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-app__identity {
@@ -924,10 +931,10 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid rgba(244, 123, 32, 0.42);
+  border: 1px solid rgba(41, 196, 178, 0.44);
   border-radius: 50%;
   color: var(--level-cyan);
-  background: rgba(244, 123, 32, 0.12);
+  background: rgba(41, 196, 178, 0.12);
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: 1rem;
   font-weight: 800;
@@ -983,7 +990,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--level-lime), var(--level-cyan), var(--level-gold));
+  background: linear-gradient(90deg, var(--level-lime), var(--level-cyan), var(--level-peach));
 }
 
 .ppp-level-app__progress-copy {
@@ -1088,7 +1095,7 @@
   height: 100%;
   width: 64%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--level-lime), var(--level-cyan), var(--level-gold));
+  background: linear-gradient(90deg, var(--level-lime), var(--level-cyan), var(--level-peach));
 }
 
 .ppp-level-pass small {
@@ -1132,7 +1139,7 @@
 
 .ppp-level-how {
   background:
-    linear-gradient(180deg, rgba(11, 18, 21, 0.98), rgba(16, 26, 32, 0.36) 42%, transparent),
+    linear-gradient(180deg, rgba(7, 16, 21, 0.98), rgba(19, 36, 44, 0.36) 42%, transparent),
     radial-gradient(circle at 88% 10%, rgba(164, 207, 95, 0.1), transparent 24rem);
 }
 
@@ -1147,15 +1154,15 @@
 
 .ppp-level-calibration {
   background:
-    linear-gradient(180deg, rgba(8, 13, 16, 0.2), rgba(16, 26, 32, 0.5)),
-    #0a1114;
+    linear-gradient(180deg, rgba(8, 17, 23, 0.2), rgba(19, 36, 44, 0.5)),
+    #0a161c;
 }
 
 .ppp-level-calibration__table {
   overflow: hidden;
   border: 1px solid rgba(248, 251, 243, 0.14);
   border-radius: 8px;
-  background: rgba(16, 26, 32, 0.76);
+  background: rgba(19, 36, 44, 0.78);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
 
@@ -1178,8 +1185,8 @@
 }
 
 .ppp-level-calibration__table strong {
-  color: #102016;
-  background: rgba(164, 207, 95, 0.88);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-calibration__table span {
@@ -1197,8 +1204,8 @@
   border-radius: 8px;
   padding: 1.2rem;
   background:
-    linear-gradient(160deg, rgba(244, 123, 32, 0.2), transparent 48%),
-    #0b1217;
+    linear-gradient(160deg, rgba(41, 196, 178, 0.2), transparent 48%),
+    #0b151b;
 }
 
 .ppp-level-app-card__screen span {
@@ -1228,7 +1235,8 @@
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 8px;
-  background: rgba(164, 207, 95, 0.12);
+  border: 1px solid rgba(164, 207, 95, 0.22);
+  background: rgba(164, 207, 95, 0.11);
 }
 
 .ppp-level-app-card__reward svg {
@@ -1269,8 +1277,8 @@
   border: 1px solid rgba(248, 251, 243, 0.11);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(244, 123, 32, 0.14), rgba(16, 26, 32, 0.88)),
-    rgba(16, 26, 32, 0.88);
+    linear-gradient(145deg, rgba(41, 196, 178, 0.13), rgba(19, 36, 44, 0.9)),
+    rgba(19, 36, 44, 0.9);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.23);
 }
 
@@ -1281,9 +1289,9 @@
   bottom: -2.4rem;
   width: 8rem;
   height: 8rem;
-  border: 1px solid rgba(244, 123, 32, 0.18);
+  border: 1px solid rgba(41, 196, 178, 0.2);
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1.4rem rgba(244, 123, 32, 0.05);
+  box-shadow: inset 0 0 0 1.4rem rgba(41, 196, 178, 0.06);
 }
 
 .ppp-level-step__number {
@@ -1293,8 +1301,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: 1.35rem;
   font-weight: 800;
@@ -1344,8 +1352,8 @@
 
 .ppp-level-earn {
   background:
-    linear-gradient(180deg, rgba(8, 13, 16, 0.2), rgba(16, 26, 32, 0.42)),
-    #0b1215;
+    linear-gradient(180deg, rgba(8, 17, 23, 0.2), rgba(19, 36, 44, 0.42)),
+    #0b151b;
 }
 
 .ppp-level-earn__grid,
@@ -1362,8 +1370,8 @@
   border: 1px solid rgba(248, 251, 243, 0.11);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(244, 123, 32, 0.12), rgba(16, 26, 32, 0.86)),
-    rgba(16, 26, 32, 0.86);
+    linear-gradient(145deg, rgba(41, 196, 178, 0.12), rgba(19, 36, 44, 0.88)),
+    rgba(19, 36, 44, 0.88);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
@@ -1402,7 +1410,7 @@
   gap: 1rem;
   align-items: stretch;
   padding: 1.25rem;
-  background: #111a1d;
+  background: #10212a;
 }
 
 .ppp-level-visual-band img {
@@ -1419,7 +1427,7 @@
   gap: 1rem;
   padding: clamp(1.5rem, 4vw, 3rem);
   border-radius: 8px;
-  background: linear-gradient(145deg, rgba(255, 122, 102, 0.18), rgba(244, 123, 32, 0.1));
+  background: linear-gradient(145deg, rgba(41, 196, 178, 0.18), rgba(251, 174, 123, 0.12));
 }
 
 .ppp-level-ladder {
@@ -1451,23 +1459,23 @@
   border: 1px solid rgba(248, 251, 243, 0.1);
   border-radius: 8px;
   background:
-    linear-gradient(90deg, rgba(244, 123, 32, 0.1), transparent 48%),
+    linear-gradient(90deg, rgba(41, 196, 178, 0.1), transparent 48%),
     rgba(8, 13, 16, 0.72);
 }
 
 .ppp-level-tier-row.is-major {
-  border-color: rgba(255, 209, 92, 0.22);
+  border-color: rgba(255, 209, 92, 0.24);
   background:
-    linear-gradient(90deg, rgba(255, 209, 92, 0.12), rgba(244, 123, 32, 0.08) 56%, transparent),
+    linear-gradient(90deg, rgba(255, 209, 92, 0.12), rgba(251, 174, 123, 0.1) 56%, transparent),
     rgba(8, 13, 16, 0.78);
 }
 
 .ppp-level-tier-row.is-vip {
-  border-color: rgba(244, 123, 32, 0.46);
+  border-color: rgba(255, 79, 139, 0.48);
   background:
-    linear-gradient(90deg, rgba(244, 123, 32, 0.26), rgba(255, 209, 92, 0.1) 58%, transparent),
+    linear-gradient(90deg, rgba(255, 79, 139, 0.24), rgba(255, 209, 92, 0.1) 58%, transparent),
     rgba(8, 13, 16, 0.86);
-  box-shadow: 0 20px 50px rgba(244, 123, 32, 0.14);
+  box-shadow: 0 20px 50px rgba(255, 79, 139, 0.14);
 }
 
 .ppp-level-tier-row__badge {
@@ -1475,10 +1483,10 @@
   place-items: center;
   width: 54px;
   height: 54px;
-  border: 1px solid rgba(244, 123, 32, 0.36);
+  border: 1px solid rgba(41, 196, 178, 0.36);
   border-radius: 8px;
   color: var(--level-cyan);
-  background: rgba(244, 123, 32, 0.1);
+  background: rgba(41, 196, 178, 0.1);
 }
 
 .ppp-level-tier-row__badge span {
@@ -1532,11 +1540,11 @@
   display: grid;
   gap: 0.9rem;
   padding: 1.2rem;
-  border: 1px solid rgba(244, 123, 32, 0.24);
+  border: 1px solid rgba(41, 196, 178, 0.26);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(244, 123, 32, 0.16), rgba(16, 26, 32, 0.9)),
-    rgba(16, 26, 32, 0.9);
+    linear-gradient(145deg, rgba(41, 196, 178, 0.14), rgba(19, 36, 44, 0.92)),
+    rgba(19, 36, 44, 0.92);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
 }
 
@@ -1600,8 +1608,8 @@
   width: 48px;
   height: 48px;
   border-radius: 8px;
-  color: #10170c;
-  background: var(--level-lime);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-tier__icon svg {
@@ -1659,7 +1667,7 @@
 .ppp-level-specials {
   background:
     radial-gradient(circle at 14% 10%, rgba(255, 209, 92, 0.12), transparent 26rem),
-    linear-gradient(180deg, rgba(16, 26, 32, 0.38), rgba(8, 13, 16, 0.2));
+    linear-gradient(180deg, rgba(19, 36, 44, 0.38), rgba(8, 17, 23, 0.2));
 }
 
 .ppp-level-specials__grid {
@@ -1719,7 +1727,7 @@
   align-items: center;
   min-height: 40px;
   padding: 0.55rem 0.75rem;
-  border: 1px solid rgba(244, 123, 32, 0.24);
+  border: 1px solid rgba(251, 174, 123, 0.28);
   border-radius: 999px;
   color: var(--level-ink);
   background: rgba(8, 13, 16, 0.64);
@@ -1729,7 +1737,7 @@
 .ppp-level-streaks {
   background:
     linear-gradient(135deg, rgba(164, 207, 95, 0.08), transparent 42%),
-    #0a1114;
+    #0a161c;
 }
 
 .ppp-level-signage {
@@ -1764,14 +1772,14 @@
   min-height: 42px;
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
-  color: #10170c;
-  background: var(--level-cyan);
+  color: #071015;
+  background: var(--level-action);
 }
 
 .ppp-level-annual {
   background:
-    radial-gradient(circle at 80% 20%, rgba(244, 123, 32, 0.12), transparent 24rem),
-    linear-gradient(180deg, rgba(8, 13, 16, 0.1), rgba(16, 26, 32, 0.42));
+    radial-gradient(circle at 80% 20%, rgba(251, 174, 123, 0.12), transparent 24rem),
+    linear-gradient(180deg, rgba(8, 17, 23, 0.1), rgba(19, 36, 44, 0.42));
 }
 
 .ppp-level-annual__grid {
@@ -1786,8 +1794,8 @@
   border: 1px solid rgba(248, 251, 243, 0.11);
   border-radius: 8px;
   background:
-    linear-gradient(145deg, rgba(164, 207, 95, 0.1), rgba(16, 26, 32, 0.88)),
-    rgba(16, 26, 32, 0.88);
+    linear-gradient(145deg, rgba(164, 207, 95, 0.1), rgba(19, 36, 44, 0.9)),
+    rgba(19, 36, 44, 0.9);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
@@ -1822,8 +1830,8 @@
   padding: clamp(4rem, 8vw, 6rem) 1.25rem;
   text-align: center;
   background:
-    linear-gradient(90deg, rgba(164, 207, 95, 0.13), rgba(244, 123, 32, 0.12), rgba(255, 122, 102, 0.13)),
-    #0b1216;
+    linear-gradient(90deg, rgba(164, 207, 95, 0.13), rgba(41, 196, 178, 0.12), rgba(251, 174, 123, 0.12), rgba(255, 79, 139, 0.1)),
+    #0b151b;
 }
 
 .ppp-level-cta div {
@@ -1841,7 +1849,7 @@
   gap: 1.25rem;
   padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
   color: rgba(248, 251, 243, 0.64);
-  background: #080d10;
+  background: #071015;
 }
 
 .ppp-level-footer img {

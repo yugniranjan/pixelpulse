@@ -29,6 +29,11 @@ const LOCATION_PREFIXES = new Set([
   "london",
   "windsor",
 ]);
+const LEGACY_LOCATION_PREFIXES = new Set([
+  "london",
+  "st-catharines",
+  "windsor",
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -36,6 +41,52 @@ function isAssetPath(pathname) {
     pathname.startsWith("/assets") ||
     PUBLIC_FILES.includes(pathname)
   );
+}
+
+function buildRedirectUrl(request, pathname, { clearSearch = false } = {}) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname || "/";
+  if (clearSearch) {
+    url.search = "";
+  }
+  return url;
+}
+
+function normalizeLegacyPath(pathname) {
+  if (pathname === "/$") {
+    return "/";
+  }
+
+  const segments = pathname.split("/").filter(Boolean);
+  if (!segments.length) {
+    return null;
+  }
+
+  const blogIndex = segments.indexOf("blogs");
+  if (blogIndex > 0 || (blogIndex === 0 && segments[1] === "blogs")) {
+    const slugParts = segments.slice(blogIndex + 1).filter((segment) => segment !== "blogs");
+    return slugParts.length ? `/blogs/${slugParts.join("/")}` : "/blogs";
+  }
+
+  if (segments[0] === "groups-events") {
+    return `/group-events${segments.length > 1 ? `/${segments.slice(1).join("/")}` : ""}`;
+  }
+
+  if (segments[0] === "group-events" && segments[1] === "private-party") {
+    return "/private-party";
+  }
+
+  if (segments[0] === "vaughan" && LEGACY_LOCATION_PREFIXES.has(segments[1])) {
+    const rest = segments.slice(2);
+    return rest.length ? `/${rest.join("/")}` : "/";
+  }
+
+  if (LEGACY_LOCATION_PREFIXES.has(segments[0])) {
+    const rest = segments.slice(1);
+    return rest.length ? `/${rest.join("/")}` : "/";
+  }
+
+  return null;
 }
 
 export function middleware(request) {
@@ -158,6 +209,23 @@ export function middleware(request) {
       url.pathname = "/birthday-party-bookings-vaughan";
       return NextResponse.rewrite(url);
     }
+  }
+
+  const normalizedPath = normalizeLegacyPath(pathname);
+  if (normalizedPath && normalizedPath !== pathname) {
+    return NextResponse.redirect(
+      buildRedirectUrl(request, normalizedPath, {
+        clearSearch: normalizedPath.startsWith("/blogs") || pathname === "/$",
+      }),
+      308,
+    );
+  }
+
+  if (pathname.startsWith("/blogs/") && request.nextUrl.searchParams.has("uid")) {
+    return NextResponse.redirect(
+      buildRedirectUrl(request, pathname, { clearSearch: true }),
+      308,
+    );
   }
 
   // ✅ Allow auth APIs
