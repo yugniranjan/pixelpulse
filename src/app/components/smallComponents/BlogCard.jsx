@@ -28,7 +28,7 @@ const BlogCard = async ({ blogsData, location_slug }) => {
       ? extractBlogData.slice(0, 4).map((item, index) => ({
           id: item.id,
           title: item?.title,
-          href: `/blogs/${slugify(item.title)}?uid=${item.id}`,
+          href: `/blogs/${slugify(item.title)}`,
           featuredImage:
             item?.featuredImage ||
             "https://storage.googleapis.com/aerosports/common/gallery-thummbnail-wall-climbwall.jpg",

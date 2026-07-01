@@ -52,7 +52,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
       ? latestBlogData.slice(0, 2).map((item, index) => ({
         id: item.id || `latest-${index}`,
         title: item.title || "Latest Update",
-        href: `/blogs/${slugify(item.title || "latest-update")}?uid=${item.id}`,
+        href: `/blogs/${slugify(item.title || "latest-update")}`,
         image: item.featuredImage || blogFallbacks[0].featuredImage,
       }))
       : blogChildren

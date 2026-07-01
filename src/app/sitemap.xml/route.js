@@ -4,6 +4,7 @@ import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { fetchBlogs } from "@/lib/blogs";
 import { LOCATION_NAME } from "@/lib/constant";
 import { canonicalUrl } from "@/lib/seo";
+import { slugify } from "@/utils/slugify";
 export async function GET() {
   const dynamicPaths = new Set();
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
@@ -49,19 +50,14 @@ export async function GET() {
     extractBlogData?.forEach(blog => {
 
       if (blog?.status === "published") {
-
-        const slug = blog?.title
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, "")
-          .replace(/\s+/g, "-");
-
-        dynamicPaths.add(canonicalUrl(`/blogs/${slug}?uid=${blog.id}`));
+        const slug = slugify(blog?.title || "");
+        if (slug) {
+          dynamicPaths.add(canonicalUrl(`/blogs/${slug}`));
+        }
       }
     });
 
-    dynamicPaths.add(canonicalUrl("/waiver"));
     dynamicPaths.add(canonicalUrl("/birthday-party-landing"));
-    dynamicPaths.add(canonicalUrl("/birthday-party-bookings-vaughan"));
     dynamicPaths.add(canonicalUrl("/private-party"));
 
   } catch (error) {

@@ -8,9 +8,11 @@ import {
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
 import { db } from "@/lib/firestore";
+import { fetchBlogs } from "@/lib/blogs";
 import { getPostgresBlogById, hasPostgres } from "@/lib/postgresData";
 import { notFound } from "next/navigation";
 import { canonicalUrl } from "@/lib/seo";
+import { slugify } from "@/utils/slugify";
 
 export async function generateMetadata({ params, searchParams }) {
   const [{ slug }, { uid: id } = {}] = await Promise.all([
@@ -18,20 +20,7 @@ export async function generateMetadata({ params, searchParams }) {
     searchParams,
   ]);
 
-  if (!id || (!db && !hasPostgres())) return {};
-
-  let data;
-  try {
-    if (hasPostgres()) {
-      data = await getPostgresBlogById(id);
-    } else {
-      const doc = await db.collection("blogs").doc(id).get();
-      if (doc.exists) data = doc.data();
-    }
-  } catch (error) {
-    console.warn(`Blog metadata unavailable: ${error?.message || error}`);
-    return {};
-  }
+  const data = await getBlogBySlugOrId({ id, slug });
 
   if (!data) {
     return {};
@@ -47,7 +36,8 @@ export async function generateMetadata({ params, searchParams }) {
     data?.featuredImage ||
     "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 
-  const url = canonicalUrl(`/blogs/${slug}?uid=${id}`);
+  const canonicalSlug = slugify(data?.title || slug);
+  const url = canonicalUrl(`/blogs/${canonicalSlug || slug}`);
 
   return {
     title,
@@ -110,6 +100,22 @@ async function getBlogById(id) {
       ...data,
       content,
     };
+  } catch (error) {
+    console.warn(`Blog detail unavailable: ${error?.message || error}`);
+    return null;
+  }
+}
+
+async function getBlogBySlugOrId({ id, slug }) {
+  if (id) {
+    return getBlogById(id);
+  }
+
+  if (!slug) return null;
+
+  try {
+    const blogs = await fetchBlogs();
+    return blogs.find((blog) => slugify(blog?.title || "") === slug) || null;
   } catch (error) {
     console.warn(`Blog detail unavailable: ${error?.message || error}`);
     return null;
@@ -196,10 +202,11 @@ function renderEditorBlocks(blocks) {
   });
 }
 
-export default async function BlogDetail({ searchParams }) {
+export default async function BlogDetail({ params, searchParams }) {
+  const { slug } = (await params) || {};
   const { uid: id } = (await searchParams) || {};
 
-  const data = await getBlogById(id);
+  const data = await getBlogBySlugOrId({ id, slug });
 
   if (!data) {
     notFound();

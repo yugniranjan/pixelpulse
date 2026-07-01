@@ -1,9 +1,7 @@
-# *
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/admin
+Disallow: /waiver-data
 
-# Host
-Host: https://pixelpulseplay.ca
-
-# Sitemaps
 Sitemap: https://pixelpulseplay.ca/sitemap.xml
