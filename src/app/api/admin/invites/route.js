@@ -151,8 +151,6 @@ function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
   const phone = invite.businessPhone || "+1 (905) 760-2922";
 
   return [
-    "Subject: Your Pixel Pulse Birthday Party is Confirmed",
-    "",
     `Dear ${hostName},`,
     `Thank you for choosing Pixel Pulse Play to celebrate ${childName}'s special day. We cannot wait to make it unforgettable!`,
     "",

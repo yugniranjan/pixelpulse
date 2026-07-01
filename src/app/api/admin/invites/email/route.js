@@ -101,7 +101,7 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: "Your Party Invite at Pixel Pulse Playzone! 🎉",
+      subject: "Your Pixel Pulse Birthday Party is Confirmed",
       text,
       html,
     });
