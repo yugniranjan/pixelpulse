@@ -5,6 +5,19 @@ import { ensureRewardsTables } from "@/lib/rewards";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+let rewardsTablesReadyPromise;
+
+function ensureRewardsTablesOnce() {
+  if (!rewardsTablesReadyPromise) {
+    rewardsTablesReadyPromise = ensureRewardsTables().catch((error) => {
+      rewardsTablesReadyPromise = null;
+      throw error;
+    });
+  }
+
+  return rewardsTablesReadyPromise;
+}
+
 function serializePlayer(row) {
   return {
     id: row.PlayerID,
@@ -57,11 +70,28 @@ export async function GET(req) {
   const limit = Math.min(Number(searchParams.get("limit")) || 500, 1000);
   const locationId = Number(searchParams.get("locationId") || 2);
 
-  await ensureRewardsTables();
+  await ensureRewardsTablesOnce();
 
   const result = await query(
     `
-      WITH scoreboard AS (
+      WITH recent_players AS (
+        SELECT
+          p."PlayerID",
+          p."FirstName",
+          p."LastName",
+          p."DateOfBirth",
+          p.email,
+          p."DateSigned",
+          p."SigneeID",
+          p."LocationID",
+          p."createdAt",
+          p."updatedAt"
+        FROM public."Players" p
+        WHERE p."LocationID" = $2
+        ORDER BY p."createdAt" DESC NULLS LAST, p."PlayerID" DESC
+        LIMIT $1
+      ),
+      scoreboard AS (
         SELECT
           ps."PlayerID" AS player_id,
           coalesce(sum(coalesce(ps."Points", 0)), 0) AS scoreboard_points,
@@ -69,6 +99,7 @@ export async function GET(req) {
           count(distinct coalesce(ps."StartTime", ps."createdAt")::date) AS repeat_visits,
           max(coalesce(ps."EndTime", ps."StartTime", ps."createdAt")) AS last_score_at
         FROM public."PlayerScores" ps
+        INNER JOIN recent_players rp ON rp."PlayerID" = ps."PlayerID"
         WHERE ps."LocationID" = $2
         GROUP BY ps."PlayerID"
       ),
@@ -77,6 +108,7 @@ export async function GET(req) {
           rpl.player_id,
           coalesce(sum(rpl.points_delta), 0) AS adjustment_points
         FROM reward_point_ledger rpl
+        INNER JOIN recent_players rp ON rp."PlayerID" = rpl.player_id
         WHERE coalesce(rpl.source_type, '') <> 'scoreboard'
         GROUP BY rpl.player_id
       ),
@@ -117,7 +149,7 @@ export async function GET(req) {
         next_level.reward_type AS next_reward_type,
         coalesce(reward_counts.available_rewards, 0)::integer AS available_rewards,
         coalesce(reward_counts.redeemed_rewards, 0)::integer AS redeemed_rewards
-      FROM public."Players" p
+      FROM recent_players p
       LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
       LEFT JOIN scorecards scorecard ON scorecard.player_id = p."PlayerID"
       LEFT JOIN LATERAL (
@@ -143,9 +175,7 @@ export async function GET(req) {
         FROM reward_redemptions rr
         WHERE rr.player_id = p."PlayerID"
       ) reward_counts ON true
-      WHERE p."LocationID" = $2
       ORDER BY p."createdAt" DESC NULLS LAST, p."PlayerID" DESC
-      LIMIT $1
     `,
     [limit, locationId],
   );

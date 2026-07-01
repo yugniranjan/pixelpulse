@@ -190,16 +190,48 @@ export async function getPostgresAdminByEmail(email) {
 }
 
 export async function listPostgresWaivers(limit = 300, { includeSignature = false } = {}) {
+  const columns = includeSignature
+    ? "*"
+    : `
+      id,
+      primary_participant,
+      family_members,
+      visit,
+      checks,
+      attractions,
+      participant_count,
+      primary_name,
+      source,
+      user_agent,
+      submitted_at,
+      updated_at
+    `;
   const result = await query(
-    "select * from waivers order by submitted_at desc nulls last limit $1",
+    `select ${columns} from waivers order by submitted_at desc nulls last limit $1`,
     [limit],
   );
   return result.rows.map((row) => normalizeWaiverRow(row, { includeSignature }));
 }
 
-export async function getPostgresWaiverById(id) {
-  const result = await query("select * from waivers where id = $1", [id]);
-  return result.rows[0] ? normalizeWaiverRow(result.rows[0], { includeSignature: true }) : null;
+export async function getPostgresWaiverById(id, { includeSignature = false } = {}) {
+  const columns = includeSignature
+    ? "*"
+    : `
+      id,
+      primary_participant,
+      family_members,
+      visit,
+      checks,
+      attractions,
+      participant_count,
+      primary_name,
+      source,
+      user_agent,
+      submitted_at,
+      updated_at
+    `;
+  const result = await query(`select ${columns} from waivers where id = $1`, [id]);
+  return result.rows[0] ? normalizeWaiverRow(result.rows[0], { includeSignature }) : null;
 }
 
 export async function getPostgresWaiverByEmail(email) {
@@ -294,8 +326,7 @@ export async function updatePostgresWaiver(id, updateData) {
     ],
   );
   if (result.rowCount === 0) return null;
-  const updated = await query("select * from waivers where id = $1", [id]);
-  return normalizeWaiverRow(updated.rows[0]);
+  return getPostgresWaiverById(id);
 }
 
 export async function deletePostgresWaiver(id) {

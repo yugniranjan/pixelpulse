@@ -172,45 +172,14 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
 
 function WaiverCard({ waiver, onDelete, onEdit }) {
   const [open, setOpen] = useState(false);
-  const [fullWaiver, setFullWaiver] = useState(waiver);
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [detailsError, setDetailsError] = useState("");
-  const activeWaiver = fullWaiver || waiver;
+  const activeWaiver = waiver;
   const familyMembers = Array.isArray(activeWaiver.familyMembers) ? activeWaiver.familyMembers : [];
   const { children, additionalAdults } = splitFamilyMembers(familyMembers);
   const attractions = Array.isArray(activeWaiver.attractions) ? activeWaiver.attractions : [];
 
-  async function toggleOpen() {
-    const nextOpen = !open;
-    setOpen(nextOpen);
-
-    if (!nextOpen || activeWaiver.signatureDataUrl || loadingDetails) return;
-
-    setLoadingDetails(true);
-    setDetailsError("");
-
-    try {
-      const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(waiver.id)}`, {
-        cache: "no-store",
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setDetailsError(data.error || "Unable to load waiver details.");
-        return;
-      }
-
-      setFullWaiver(data.waiver || waiver);
-    } catch (error) {
-      setDetailsError("Unable to load waiver details.");
-    } finally {
-      setLoadingDetails(false);
-    }
-  }
-
   return (
     <article className="waiver-admin-card">
-      <button type="button" className="waiver-admin-card__summary" onClick={toggleOpen}>
+      <button type="button" className="waiver-admin-card__summary" onClick={() => setOpen((current) => !current)}>
         <span>
           <strong>Parent / Guardian: {activeWaiver.primaryName || participantName(activeWaiver.primary)}</strong>
           <em>{activeWaiver.primary?.email || "No email"}</em>
@@ -235,8 +204,6 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
 
       {open ? (
         <div className="waiver-admin-card__details">
-          {loadingDetails ? <p className="waiver-admin-state">Loading signature details...</p> : null}
-          {detailsError ? <p className="waiver-admin-error">{detailsError}</p> : null}
           <section>
             <h2>Parent / Guardian</h2>
             <dl>
@@ -306,15 +273,6 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
             <div className="waiver-admin-pills">
               {attractions.length ? attractions.map((attraction) => <span key={attraction}>{attraction}</span>) : <span>None selected</span>}
             </div>
-          </section>
-
-          <section className="waiver-admin-card__wide">
-            <h2>Signature</h2>
-            {activeWaiver.signatureDataUrl ? (
-              <img className="waiver-admin-signature" src={activeWaiver.signatureDataUrl} alt={`Signature for ${activeWaiver.primaryName || "waiver"}`} />
-            ) : (
-              <p>{loadingDetails ? "Checking signature..." : "No signature image saved."}</p>
-            )}
           </section>
 
           <section className="waiver-admin-card__wide waiver-record-actions">

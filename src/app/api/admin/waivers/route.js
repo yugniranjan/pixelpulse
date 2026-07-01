@@ -54,7 +54,8 @@ export async function GET(req) {
 
   if (hasPostgres()) {
     if (id) {
-      const waiver = await getPostgresWaiverById(id);
+      const includeSignature = searchParams.get("includeSignature") === "1";
+      const waiver = await getPostgresWaiverById(id, { includeSignature });
       return waiver
         ? NextResponse.json({ waiver })
         : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
@@ -73,12 +74,29 @@ export async function GET(req) {
   if (id) {
     const snapshot = await db.collection("waivers").doc(id).get();
     return snapshot.exists
-      ? NextResponse.json({ waiver: serializeWaiver(snapshot, { includeSignature: true }) })
+      ? NextResponse.json({
+          waiver: serializeWaiver(snapshot, {
+            includeSignature: searchParams.get("includeSignature") === "1",
+          }),
+        })
       : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
   }
 
   const snapshot = await db
     .collection("waivers")
+    .select(
+      "primary",
+      "familyMembers",
+      "visit",
+      "checks",
+      "attractions",
+      "participantCount",
+      "primaryName",
+      "source",
+      "userAgent",
+      "submittedAt",
+      "updatedAt",
+    )
     .orderBy("submittedAt", "desc")
     .limit(limit)
     .get();
