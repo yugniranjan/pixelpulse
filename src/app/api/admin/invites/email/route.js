@@ -37,18 +37,20 @@ export async function POST(request) {
     const body = await request.json();
     const to = cleanEmail(body?.email);
     const smsText = cleanText(body?.smsText);
+    const confirmationEmailText = cleanText(body?.confirmationEmailText);
     const inviteUrl = cleanText(body?.inviteUrl);
     const waiverUrl = cleanText(body?.waiverUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
     const partyId = cleanText(body?.partyId);
+    const emailText = confirmationEmailText || smsText;
 
     if (!to) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     }
 
-    if (!smsText || !inviteUrl || !qrCodeUrl) {
+    if (!emailText || !inviteUrl) {
       return NextResponse.json(
-        { error: "SMS text, invite URL, and QR code are required." },
+        { error: "Email text and invite URL are required." },
         { status: 400 },
       );
     }
@@ -74,23 +76,27 @@ export async function POST(request) {
 
     const text = [
       partyId ? `Party ID: ${partyId}` : "",
-      smsText,
+      emailText,
       "",
-      `QR Code: ${qrCodeUrl}`,
+      waiverUrl ? `Waiver: ${waiverUrl}` : "",
+      qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
     ].filter(Boolean).join("\n");
 
     const html = `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
         ${partyId ? `<p><strong>Party ID:</strong> ${escapeHtml(partyId)}</p>` : ""}
         <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
-          ${textToHtml(smsText)}
+          ${textToHtml(emailText)}
         </div>
-        <p><strong>QR Code</strong></p>
-        <p>
-          <a href="${escapeHtml(inviteUrl)}">
-            <img src="${escapeHtml(qrCodeUrl)}" alt="Invite QR code" width="220" height="220" style="display:block;border:0;" />
-          </a>
-        </p>
+        ${waiverUrl ? `<p><strong>Waiver:</strong> <a href="${escapeHtml(waiverUrl)}">${escapeHtml(waiverUrl)}</a></p>` : ""}
+        ${qrCodeUrl ? `
+          <p><strong>QR Code</strong></p>
+          <p>
+            <a href="${escapeHtml(inviteUrl)}">
+              <img src="${escapeHtml(qrCodeUrl)}" alt="Invite QR code" width="220" height="220" style="display:block;border:0;" />
+            </a>
+          </p>
+        ` : ""}
       </div>
     `;
 

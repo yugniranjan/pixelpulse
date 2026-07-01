@@ -65,6 +65,7 @@ export default function AdminInvitesPage() {
   const [emailTo, setEmailTo] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendingConfirmationEmail, setSendingConfirmationEmail] = useState(false);
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(false);
   const [editingInvite, setEditingInvite] = useState(null);
@@ -222,6 +223,40 @@ export default function AdminInvitesPage() {
       setEmailStatus("Unable to send email.");
     } finally {
       setSendingEmail(false);
+    }
+  }
+
+  async function sendConfirmationEmail() {
+    if (!result || !emailTo) return;
+    setSendingConfirmationEmail(true);
+    setEmailStatus("");
+
+    try {
+      const response = await fetch("/api/admin/invites/email", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailTo,
+          partyId: result.partyId,
+          inviteUrl: result.inviteUrl,
+          waiverUrl: result.waiverUrl,
+          confirmationEmailText: result.confirmationEmailText,
+          qrCodeUrl: result.qrCodeUrl,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEmailStatus(data.error || "Unable to send confirmation email.");
+        return;
+      }
+
+      setEmailStatus("Confirmation email sent.");
+    } catch (sendError) {
+      setEmailStatus("Unable to send confirmation email.");
+    } finally {
+      setSendingConfirmationEmail(false);
     }
   }
 
@@ -431,7 +466,12 @@ export default function AdminInvitesPage() {
                 <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
               </div>
               <div>
-                <span>Email SMS + QR</span>
+                <span>Confirmation Email Text</span>
+                <textarea readOnly value={result.confirmationEmailText || ""} />
+                <button type="button" onClick={() => copyText(result.confirmationEmailText || "")}>Copy</button>
+              </div>
+              <div>
+                <span>Email</span>
                 <input
                   type="email"
                   value={emailTo}
@@ -442,7 +482,14 @@ export default function AdminInvitesPage() {
                   placeholder="name@example.com"
                 />
                 <button type="button" onClick={sendInviteEmail} disabled={sendingEmail || !emailTo}>
-                  {sendingEmail ? "Sending..." : "Send Email"}
+                  {sendingEmail ? "Sending..." : "Send SMS + QR"}
+                </button>
+                <button
+                  type="button"
+                  onClick={sendConfirmationEmail}
+                  disabled={sendingConfirmationEmail || !emailTo || !result.confirmationEmailText}
+                >
+                  {sendingConfirmationEmail ? "Sending..." : "Send Confirmation Email"}
                 </button>
                 {emailStatus ? <small>{emailStatus}</small> : null}
               </div>

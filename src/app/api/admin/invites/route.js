@@ -142,6 +142,17 @@ async function listInvites() {
 }
 
 function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
+  return [
+    invite.intro,
+    `${invite.dateLabel || "Date"}: ${invite.date}`,
+    `${invite.timeLabel || "Time"}: ${invite.time}`,
+    `${invite.addressLabel || "Address"}: ${invite.address}`,
+    `Invite: ${inviteUrl}`,
+    `Waiver: ${waiverLink}`,
+  ].filter(Boolean).join("\n");
+}
+
+function buildConfirmationEmailText(invite = {}) {
   const hostName = invite.rsvpName || "Party Host";
   const childName = invite.childName || "the birthday child";
   const partyPackage = invite.titleSuffix || invite.title || "Birthday Party Package";
@@ -152,33 +163,73 @@ function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
 
   return [
     `Dear ${hostName},`,
-    `Thank you for choosing Pixel Pulse Play to celebrate ${childName}'s special day. We cannot wait to make it unforgettable!`,
+    `Thank you for choosing Pixel Pulse Play to celebrate ${childName}'s special day! We can't wait to make it an unforgettable experience.`,
     "",
     "Your Party Details",
+    "Booking Details",
     `Party ID: ${invite.partyId || "As confirmed"}`,
     `Party Date: ${invite.date || "As confirmed"}`,
     `Party Start Time: ${invite.time || "As confirmed"}`,
     `Party Package: ${partyPackage}`,
-    "Play Duration / Children Included / Food & Add-ons: As confirmed in your booking.",
-    `Invite: ${inviteUrl}`,
-    `Waiver: ${waiverLink}`,
+    "Play Duration: As confirmed in your booking",
+    "Number of Children Included: As confirmed in your booking",
+    "Party Room Access: As confirmed in your booking",
+    "Food & Add-ons: As confirmed in your booking",
+    "Additional Extras: As confirmed in your booking",
+    "Special Notes: As confirmed in your booking",
     "",
-    "Important Information - Please Read",
-    "1. Scheduled party package: This booking is during regular operating hours and is not a private facility rental. Other guests or walk-in visitors may be in the facility. For private-party pricing and availability, please contact us.",
-    "2. Challenge rooms run one group at a time. Children stay with their own group and may wait briefly if a room is occupied. Staff will guide rotations.",
-    "3. Safety: Our team supervises activities, monitors the facility, and helps children throughout the experience.",
-    "4. Equipment & behaviour: Please follow staff instructions, use equipment appropriately, keep food/drinks in designated areas, and avoid unsafe or disruptive behaviour. Deliberate damage may result in repair or replacement charges to the party host.",
-    "5. Waivers & arrival: Please complete waivers before arrival and arrive 15 minutes early. Late arrivals may reduce play time because parties run on schedule.",
-    "6. Clothing: Comfortable clothing and closed-toe shoes are recommended for active play.",
+    "Important Information - Please Read Carefully",
+    "1. This is a Scheduled Party Package",
+    "Your booking is for a party package during our regular operating hours and is not a private facility rental. There may be other guests and walk-in visitors in the facility during your party. If you are looking for a private party experience, please contact us regarding pricing and availability.",
+    "Our team carefully manages all activities to ensure a fun and safe experience for everyone.",
     "",
-    "Questions?",
+    "2. Challenge Rooms Operate One Group at a Time",
+    "For safety and the best experience:",
+    "- Children play only with their own group.",
+    "- Different stranger groups do not mix inside challenge rooms.",
+    "- If a room is occupied, your group may need to wait briefly until it is their turn.",
+    "Our staff members will guide the rotation throughout your visit.",
+    "",
+    "3. Safety is Our Top Priority",
+    "The entire facility is:",
+    "- Fully supervised by trained team members.",
+    "- Monitored through CCTV cameras.",
+    "- Designed with child safety and controlled access in mind.",
+    "Parents can relax knowing that our team continuously monitors activities and assists children throughout their experience.",
+    "",
+    "4. Respect for Equipment & Property",
+    "Our games and equipment are specially designed and maintained for everyone's enjoyment.",
+    "We kindly ask all children to:",
+    "- Follow staff instructions.",
+    "- Use equipment appropriately.",
+    "- Avoid intentional misuse, rough handling, or vandalism.",
+    "Any deliberate damage or breakage caused by guests may result in repair or replacement charges being billed to the party host.",
+    "",
+    "5. Supervision & Behaviour",
+    "For everyone's enjoyment and safety:",
+    "- Running in hallways or climbing on furniture is not permitted.",
+    "- Food and drinks should remain in designated areas.",
+    "- Children should follow staff instructions at all times.",
+    "- Children displaying unsafe or disruptive behaviour may be temporarily removed from an activity.",
+    "",
+    "6. Waivers & Arrival",
+    "- Please ensure all participants have a signed waiver before arrival.",
+    "- We recommend arriving 15 minutes before your party start time for smooth check-in.",
+    "- Late arrivals may reduce play time as parties run on a scheduled basis.",
+    "",
+    "7. Shoes & Comfortable Clothing",
+    "Children should wear comfortable clothing suitable for active play and closed-toe shoes where required.",
+    "",
+    "8. Questions?",
+    "Please visit our FAQ page for additional information:",
     "FAQs: https://www.pixelpulseplay.ca/faqs",
     `Website: ${website}`,
     `Phone: ${phone}`,
-    `${venue}`,
+    venue,
     address,
     "",
-    `We look forward to welcoming ${childName} and your guests for an exciting day of challenges, games, and unforgettable memories!`,
+    "Thank you again for celebrating with us.",
+    `We look forward to welcoming ${childName} and all of your guests for an exciting day of challenges, games, and unforgettable memories!`,
     "Warm regards,",
     "The Pixel Pulse Team",
     '"Leave the Screen. Enter the Challenge."',
@@ -284,11 +335,13 @@ export async function POST(req) {
   };
 
   const smsText = buildSmsText(invite, inviteUrl, waiverLink);
+  const confirmationEmailText = buildConfirmationEmailText(invite);
 
   const inviteRecord = {
     ...invite,
     inviteUrl,
     smsText,
+    confirmationEmailText,
   };
 
   if (hasPostgres()) {
@@ -329,6 +382,7 @@ export async function POST(req) {
     inviteUrl,
     waiverUrl: waiverLink,
     smsText,
+    confirmationEmailText,
     qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(inviteUrl)}&size=220`,
   });
 }
@@ -400,6 +454,7 @@ export async function PUT(req) {
     updatedAt,
   };
   invite.smsText = buildSmsText(invite, inviteUrl, waiverLink);
+  invite.confirmationEmailText = buildConfirmationEmailText(invite);
 
   if (hasPostgres()) {
     await upsertPostgresInvite(invite);
