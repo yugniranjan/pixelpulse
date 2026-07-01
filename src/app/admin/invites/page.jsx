@@ -40,6 +40,12 @@ export default function AdminInvitesPage() {
     childName: "",
     partyId: "",
     title: "Birthday Party",
+    playDuration: "",
+    childrenIncluded: "",
+    partyRoomAccess: "",
+    foodAddOns: "",
+    additionalExtras: "",
+    specialNotes: "",
     greeting: DEFAULT_GREETING,
     guestName: DEFAULT_GUEST_LINE,
     intro: DEFAULT_PARTY_INTRO,
@@ -266,6 +272,12 @@ export default function AdminInvitesPage() {
       childName: invite.childName || "",
       partyId: invite.partyId || "",
       title: invite.title || "",
+      playDuration: invite.playDuration || "",
+      childrenIncluded: invite.childrenIncluded || "",
+      partyRoomAccess: invite.partyRoomAccess || "",
+      foodAddOns: invite.foodAddOns || "",
+      additionalExtras: invite.additionalExtras || "",
+      specialNotes: invite.specialNotes || "",
       greeting: invite.greeting || DEFAULT_GREETING,
       guestName: invite.guestName || DEFAULT_GUEST_LINE,
       intro: invite.intro || "",
@@ -371,8 +383,8 @@ export default function AdminInvitesPage() {
             <Field label="Party ID" required>
               <input required value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Party ID" />
             </Field>
-            <Field label="Title">
-              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Birthday Party" />
+            <Field label="Party Package">
+              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Pixel Ultra" />
             </Field>
             <Field label="Slug">
               <input value={form.slug} onChange={(event) => updateSlug(event.target.value)} placeholder={suggestedSlug} />
@@ -382,6 +394,24 @@ export default function AdminInvitesPage() {
             </Field>
             <Field label="Time" required>
               <input required type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
+            </Field>
+            <Field label="Play Duration">
+              <input value={form.playDuration} onChange={(event) => updateField("playDuration", event.target.value)} placeholder="60 / 90 / 120 Minutes" />
+            </Field>
+            <Field label="Number of Children Included">
+              <input value={form.childrenIncluded} onChange={(event) => updateField("childrenIncluded", event.target.value)} placeholder="Up to 12" />
+            </Field>
+            <Field label="Party Room Access">
+              <input value={form.partyRoomAccess} onChange={(event) => updateField("partyRoomAccess", event.target.value)} placeholder="Time 00:00 hrs" />
+            </Field>
+            <Field label="Food & Add-ons">
+              <textarea value={form.foodAddOns} onChange={(event) => updateField("foodAddOns", event.target.value)} placeholder="Pizza, drinks, arcade credits, etc." />
+            </Field>
+            <Field label="Additional Extras">
+              <textarea value={form.additionalExtras} onChange={(event) => updateField("additionalExtras", event.target.value)} placeholder="Extra kids, decorations, return gifts, etc." />
+            </Field>
+            <Field label="Special Notes">
+              <textarea value={form.specialNotes} onChange={(event) => updateField("specialNotes", event.target.value)} placeholder="Allergies, special requests, additional information" />
             </Field>
           </div>
         </section>
@@ -518,7 +548,7 @@ export default function AdminInvitesPage() {
                 <Field label="Party ID" required>
                   <input required value={editingInvite.partyId} onChange={(event) => updateEditingInvite("partyId", event.target.value)} />
                 </Field>
-                <Field label="Title">
+                <Field label="Party Package">
                   <input value={editingInvite.title} onChange={(event) => updateEditingInvite("title", event.target.value)} />
                 </Field>
                 <Field label="Date" required>
@@ -526,6 +556,24 @@ export default function AdminInvitesPage() {
                 </Field>
                 <Field label="Time" required>
                   <input required type="time" value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} />
+                </Field>
+                <Field label="Play Duration">
+                  <input value={editingInvite.playDuration} onChange={(event) => updateEditingInvite("playDuration", event.target.value)} />
+                </Field>
+                <Field label="Number of Children Included">
+                  <input value={editingInvite.childrenIncluded} onChange={(event) => updateEditingInvite("childrenIncluded", event.target.value)} />
+                </Field>
+                <Field label="Party Room Access">
+                  <input value={editingInvite.partyRoomAccess} onChange={(event) => updateEditingInvite("partyRoomAccess", event.target.value)} />
+                </Field>
+                <Field label="Food & Add-ons">
+                  <textarea value={editingInvite.foodAddOns} onChange={(event) => updateEditingInvite("foodAddOns", event.target.value)} />
+                </Field>
+                <Field label="Additional Extras">
+                  <textarea value={editingInvite.additionalExtras} onChange={(event) => updateEditingInvite("additionalExtras", event.target.value)} />
+                </Field>
+                <Field label="Special Notes">
+                  <textarea value={editingInvite.specialNotes} onChange={(event) => updateEditingInvite("specialNotes", event.target.value)} />
                 </Field>
                 <Field label="Parent / Party Host Name" required>
                   <input required value={editingInvite.rsvpName} onChange={(event) => updateEditingInvite("rsvpName", event.target.value)} />
