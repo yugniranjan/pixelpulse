@@ -153,6 +153,23 @@
   margin-top: 22px;
 }
 
+.invite-admin-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.invite-admin-edit__actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #eef4ff;
+  color: #175cd3;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .invite-admin-list__header {
   display: flex;
   align-items: flex-start;

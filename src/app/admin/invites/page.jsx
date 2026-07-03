@@ -51,7 +51,6 @@ export default function AdminInvitesPage() {
     intro: DEFAULT_PARTY_INTRO,
     date: "",
     time: "",
-    partyEndTime: "",
     venue: "Pixel Pulse Playzone",
     address: DEFAULT_ADDRESS,
     directionsLink: DEFAULT_DIRECTIONS_LINK,
@@ -284,7 +283,6 @@ export default function AdminInvitesPage() {
       intro: invite.intro || "",
       date: invite.date || "",
       time: invite.time || "",
-      partyEndTime: invite.partyEndTime || "",
       venue: invite.venue || "",
       address: invite.address || "",
       waiverText: invite.waiverText || "",
@@ -325,6 +323,15 @@ export default function AdminInvitesPage() {
         return;
       }
 
+      const updatedInvite = data.invite || editingInvite;
+      setResult({
+        partyId: updatedInvite.partyId,
+        inviteUrl: updatedInvite.inviteUrl || `/invite/${updatedInvite.slug}`,
+        waiverUrl: updatedInvite.waiverLink || "",
+        smsText: updatedInvite.smsText || "",
+        confirmationEmailText: updatedInvite.confirmationEmailText || "",
+        qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(updatedInvite.inviteUrl || `/invite/${updatedInvite.slug}`)}&size=220`,
+      });
       setEditingInvite(null);
       setInviteStatus("Invite updated.");
       loadInvites();
@@ -394,11 +401,8 @@ export default function AdminInvitesPage() {
             <Field label="Date" required>
               <input required type="date" value={form.date} onChange={(event) => updateField("date", event.target.value)} />
             </Field>
-            <Field label="Party Start Time" required>
-              <input required type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
-            </Field>
-            <Field label="Party End Time">
-              <input type="time" value={form.partyEndTime} onChange={(event) => updateField("partyEndTime", event.target.value)} />
+            <Field label="Party Time" required>
+              <input required value={form.time} onChange={(event) => updateField("time", event.target.value)} placeholder="2:00 PM - 4:00 PM" />
             </Field>
             <Field label="Play Duration">
               <input value={form.playDuration} onChange={(event) => updateField("playDuration", event.target.value)} placeholder="60 / 90 / 120 Minutes" />
@@ -459,6 +463,12 @@ export default function AdminInvitesPage() {
             </Field>
             <Field label="Google Maps link">
               <input value={form.directionsLink} onChange={(event) => updateField("directionsLink", event.target.value)} />
+            </Field>
+            <Field label="Waiver text">
+              <textarea value={form.waiverText} onChange={(event) => updateField("waiverText", event.target.value)} />
+            </Field>
+            <Field label="Waiver button">
+              <input value={form.waiverButton} onChange={(event) => updateField("waiverButton", event.target.value)} />
             </Field>
             <Field label="Website text">
               <input value={form.websiteText} onChange={(event) => updateField("websiteText", event.target.value)} />
@@ -546,6 +556,11 @@ export default function AdminInvitesPage() {
                 </div>
                 <button type="button" onClick={() => setEditingInvite(null)}>Cancel</button>
               </div>
+              <div className="invite-admin-edit__actions">
+                <a href={`/invite/${editingInvite.slug}`} target="_blank" rel="noopener noreferrer">
+                  View current invite
+                </a>
+              </div>
               <div className="invite-admin-grid">
                 <Field label="Child name" required>
                   <input required value={editingInvite.childName} onChange={(event) => updateEditingInvite("childName", event.target.value)} />
@@ -559,11 +574,8 @@ export default function AdminInvitesPage() {
                 <Field label="Date" required>
                   <input required type="date" value={editingInvite.date} onChange={(event) => updateEditingInvite("date", event.target.value)} />
                 </Field>
-                <Field label="Party Start Time" required>
-                  <input required type="time" value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} />
-                </Field>
-                <Field label="Party End Time">
-                  <input type="time" value={editingInvite.partyEndTime} onChange={(event) => updateEditingInvite("partyEndTime", event.target.value)} />
+                <Field label="Party Time" required>
+                  <input required value={editingInvite.time} onChange={(event) => updateEditingInvite("time", event.target.value)} placeholder="2:00 PM - 4:00 PM" />
                 </Field>
                 <Field label="Play Duration">
                   <input value={editingInvite.playDuration} onChange={(event) => updateEditingInvite("playDuration", event.target.value)} />
@@ -598,8 +610,32 @@ export default function AdminInvitesPage() {
                 <Field label="Greeting">
                   <input value={editingInvite.greeting} onChange={(event) => updateEditingInvite("greeting", event.target.value)} />
                 </Field>
+                <Field label="Guest line">
+                  <input value={editingInvite.guestName} onChange={(event) => updateEditingInvite("guestName", event.target.value)} />
+                </Field>
                 <Field label="Intro">
                   <textarea value={editingInvite.intro} onChange={(event) => updateEditingInvite("intro", event.target.value)} />
+                </Field>
+                <Field label="Waiver text">
+                  <textarea value={editingInvite.waiverText} onChange={(event) => updateEditingInvite("waiverText", event.target.value)} />
+                </Field>
+                <Field label="Waiver button">
+                  <input value={editingInvite.waiverButton} onChange={(event) => updateEditingInvite("waiverButton", event.target.value)} />
+                </Field>
+                <Field label="RSVP text">
+                  <input value={editingInvite.rsvpText} onChange={(event) => updateEditingInvite("rsvpText", event.target.value)} />
+                </Field>
+                <Field label="Pixel Pulse phone">
+                  <input value={editingInvite.businessPhone} onChange={(event) => updateEditingInvite("businessPhone", event.target.value)} />
+                </Field>
+                <Field label="Google Maps link">
+                  <input value={editingInvite.directionsLink} onChange={(event) => updateEditingInvite("directionsLink", event.target.value)} />
+                </Field>
+                <Field label="Website text">
+                  <input value={editingInvite.websiteText} onChange={(event) => updateEditingInvite("websiteText", event.target.value)} />
+                </Field>
+                <Field label="Website URL">
+                  <input value={editingInvite.websiteLink} onChange={(event) => updateEditingInvite("websiteLink", event.target.value)} />
                 </Field>
                 <Field label="Footer">
                   <textarea value={editingInvite.footer} onChange={(event) => updateEditingInvite("footer", event.target.value)} />
