@@ -20,6 +20,15 @@ const LEGACY_PARTIES_HOSTS = new Set([
   "parties.pixelpulseplay.ca",
   "www.parties.pixelpulseplay.ca",
 ]);
+const LOCATION_PREFIXES = new Set([
+  "vaughan",
+  "st-catharines",
+  "st-catherines",
+  "mississauga",
+  "oakville",
+  "london",
+  "windsor",
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -41,6 +50,37 @@ export function middleware(request) {
     .split(":")[0]
     .toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
+
+  if (requestHostname === "www.pixelpulseplay.ca") {
+    const url = request.nextUrl.clone();
+    url.protocol = "https";
+    url.hostname = "pixelpulseplay.ca";
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
+  const pathParts = pathname.split("/").filter(Boolean);
+  let canonicalPathname = pathname;
+
+  if (pathParts[0] === "undefined") {
+    canonicalPathname = `/${pathParts.slice(1).join("/")}`;
+  } else if (pathParts[0] === "blogs" && pathParts[1] === "blogs") {
+    canonicalPathname = `/blogs/${pathParts.slice(2).join("/")}`;
+  } else if (LOCATION_PREFIXES.has(pathParts[0]) && pathParts[1] === "blogs") {
+    canonicalPathname = `/blogs/${pathParts.slice(2).join("/")}`;
+  } else if (pathname === "/contact-us") {
+    canonicalPathname = "/contactus";
+  }
+
+  if (canonicalPathname !== pathname || request.nextUrl.searchParams.has("uid")) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https";
+    url.hostname = "pixelpulseplay.ca";
+    url.port = "";
+    url.pathname = canonicalPathname || "/";
+    url.searchParams.delete("uid");
+    return NextResponse.redirect(url, 308);
+  }
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
@@ -118,14 +158,6 @@ export function middleware(request) {
       url.pathname = "/birthday-party-bookings-vaughan";
       return NextResponse.rewrite(url);
     }
-  }
-
-  if (requestHostname === "www.pixelpulseplay.ca") {
-    const url = request.nextUrl.clone();
-    url.protocol = "https";
-    url.hostname = "pixelpulseplay.ca";
-    url.port = "";
-    return NextResponse.redirect(url, 308);
   }
 
   // ✅ Allow auth APIs

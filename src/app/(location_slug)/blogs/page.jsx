@@ -101,7 +101,7 @@ const schema = {
     return {
       "@type": "BlogPosting",
       headline: blog.title,
-      url: blog.href || canonicalUrl(`/blogs/${slug}`),
+      url: slug ? canonicalUrl(`/blogs/${slug}`) : canonicalUrl("/blogs"),
       image:
         blog.featuredImage ||
         "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
@@ -155,7 +155,7 @@ const schema = {
         <section className="ppp-blogs-grid">
           {blogsToRender?.map((item) => {
             const slug = slugify(item.title);
-            const href = item.href || `/blogs/${slug}`;
+            const href = slug ? `/blogs/${slug}` : "/blogs";
             return (
               <article className="ppp-blog-card" key={item.id}>
                 <div className="ppp-blog-card__media">

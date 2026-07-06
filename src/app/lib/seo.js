@@ -29,10 +29,18 @@ export function canonicalPath(...segments) {
   const parts = segments
     .flatMap((segment) => String(segment || "").split("/"))
     .map((segment) => segment.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((segment) => {
+      const normalized = segment.toLowerCase();
+      return normalized !== "undefined" && normalized !== "null" && normalized !== "$";
+    });
 
   if (parts[0]?.toLowerCase() === defaultLocation) {
     parts.shift();
+  }
+
+  if (parts[0]?.toLowerCase() === "blogs" && parts[1]?.toLowerCase() === "blogs") {
+    parts.splice(0, 1);
   }
 
   if (parts.length === 1 && parts[0].toLowerCase() === "contact-us") {

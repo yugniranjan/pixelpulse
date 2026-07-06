@@ -8,8 +8,19 @@ import { slugify } from "@/utils/slugify";
 export async function GET() {
   const dynamicPaths = new Set();
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
+  dynamicPaths.add(canonicalUrl());
+  dynamicPaths.add(canonicalUrl("/blogs"));
+
   const getLocationPath = (location = "") => {
     const normalizedLocation = location.trim().toLowerCase();
+    if (
+      !normalizedLocation ||
+      normalizedLocation === "undefined" ||
+      normalizedLocation === "null"
+    ) {
+      return "";
+    }
+
     return normalizedLocation && normalizedLocation !== locationName ? `/${normalizedLocation}` : "";
   };
 
@@ -23,9 +34,12 @@ export async function GET() {
       const path = typeof row?.path === "string" ? row.path.trim().toLowerCase() : "";
       const isActive = String(row?.isactive ?? "1").trim();
       const locations = location?.split(',').map(l => l.trim().toLowerCase()) || [];
+      const invalidSegments = new Set(["undefined", "null", "$"]);
 
       if (
         !path ||
+        invalidSegments.has(path) ||
+        invalidSegments.has(parentid) ||
         isActive !== "1" ||
         path === "home" ||
         path.startsWith("_") ||
