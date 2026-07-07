@@ -497,6 +497,8 @@ function getVrContent(rows = []) {
       primaryText: get(["heroPrimaryText", "heroCtaText"], "Book a VR Session"),
       primaryHref: get(["heroPrimaryHref", "heroCtaHref"], bookingUrl),
       primaryBookingType: get(["heroPrimaryBookingType", "heroBookingType"], "ticket"),
+      bookNowText: get(["heroBookNowText", "bookNowText"], "Book Now"),
+      bookNowHref: get(["heroBookNowHref", "bookNowHref"], bookingUrl),
       secondaryText: get(["heroSecondaryText"], "Browse Experiences"),
       secondaryHref: get(["heroSecondaryHref"], "#experiences"),
       launchLabel: get(["launchLineupLabel", "launchStripLabel"], "Launch lineup"),
@@ -642,6 +644,11 @@ export default async function VrPage() {
               text={content.hero.primaryText}
               href={content.hero.primaryHref}
               bookingType={content.hero.primaryBookingType}
+              className="ppp-vr-btn ppp-vr-btn--primary"
+            />
+            <ActionButton
+              text={content.hero.bookNowText}
+              href={content.hero.bookNowHref}
               className="ppp-vr-btn ppp-vr-btn--primary"
             />
             <ActionButton
