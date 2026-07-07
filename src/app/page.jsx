@@ -17,6 +17,7 @@ import { LOCATION_NAME } from "./lib/constant";
 import SectionHeading from "./components/home/SectionHeading";
 import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
+import VrTeaserModal from "./components/model/VrTeaserModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
 import { safeImageUrl } from "@/lib/seo";
 
@@ -302,6 +303,53 @@ function parseVisibleFlag(value, fallback = true) {
 
 function configValue(configData, key) {
   return getConfigValue(configData, [key]);
+}
+
+function parseNonNegativeInteger(value) {
+  const parsed = Number.parseInt(String(value ?? "").trim(), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function getVrTeaserPopupConfig(configData = []) {
+  const html = getConfigValue(configData, [
+    "vr-teaser-popup",
+    "vrTeaserPopup",
+    "vrPopupHtml",
+  ]);
+  const configuredShow = getConfigValue(configData, [
+    "vr-teaser-popup-show",
+    "vrTeaserPopupShow",
+    "vrPopupShow",
+  ]);
+
+  return {
+    show: parseVisibleFlag(configuredShow, Boolean(html)),
+    html,
+    delayMs:
+      parseNonNegativeInteger(
+        getConfigValue(configData, [
+          "vr-teaser-popup-delay-ms",
+          "vrTeaserPopupDelayMs",
+          "vrPopupDelayMs",
+        ]),
+      ) ?? 3600,
+    autoDismissMs:
+      parseNonNegativeInteger(
+        getConfigValue(configData, [
+          "vr-teaser-popup-auto-dismiss-ms",
+          "vrTeaserPopupAutoDismissMs",
+          "vrPopupAutoDismissMs",
+        ]),
+      ) ?? 10000,
+    maxWidth:
+      parsePositiveInteger(
+        getConfigValue(configData, [
+          "vr-teaser-popup-width",
+          "vrTeaserPopupWidth",
+          "vrPopupWidth",
+        ]),
+      ) || 560,
+  };
 }
 
 function hasSheetField(sheet, field) {
@@ -691,6 +739,7 @@ const Home = async () => {
   const promotionPopup = Array.isArray(dataconfig)
     ? dataconfig.filter((item) => item.key === "promotion-popup")
     : [];
+  const vrTeaserPopup = getVrTeaserPopupConfig(dataconfig);
   const header_image = homePageData
     ? [homePageData]
     : Array.isArray(data)
@@ -887,6 +936,7 @@ const Home = async () => {
         delayMs={5000}
         claimOfferText={ctaContent.claimOfferText}
       />
+      <VrTeaserModal config={vrTeaserPopup} />
 
       {/* ── Hero ── */}
       <PromotionHeroMarquee promotions={promotionMarqueeItems} />

@@ -5,7 +5,14 @@ import ReactDOM from "react-dom";
 import "../../styles/modal.css";
 import { IoCloseSharp } from "react-icons/io5";
 
-const Modal = ({ isOpen, onClose, children, titleId, ariaLabel = "Dialog" }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  titleId,
+  ariaLabel = "Dialog",
+  contentStyle,
+}) => {
   const [modalRoot, setModalRoot] = useState(null);
   const closeButtonRef = useRef(null);
 
@@ -43,6 +50,7 @@ const Modal = ({ isOpen, onClose, children, titleId, ariaLabel = "Dialog" }) => 
         aria-labelledby={titleId}
         aria-label={titleId ? undefined : ariaLabel}
         onClick={(event) => event.stopPropagation()}
+        style={contentStyle}
       >
       
         <button
