@@ -9,6 +9,7 @@ import BlogCard from "@/components/smallComponents/BlogCard";
 import {
   fetchsheetdata,
   fetchMenuData,
+  fetchPageData,
   getWaiverLink,
   generateMetadataLib,
 } from "@/lib/sheets";
@@ -663,13 +664,15 @@ const Home = async () => {
 
   let waiverLink = "";
   let data = [];
+  let homePageData = null;
   let dataconfig = [];
   let siteData = emptySiteData;
 
   try {
-    [waiverLink, data, dataconfig, siteData] = await Promise.all([
+    [waiverLink, data, homePageData, dataconfig, siteData] = await Promise.all([
       getWaiverLink(location_slug),
       fetchMenuData(location_slug),
+      fetchPageData(location_slug, "home"),
       fetchsheetdata("config", location_slug),
       fetchGoogleSiteDataSheets().then(parseSiteDataSheets),
     ]);
@@ -688,9 +691,11 @@ const Home = async () => {
   const promotionPopup = Array.isArray(dataconfig)
     ? dataconfig.filter((item) => item.key === "promotion-popup")
     : [];
-  const header_image = Array.isArray(data)
-    ? data.filter((item) => item.path === "home")
-    : [];
+  const header_image = homePageData
+    ? [homePageData]
+    : Array.isArray(data)
+      ? data.filter((item) => item.path === "home")
+      : [];
 
   const safeHeaderImage = header_image
     ? JSON.parse(JSON.stringify(header_image))
