@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import { getConfigValue } from "@/lib/ctaContent";
 import { DEFAULT_SEO_IMAGE, canonicalUrl, getCanonicalSiteUrl, safeImageUrl } from "@/lib/seo";
+import { isMenuItemActive } from "@/utils/customFunctions";
 
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I/export?format=xlsx`;
 const sheetCache = new Map();
@@ -145,20 +146,26 @@ export async function fetchsheetdataNoCache(sheetName) {
 export async function fetchMenuData(location) {
   const jsonData = await fetchsheetdata("Data", location);
   const hierarchy = {};
+  const allPaths = new Set(jsonData.map((item) => item.path).filter(Boolean));
 
   jsonData.forEach(item => {
     const { section1, section2, ruleyes, ruleno, ...rest } = item;
-    hierarchy[item.path] = { ...rest, children: [] };
+    if (isMenuItemActive(rest)) {
+      hierarchy[item.path] = { ...rest, children: [] };
+    }
   });
 
   jsonData.forEach(item => {
     if (item.parentid && item.parentid !== item.path && hierarchy[item.parentid]) {
-      hierarchy[item.parentid].children.push(hierarchy[item.path]);
+      const child = hierarchy[item.path];
+      if (child) {
+        hierarchy[item.parentid].children.push(child);
+      }
     }
   });
 
   return Object.values(hierarchy).filter(
-    item => !item.parentid || item.parentid === item.path || !hierarchy[item.parentid]
+    item => !item.parentid || item.parentid === item.path || !allPaths.has(item.parentid)
   );
 }
 

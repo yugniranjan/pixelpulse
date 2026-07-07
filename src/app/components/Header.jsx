@@ -11,6 +11,7 @@ import BookingButton from "./smallComponents/BookingButton";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { getCtaContent } from "@/lib/ctaContent";
+import { isMenuItemActive } from "@/utils/customFunctions";
 
 
 function normalizePath(path = "/") {
@@ -30,7 +31,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
     ...(Array.isArray(menudata) ? menudata : [])
     .filter(
       (item) =>
-        item.isactive === 1 &&
+        isMenuItemActive(item) &&
         !["contactus", "contact-us"].includes(item.path?.toLowerCase()),
     )
     .map((item) => ({
