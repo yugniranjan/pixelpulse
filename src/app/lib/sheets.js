@@ -152,12 +152,14 @@ export async function fetchMenuData(location) {
   });
 
   jsonData.forEach(item => {
-    if (item.parentid && hierarchy[item.parentid]) {
+    if (item.parentid && item.parentid !== item.path && hierarchy[item.parentid]) {
       hierarchy[item.parentid].children.push(hierarchy[item.path]);
     }
   });
 
-  return Object.values(hierarchy).filter(item => !item.parentid || !hierarchy[item.parentid]);
+  return Object.values(hierarchy).filter(
+    item => !item.parentid || item.parentid === item.path || !hierarchy[item.parentid]
+  );
 }
 
 /**
