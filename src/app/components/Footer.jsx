@@ -6,7 +6,7 @@ import Link from "next/link";
 import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
 import { getConfiguredValue } from "@/lib/ctaContent";
 import BookingButton from "@/components/smallComponents/BookingButton";
-import { getDataByParentId } from "@/utils/customFunctions";
+import { getDataByParentId, isMenuItemActive } from "@/utils/customFunctions";
 import { slugify } from "@/utils/slugify";
 import facebookicon from "@public/assets/images/social_icon/facebook.png";
 import tiktokicon from "@public/assets/images/social_icon/tiktok.png";
@@ -14,6 +14,15 @@ import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import youtubeicon from "@public/assets/images/social_icon/youtube.svg";
 import Script from "next/script";
 
+function footerHrefForItem(item = {}, locationSlug = "") {
+  const path = String(item?.path || "").trim().toLowerCase();
+  const parentid = String(item?.parentid || "").trim().toLowerCase();
+
+  if (!path) return "";
+  if (!parentid || parentid === path) return `/${path}`;
+
+  return `/${locationSlug}/${parentid}/${path}`;
+}
 
 const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   if (!configdata?.length || !menudata?.length) return null;
@@ -43,6 +52,34 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
     { label: "Birthday Parties", href: "/kids-birthday-parties" },
     { label: "Pricing Promos", href: "/pricing-promos" },
   ];
+  const staticCompanyHrefs = new Set(companyStaticLinks.map((item) => item.href));
+  const footerExcludedTopLevelPaths = new Set([
+    "home",
+    "contactus",
+    "contact-us",
+    "group-events",
+    "blogs",
+    "about-us",
+  ]);
+  const sheetCompanyLinks = (Array.isArray(menudata) ? menudata : [])
+    .filter((item) => {
+      const path = String(item?.path || "").trim().toLowerCase();
+      const parentid = String(item?.parentid || "").trim().toLowerCase();
+      const href = footerHrefForItem(item, location_slug);
+
+      return (
+        isMenuItemActive(item) &&
+        path &&
+        (!parentid || parentid === path) &&
+        !footerExcludedTopLevelPaths.has(path) &&
+        !staticCompanyHrefs.has(href)
+      );
+    })
+    .map((item) => ({
+      label: item?.desc || item?.title || item?.path,
+      href: footerHrefForItem(item, location_slug),
+    }));
+  const companyLinks = [...companyStaticLinks, ...sheetCompanyLinks];
   const companyChildren = companyData?.[0]?.children || [];
   const blogChildren = blogsData?.[0]?.children || [];
   const blogFallbacks = getFallbackBlogs();
@@ -115,7 +152,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               ))} */}
           <ul>
             <li>Company</li>
-            {companyStaticLinks.map((item) => (
+            {companyLinks.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} prefetch>
                   {item.label}
