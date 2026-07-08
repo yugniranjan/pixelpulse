@@ -133,6 +133,8 @@ export function middleware(request) {
     return NextResponse.redirect(url, 308);
   }
 
+  const isInternalAppPath = pathname.startsWith("/admin") || pathname.startsWith("/api");
+
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
     return NextResponse.next();
@@ -211,7 +213,7 @@ export function middleware(request) {
     }
   }
 
-  const normalizedPath = normalizeLegacyPath(pathname);
+  const normalizedPath = isInternalAppPath ? null : normalizeLegacyPath(pathname);
   if (normalizedPath && normalizedPath !== pathname) {
     return NextResponse.redirect(
       buildRedirectUrl(request, normalizedPath, {
