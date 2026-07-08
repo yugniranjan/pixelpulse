@@ -58,8 +58,13 @@ function normalizeRedirect(row) {
     return null;
   }
 
+  const normalizedSource = source.startsWith("/") ? source : `/${source}`;
+  if (normalizedSource.startsWith("/admin") || normalizedSource.startsWith("/api")) {
+    return null;
+  }
+
   return {
-    source: source.startsWith("/") ? source : `/${source}`,
+    source: normalizedSource,
     destination,
     permanent: ["true", "yes", "1"].includes(
       String(row?.permanent ?? "true").trim().toLowerCase(),

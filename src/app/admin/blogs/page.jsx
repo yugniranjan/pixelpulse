@@ -80,7 +80,7 @@ export default function AllBlogs() {
         </div>
         <div>
         <Link
-          href="/admin/blog"
+          href="/admin/blogs/new"
           className="delete-btn"
           style={{fontSize:"16px", marginRight:"10px", padding:"8px 16px", color: "white", backgroundColor: "var(--primary-color)", display: "inline-block"}}
         >

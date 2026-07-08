@@ -101,6 +101,7 @@ export function middleware(request) {
     .split(":")[0]
     .toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
+  const isInternalAppPath = pathname.startsWith("/admin") || pathname.startsWith("/api");
 
   if (requestHostname === "www.pixelpulseplay.ca") {
     const url = request.nextUrl.clone();
@@ -123,7 +124,7 @@ export function middleware(request) {
     canonicalPathname = "/contactus";
   }
 
-  if (canonicalPathname !== pathname || request.nextUrl.searchParams.has("uid")) {
+  if (!isInternalAppPath && (canonicalPathname !== pathname || request.nextUrl.searchParams.has("uid"))) {
     const url = request.nextUrl.clone();
     url.protocol = "https";
     url.hostname = "pixelpulseplay.ca";
@@ -132,8 +133,6 @@ export function middleware(request) {
     url.searchParams.delete("uid");
     return NextResponse.redirect(url, 308);
   }
-
-  const isInternalAppPath = pathname.startsWith("/admin") || pathname.startsWith("/api");
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
