@@ -16,7 +16,7 @@ const DEFAULT_VR_BOOKING_URL =
 
 const META_TITLE = "VR Experiences | Pixel Pulse Play Zone Vaughan";
 const META_DESCRIPTION =
-  "VR is launching soon at Pixel Pulse Play Zone in Vaughan with a focused 4x4 metre arena lineup including Holomia, Party Ship, HunterVR, and Cops and Robbers.";
+  "VR is launching soon at Pixel Pulse Play Zone in Vaughan with a focused 4x4 metre arena lineup including The Smurfs: Blueberry Battle, Party Ship, HunterVR, and Cops and Robbers.";
 
 const VR_LAUNCH_MODE = true;
 const HUNTER_VR_IMAGE =
@@ -24,11 +24,13 @@ const HUNTER_VR_IMAGE =
 const COPS_ROBBERS_IMAGE =
   "https://cdn.synthesisvr.com/gameassets/svr_5739/header2460x215_1672244114.webp";
 const LAUNCH_GAME_NAMES = [
-  "Holomia",
+  "The Smurfs: Blueberry Battle",
   "Party Ship",
   "HunterVR",
   "Cops and Robbers",
 ];
+const DEFAULT_LAUNCH_HERO_TEXT =
+  "We are starting with a focused 4x4 metre VR arena lineup: The Smurfs: Blueberry Battle, Party Ship, HunterVR, and Cops and Robbers.";
 
 const FALLBACK_STATS = [
   { value: "4", label: "Launch Games" },
@@ -70,11 +72,11 @@ const FALLBACK_OFFERS = [
 
 const FALLBACK_FEATURED = [
   {
-    flag: "Launch Lineup",
-    title: "HunterVR",
-    desc: "Step into the arena for a compact, action-focused VR challenge built for the first rollout.",
-    tags: ["Action", "Launch"],
-    img: HUNTER_VR_IMAGE,
+    flag: "Family Pick",
+    title: "The Smurfs: Blueberry Battle",
+    desc: "A bright, family-friendly VR adventure where players jump into a playful Smurfs challenge.",
+    tags: ["Family", "Adventure", "Launch"],
+    img: PAGE_BG,
   },
   {
     flag: "Family Pick",
@@ -84,11 +86,18 @@ const FALLBACK_FEATURED = [
     img: "https://cdn.synthesisvr.com/gameassets/svr_79692/headerr460x215_1773153241.webp",
   },
   {
-    flag: "Escape",
-    title: "Holomia",
-    desc: "Immersive VR escape adventures designed for groups that want puzzles, teamwork, and exploration.",
-    tags: ["Team", "Escape", "Adventure"],
-    img: "https://cdn.synthesisvr.com/gameassets/svr_79670/header_v2460x215_1779100697.webp",
+    flag: "Launch Lineup",
+    title: "HunterVR",
+    desc: "Step into the arena for a compact, action-focused VR challenge built for the first rollout.",
+    tags: ["Action", "Launch"],
+    img: HUNTER_VR_IMAGE,
+  },
+  {
+    flag: "Team Play",
+    title: "Cops and Robbers",
+    desc: "A team-based chase experience with fast rounds and arcade energy.",
+    tags: ["Team", "Action", "Launch"],
+    img: COPS_ROBBERS_IMAGE,
   },
 ];
 
@@ -99,7 +108,7 @@ const FALLBACK_CATEGORIES = [
     accent: "var(--vr-magenta)",
     icon: "🥽",
     games: [
-      { title: "Holomia", desc: "Immersive escape-style VR adventures for teamwork and exploration.", tags: ["Team", "Escape"], img: `${IMG}/svr_79670/header_v2460x215_1779100697.webp` },
+      { title: "The Smurfs: Blueberry Battle", desc: "A colorful, family-friendly VR adventure built for playful teamwork.", tags: ["Family", "Adventure"], img: PAGE_BG },
       { title: "Party Ship", desc: "Chaotic, laugh-out-loud crew gameplay for friends and families.", tags: ["2-4", "Party"], img: `${IMG}/svr_79692/headerr460x215_1773153241.webp` },
       { title: "HunterVR", desc: "Step into the arena for a compact, action-focused VR challenge.", tags: ["Action", "Launch"], img: HUNTER_VR_IMAGE },
       { title: "Cops and Robbers", desc: "A team-based chase experience with fast rounds and arcade energy.", tags: ["Team", "Action"], img: COPS_ROBBERS_IMAGE },
@@ -145,6 +154,21 @@ function isHidden(row = {}) {
   );
 }
 
+function parseVisibleFlag(value, fallback = true) {
+  const normalizedValue = clean(value).toLowerCase();
+  if (!normalizedValue) return fallback;
+
+  if (["true", "yes", "1", "show", "visible", "enabled", "on"].includes(normalizedValue)) {
+    return true;
+  }
+
+  if (["false", "no", "0", "hide", "hidden", "disabled", "off"].includes(normalizedValue)) {
+    return false;
+  }
+
+  return fallback;
+}
+
 function rowSection(row = {}) {
   return getRowValue(row, ["section", "type", "kind"]).toLowerCase();
 }
@@ -184,12 +208,13 @@ function getLaunchGameNames(rows = []) {
       ["launchGameNames", "launchLineup", "launchGames", "heroLaunchGames"],
       "",
     ),
-  );
+  ).map((title) => launchGameName(title)).filter(Boolean);
 
   if (configuredGames.length) return configuredGames;
 
   const launchRows = sectionRows(rows, ["launchLineup", "launchGame", "launchGames"])
     .map((row) => firstValue(row, ["title", "name", "value", "game"]))
+    .map((title) => launchGameName(title))
     .filter(Boolean);
 
   return launchRows.length ? launchRows : LAUNCH_GAME_NAMES;
@@ -223,8 +248,10 @@ function gameKey(value = "") {
 }
 
 const LAUNCH_GAME_ALIASES = new Map([
-  ["holomia", "Holomia"],
-  ["holomia escape", "Holomia"],
+  ["the smurfs blueberry battle", "The Smurfs: Blueberry Battle"],
+  ["smurfs blueberry battle", "The Smurfs: Blueberry Battle"],
+  ["smurf blueberry battle", "The Smurfs: Blueberry Battle"],
+  ["blueberry battle", "The Smurfs: Blueberry Battle"],
   ["party ship", "Party Ship"],
   ["huntervr", "HunterVR"],
   ["hunter vr", "HunterVR"],
@@ -234,6 +261,12 @@ const LAUNCH_GAME_ALIASES = new Map([
 
 function launchGameName(title = "") {
   return LAUNCH_GAME_ALIASES.get(gameKey(title));
+}
+
+function normalizeLaunchCopy(value = "") {
+  return clean(value)
+    .replace(/\bHolomia\b/gi, "The Smurfs: Blueberry Battle")
+    .replace(/\bCops\s*&\s*Robbers\b/gi, "Cops and Robbers");
 }
 
 function looksLikeImageUrl(value = "") {
@@ -464,6 +497,14 @@ function getFaqs(rows = []) {
 function getVrContent(rows = []) {
   const get = (keys, fallback = "") => getConfiguredValue(rows, keys, fallback);
   const bookingUrl = getVrBookingUrl(rows);
+  const showGameLineup = parseVisibleFlag(
+    get(["showGameLineup", "showGameLibrary", "showLibrary", "gameLineupVisible"]),
+    true,
+  );
+  const showFeaturedSection = parseVisibleFlag(
+    get(["showFeaturedSection", "showFeatured", "featuredSectionVisible"]),
+    false,
+  );
   const launchCopy = VR_LAUNCH_MODE
     ? {
         metaTitle: "VR Adventure | Pixel Pulse Play Zone Vaughan",
@@ -493,17 +534,18 @@ function getVrContent(rows = []) {
       eyebrow: get(["heroEyebrow", "eyebrow"], "Pixel Pulse VR · Vaughan"),
       title: get(["heroTitle", "headline"], "VR Launch"),
       titleAccent: get(["heroTitleAccent", "headlineAccent"], "Coming Soon"),
-      text: get(["heroText", "heroSubtitle", "subheadline"], "We are starting with a focused 4x4 metre VR arena lineup: Holomia, Party Ship, HunterVR, and Cops and Robbers."),
+      text: normalizeLaunchCopy(get(["heroText", "heroSubtitle", "subheadline"], DEFAULT_LAUNCH_HERO_TEXT)),
       primaryText: get(["heroPrimaryText", "heroCtaText"], "Book a VR Session"),
       primaryHref: get(["heroPrimaryHref", "heroCtaHref"], bookingUrl),
       primaryBookingType: get(["heroPrimaryBookingType", "heroBookingType"], "ticket"),
       bookNowText: get(["heroBookNowText", "bookNowText"], "Book Now"),
       bookNowHref: get(["heroBookNowHref", "bookNowHref"], bookingUrl),
-      secondaryText: get(["heroSecondaryText"], "Browse Experiences"),
-      secondaryHref: get(["heroSecondaryHref"], "#experiences"),
+      secondaryText: showGameLineup ? get(["heroSecondaryText"], "Browse Experiences") : "",
+      secondaryHref: showGameLineup ? get(["heroSecondaryHref"], "#experiences") : "",
       launchLabel: get(["launchLineupLabel", "launchStripLabel"], "Launch lineup"),
       launchGames: getLaunchGameNames(rows),
       stats: getStats(rows),
+      showLaunchStrip: showGameLineup,
     },
     offersSection: {
       title: get(["offersTitle", "packagesTitle"], "Choose Your"),
@@ -512,12 +554,14 @@ function getVrContent(rows = []) {
       offers: getOffers(rows),
     },
     featuredSection: {
+      show: showFeaturedSection,
       title: get(["featuredTitle"], "Featured"),
       accent: get(["featuredAccent"], "This Month"),
       subtitle: launchCopy?.featuredSubtitle || get(["featuredSubtitle"], "The experiences our players keep coming back for."),
       games: getFeatured(rows),
     },
     librarySection: {
+      show: showGameLineup,
       title: launchCopy?.libraryTitle || get(["libraryTitle"], "Launch"),
       accent: launchCopy?.libraryAccent || get(["libraryAccent"], "Game Lineup"),
       subtitle: launchCopy?.librarySubtitle || get(["librarySubtitle"], "Dozens of worlds across every genre - powered by the Synthesis VR catalogue. Here's a taste of what's on rotation."),
@@ -667,7 +711,7 @@ export default async function VrPage() {
               ))}
             </div>
           ) : null}
-          {VR_LAUNCH_MODE && content.hero.launchGames.length ? (
+          {content.hero.showLaunchStrip && VR_LAUNCH_MODE && content.hero.launchGames.length ? (
             <div className="ppp-vr-launch-strip" aria-label="VR launch games">
               {content.hero.launchLabel ? <span>{content.hero.launchLabel}</span> : null}
               {content.hero.launchGames.map((game) => (
@@ -719,38 +763,41 @@ export default async function VrPage() {
         </div>
       </section>
 
-      <section className="ppp-vr-section">
-        <div className="ppp-vr-shell">
-          <div className="ppp-vr-section__head">
-            <SectionTitle title={content.featuredSection.title} accent={content.featuredSection.accent} />
-            {content.featuredSection.subtitle ? (
-              <p className="ppp-vr-section__sub">{content.featuredSection.subtitle}</p>
-            ) : null}
+      {content.featuredSection.show ? (
+        <section className="ppp-vr-section">
+          <div className="ppp-vr-shell">
+            <div className="ppp-vr-section__head">
+              <SectionTitle title={content.featuredSection.title} accent={content.featuredSection.accent} />
+              {content.featuredSection.subtitle ? (
+                <p className="ppp-vr-section__sub">{content.featuredSection.subtitle}</p>
+              ) : null}
+            </div>
+            <div className="ppp-vr-featured">
+              {content.featuredSection.games.map((game, index) => (
+                <article className="ppp-vr-spotlight" key={`${game.title}-${index}`}>
+                  <div className="ppp-vr-spotlight__bg" aria-hidden="true" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="ppp-vr-spotlight__img" src={game.img} alt={game.title} loading="lazy" />
+                  {game.flag ? <span className="ppp-vr-spotlight__flag">{game.flag}</span> : null}
+                  <h3 className="ppp-vr-spotlight__title">{game.title}</h3>
+                  {game.desc ? <p className="ppp-vr-spotlight__desc">{game.desc}</p> : null}
+                  {Array.isArray(game.tags) && game.tags.length ? (
+                    <div className="ppp-vr-tags">
+                      {game.tags.map((tag) => (
+                        <span className="ppp-vr-tag" key={tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="ppp-vr-featured">
-            {content.featuredSection.games.map((game, index) => (
-              <article className="ppp-vr-spotlight" key={`${game.title}-${index}`}>
-                <div className="ppp-vr-spotlight__bg" aria-hidden="true" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="ppp-vr-spotlight__img" src={game.img} alt={game.title} loading="lazy" />
-                {game.flag ? <span className="ppp-vr-spotlight__flag">{game.flag}</span> : null}
-                <h3 className="ppp-vr-spotlight__title">{game.title}</h3>
-                {game.desc ? <p className="ppp-vr-spotlight__desc">{game.desc}</p> : null}
-                {Array.isArray(game.tags) && game.tags.length ? (
-                  <div className="ppp-vr-tags">
-                    {game.tags.map((tag) => (
-                      <span className="ppp-vr-tag" key={tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
+      {content.librarySection.show ? (
       <section className="ppp-vr-section" id="experiences">
         <div className="ppp-vr-shell">
           <div className="ppp-vr-section__head">
@@ -776,6 +823,7 @@ export default async function VrPage() {
           ) : null}
         </div>
       </section>
+      ) : null}
 
       <div className="ppp-vr-shell">
         <section className="ppp-vr-band">
