@@ -44,6 +44,10 @@ const MODULES = [
   },
 ];
 
+function shouldUseDocumentNavigation(href) {
+  return href.startsWith("/admin/blogs");
+}
+
 function isoDate(date) {
   return date.toISOString().slice(0, 10);
 }
@@ -231,13 +235,29 @@ export default function AdminDashboardPage() {
             <h2>Modules</h2>
           </div>
           <div className="dash-modules">
-            {MODULES.map((m) => (
-              <Link className="dash-module" href={m.href} key={m.href} style={{ "--accent": m.accent }}>
-                <span className="dash-module__title">{m.title}</span>
-                <span className="dash-module__desc">{m.desc}</span>
-                <span className="dash-module__action">{m.action} →</span>
-              </Link>
-            ))}
+            {MODULES.map((m) => {
+              const content = (
+                <>
+                  <span className="dash-module__title">{m.title}</span>
+                  <span className="dash-module__desc">{m.desc}</span>
+                  <span className="dash-module__action">{m.action} →</span>
+                </>
+              );
+
+              if (shouldUseDocumentNavigation(m.href)) {
+                return (
+                  <a className="dash-module" href={m.href} key={m.href} style={{ "--accent": m.accent }}>
+                    {content}
+                  </a>
+                );
+              }
+
+              return (
+                <Link className="dash-module" href={m.href} key={m.href} style={{ "--accent": m.accent }}>
+                  {content}
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import "../../styles/blogs-table.css";
 import "../../styles/admin-waivers.css";
 import AdminShell from "@/components/AdminShell";
@@ -79,13 +78,13 @@ export default function AllBlogs() {
           <p>Manage Pixel Pulse blog posts and updates.</p>
         </div>
         <div>
-        <Link
+        <a
           href="/admin/blogs/new"
           className="delete-btn"
           style={{fontSize:"16px", marginRight:"10px", padding:"8px 16px", color: "white", backgroundColor: "var(--primary-color)", display: "inline-block"}}
         >
           Add New Blog
-        </Link>
+        </a>
         <label htmlFor="blog-search" className="sr-only">Search blogs</label>
         <input
           id="blog-search"
@@ -134,12 +133,12 @@ export default function AllBlogs() {
 
                   <td className="title-cell">
                     {blog.title}
-                    <Link
+                    <a
                       href={`/admin/blogs/edit/?id=${blog.id}`}
                       className="edit-link"
                     >
                       Edit
-                    </Link>
+                    </a>
                   </td>
 
                   <td>

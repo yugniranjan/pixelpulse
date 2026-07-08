@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
@@ -15,7 +15,6 @@ const BlogEditor = dynamic(() => import("@/components/Editor"), {
 export default function EditBlog() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const router = useRouter();
 
   const editorDataRef = useRef(null);
 
@@ -74,7 +73,7 @@ export default function EditBlog() {
       if (data.success) {
         localStorage.removeItem(`blog-draft-${id}`);
         toast.success("Blog updated");
-        router.push("/admin/blogs");
+        window.location.assign("/admin/blogs");
       } else {
         toast.error("Update failed");
       }

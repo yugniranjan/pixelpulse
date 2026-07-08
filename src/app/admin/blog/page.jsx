@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
@@ -13,8 +12,6 @@ const BlogEditor = dynamic(() => import("@/components/Editor"), {
 });
 
 export default function CreateBlog() {
-  const router = useRouter();
-
   const editorDataRef = useRef(null);
   const [title, setTitle] = useState("");
   const [featuredImage, setFeaturedImage] = useState(null);
@@ -71,7 +68,7 @@ export default function CreateBlog() {
       if (data.success) {
         localStorage.removeItem("blog-draft-new");
         toast.success("Blog published");
-        router.push("/admin/blogs");
+        window.location.assign("/admin/blogs");
       } else {
         toast.error("Failed to publish blog");
       }

@@ -15,6 +15,10 @@ const ADMIN_LINKS = [
   { href: "/waiver-data", label: "Players Data" },
 ];
 
+function shouldUseDocumentNavigation(href) {
+  return href.startsWith("/admin/blogs");
+}
+
 function isActiveLink(pathname, href) {
   if (href === "/admin") {
     return pathname === "/admin";
@@ -43,15 +47,23 @@ export default function AdminShell({ children }) {
           <span>Admin</span>
         </div>
         <nav>
-          {ADMIN_LINKS.map((link) => (
-            <Link
-              className={isActiveLink(pathname, link.href) ? "is-active" : ""}
-              href={link.href}
-              key={link.href}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {ADMIN_LINKS.map((link) => {
+            const className = isActiveLink(pathname, link.href) ? "is-active" : "";
+
+            if (shouldUseDocumentNavigation(link.href)) {
+              return (
+                <a className={className} href={link.href} key={link.href}>
+                  {link.label}
+                </a>
+              );
+            }
+
+            return (
+              <Link className={className} href={link.href} key={link.href}>
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
       <section className="waiver-admin-page waiver-admin-page--dashboard">

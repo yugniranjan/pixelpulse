@@ -110,7 +110,7 @@ export default async function LocalWaiverDataPage() {
           <Link className="is-active" href="/waiver-data">Players Data</Link>
           <Link href="/admin/waivers">Admin Waivers</Link>
           <Link href="/admin/invites">Create Party Links</Link>
-          <Link href="/admin/blogs">Blogs</Link>
+          <a href="/admin/blogs">Blogs</a>
         </nav>
       </aside>
 
