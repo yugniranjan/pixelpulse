@@ -733,6 +733,14 @@ const PricingPromosPage = async ({ params }) => {
     value: ctaContent.pricingPromoFinalCtaPrimaryText,
     fallback: "Book Your Session",
   });
+  const pricingPromoFinalCtaPrimaryHref = resolveConfiguredValue({
+    sources: [configData, pageData || {}],
+    keys: ["pricingPromoFinalCtaPrimaryHref", "pricingPromosFinalCtaPrimaryHref"],
+    value: ctaContent.pricingPromoFinalCtaPrimaryHref,
+  });
+  const isPricingPromoFinalCtaPrimaryExternal = /^https?:\/\//i.test(
+    pricingPromoFinalCtaPrimaryHref || "",
+  );
   const pricingPromoFinalCtaSecondaryText = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: ["pricingPromoFinalCtaSecondaryText", "pricingPromosFinalCtaSecondaryText"],
@@ -1042,12 +1050,24 @@ const PricingPromosPage = async ({ params }) => {
                     </p>
                   )}
                   <div className="ppp-cta-band__actions">
-                    <div className="aero-btn-booknow">
-                      <BookingButton
-                        title={pricingPromoFinalCtaPrimaryText}
-                        bookingType={ctaContent.pricingPromoFinalCtaPrimaryBookingType || "ticket"}
-                      />
-                    </div>
+                    {pricingPromoFinalCtaPrimaryHref ? (
+                      <Link
+                        href={pricingPromoFinalCtaPrimaryHref}
+                        className="ppp-btn ppp-btn--primary"
+                        target={isPricingPromoFinalCtaPrimaryExternal ? "_blank" : undefined}
+                        rel={isPricingPromoFinalCtaPrimaryExternal ? "noopener noreferrer" : undefined}
+                        prefetch={!isPricingPromoFinalCtaPrimaryExternal}
+                      >
+                        {pricingPromoFinalCtaPrimaryText}
+                      </Link>
+                    ) : (
+                      <div className="aero-btn-booknow">
+                        <BookingButton
+                          title={pricingPromoFinalCtaPrimaryText}
+                          bookingType={ctaContent.pricingPromoFinalCtaPrimaryBookingType || "ticket"}
+                        />
+                      </div>
+                    )}
                     <div className="aero-btn-booknow">
                       <BookingButton
                         title={pricingPromoFinalCtaSecondaryText}

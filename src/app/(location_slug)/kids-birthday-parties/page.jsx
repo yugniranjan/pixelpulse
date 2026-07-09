@@ -146,6 +146,7 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
     ctaSources,
     ["birthdayFinalCtaSecondaryHref", "partyFinalCtaSecondaryHref"],
   );
+  const isCtaSecondaryHrefExternal = /^https?:\/\//i.test(ctaSecondaryHref || "");
 
   const packages = parsedData.packages;
   const features = Object.keys(packages[0]).filter((key) => key !== "name");
@@ -249,7 +250,13 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
                 </Link>
               )}
               {ctaSecondaryText && ctaSecondaryHref ? (
-                <Link href={ctaSecondaryHref} className="ppp-party-cta-band__btn" prefetch>
+                <Link
+                  href={ctaSecondaryHref}
+                  className="ppp-party-cta-band__btn"
+                  prefetch={!isCtaSecondaryHrefExternal}
+                  target={isCtaSecondaryHrefExternal ? "_blank" : undefined}
+                  rel={isCtaSecondaryHrefExternal ? "noopener noreferrer" : undefined}
+                >
                   {ctaSecondaryText}
                 </Link>
               ) : ctaSecondaryText ? (

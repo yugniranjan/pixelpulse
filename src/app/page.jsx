@@ -956,7 +956,7 @@ const Home = async () => {
               {heroData.ctaPrimary}
             </a>
           ) : heroData.ctaPrimary ? (
-            <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="ticket" />
+            <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="party" />
           ) : null}
         </div>
       </section>
@@ -1473,7 +1473,7 @@ const Home = async () => {
                   {heroData.ctaPrimary}
                 </a>
               ) : heroData.ctaPrimary ? (
-                <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="ticket" />
+                <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="party" />
               ) : null}
               {siteData.location.mapsLink && ctaContent.findLocationText && (
                 <Link
