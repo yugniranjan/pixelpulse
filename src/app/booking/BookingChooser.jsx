@@ -37,60 +37,108 @@ function shouldOpenOutsideFrame(option = {}) {
   return ["party", "birthday"].includes(option.type);
 }
 
+function isCouponOption(option = {}) {
+  return option.iconKey === "coupon" || ["wagjag", "groupon"].includes(option.type);
+}
+
+function isPlayTimeOption(option = {}) {
+  return ["ticket", "tickets", "play-time", "playtime", "wagjag", "groupon"].includes(option.type) || isCouponOption(option);
+}
+
 export default function BookingChooser({ options = [], selectedType = "" }) {
-  const initialFrameOption = useMemo(
-    () => options.find((option) => !shouldOpenOutsideFrame(option)),
+  const primaryOptions = useMemo(
+    () => options.filter((option) => !isCouponOption(option)),
     [options],
   );
+  const couponOptions = useMemo(
+    () => options.filter(isCouponOption),
+    [options],
+  );
+  const initialFrameOption = useMemo(
+    () => primaryOptions.find((option) => !shouldOpenOutsideFrame(option)) || couponOptions[0],
+    [couponOptions, primaryOptions],
+  );
   const [frameOption, setFrameOption] = useState(initialFrameOption);
+  const showCouponNav = couponOptions.length > 0 && isPlayTimeOption(frameOption);
+
+  function renderTabContent(option) {
+    return (
+      <>
+        <span className="ppp-booking-option__icon">
+          {BOOKING_ICONS[option.iconKey] || BOOKING_ICONS.ticket}
+        </span>
+        <span className="ppp-booking-option__copy">
+          {option.eyebrow ? (
+            <span className="ppp-booking-option__eyebrow">{option.eyebrow}</span>
+          ) : null}
+          <span className="ppp-booking-option__title">{option.title}</span>
+          {option.meta ? <span className="ppp-booking-option__meta">{option.meta}</span> : null}
+        </span>
+      </>
+    );
+  }
 
   return (
     <>
-      <div className="ppp-booking-options">
-        {options.length ? options.map((option) => {
+      <div className="ppp-booking-options" role="tablist" aria-label="Booking options">
+        {primaryOptions.length ? primaryOptions.map((option) => {
           const opensOutside = shouldOpenOutsideFrame(option);
           const isSelected = option.type === selectedType || option.type === frameOption?.type;
 
-          return (
-            <article
+          return opensOutside ? (
+            <a
+              href={option.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className={[
                 "ppp-booking-option",
                 option.variant ? `ppp-booking-option--${option.variant}` : "",
                 isSelected ? "is-selected" : "",
               ].filter(Boolean).join(" ")}
               key={option.type}
+              role="tab"
+              aria-selected={isSelected}
             >
-              <div className="ppp-booking-option__body">
-                <div className="ppp-booking-option__icon">
-                  {BOOKING_ICONS[option.iconKey] || BOOKING_ICONS.ticket}
-                </div>
-                {option.eyebrow ? (
-                  <span className="ppp-booking-option__eyebrow">{option.eyebrow}</span>
-                ) : null}
-                <h3>{option.title}</h3>
-              </div>
-              <div className="ppp-booking-option__perf" aria-hidden="true" />
-              <div className="ppp-booking-option__footer">
-                {option.meta ? <span>{option.meta}</span> : null}
-                <a
-                  href={option.href}
-                  target={opensOutside ? "_blank" : "ppp-booking-frame"}
-                  rel={opensOutside ? "noopener noreferrer" : undefined}
-                  onClick={() => {
-                    if (!opensOutside) {
-                      setFrameOption(option);
-                    }
-                  }}
-                >
-                  {option.cta}
-                </a>
-              </div>
-            </article>
+              {renderTabContent(option)}
+            </a>
+          ) : (
+            <button
+              type="button"
+              className={[
+                "ppp-booking-option",
+                option.variant ? `ppp-booking-option--${option.variant}` : "",
+                isSelected ? "is-selected" : "",
+              ].filter(Boolean).join(" ")}
+              key={option.type}
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setFrameOption(option)}
+            >
+              {renderTabContent(option)}
+            </button>
           );
         }) : (
           <p className="ppp-booking-empty">No booking options are active right now.</p>
         )}
       </div>
+
+      {showCouponNav ? (
+        <div className="ppp-booking-coupons" aria-label="Coupon code redemption options">
+          <span>Redeem coupon code</span>
+          <div>
+            {couponOptions.map((option) => (
+              <button
+                type="button"
+                className={option.type === frameOption?.type ? "is-selected" : ""}
+                key={option.type}
+                onClick={() => setFrameOption(option)}
+              >
+                {option.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {frameOption ? (
         <section className="ppp-booking-frame-shell" aria-label="Booking checkout">

@@ -831,6 +831,15 @@ const Home = async () => {
       getConfigValue(dataconfig, ["heroUrgencyStrip", "homeHeroUrgencyStrip"]),
   };
   const isHeroCtaPrimaryExternal = /^https?:\/\//i.test(heroData.ctaPrimaryHref);
+  const miniCtaText =
+    heroData.urgencyStrip && heroData.partyCtaText && heroData.partyCtaHref
+      ? heroData.partyCtaText
+      : heroData.ctaPrimary;
+  const miniCtaHref =
+    heroData.urgencyStrip && heroData.partyCtaText && heroData.partyCtaHref
+      ? heroData.partyCtaHref
+      : heroData.ctaPrimaryHref;
+  const isMiniCtaExternal = /^https?:\/\//i.test(miniCtaHref || "");
   const howItWorksCta = {
     text:
       siteData.howItWorks.cta ||
@@ -942,21 +951,21 @@ const Home = async () => {
       <PromotionHeroMarquee promotions={promotionMarqueeItems} />
       <MotionImage pageData={safeHeaderImage} heroData={heroData} waiverLink={waiverLink} />
 
-      {(heroData.urgencyStrip || heroData.ctaPrimary) && (
+      {(heroData.urgencyStrip || miniCtaText) && (
       <section className="ppp-mini-cta">
         <div className="aero-max-container ppp-mini-cta__inner">
           {heroData.urgencyStrip && <p>{heroData.urgencyStrip}</p>}
-          {heroData.ctaPrimary && heroData.ctaPrimaryHref ? (
+          {miniCtaText && miniCtaHref ? (
             <a
-              href={heroData.ctaPrimaryHref}
+              href={miniCtaHref}
               className="ppp-btn ppp-btn--primary"
-              target={isHeroCtaPrimaryExternal ? "_blank" : undefined}
-              rel={isHeroCtaPrimaryExternal ? "noopener noreferrer" : undefined}
+              target={isMiniCtaExternal ? "_blank" : undefined}
+              rel={isMiniCtaExternal ? "noopener noreferrer" : undefined}
             >
-              {heroData.ctaPrimary}
+              {miniCtaText}
             </a>
-          ) : heroData.ctaPrimary ? (
-            <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="party" />
+          ) : miniCtaText ? (
+            <BookingButton title={miniCtaText} className="ppp-btn ppp-btn--primary" bookingType="party" />
           ) : null}
         </div>
       </section>

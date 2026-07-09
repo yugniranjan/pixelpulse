@@ -3,7 +3,7 @@ import BookingChooser from "./BookingChooser";
 import "../styles/booking-page.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { getConfigValue, getRowValue } from "@/lib/ctaContent";
-import { fetchsheetdata } from "@/lib/sheets";
+import { fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
 import { canonicalUrl } from "@/lib/seo";
 
 const DEFAULT_BIRTHDAY_URL = "https://birthdays.pixelpulseplay.ca/";
@@ -36,8 +36,13 @@ async function getBookingConfig() {
 
 async function getBookingRows() {
   try {
-    const rows = await fetchsheetdata(BOOKING_SHEET, LOCATION_NAME);
-    return Array.isArray(rows) ? rows : [];
+    const rows = await fetchsheetdataNoCache(BOOKING_SHEET);
+    if (!Array.isArray(rows)) return [];
+
+    return rows.filter((row) => {
+      const location = String(row.location || "").trim();
+      return !location || location.includes(LOCATION_NAME);
+    });
   } catch (error) {
     console.error("booking cards sheet failed:", error);
     return [];
@@ -61,7 +66,7 @@ function parseVisibleFlag(value = "", fallback = true) {
     return true;
   }
 
-  if (["false", "no", "0", "hide", "hidden", "disabled", "off"].includes(normalizedValue)) {
+  if (["false", "no", "0", "hide", "hidden", "disabled", "off", "inactive", "not active"].includes(normalizedValue)) {
     return false;
   }
 
@@ -263,7 +268,21 @@ function getSheetBookingOptions(rows = [], config = []) {
   const options = rows
     .map((row, index) => {
       const visible = parseVisibleFlag(
-        getRowValue(row, ["isactive", "active", "show", "visible", "enabled"]),
+        getRowValue(row, [
+          "isactive",
+          "isActive",
+          "active",
+          "show",
+          "show/hide",
+          "show hide",
+          "show_hide",
+          "showHide",
+          "visibility",
+          "visible",
+          "display",
+          "enabled",
+          "status",
+        ]),
         true,
       );
 
@@ -279,7 +298,7 @@ function getSheetBookingOptions(rows = [], config = []) {
 
 function getBookingOptions(config = [], bookingRows = [], selectedType = "") {
   const sheetOptions = getSheetBookingOptions(bookingRows, config);
-  const options = sheetOptions.length
+  const options = bookingRows.length
     ? sheetOptions
     : getFallbackBookingOptions(config).filter((option) => isBookingCardVisible(config, option.type));
 
@@ -305,15 +324,30 @@ export default async function BookingPage({ searchParams }) {
       <div className="aero-max-container ppp-booking-wrap">
         <section className="ppp-booking-layout" aria-label="Booking options">
           <div className="ppp-booking-section-intro">
-            <h2>What would you like to book?</h2>
-            <p>Select a card to load the booking page below.</p>
+            <h2>Book your play time now</h2>
           </div>
 
           <BookingChooser options={options} selectedType={selectedType} />
 
+          <div className="ppp-booking-party-top">
+            <div>
+              <span>Birthday Parties</span>
+              <strong>Planning a celebration?</strong>
+            </div>
+            <a href="https://birthdays.pixelpulseplay.ca" target="_blank" rel="noopener noreferrer">
+              Book Birthday Party
+            </a>
+          </div>
+
           <div className="ppp-booking-help">
-            <p>Not sure which option to choose?</p>
-            <Link href="/contactus">Contact us</Link>
+            <div className="ppp-booking-help__prompt">
+              <p>Not sure which option to choose?</p>
+              <div className="ppp-booking-help__links">
+                <Link href="/contactus">Contact us</Link>
+                <a href="mailto:connect@pixelpulseplay.ca">Email us</a>
+                <a href="tel:+19057602922">Call 905-760-2922</a>
+              </div>
+            </div>
           </div>
         </section>
       </div>
