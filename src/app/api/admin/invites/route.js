@@ -155,7 +155,7 @@ function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
 function buildConfirmationEmailText(invite = {}) {
   const hostName = invite.rsvpName || "Party Host";
   const childName = invite.childName || "the birthday child";
-  const partyPackage = invite.titleSuffix || invite.title || "Birthday Party Package";
+  const partyPackage = invite.partyPackage || invite.titleSuffix || invite.title || "Birthday Party Package";
   const venue = invite.venue || "Pixel Pulse PlayZone";
   const address = invite.address || DEFAULT_ADDRESS;
   const website = invite.websiteLink || "https://www.pixelpulseplay.ca";
@@ -284,6 +284,7 @@ export async function POST(req) {
     ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
     : `${origin}/waiver`;
   const title = titleWithoutChildName(cleanText(body.title) || "Birthday Party", childName) || "Birthday Party";
+  const partyPackage = cleanText(body.partyPackage);
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
   const inviteDefaults = await getInviteDefaults();
@@ -302,6 +303,7 @@ export async function POST(req) {
     childName,
     title,
     titleSuffix: cleanText(body.titleSuffix) || title,
+    partyPackage,
     playDuration: cleanText(body.playDuration),
     childrenIncluded: cleanText(body.childrenIncluded),
     partyRoomAccess: cleanText(body.partyRoomAccess),
@@ -358,7 +360,7 @@ export async function POST(req) {
         primaryParticipant: childName,
         visitDate: date,
         visitTime: time,
-        passType: "Birthday Party Package",
+        passType: partyPackage || "Birthday Party Package",
         createdAt: now,
         updatedAt: now,
       });
@@ -372,7 +374,7 @@ export async function POST(req) {
           primaryParticipant: childName,
           visitDate: date,
           visitTime: time,
-          passType: "Birthday Party Package",
+          passType: partyPackage || "Birthday Party Package",
           createdAt: now,
           updatedAt: now,
         },
@@ -432,6 +434,7 @@ export async function PUT(req) {
     childName,
     title: titleWithoutChildName(title, childName) || "Birthday Party",
     titleSuffix: bodyText("titleSuffix", existing.titleSuffix || title || "Birthday Party") || title || "Birthday Party",
+    partyPackage: bodyText("partyPackage", existing.partyPackage || ""),
     playDuration: bodyText("playDuration", existing.playDuration || ""),
     childrenIncluded: bodyText("childrenIncluded", existing.childrenIncluded || ""),
     partyRoomAccess: bodyText("partyRoomAccess", existing.partyRoomAccess || ""),

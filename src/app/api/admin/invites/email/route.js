@@ -82,7 +82,7 @@ function renderTextLines(lines = []) {
   return html;
 }
 
-function renderConfirmationHtml({ emailText, partyId, waiverUrl, inviteUrl, qrCodeUrl }) {
+function renderConfirmationHtml({ emailText, partyId }) {
   const lines = emailText.split("\n");
   const greetingLines = lines.slice(0, 3);
   const detailStart = lines.findIndex((line) => line.trim() === "Your Party Details");
@@ -133,17 +133,6 @@ function renderConfirmationHtml({ emailText, partyId, waiverUrl, inviteUrl, qrCo
           <div style="font-size:15px;line-height:1.6;">
             ${renderTextLines(importantLines)}
           </div>
-
-          <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e7eb;">
-            ${waiverUrl ? `<p style="margin:0 0 10px;"><strong>Waiver:</strong> <a href="${escapeHtml(waiverUrl)}" style="color:#175cd3;">${escapeHtml(waiverUrl)}</a></p>` : ""}
-            ${inviteUrl ? `<p style="margin:0 0 10px;"><strong>Invite:</strong> <a href="${escapeHtml(inviteUrl)}" style="color:#175cd3;">${escapeHtml(inviteUrl)}</a></p>` : ""}
-            ${qrCodeUrl ? `
-              <p style="margin:14px 0 8px;"><strong>Invite QR Code</strong></p>
-              <a href="${escapeHtml(inviteUrl)}">
-                <img src="${escapeHtml(qrCodeUrl)}" alt="Invite QR code" width="180" height="180" style="display:block;border:1px solid #e5e7eb;border-radius:10px;" />
-              </a>
-            ` : ""}
-          </div>
         </div>
       </div>
     </div>
@@ -192,22 +181,29 @@ export async function POST(request) {
       },
     });
 
-    const text = [
-      partyId ? `Party ID: ${partyId}` : "",
-      emailText,
-      "",
-      waiverUrl ? `Waiver: ${waiverUrl}` : "",
-      qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
-    ].filter(Boolean).join("\n");
+    const text = confirmationEmailText
+      ? [
+          partyId ? `Party ID: ${partyId}` : "",
+          emailText,
+        ].filter(Boolean).join("\n")
+      : [
+          partyId ? `Party ID: ${partyId}` : "",
+          emailText,
+          "",
+          inviteUrl ? `Invite: ${inviteUrl}` : "",
+          waiverUrl ? `Waiver: ${waiverUrl}` : "",
+          qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
+        ].filter(Boolean).join("\n");
 
     const html = confirmationEmailText
-      ? renderConfirmationHtml({ emailText, partyId, waiverUrl, inviteUrl, qrCodeUrl })
+      ? renderConfirmationHtml({ emailText, partyId })
       : `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
           ${partyId ? `<p><strong>Party ID:</strong> ${escapeHtml(partyId)}</p>` : ""}
           <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
             ${textToHtml(emailText)}
           </div>
+          ${inviteUrl ? `<p><strong>Invite:</strong> <a href="${escapeHtml(inviteUrl)}">${escapeHtml(inviteUrl)}</a></p>` : ""}
           ${waiverUrl ? `<p><strong>Waiver:</strong> <a href="${escapeHtml(waiverUrl)}">${escapeHtml(waiverUrl)}</a></p>` : ""}
           ${qrCodeUrl ? `
             <p><strong>QR Code</strong></p>

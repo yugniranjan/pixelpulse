@@ -60,6 +60,7 @@
 }
 
 .invite-admin-field input,
+.invite-admin-field select,
 .invite-admin-field textarea,
 .invite-admin-output input,
 .invite-admin-output textarea {

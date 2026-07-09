@@ -34,12 +34,14 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
+const PARTY_PACKAGE_OPTIONS = ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"];
 
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
     partyId: "",
     title: "Birthday Party",
+    partyPackage: "",
     playDuration: "",
     childrenIncluded: "",
     partyRoomAccess: "",
@@ -272,6 +274,7 @@ export default function AdminInvitesPage() {
       childName: invite.childName || "",
       partyId: invite.partyId || "",
       title: invite.title || "",
+      partyPackage: invite.partyPackage || invite.titleSuffix || "",
       playDuration: invite.playDuration || "",
       childrenIncluded: invite.childrenIncluded || "",
       partyRoomAccess: invite.partyRoomAccess || "",
@@ -392,8 +395,16 @@ export default function AdminInvitesPage() {
             <Field label="Party ID" required>
               <input required value={form.partyId} onChange={(event) => updateField("partyId", event.target.value)} placeholder="Party ID" />
             </Field>
-            <Field label="Party Package">
-              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Pixel Ultra" />
+            <Field label="Invite look">
+              <input value={form.title} onChange={(event) => updateField("title", event.target.value)} placeholder="Birthday Party" />
+            </Field>
+            <Field label="Party package">
+              <select value={form.partyPackage} onChange={(event) => updateField("partyPackage", event.target.value)}>
+                <option value="">Select party package</option>
+                {PARTY_PACKAGE_OPTIONS.map((option) => (
+                  <option value={option} key={option}>{option}</option>
+                ))}
+              </select>
             </Field>
             <Field label="Slug">
               <input value={form.slug} onChange={(event) => updateSlug(event.target.value)} placeholder={suggestedSlug} />
@@ -568,8 +579,16 @@ export default function AdminInvitesPage() {
                 <Field label="Party ID" required>
                   <input required value={editingInvite.partyId} onChange={(event) => updateEditingInvite("partyId", event.target.value)} />
                 </Field>
-                <Field label="Party Package">
+                <Field label="Invite look">
                   <input value={editingInvite.title} onChange={(event) => updateEditingInvite("title", event.target.value)} />
+                </Field>
+                <Field label="Party package">
+                  <select value={editingInvite.partyPackage} onChange={(event) => updateEditingInvite("partyPackage", event.target.value)}>
+                    <option value="">Select party package</option>
+                    {PARTY_PACKAGE_OPTIONS.map((option) => (
+                      <option value={option} key={option}>{option}</option>
+                    ))}
+                  </select>
                 </Field>
                 <Field label="Date" required>
                   <input required type="date" value={editingInvite.date} onChange={(event) => updateEditingInvite("date", event.target.value)} />
