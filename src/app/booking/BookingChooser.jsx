@@ -46,6 +46,7 @@ function isPlayTimeOption(option = {}) {
 }
 
 export default function BookingChooser({ options = [], selectedType = "" }) {
+  const normalizedSelectedType = selectedType.trim().toLowerCase();
   const primaryOptions = useMemo(
     () => options.filter((option) => !isCouponOption(option)),
     [options],
@@ -54,9 +55,15 @@ export default function BookingChooser({ options = [], selectedType = "" }) {
     () => options.filter(isCouponOption),
     [options],
   );
+  const selectedOption = useMemo(
+    () => options.find((option) => option.type === normalizedSelectedType),
+    [normalizedSelectedType, options],
+  );
   const initialFrameOption = useMemo(
-    () => primaryOptions.find((option) => !shouldOpenOutsideFrame(option)) || couponOptions[0],
-    [couponOptions, primaryOptions],
+    () => (!shouldOpenOutsideFrame(selectedOption) ? selectedOption : null)
+      || primaryOptions.find((option) => !shouldOpenOutsideFrame(option))
+      || couponOptions[0],
+    [couponOptions, primaryOptions, selectedOption],
   );
   const [frameOption, setFrameOption] = useState(initialFrameOption);
   const showCouponNav = couponOptions.length > 0 && isPlayTimeOption(frameOption);
@@ -83,7 +90,7 @@ export default function BookingChooser({ options = [], selectedType = "" }) {
       <div className="ppp-booking-options" role="tablist" aria-label="Booking options">
         {primaryOptions.length ? primaryOptions.map((option) => {
           const opensOutside = shouldOpenOutsideFrame(option);
-          const isSelected = option.type === selectedType || option.type === frameOption?.type;
+          const isSelected = option.type === frameOption?.type;
 
           return opensOutside ? (
             <a
