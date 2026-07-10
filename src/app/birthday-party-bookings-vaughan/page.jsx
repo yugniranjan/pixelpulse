@@ -482,6 +482,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
                   alt=""
                   width={800}
                   height={600}
+                  sizes="(max-width: 700px) 82vw, (max-width: 1100px) 42vw, 320px"
                   style={{ width: "100%", height: "auto" }}
                 />
                 <div>
