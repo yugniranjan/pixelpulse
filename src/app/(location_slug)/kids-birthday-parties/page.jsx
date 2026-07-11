@@ -127,7 +127,6 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
   const ctaTitle = getConfiguredValue(
     ctaSources,
     ["birthdayFinalCtaTitle", "partyFinalCtaTitle"],
-    "Weekday Special: Save $50 on Birthday Parties (Mon-Thu)",
   );
   const ctaSubtitle = getConfiguredValue(
     ctaSources,
@@ -372,9 +371,6 @@ const Page = async ({ params }) => {
                   ))}
                 </ul>
               )}
-              <p className="ppp-party-hero__offer">
-                Weekday Special: Save $50 on Birthday Parties (Mon-Thu)
-              </p>
               {hasBirthdayHeroCta && (
                 <a
                   href={birthdayHeroCtaHref}

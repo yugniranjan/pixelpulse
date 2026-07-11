@@ -254,8 +254,8 @@ export default function DesignSystemPage() {
         <Section title="Promo Banner" hint="The lime-gradient promotional strip used across pricing & promos.">
           <div className="ds-banner">
             <div>
-              <p className="ds-banner__title">Weekday Birthday Deal</p>
-              <span className="ds-banner__sub">Save $50 when you book Mon-Thu</span>
+              <p className="ds-banner__title">Featured Booking Banner</p>
+              <span className="ds-banner__sub">Highlight a current offer or booking message</span>
             </div>
             <button type="button" className="ds-btn ds-btn--dark">
               Book Now

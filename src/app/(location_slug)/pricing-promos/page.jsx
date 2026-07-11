@@ -680,13 +680,13 @@ const PricingPromosPage = async ({ params }) => {
     sources: [configData, pageData || {}],
     keys: ["pricingPromoInlineCtaTitle", "pricingPromosInlineCtaTitle"],
     value: ctaContent.pricingPromoInlineCtaTitle,
-    fallback: "Weekday Birthday Deal",
+    fallback: "",
   });
   const pricingPromoInlineCtaSubtitle = resolveConfiguredValue({
     sources: [configData, pageData || {}],
     keys: ["pricingPromoInlineCtaSubtitle", "pricingPromosInlineCtaSubtitle"],
     value: ctaContent.pricingPromoInlineCtaSubtitle,
-    fallback: "Save $50 when you book Mon-Thu",
+    fallback: "",
   });
   const pricingPromoInlineCtaButtonText = resolveConfiguredValue({
     sources: [configData, pageData || {}],
