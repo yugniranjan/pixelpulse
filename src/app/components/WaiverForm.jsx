@@ -663,7 +663,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
               </select>
             </label>
           ) : null}
-          <label className="ppp-waiver-wide">
+          <label>
             <span>{configuredText(waiverContent, "emailLabel")}</span>
             <input required type="email" value={primary.email} onChange={(event) => updatePrimary("email", event.target.value)} />
           </label>
