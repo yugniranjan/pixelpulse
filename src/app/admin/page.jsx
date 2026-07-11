@@ -66,9 +66,78 @@ function timeLabel(value = "") {
   return `${h}:${m[2]} ${period}`;
 }
 
+function effectiveWaiverDate(waiver = {}) {
+  const visitDate = waiver.visit?.visitDate;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(visitDate || "")) return visitDate;
+  return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : "";
+}
+
+function waiverParticipantCount(waiver = {}) {
+  return Math.max(Number(waiver.participantCount) || 1, 1);
+}
+
+function isPartyWaiver(waiver = {}) {
+  return Boolean(String(waiver.visit?.partyId || "").trim());
+}
+
+function startOfWeek(date) {
+  const value = new Date(date);
+  const day = value.getDay();
+  value.setHours(0, 0, 0, 0);
+  value.setDate(value.getDate() - day);
+  return value;
+}
+
+function deriveReportFromWaivers(waivers = [], from = "", to = "") {
+  const weekStart = startOfWeek(new Date());
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const byDateMap = new Map();
+  const inRange = [];
+  let weekWaivers = 0;
+  let monthWaivers = 0;
+
+  waivers.forEach((waiver) => {
+    const date = effectiveWaiverDate(waiver);
+    if (!date) return;
+
+    const submittedAt = waiver.submittedAt ? new Date(waiver.submittedAt) : new Date(`${date}T00:00:00`);
+    if (!Number.isNaN(submittedAt.getTime())) {
+      if (submittedAt >= weekStart) weekWaivers += 1;
+      if (submittedAt >= monthStart) monthWaivers += 1;
+    }
+
+    if ((from && date < from) || (to && date > to)) return;
+    inRange.push(waiver);
+
+    const entry = byDateMap.get(date) || { date, waivers: 0, participants: 0 };
+    entry.waivers += 1;
+    entry.participants += waiverParticipantCount(waiver);
+    byDateMap.set(date, entry);
+  });
+
+  const partyCount = inRange.filter(isPartyWaiver).length;
+  const walkInCount = Math.max(inRange.length - partyCount, 0);
+
+  return {
+    summary: {
+      totalWaivers: inRange.length,
+      totalParticipants: inRange.reduce((total, waiver) => total + waiverParticipantCount(waiver), 0),
+      partyCount,
+      walkInCount,
+      weekWaivers,
+      monthWaivers,
+    },
+    byDate: [...byDateMap.values()].sort((a, b) => (a.date < b.date ? -1 : 1)),
+  };
+}
+
 export default function AdminDashboardPage() {
   const [report, setReport] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -78,18 +147,41 @@ export default function AdminDashboardPage() {
 
     async function load() {
       setLoading(true);
+      setErrors([]);
       try {
+        const fromDate = isoDate(from);
+        const toDate = isoDate(to);
         const [reportRes, bookingsRes] = await Promise.all([
-          fetch(`/api/admin/waivers/report?from=${isoDate(from)}&to=${isoDate(to)}`, { cache: "no-store" }),
+          fetch(`/api/admin/waivers/report?from=${fromDate}&to=${toDate}`, { cache: "no-store" }),
           fetch("/api/admin/bookings", { cache: "no-store" }),
         ]);
-        if (reportRes.ok) setReport(await reportRes.json());
+
+        const nextErrors = [];
+
+        if (reportRes.ok) {
+          setReport(await reportRes.json());
+        } else {
+          const waiversRes = await fetch("/api/admin/waivers?limit=1000", { cache: "no-store" });
+          if (waiversRes.ok) {
+            const data = await waiversRes.json();
+            setReport(deriveReportFromWaivers(data.waivers || [], fromDate, toDate));
+            nextErrors.push("Using waiver-list fallback because the summary report did not load.");
+          } else {
+            const data = await reportRes.json().catch(() => ({}));
+            nextErrors.push(data.error || "Unable to load waiver report.");
+          }
+        }
+
         if (bookingsRes.ok) {
           const data = await bookingsRes.json();
           setBookings(data.bookings || []);
+        } else {
+          const data = await bookingsRes.json().catch(() => ({}));
+          nextErrors.push(data.error || "Unable to load bookings.");
         }
-      } catch {
-        /* leave placeholders */
+        setErrors(nextErrors);
+      } catch (error) {
+        setErrors([error?.message || "Unable to load dashboard data."]);
       } finally {
         setLoading(false);
       }
@@ -140,6 +232,13 @@ export default function AdminDashboardPage() {
       </div>
 
       {loading ? <p className="dash-loading">Loading dashboard…</p> : null}
+      {errors.length ? (
+        <div className="waiver-admin-error">
+          {errors.map((error) => (
+            <p key={error}>{error}</p>
+          ))}
+        </div>
+      ) : null}
 
       <div className="dash-kpis">
         {kpis.map((kpi) => (
