@@ -574,7 +574,7 @@ export default function AdminInvitesPage() {
                 <button type="button" onClick={() => copyText(result.feedbackUrl)}>Copy</button>
               </div>
               <div>
-                <span>SMS Text</span>
+                <span>Invite Text</span>
                 <textarea readOnly value={result.smsText} />
                 <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
               </div>
@@ -600,7 +600,7 @@ export default function AdminInvitesPage() {
                   placeholder="name@example.com"
                 />
                 <button type="button" onClick={sendInviteEmail} disabled={sendingEmail || !emailTo}>
-                  {sendingEmail ? "Sending..." : "Send SMS + QR"}
+                  {sendingEmail ? "Sending..." : "Send Invite"}
                 </button>
                 <button
                   type="button"

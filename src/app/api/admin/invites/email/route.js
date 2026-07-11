@@ -231,8 +231,6 @@ export async function POST(request) {
           partyId ? `Party ID: ${partyId}` : "",
           emailText,
           "",
-          inviteUrl ? `Invite: ${inviteUrl}` : "",
-          waiverUrl ? `Waiver: ${waiverUrl}` : "",
           qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
         ].filter(Boolean).join("\n");
 
@@ -246,8 +244,6 @@ export async function POST(request) {
           <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
             ${textToHtml(emailText)}
           </div>
-          ${inviteUrl ? `<p><strong>Invite:</strong> <a href="${escapeHtml(inviteUrl)}">${escapeHtml(inviteUrl)}</a></p>` : ""}
-          ${waiverUrl ? `<p><strong>Waiver:</strong> <a href="${escapeHtml(waiverUrl)}">${escapeHtml(waiverUrl)}</a></p>` : ""}
           ${qrCodeUrl ? `
             <p><strong>QR Code</strong></p>
             <p>
@@ -268,7 +264,9 @@ export async function POST(request) {
       replyTo: CONTACT_EMAIL,
       subject: sendThankYou
         ? "Thanks for visiting Pixel Pulse Play"
-        : "Your Pixel Pulse Birthday Party is Confirmed",
+        : confirmationEmailText
+        ? "Your Pixel Pulse Birthday Party is Confirmed"
+        : "You're Invited to Pixel Pulse Play",
       text,
       html,
     });
