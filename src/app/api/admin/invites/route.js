@@ -283,6 +283,9 @@ export async function POST(req) {
   const waiverLink = partyId
     ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
     : `${origin}/waiver`;
+  const feedbackUrl = partyId
+    ? `${origin}/feedback?partyId=${encodeURIComponent(partyId)}&date=${encodeURIComponent(date)}`
+    : `${origin}/feedback`;
   const title = titleWithoutChildName(cleanText(body.title) || "Birthday Party", childName) || "Birthday Party";
   const partyPackage = cleanText(body.partyPackage);
   const websiteLink = cleanText(body.websiteLink);
@@ -348,6 +351,7 @@ export async function POST(req) {
   const inviteRecord = {
     ...invite,
     inviteUrl,
+    feedbackUrl,
     smsText,
     confirmationEmailText,
   };
@@ -389,6 +393,7 @@ export async function POST(req) {
     partyId,
     inviteUrl,
     waiverUrl: waiverLink,
+    feedbackUrl,
     smsText,
     confirmationEmailText,
     qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(inviteUrl)}&size=220`,
@@ -423,6 +428,9 @@ export async function PUT(req) {
   const waiverLink = partyId
     ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
     : existing.waiverLink || `${origin}/waiver`;
+  const feedbackUrl = partyId
+    ? `${origin}/feedback?partyId=${encodeURIComponent(partyId)}&date=${encodeURIComponent(bodyText("date", existing.date || ""))}`
+    : existing.feedbackUrl || `${origin}/feedback`;
   const updatedAt = new Date();
   const childName = bodyText("childName", existing.childName || "");
   const title = bodyText("title", existing.title || "Birthday Party");
@@ -472,6 +480,7 @@ export async function PUT(req) {
     logoAlt: existing.logoAlt || "Pixel Pulse Play logo",
     metaTitle: existing.metaTitle || `${title || "Birthday Party"} Invite`,
     inviteUrl,
+    feedbackUrl,
     updatedAt,
   };
   invite.smsText = buildSmsText(invite, inviteUrl, waiverLink);

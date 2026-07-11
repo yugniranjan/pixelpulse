@@ -139,12 +139,37 @@ function renderConfirmationHtml({ emailText, partyId }) {
   `;
 }
 
+function renderThankYouHtml({ feedbackUrl, partyId }) {
+  return `
+    <div style="margin:0;padding:0;background:#f3f4f6;">
+      <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
+        <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
+          <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
+          <h1 style="margin:0;font-size:24px;line-height:1.25;">Thanks for playing with us</h1>
+          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
+        </div>
+        <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
+          <p style="margin:0 0 12px;">Thank you for visiting Pixel Pulse Play Zone. We hope your group had a great run through the challenge rooms.</p>
+          <p style="margin:0 0 12px;">Your quick feedback helps us tune the games, staff flow, and party experience for the next squad.</p>
+          <p style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:#f7fbea;border:1px solid #d8e6b8;color:#374151;"><strong style="color:#111827;">Get 10% off your next visit</strong><br />Submit the review and we will send you a 10% off thank-you offer.</p>
+          <p style="margin:22px 0;">
+            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">Rate your run</a>
+          </p>
+          <p style="margin:0;color:#6b7280;">The form takes about two minutes. If anything needs direct follow-up, you can also reply to this email.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
     const to = cleanEmail(body?.email);
     const smsText = cleanText(body?.smsText);
     const confirmationEmailText = cleanText(body?.confirmationEmailText);
+    const feedbackUrl = cleanText(body?.feedbackUrl);
+    const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const inviteUrl = cleanText(body?.inviteUrl);
     const waiverUrl = cleanText(body?.waiverUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
@@ -155,7 +180,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     }
 
-    if (!emailText || !inviteUrl) {
+    if (sendThankYou && !feedbackUrl) {
+      return NextResponse.json(
+        { error: "Feedback URL is required." },
+        { status: 400 },
+      );
+    }
+
+    if (!sendThankYou && (!emailText || !inviteUrl)) {
       return NextResponse.json(
         { error: "Email text and invite URL are required." },
         { status: 400 },
@@ -181,7 +213,16 @@ export async function POST(request) {
       },
     });
 
-    const text = confirmationEmailText
+    const text = sendThankYou
+      ? [
+          partyId ? `Party ID: ${partyId}` : "",
+          "Thank you for visiting Pixel Pulse Play Zone.",
+          "Please take two minutes to rate your run and help us improve the experience.",
+          "Submit the review and we will send you a 10% off thank-you offer for your next visit.",
+          "",
+          `Feedback form: ${feedbackUrl}`,
+        ].filter(Boolean).join("\n")
+      : confirmationEmailText
       ? [
           partyId ? `Party ID: ${partyId}` : "",
           emailText,
@@ -195,7 +236,9 @@ export async function POST(request) {
           qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
         ].filter(Boolean).join("\n");
 
-    const html = confirmationEmailText
+    const html = sendThankYou
+      ? renderThankYouHtml({ feedbackUrl, partyId })
+      : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
@@ -223,7 +266,9 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: "Your Pixel Pulse Birthday Party is Confirmed",
+      subject: sendThankYou
+        ? "Thanks for visiting Pixel Pulse Play"
+        : "Your Pixel Pulse Birthday Party is Confirmed",
       text,
       html,
     });

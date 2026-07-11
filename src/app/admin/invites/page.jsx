@@ -74,6 +74,7 @@ export default function AdminInvitesPage() {
   const [emailStatus, setEmailStatus] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingConfirmationEmail, setSendingConfirmationEmail] = useState(false);
+  const [sendingThankYouEmail, setSendingThankYouEmail] = useState(false);
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(false);
   const [editingInvite, setEditingInvite] = useState(null);
@@ -268,6 +269,38 @@ export default function AdminInvitesPage() {
     }
   }
 
+  async function sendThankYouEmail() {
+    if (!result || !emailTo) return;
+    setSendingThankYouEmail(true);
+    setEmailStatus("");
+
+    try {
+      const response = await fetch("/api/admin/invites/email", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "thank-you",
+          email: emailTo,
+          partyId: result.partyId,
+          feedbackUrl: result.feedbackUrl,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEmailStatus(data.error || "Unable to send thank you email.");
+        return;
+      }
+
+      setEmailStatus("Thank you email sent.");
+    } catch (sendError) {
+      setEmailStatus("Unable to send thank you email.");
+    } finally {
+      setSendingThankYouEmail(false);
+    }
+  }
+
   function beginEditInvite(invite) {
     setEditingInvite({
       slug: invite.slug || "",
@@ -331,6 +364,7 @@ export default function AdminInvitesPage() {
         partyId: updatedInvite.partyId,
         inviteUrl: updatedInvite.inviteUrl || `/invite/${updatedInvite.slug}`,
         waiverUrl: updatedInvite.waiverLink || "",
+        feedbackUrl: updatedInvite.feedbackUrl || `/feedback?partyId=${encodeURIComponent(updatedInvite.partyId || "")}`,
         smsText: updatedInvite.smsText || "",
         confirmationEmailText: updatedInvite.confirmationEmailText || "",
         qrCodeUrl: `https://quickchart.io/qr?text=${encodeURIComponent(updatedInvite.inviteUrl || `/invite/${updatedInvite.slug}`)}&size=220`,
@@ -517,6 +551,11 @@ export default function AdminInvitesPage() {
                 <button type="button" onClick={() => copyText(result.waiverUrl)}>Copy</button>
               </div>
               <div>
+                <span>Feedback Form URL</span>
+                <a href={result.feedbackUrl} target="_blank" rel="noopener noreferrer">{result.feedbackUrl}</a>
+                <button type="button" onClick={() => copyText(result.feedbackUrl)}>Copy</button>
+              </div>
+              <div>
                 <span>SMS Text</span>
                 <textarea readOnly value={result.smsText} />
                 <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
@@ -546,6 +585,13 @@ export default function AdminInvitesPage() {
                   disabled={sendingConfirmationEmail || !emailTo || !result.confirmationEmailText}
                 >
                   {sendingConfirmationEmail ? "Sending..." : "Send Confirmation Email"}
+                </button>
+                <button
+                  type="button"
+                  onClick={sendThankYouEmail}
+                  disabled={sendingThankYouEmail || !emailTo || !result.feedbackUrl}
+                >
+                  {sendingThankYouEmail ? "Sending..." : "Send Thank You + Feedback"}
                 </button>
                 {emailStatus ? <small>{emailStatus}</small> : null}
               </div>
