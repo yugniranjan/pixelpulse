@@ -36,6 +36,20 @@ const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
 const PARTY_PACKAGE_OPTIONS = ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"];
 
+function buildThankYouEmailText(invite = {}) {
+  if (!invite.feedbackUrl) return "";
+
+  return [
+    invite.partyId ? `Party ID: ${invite.partyId}` : "",
+    "Thank you for visiting Pixel Pulse Play Zone.",
+    "We hope your group had a great run through the challenge rooms.",
+    "Your quick feedback helps us tune the games, staff flow, and party experience for the next squad.",
+    "Get 10% off your next visit: submit the review and we will send you a 10% off thank-you offer.",
+    "",
+    `Feedback form: ${invite.feedbackUrl}`,
+  ].filter(Boolean).join("\n");
+}
+
 export default function AdminInvitesPage() {
   const [form, setForm] = useState({
     childName: "",
@@ -86,6 +100,10 @@ export default function AdminInvitesPage() {
   const suggestedSlug = useMemo(
     () => slugify(form.slug || form.childName),
     [form.childName, form.slug],
+  );
+  const thankYouEmailText = useMemo(
+    () => buildThankYouEmailText(result || {}),
+    [result],
   );
 
   useEffect(() => {
@@ -564,6 +582,11 @@ export default function AdminInvitesPage() {
                 <span>Confirmation Email Text</span>
                 <textarea readOnly value={result.confirmationEmailText || ""} />
                 <button type="button" onClick={() => copyText(result.confirmationEmailText || "")}>Copy</button>
+              </div>
+              <div>
+                <span>Thank You Email Text</span>
+                <textarea readOnly value={thankYouEmailText} />
+                <button type="button" onClick={() => copyText(thankYouEmailText)}>Copy</button>
               </div>
               <div>
                 <span>Email</span>
