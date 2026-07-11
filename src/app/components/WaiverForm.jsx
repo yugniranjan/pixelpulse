@@ -230,6 +230,13 @@ function formatDob({ year, month, day }) {
   return `${year}-${month}-${day}`;
 }
 
+function formatReadableDate(value = "") {
+  const { year, month, day } = parseDob(value);
+  if (!year || !month || !day) return "";
+  const monthName = MONTHS.find(([monthValue]) => monthValue === month)?.[1] || month;
+  return `${monthName} ${Number(day)}, ${year}`;
+}
+
 function isCompleteDate({ year, month, day }) {
   return Boolean(year && month && day);
 }
@@ -257,6 +264,8 @@ function DobField({ label, value, onChange }) {
     onChange(isCompleteDate(nextDob) ? formatDob(nextDob) : "");
   }
 
+  const selectedDate = isCompleteDate(dob) ? formatReadableDate(formatDob(dob)) : "";
+
   return (
     <label>
       <span>{label}</span>
@@ -274,6 +283,11 @@ function DobField({ label, value, onChange }) {
           {DOB_YEARS.map((year) => <option value={year} key={year}>{year}</option>)}
         </select>
       </div>
+      {selectedDate ? (
+        <small className="ppp-waiver-date-summary" aria-live="polite">
+          Selected: <strong>{selectedDate}</strong>
+        </small>
+      ) : null}
     </label>
   );
 }
@@ -341,10 +355,15 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
     return Number(year) < Number(todayParts.year);
   }
 
+  const selectedDate = isCompleteDate(dateParts) ? formatReadableDate(formatDob(dateParts)) : "";
+
   return (
     <label>
       <span>{label}</span>
       <div className="ppp-waiver-dob-row ppp-waiver-date-row">
+        <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
+          Use today
+        </button>
         <select required aria-label={`${label} month`} value={dateParts.month} onChange={(event) => updateDate("month", event.target.value)}>
           <option value="">Month</option>
           {MONTHS.map(([value, name]) => (
@@ -369,10 +388,12 @@ function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
             </option>
           ))}
         </select>
-        <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
-          Today
-        </button>
       </div>
+      {selectedDate ? (
+        <small className="ppp-waiver-date-summary" aria-live="polite">
+          Selected: <strong>{selectedDate}</strong>
+        </small>
+      ) : null}
     </label>
   );
 }
@@ -834,10 +855,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             <span>{configuredText(waiverContent, "printNameLabel")}</span>
             <input required value={visit.printName} onChange={(event) => updateVisit("printName", event.target.value)} />
           </label>
-          <label>
-            <span>{configuredText(waiverContent, "signDateLabel")}</span>
-            <input required type="date" value={visit.signDate} onChange={(event) => updateVisit("signDate", event.target.value)} />
-          </label>
+          <DatePartsField label={configuredText(waiverContent, "signDateLabel")} value={visit.signDate} yearOptions={visitYears} onChange={(value) => updateVisit("signDate", value)} />
         </div>
       </section>
 

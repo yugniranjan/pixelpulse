@@ -208,13 +208,15 @@
 .ppp-waiver-field-grid textarea {
   box-sizing: border-box;
   width: 100%;
+  min-height: 52px;
   border: 1px solid var(--rim);
   border-radius: 6px;
-  padding: 0.72rem 0.9rem;
+  padding: 0.85rem 0.95rem;
   background: #ffffff;
   color: #0f172a;
   font: inherit;
   outline: none;
+  touch-action: manipulation;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -224,7 +226,8 @@
 }
 
 .ppp-waiver-field-grid select {
-  font-size: 0.86rem;
+  font-size: 1rem;
+  line-height: 1.2;
 }
 
 .ppp-waiver-field-grid textarea {
@@ -242,7 +245,7 @@
 .ppp-waiver-dob-row {
   display: grid;
   grid-template-columns: 1.35fr 0.85fr 1fr;
-  gap: 0.5rem;
+  gap: 0.65rem;
   min-width: 0;
 }
 
@@ -251,29 +254,46 @@
 }
 
 .ppp-waiver-date-row {
-  grid-template-columns: 1.25fr 0.75fr 0.9fr auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
 }
 
 .ppp-waiver-date-today {
-  justify-self: start;
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  min-height: 52px;
   border: 1px solid #64748b;
   border-radius: 6px;
-  padding: 0.72rem 0.9rem;
+  padding: 0.85rem 1rem;
   background: #ffffff;
   color: #0f172a;
   font-family: inherit;
-  font-size: 0.86rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: none;
   cursor: pointer;
+  touch-action: manipulation;
   white-space: nowrap;
 }
 
 .ppp-waiver-date-today:hover {
   border-color: #0f172a;
   background: #f1f5f9;
+}
+
+.ppp-waiver-date-summary {
+  display: block;
+  min-height: 1.25rem;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.ppp-waiver-date-summary strong {
+  color: #0f172a;
+  font-weight: 800;
 }
 
 .ppp-waiver-medical-row {
@@ -657,7 +677,7 @@
   }
 
   .ppp-waiver-date-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .ppp-waiver-wide {
