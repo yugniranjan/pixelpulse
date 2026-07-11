@@ -164,9 +164,9 @@ export async function POST(req) {
     : [];
   const signatureDataUrl = cleanText(body.signatureDataUrl);
 
-  if (!hasRequiredParticipantFields(primary) || !primary.email || !primary.phone || !primary.city) {
+  if (!hasRequiredParticipantFields(primary) || !primary.email || !primary.phone) {
     return NextResponse.json(
-      { error: "Primary participant name, date of birth, email, phone, and city are required." },
+      { error: "Primary participant name, date of birth, email, and phone are required." },
       { status: 400 },
     );
   }
@@ -196,14 +196,14 @@ export async function POST(req) {
     );
   }
 
-  if (!visit.visitDate || !visit.printName || !visit.signDate) {
+  if (!visit.printName || !visit.signDate) {
     return NextResponse.json(
-      { error: "Visit date, printed name, and signed date are required." },
+      { error: "Printed name and signed date are required." },
       { status: 400 },
     );
   }
 
-  if (isPastDate(visit.visitDate)) {
+  if (visit.visitDate && isPastDate(visit.visitDate)) {
     return NextResponse.json(
       { error: "Visit date cannot be in the past." },
       { status: 400 },

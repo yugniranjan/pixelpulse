@@ -427,8 +427,27 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   );
   const showFamilyMembers = configuredBoolean(waiverContent, "showFamilyMembers", true);
   const showGenderField = configuredBoolean(waiverContent, "showGenderField", true);
+  const showCityField = configuredBoolean(
+    waiverContent,
+    "showCityField",
+    configuredBoolean(waiverContent, "showCity", true),
+  );
   const showMedicalFields = configuredBoolean(waiverContent, "showMedicalFields", true);
   const showPartyFields = configuredBoolean(waiverContent, "showPartyFields", true);
+  const showVisitDateField = configuredBoolean(
+    waiverContent,
+    "showVisitDateField",
+    configuredBoolean(waiverContent, "showVisitDate", true),
+  );
+  const showVisitTimeField = configuredBoolean(
+    waiverContent,
+    "showVisitTimeField",
+    configuredBoolean(
+      waiverContent,
+      "showVisitTime",
+      configuredBoolean(waiverContent, "showPartyTimeField", true),
+    ),
+  );
   const showPhotoConsent = configuredBoolean(waiverContent, "showPhotoConsent", true);
 
   const namedFamily = useMemo(
@@ -572,7 +591,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       return;
     }
 
-    if (isPastDate(visit.visitDate)) {
+    if (showVisitDateField && isPastDate(visit.visitDate)) {
       setError(configuredText(waiverContent, "pastVisitDateError"));
       return;
     }
@@ -652,10 +671,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             <span>{configuredText(waiverContent, "phoneLabel")}</span>
             <input required type="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
           </label>
-          <label>
-            <span>{configuredText(waiverContent, "cityLabel")}</span>
-            <input required value={primary.city} onChange={(event) => updatePrimary("city", event.target.value)} />
-          </label>
+          {showCityField ? (
+            <label>
+              <span>{configuredText(waiverContent, "cityLabel")}</span>
+              <input required value={primary.city} onChange={(event) => updatePrimary("city", event.target.value)} />
+            </label>
+          ) : null}
           {showMedicalFields ? <div className="ppp-waiver-wide ppp-waiver-medical-row">
             <label>
               <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
@@ -770,8 +791,8 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             {configuredText(waiverContent, "linkedPartyPrefix")}{" "}
             {visit.partyName ? <strong>{visit.partyName}</strong> : configuredText(waiverContent, "linkedPartyFallback")}
             {visit.partyId ? <> {configuredText(waiverContent, "linkedPartyIdText")} <strong>{visit.partyId}</strong></> : null}.
-            {visit.visitDate ? <> Visit date: <strong>{visit.visitDate}</strong>.</> : null}
-            {visit.visitTime ? <> Party time: <strong>{visit.visitTime}</strong>.</> : null}
+            {showVisitDateField && visit.visitDate ? <> Visit date: <strong>{visit.visitDate}</strong>.</> : null}
+            {showVisitTimeField && visit.visitTime ? <> Party time: <strong>{visit.visitTime}</strong>.</> : null}
           </p>
         ) : null}
         <div className="ppp-waiver-field-grid">
@@ -791,11 +812,15 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
               </label>
             </>
           ) : null}
-          <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
-          <label>
-            <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
-            <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
-          </label>
+          {showVisitDateField ? (
+            <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
+          ) : null}
+          {showVisitTimeField ? (
+            <label>
+              <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
+              <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
+            </label>
+          ) : null}
         </div>
       </section>
 
