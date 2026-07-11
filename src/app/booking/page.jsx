@@ -3,7 +3,7 @@ import BookingChooser from "./BookingChooser";
 import "../styles/booking-page.css";
 import { LOCATION_NAME } from "@/lib/constant";
 import { getConfigValue, getRowValue } from "@/lib/ctaContent";
-import { fetchsheetdata, fetchsheetdataNoCache } from "@/lib/sheets";
+import { fetchsheetdata } from "@/lib/sheets";
 import { canonicalUrl } from "@/lib/seo";
 
 const DEFAULT_BIRTHDAY_URL = "https://birthdays.pixelpulseplay.ca/";
@@ -36,7 +36,7 @@ async function getBookingConfig() {
 
 async function getBookingRows() {
   try {
-    const rows = await fetchsheetdataNoCache(BOOKING_SHEET);
+    const rows = await fetchsheetdata(BOOKING_SHEET, LOCATION_NAME);
     if (!Array.isArray(rows)) return [];
 
     return rows.filter((row) => {

@@ -160,6 +160,7 @@ export default function BookingChooser({ options = [], selectedType = "" }) {
           </div>
           <iframe
             className="ppp-booking-frame"
+            loading="lazy"
             name="ppp-booking-frame"
             src={frameOption.href}
             title={`${frameOption.title} checkout`}
