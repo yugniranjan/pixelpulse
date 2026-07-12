@@ -266,7 +266,7 @@ export async function POST(request) {
         ? "Thanks for visiting Pixel Pulse Play"
         : confirmationEmailText
         ? "Your Pixel Pulse Birthday Party is Confirmed"
-        : "You're Invited to Pixel Pulse Play",
+        : "Your Party Invite at Pixel Pulse Playzone! 🎉",
       text,
       html,
     });
