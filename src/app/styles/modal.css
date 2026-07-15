@@ -35,17 +35,20 @@
 
 .modal-close {
   position: absolute;
-  top: 2px;
-  right: 1px;
- 
-  background: #a4cf5f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 16, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.36);
   border-radius: 999px;
   width: 36px;
   height: 36px;
-  font-size: .8rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  color: #000;
+  color: #ffffff;
   padding: 0;
   line-height: 1;
   transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
@@ -53,8 +56,8 @@
 
 .modal-close:hover,
 .modal-close:focus {
-  color: #fbae7b;
-  background: rgba(251, 174, 123, 0.12);
+  color: #a4cf5f;
+  background: rgba(5, 8, 16, 0.92);
   transform: translateY(-1px);
   outline: none;
 }
