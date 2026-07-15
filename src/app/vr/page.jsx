@@ -12,25 +12,26 @@ const HERO_VIDEO = "/assets/videos/vr-hero.mp4";
 const PAGE_BG = "/assets/images/vr-section-bg.jpg";
 const SITE_URL = getCanonicalSiteUrl();
 const DEFAULT_VR_BOOKING_URL =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinesales/tickets1.php?ptid=19";
+  "/booking?type=vr";
 
 const META_TITLE = "VR Experiences | Pixel Pulse Play Zone Vaughan";
 const META_DESCRIPTION =
-  "VR is launching soon at Pixel Pulse Play Zone in Vaughan with a focused 4x4 metre arena lineup including The Smurfs: Blueberry Battle, Party Ship, HunterVR, and Cops and Robbers.";
+  "VR is launching soon at Pixel Pulse Play Zone in Vaughan with a focused 4x4 metre arena lineup including Holomia Action, Party Ship, HunterVR, and Cops and Robbers.";
 
 const VR_LAUNCH_MODE = true;
+const HOLOMIA_ACTION_IMAGE = "https://cdn.synthesisvr.com/gameassets/svr_79700/1.jpg";
 const HUNTER_VR_IMAGE =
   "https://cdn.synthesisvr.com/gameassets/svr_79522/header460x215_1756891174.webp";
 const COPS_ROBBERS_IMAGE =
   "https://cdn.synthesisvr.com/gameassets/svr_5739/header2460x215_1672244114.webp";
 const LAUNCH_GAME_NAMES = [
-  "The Smurfs: Blueberry Battle",
+  "Holomia Action",
   "Party Ship",
   "HunterVR",
   "Cops and Robbers",
 ];
 const DEFAULT_LAUNCH_HERO_TEXT =
-  "We are starting with a focused 4x4 metre VR arena lineup: The Smurfs: Blueberry Battle, Party Ship, HunterVR, and Cops and Robbers.";
+  "We are starting with a focused 4x4 metre VR arena lineup: Holomia Action, Party Ship, HunterVR, and Cops and Robbers.";
 
 const FALLBACK_STATS = [
   { value: "4", label: "Launch Games" },
@@ -51,7 +52,7 @@ const FALLBACK_OFFERS = [
       "Staff assistance included",
     ],
     buttonText: "Book Your VR Session",
-    bookingType: "ticket",
+    bookingType: "vr",
   },
   {
     label: "VR Unlimited Adventure",
@@ -65,18 +66,18 @@ const FALLBACK_OFFERS = [
       "Staff assistance included",
     ],
     buttonText: "Book Your VR Session",
-    bookingType: "ticket",
+    bookingType: "vr",
     featured: true,
   },
 ];
 
 const FALLBACK_FEATURED = [
   {
-    flag: "Family Pick",
-    title: "The Smurfs: Blueberry Battle",
-    desc: "A bright, family-friendly VR adventure where players jump into a playful Smurfs challenge.",
-    tags: ["Family", "Adventure", "Launch"],
-    img: PAGE_BG,
+    flag: "Launch Lineup",
+    title: "Holomia Action",
+    desc: "A competitive multiplayer free-roaming FPS that turns the arena into a futuristic VR laser tag battle.",
+    tags: ["2-4", "Free-Roam", "Action"],
+    img: HOLOMIA_ACTION_IMAGE,
   },
   {
     flag: "Family Pick",
@@ -108,7 +109,7 @@ const FALLBACK_CATEGORIES = [
     accent: "var(--vr-magenta)",
     icon: "🥽",
     games: [
-      { title: "The Smurfs: Blueberry Battle", desc: "A colorful, family-friendly VR adventure built for playful teamwork.", tags: ["Family", "Adventure"], img: PAGE_BG },
+      { title: "Holomia Action", desc: "Competitive multiplayer free-roaming FPS with futuristic VR laser tag energy.", tags: ["2-4", "Free-Roam", "Action"], img: HOLOMIA_ACTION_IMAGE },
       { title: "Party Ship", desc: "Chaotic, laugh-out-loud crew gameplay for friends and families.", tags: ["2-4", "Party"], img: `${IMG}/svr_79692/headerr460x215_1773153241.webp` },
       { title: "HunterVR", desc: "Step into the arena for a compact, action-focused VR challenge.", tags: ["Action", "Launch"], img: HUNTER_VR_IMAGE },
       { title: "Cops and Robbers", desc: "A team-based chase experience with fast rounds and arcade energy.", tags: ["Team", "Action"], img: COPS_ROBBERS_IMAGE },
@@ -248,10 +249,8 @@ function gameKey(value = "") {
 }
 
 const LAUNCH_GAME_ALIASES = new Map([
-  ["the smurfs blueberry battle", "The Smurfs: Blueberry Battle"],
-  ["smurfs blueberry battle", "The Smurfs: Blueberry Battle"],
-  ["smurf blueberry battle", "The Smurfs: Blueberry Battle"],
-  ["blueberry battle", "The Smurfs: Blueberry Battle"],
+  ["holomia", "Holomia Action"],
+  ["holomia action", "Holomia Action"],
   ["party ship", "Party Ship"],
   ["huntervr", "HunterVR"],
   ["hunter vr", "HunterVR"],
@@ -265,7 +264,7 @@ function launchGameName(title = "") {
 
 function normalizeLaunchCopy(value = "") {
   return clean(value)
-    .replace(/\bHolomia\b/gi, "The Smurfs: Blueberry Battle")
+    .replace(/\bHolomia\b(?!\s+Action)/gi, "Holomia Action")
     .replace(/\bCops\s*&\s*Robbers\b/gi, "Cops and Robbers");
 }
 
