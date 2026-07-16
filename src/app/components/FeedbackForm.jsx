@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 const LOGO_SRC = "/assets/images/logo.png";
 const GOOGLE_REVIEW_URL =
-  "https://www.google.com/search?q=Pixel+Pulse+Play+Zone+960+Edgeley+Blvd+Vaughan+review";
+  "https://g.page/r/CQzE8tFOGzEYEBM/review";
 
 const ROOMS = [
   "Laser Maze",

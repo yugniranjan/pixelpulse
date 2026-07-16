@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import nodemailer from "nodemailer";
+import { fetchsheetdataNoCache } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 
@@ -40,8 +41,25 @@ function textToHtml(value = "") {
   return escapeHtml(value).replace(/\n/g, "<br />");
 }
 
-function readSocialRedirectLinks() {
+function applySocialRedirectRow(links, row = {}) {
+  const source = cleanText(row.source).replace(/^\//, "").toLowerCase();
+  const destination = cleanText(row.destination);
+
+  if (source in links && destination) {
+    links[source] = destination;
+  }
+}
+
+async function readSocialRedirectLinks() {
   const links = { ...SOCIAL_REDIRECT_FALLBACKS };
+
+  try {
+    const sheetRows = await fetchsheetdataNoCache("redirects");
+    sheetRows.forEach((row) => applySocialRedirectRow(links, row));
+    return links;
+  } catch (error) {
+    console.warn("Live redirect sheet unavailable for thank you email:", error);
+  }
 
   try {
     const csv = readFileSync(path.join(process.cwd(), "social_redirects.csv"), "utf8");
@@ -50,15 +68,10 @@ function readSocialRedirectLinks() {
       .slice(1)
       .forEach((line) => {
         const [source, destination] = line.split(",");
-        const key = cleanText(source).replace(/^\//, "");
-        const url = cleanText(destination);
-
-        if (key in links && url) {
-          links[key] = url;
-        }
+        applySocialRedirectRow(links, { source, destination });
       });
   } catch (error) {
-    console.warn("Social redirect sheet unavailable for thank you email:", error);
+    console.warn("Local social redirects unavailable for thank you email:", error);
   }
 
   return links;
@@ -300,7 +313,7 @@ export async function POST(request) {
     const firstName = cleanText(body?.firstName);
     const bookingLink = cleanText(body?.bookingLink) || "https://www.pixelpulseplay.ca/booking?type=ticket";
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
-    const socialLinks = readSocialRedirectLinks();
+    const socialLinks = await readSocialRedirectLinks();
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const inviteUrl = cleanText(body?.inviteUrl);
     const waiverUrl = cleanText(body?.waiverUrl);
