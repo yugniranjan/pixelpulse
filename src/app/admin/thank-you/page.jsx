@@ -8,7 +8,6 @@ import AdminShell from "@/components/AdminShell";
 const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
 const DEFAULT_BOOKING_LINK = "https://www.pixelpulseplay.ca/booking?type=ticket";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
-const DEFAULT_INSTAGRAM_LINK = "https://www.instagram.com/pixelpulseplay/";
 
 function Field({ label, required = false, children }) {
   return (
@@ -63,7 +62,7 @@ function buildThankYouPreview(form) {
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
     form.websiteLink,
-    form.instagramLink,
+    "Social links: Instagram, Facebook, and TikTok are pulled from the redirect sheet.",
   ].filter((line) => line !== null && line !== undefined).join("\n");
 }
 
@@ -75,7 +74,6 @@ export default function AdminThankYouPage() {
     feedbackUrl: DEFAULT_FEEDBACK_URL,
     bookingLink: DEFAULT_BOOKING_LINK,
     websiteLink: DEFAULT_WEBSITE_LINK,
-    instagramLink: DEFAULT_INSTAGRAM_LINK,
   });
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -107,7 +105,6 @@ export default function AdminThankYouPage() {
       payload.append("feedbackUrl", form.feedbackUrl);
       payload.append("bookingLink", form.bookingLink);
       payload.append("websiteLink", form.websiteLink);
-      payload.append("instagramLink", form.instagramLink);
       attachments.forEach((file) => {
         payload.append("attachments", file);
       });
@@ -196,13 +193,10 @@ export default function AdminThankYouPage() {
                   onChange={(event) => updateField("websiteLink", event.target.value)}
                 />
               </Field>
-              <Field label="Instagram">
-                <input
-                  value={form.instagramLink}
-                  onChange={(event) => updateField("instagramLink", event.target.value)}
-                />
-              </Field>
             </div>
+            <p className="invite-admin-help">
+              Instagram, Facebook, and TikTok links are pulled from the redirect sheet.
+            </p>
           </section>
 
           <section>

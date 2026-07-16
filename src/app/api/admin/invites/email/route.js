@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
@@ -6,6 +8,11 @@ export const runtime = "nodejs";
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+const SOCIAL_REDIRECT_FALLBACKS = {
+  facebook: "https://www.facebook.com/pixelpulseplay",
+  instagram: "https://www.instagram.com/pixelpulseplay",
+  tiktok: "https://www.tiktok.com/@pixelpulseplay",
+};
 
 function getRequiredEnv(name) {
   const value = process.env[name];
@@ -31,6 +38,38 @@ function escapeHtml(value = "") {
 
 function textToHtml(value = "") {
   return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+function readSocialRedirectLinks() {
+  const links = { ...SOCIAL_REDIRECT_FALLBACKS };
+
+  try {
+    const csv = readFileSync(path.join(process.cwd(), "social_redirects.csv"), "utf8");
+    csv
+      .split(/\r?\n/)
+      .slice(1)
+      .forEach((line) => {
+        const [source, destination] = line.split(",");
+        const key = cleanText(source).replace(/^\//, "");
+        const url = cleanText(destination);
+
+        if (key in links && url) {
+          links[key] = url;
+        }
+      });
+  } catch (error) {
+    console.warn("Social redirect sheet unavailable for thank you email:", error);
+  }
+
+  return links;
+}
+
+function renderSocialIconLink({ href, label, iconUrl }) {
+  return `
+    <a href="${escapeHtml(href)}" aria-label="${escapeHtml(label)}" style="display:inline-block;margin:0 5px;text-decoration:none;">
+      <img src="${escapeHtml(iconUrl)}" alt="${escapeHtml(label)}" width="34" height="34" style="display:block;border:0;width:34px;height:34px;border-radius:50%;" />
+    </a>
+  `;
 }
 
 async function parseEmailRequest(request) {
@@ -177,8 +216,26 @@ function renderConfirmationHtml({ emailText, partyId }) {
   `;
 }
 
-function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, instagramLink, partyId }) {
+function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, socialLinks, partyId }) {
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
+  const iconBaseUrl = websiteLink.replace(/\/+$/, "");
+  const socialIconLinks = [
+    {
+      href: socialLinks.instagram,
+      label: "Instagram",
+      iconUrl: `${iconBaseUrl}/assets/images/social_icon/instagram.png`,
+    },
+    {
+      href: socialLinks.facebook,
+      label: "Facebook",
+      iconUrl: `${iconBaseUrl}/assets/images/social_icon/facebook.png`,
+    },
+    {
+      href: socialLinks.tiktok,
+      label: "TikTok",
+      iconUrl: `${iconBaseUrl}/assets/images/social_icon/tiktok.png`,
+    },
+  ];
 
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
@@ -222,8 +279,10 @@ function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, 
           <p style="margin:0 0 18px;">See you soon,<br /><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
           <p style="margin:0;color:#6b7280;">
             Vaughan, Ontario<br />
-            <a href="${escapeHtml(websiteLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(websiteLink)}</a><br />
-            <a href="${escapeHtml(instagramLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(instagramLink)}</a>
+            <a href="${escapeHtml(websiteLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(websiteLink)}</a>
+          </p>
+          <p style="margin:18px 0 0;">
+            ${socialIconLinks.map(renderSocialIconLink).join("")}
           </p>
         </div>
       </div>
@@ -241,7 +300,7 @@ export async function POST(request) {
     const firstName = cleanText(body?.firstName);
     const bookingLink = cleanText(body?.bookingLink) || "https://www.pixelpulseplay.ca/booking?type=ticket";
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
-    const instagramLink = cleanText(body?.instagramLink) || "https://www.pixelpulseplay.ca/instagram";
+    const socialLinks = readSocialRedirectLinks();
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const inviteUrl = cleanText(body?.inviteUrl);
     const waiverUrl = cleanText(body?.waiverUrl);
@@ -321,7 +380,9 @@ export async function POST(request) {
           "The Pixel Pulse Team",
           "Vaughan, Ontario",
           websiteLink,
-          instagramLink,
+          `Instagram: ${socialLinks.instagram}`,
+          `Facebook: ${socialLinks.facebook}`,
+          `TikTok: ${socialLinks.tiktok}`,
         ].filter(Boolean).join("\n")
       : confirmationEmailText
       ? [
@@ -336,7 +397,7 @@ export async function POST(request) {
         ].filter(Boolean).join("\n");
 
     const html = sendThankYou
-      ? renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, instagramLink, partyId })
+      ? renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, socialLinks, partyId })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `
