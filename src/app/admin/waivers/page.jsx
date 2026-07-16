@@ -64,6 +64,24 @@ function normalizeSearchValue(value = "") {
   return String(value || "").trim().toLowerCase();
 }
 
+function localDateString(date = new Date()) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function effectiveWaiverDate(waiver = {}) {
+  const visitDate = waiver.visit?.visitDate;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(visitDate || "")) return visitDate;
+  return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : "";
+}
+
+function waiverParticipantCount(waiver = {}) {
+  return Math.max(Number(waiver.participantCount) || 1, 1);
+}
+
 function PersonTile({ person, relationship }) {
   return (
     <div>
@@ -463,6 +481,7 @@ export default function AdminWaiversPage() {
         waiver.visit?.partyId,
         waiver.visit?.partyName,
         waiver.visit?.visitDate,
+        effectiveWaiverDate(waiver),
         waiver.visit?.passType,
       ];
       const matchesSearch = !needle || (
@@ -473,9 +492,9 @@ export default function AdminWaiversPage() {
             .some((value) => normalizeSearchValue(value).includes(needle))
       );
 
-      const waiverVisitDate = waiver.visit?.visitDate || "";
-      const matchesFrom = !dateFrom || waiverVisitDate >= dateFrom;
-      const matchesTo = !dateTo || waiverVisitDate <= dateTo;
+      const waiverDate = effectiveWaiverDate(waiver);
+      const matchesFrom = !dateFrom || waiverDate >= dateFrom;
+      const matchesTo = !dateTo || waiverDate <= dateTo;
       const matchesParty = !partyOnly || Boolean(waiver.visit?.partyId);
 
       return matchesSearch && matchesFrom && matchesTo && matchesParty;
@@ -494,6 +513,7 @@ export default function AdminWaiversPage() {
         waiver.visit?.partyName,
         waiver.visit?.passType,
         waiver.visit?.visitDate,
+        effectiveWaiverDate(waiver),
       ]
         .filter(Boolean)
         .forEach((value) => values.add(String(value)));
@@ -504,7 +524,7 @@ export default function AdminWaiversPage() {
   const totalParticipants = useMemo(
     () =>
       waivers.reduce(
-        (total, waiver) => total + (Number(waiver.participantCount) || 1),
+        (total, waiver) => total + waiverParticipantCount(waiver),
         0,
       ),
     [waivers],
@@ -527,9 +547,9 @@ export default function AdminWaiversPage() {
       };
 
       current.records += 1;
-      current.participants += Number(waiver.participantCount) || 1;
+      current.participants += waiverParticipantCount(waiver);
       current.partyName ||= waiver.visit?.partyName || "";
-      current.visitDate ||= waiver.visit?.visitDate || "";
+      current.visitDate ||= effectiveWaiverDate(waiver);
       current.visitTime ||= waiver.visit?.visitTime || "";
       if (!current.latestSubmittedAt || waiver.submittedAt > current.latestSubmittedAt) {
         current.latestSubmittedAt = waiver.submittedAt;
@@ -542,9 +562,11 @@ export default function AdminWaiversPage() {
       (b.latestSubmittedAt || "").localeCompare(a.latestSubmittedAt || ""),
     );
   }, [waivers]);
-  const todayWaivers = useMemo(() => {
-    const today = new Date().toISOString().split("T")[0];
-    return waivers.filter((waiver) => waiver.visit?.visitDate === today).length;
+  const todayVisits = useMemo(() => {
+    const today = localDateString();
+    return waivers
+      .filter((waiver) => effectiveWaiverDate(waiver) === today)
+      .reduce((total, waiver) => total + waiverParticipantCount(waiver), 0);
   }, [waivers]);
   const latestWaiver = waivers[0];
   const totalPages = Math.max(1, Math.ceil(filteredWaivers.length / pageSize));
@@ -732,7 +754,7 @@ export default function AdminWaiversPage() {
               </article>
               <article>
                 <span>Visits Today</span>
-                <strong>{todayWaivers}</strong>
+                <strong>{todayVisits}</strong>
               </article>
               <article>
                 <span>Latest</span>
