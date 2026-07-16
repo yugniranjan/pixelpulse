@@ -150,6 +150,13 @@
   font-weight: 800;
 }
 
+.invite-admin-help {
+  margin: 0;
+  color: #667085;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .invite-admin-edit {
   margin-top: 22px;
 }

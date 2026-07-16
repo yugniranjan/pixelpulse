@@ -19,6 +19,10 @@ function ratingReasonLine(label, value, reason) {
   return `${label} reason: ${reason}`;
 }
 
+function listLines(values = []) {
+  return values.length ? values.map((value) => `- ${value}`).join("\n") : "Not provided";
+}
+
 export async function POST(request) {
   if (!mailerConfigured()) {
     return NextResponse.json(
@@ -39,11 +43,17 @@ export async function POST(request) {
   const phone = cleanText(body.phone);
   const visitDate = cleanText(body.visitDate);
   const partyId = cleanText(body.partyId);
+  const visitReasons = Array.isArray(body.visitReasons) ? body.visitReasons.map(cleanText).filter(Boolean) : [];
   const rooms = Array.isArray(body.rooms) ? body.rooms.map(cleanText).filter(Boolean) : [];
   const ratings = body.ratings || {};
   const ratingReasons = body.ratingReasons || {};
   const recommend = cleanText(body.recommend);
-  const notes = cleanText(body.notes);
+  const returnVisit = cleanText(body.returnVisit);
+  const favoriteMoment = cleanText(body.favoriteMoment);
+  const upgradeIdea = cleanText(body.upgradeIdea);
+  const futureExperiences = Array.isArray(body.futureExperiences) ? body.futureExperiences.map(cleanText).filter(Boolean) : [];
+  const otherFutureExperience = cleanText(body.otherFutureExperience);
+  const marketingConsent = Boolean(body.marketingConsent);
 
   if (!name || !isEmail(email) || !ratings.overall) {
     return NextResponse.json(
@@ -68,24 +78,41 @@ export async function POST(request) {
     partyId ? `Party ID: ${partyId}` : "",
     visitDate ? `Visit date: ${visitDate}` : "",
     "",
+    "Visit reason",
+    listLines(visitReasons),
+    "",
     "Rooms played",
-    rooms.length ? rooms.map((room) => `- ${room}`).join("\n") : "Not provided",
+    listLines(rooms),
     "",
     "Ratings",
-    ratingLine("Overall Experience", ratings.overall),
-    ratingReasonLine("Overall Experience", ratings.overall, cleanText(ratingReasons.overall)),
-    ratingLine("Staff & Crew", ratings.staff),
-    ratingReasonLine("Staff & Crew", ratings.staff, cleanText(ratingReasons.staff)),
+    ratingLine("Overall Fun", ratings.overall),
+    ratingReasonLine("Overall Fun", ratings.overall, cleanText(ratingReasons.overall)),
+    ratingLine("Game Variety", ratings.gameVariety),
+    ratingReasonLine("Game Variety", ratings.gameVariety, cleanText(ratingReasons.gameVariety)),
+    ratingLine("Staff Friendliness", ratings.staff),
+    ratingReasonLine("Staff Friendliness", ratings.staff, cleanText(ratingReasons.staff)),
     ratingLine("Cleanliness", ratings.cleanliness),
     ratingReasonLine("Cleanliness", ratings.cleanliness, cleanText(ratingReasons.cleanliness)),
+    ratingLine("Technology & Gameplay", ratings.technology),
+    ratingReasonLine("Technology & Gameplay", ratings.technology, cleanText(ratingReasons.technology)),
     ratingLine("Value for Money", ratings.value),
     ratingReasonLine("Value for Money", ratings.value, cleanText(ratingReasons.value)),
     average ? `Average: ${average}/5` : "",
     "",
     `Would recommend: ${recommend || "Not provided"}`,
+    `Will play again: ${returnVisit || "Not provided"}`,
     "",
-    "Additional notes",
-    notes || "Not provided",
+    "Biggest win",
+    favoriteMoment || "Not provided",
+    "",
+    "Upgrade idea",
+    upgradeIdea || "Not provided",
+    "",
+    "Future experiences",
+    listLines(futureExperiences),
+    otherFutureExperience ? `Other idea: ${otherFutureExperience}` : "",
+    "",
+    `Marketing consent: ${marketingConsent ? "Yes" : "No"}`,
   ].filter((line) => line !== "").join("\n");
 
   await sendBrandedEmail({

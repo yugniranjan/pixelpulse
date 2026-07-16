@@ -5,7 +5,7 @@ import { canonicalUrl } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Rate your Visit | Pixel Pulse Play Vaughan",
+  title: "Help Us Level Up! | Pixel Pulse Play Vaughan",
   description: "Share quick feedback after your Pixel Pulse Play visit.",
   alternates: {
     canonical: canonicalUrl("/feedback"),
