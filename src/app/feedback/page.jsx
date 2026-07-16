@@ -5,7 +5,7 @@ import { canonicalUrl } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Rate Your Run | Pixel Pulse Play Vaughan",
+  title: "Rate your Visit | Pixel Pulse Play Vaughan",
   description: "Share quick feedback after your Pixel Pulse Play visit.",
   alternates: {
     canonical: canonicalUrl("/feedback"),
@@ -26,8 +26,8 @@ export default async function FeedbackPage({ searchParams }) {
   const initial = {
     name: searchValue(params, "name"),
     email: searchValue(params, "email"),
+    phone: searchValue(params, "phone"),
     visitDate: searchValue(params, "visitDate") || searchValue(params, "date"),
-    partySize: searchValue(params, "partySize"),
     partyId: searchValue(params, "partyId"),
   };
 

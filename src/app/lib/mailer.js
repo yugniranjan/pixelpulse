@@ -75,15 +75,16 @@ function brandedHtml(message) {
  * Send one branded email. `subject` and `message` should already have any
  * tokens (e.g. {name}) substituted by the caller.
  */
-export async function sendBrandedEmail({ to, subject, message }) {
+export async function sendBrandedEmail({ to, subject, message, replyTo }) {
   const tx = getTransporter();
   if (!tx) throw new Error("Mailer is not configured.");
 
   const sender = env("GMAIL_FROM_EMAIL") || env("GMAIL_USER");
+  const replyAddress = replyTo && isEmail(replyTo) ? replyTo : CONTACT_EMAIL;
   await tx.sendMail({
     from: { name: BUSINESS_NAME, address: sender },
     to,
-    replyTo: { name: BUSINESS_NAME, address: CONTACT_EMAIL },
+    replyTo: replyAddress,
     subject,
     text: message,
     html: brandedHtml(message),

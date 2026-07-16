@@ -1,6 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
+
+const LOGO_SRC = "/assets/images/logo.png";
 
 const ROOMS = [
   "Laser Maze",
@@ -28,10 +31,16 @@ const RATINGS = [
 const DEFAULT_FORM = {
   name: "",
   email: "",
+  phone: "",
   visitDate: "",
-  partySize: "",
   rooms: [],
   ratings: {
+    overall: "",
+    staff: "",
+    cleanliness: "",
+    value: "",
+  },
+  ratingReasons: {
     overall: "",
     staff: "",
     cleanliness: "",
@@ -76,8 +85,8 @@ export default function FeedbackForm({ initial = {} }) {
     ...DEFAULT_FORM,
     name: cleanInitial(initial.name),
     email: cleanInitial(initial.email),
+    phone: cleanInitial(initial.phone),
     visitDate: cleanInitial(initial.visitDate),
-    partySize: cleanInitial(initial.partySize),
     partyId: cleanInitial(initial.partyId),
   }));
   const [submitting, setSubmitting] = useState(false);
@@ -101,6 +110,22 @@ export default function FeedbackForm({ initial = {} }) {
       ...current,
       ratings: {
         ...current.ratings,
+        [name]: value,
+      },
+      ratingReasons: Number(value) >= 5
+        ? {
+            ...current.ratingReasons,
+            [name]: "",
+          }
+        : current.ratingReasons,
+    }));
+  }
+
+  function updateRatingReason(name, value) {
+    setForm((current) => ({
+      ...current,
+      ratingReasons: {
+        ...current.ratingReasons,
         [name]: value,
       },
     }));
@@ -159,13 +184,21 @@ export default function FeedbackForm({ initial = {} }) {
   return (
     <div className="ppp-feedback-shell">
       <section className="ppp-feedback-hero">
+        <Image
+          className="ppp-feedback-logo"
+          src={LOGO_SRC}
+          alt="Pixel Pulse Play"
+          width={240}
+          height={160}
+          priority
+        />
         <div className="ppp-feedback-kicker">
           <span />
           Pixel Pulse Play · Vaughan, ON
         </div>
-        <h1>Rate Your Run</h1>
+        <h1>Rate your Visit</h1>
         <p>
-          You played, you scored, now debrief. Two minutes of feedback helps us tune every room for
+          You played, you scored, now share how it went. Two minutes of feedback helps us tune every room for
           the next squad through the door.
         </p>
       </section>
@@ -173,7 +206,7 @@ export default function FeedbackForm({ initial = {} }) {
       {submitted ? (
         <section className="ppp-feedback-confirm">
           <span>Complete</span>
-          <h2>Debrief Logged</h2>
+          <h2>Feedback received</h2>
           <p>Thanks for playing. We read every submission and use it to improve the next visit.</p>
           {average ? <strong>Session score: {average} / 5.0</strong> : null}
         </section>
@@ -181,7 +214,6 @@ export default function FeedbackForm({ initial = {} }) {
         <form className="ppp-feedback-form" onSubmit={submitFeedback}>
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
-              <span>01</span>
               <div>
                 <h2>The Basics</h2>
                 <p>So we can follow up if needed.</p>
@@ -201,15 +233,14 @@ export default function FeedbackForm({ initial = {} }) {
                 <input type="date" value={form.visitDate} onChange={(event) => updateField("visitDate", event.target.value)} />
               </label>
               <label>
-                <span>Party size</span>
-                <input value={form.partySize} onChange={(event) => updateField("partySize", event.target.value)} placeholder="e.g. 4 players" />
+                <span>Phone optional</span>
+                <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Optional phone number" />
               </label>
             </div>
           </section>
 
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
-              <span>02</span>
               <div>
                 <h2>Which Rooms Did You Play?</h2>
                 <p>Select all that apply.</p>
@@ -231,26 +262,38 @@ export default function FeedbackForm({ initial = {} }) {
 
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
-              <span>03</span>
               <div>
                 <h2>Rate Your Session</h2>
                 <p>Tap a bar. Higher signal, better score.</p>
               </div>
             </div>
-            {RATINGS.map(([name, label]) => (
-              <RatingBars
-                key={name}
-                name={name}
-                label={label}
-                value={form.ratings[name]}
-                onChange={(value) => updateRating(name, value)}
-              />
-            ))}
+            {RATINGS.map(([name, label]) => {
+              const rating = Number(form.ratings[name]);
+              return (
+                <div className="ppp-feedback-rating-block" key={name}>
+                  <RatingBars
+                    name={name}
+                    label={label}
+                    value={form.ratings[name]}
+                    onChange={(value) => updateRating(name, value)}
+                  />
+                  {rating > 0 && rating < 5 ? (
+                    <label className="ppp-feedback-rating-reason">
+                      <span>What could make this a 5?</span>
+                      <input
+                        value={form.ratingReasons[name]}
+                        onChange={(event) => updateRatingReason(name, event.target.value)}
+                        placeholder={`Tell us how we can improve ${label.toLowerCase()}.`}
+                      />
+                    </label>
+                  ) : null}
+                </div>
+              );
+            })}
           </section>
 
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
-              <span>04</span>
               <div>
                 <h2>Would You Recommend Us?</h2>
               </div>
@@ -276,15 +319,14 @@ export default function FeedbackForm({ initial = {} }) {
 
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
-              <span>05</span>
               <div>
-                <h2>Debrief Notes</h2>
+                <h2>Share Your Thoughts</h2>
                 <p>What should we level up, and what already hits?</p>
               </div>
             </div>
             <label className="ppp-feedback-notes">
               <span>Notes</span>
-              <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} placeholder="Tell us about your run..." />
+              <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} placeholder="Tell us about your visit..." />
             </label>
           </section>
 
@@ -292,7 +334,7 @@ export default function FeedbackForm({ initial = {} }) {
             <p>Takes about 2 minutes. Your feedback shapes what we build next.</p>
             {error ? <strong>{error}</strong> : null}
             <button type="submit" disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Debrief"}
+              {submitting ? "Submitting..." : "Submit Feedback"}
             </button>
           </div>
         </form>

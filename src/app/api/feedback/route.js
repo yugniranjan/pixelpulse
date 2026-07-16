@@ -14,6 +14,11 @@ function ratingLine(label, value) {
   return `${label}: ${value ? `${value}/5` : "Not provided"}`;
 }
 
+function ratingReasonLine(label, value, reason) {
+  if (!value || Number(value) >= 5 || !reason) return "";
+  return `${label} reason: ${reason}`;
+}
+
 export async function POST(request) {
   if (!mailerConfigured()) {
     return NextResponse.json(
@@ -31,11 +36,12 @@ export async function POST(request) {
 
   const name = cleanText(body.name);
   const email = cleanText(body.email);
+  const phone = cleanText(body.phone);
   const visitDate = cleanText(body.visitDate);
-  const partySize = cleanText(body.partySize);
   const partyId = cleanText(body.partyId);
   const rooms = Array.isArray(body.rooms) ? body.rooms.map(cleanText).filter(Boolean) : [];
   const ratings = body.ratings || {};
+  const ratingReasons = body.ratingReasons || {};
   const recommend = cleanText(body.recommend);
   const notes = cleanText(body.notes);
 
@@ -58,23 +64,27 @@ export async function POST(request) {
     "",
     `Name: ${name}`,
     `Email: ${email}`,
+    phone ? `Phone: ${phone}` : "",
     partyId ? `Party ID: ${partyId}` : "",
     visitDate ? `Visit date: ${visitDate}` : "",
-    partySize ? `Party size: ${partySize}` : "",
     "",
     "Rooms played",
     rooms.length ? rooms.map((room) => `- ${room}`).join("\n") : "Not provided",
     "",
     "Ratings",
     ratingLine("Overall Experience", ratings.overall),
+    ratingReasonLine("Overall Experience", ratings.overall, cleanText(ratingReasons.overall)),
     ratingLine("Staff & Crew", ratings.staff),
+    ratingReasonLine("Staff & Crew", ratings.staff, cleanText(ratingReasons.staff)),
     ratingLine("Cleanliness", ratings.cleanliness),
+    ratingReasonLine("Cleanliness", ratings.cleanliness, cleanText(ratingReasons.cleanliness)),
     ratingLine("Value for Money", ratings.value),
+    ratingReasonLine("Value for Money", ratings.value, cleanText(ratingReasons.value)),
     average ? `Average: ${average}/5` : "",
     "",
     `Would recommend: ${recommend || "Not provided"}`,
     "",
-    "Debrief notes",
+    "Additional notes",
     notes || "Not provided",
   ].filter((line) => line !== "").join("\n");
 
@@ -82,6 +92,7 @@ export async function POST(request) {
     to: FEEDBACK_TO,
     subject: `Pixel Pulse feedback from ${name}`,
     message,
+    replyTo: email,
   });
 
   return NextResponse.json({ success: true, average });

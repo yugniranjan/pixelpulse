@@ -153,7 +153,7 @@ function renderThankYouHtml({ feedbackUrl, partyId }) {
           <p style="margin:0 0 12px;">Your quick feedback helps us tune the games, staff flow, and party experience for the next squad.</p>
           <p style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:#f7fbea;border:1px solid #d8e6b8;color:#374151;"><strong style="color:#111827;">Get 10% off your next visit</strong><br />Submit the review and we will send you a 10% off thank-you offer.</p>
           <p style="margin:22px 0;">
-            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">Rate your run</a>
+            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">Submit Feedback</a>
           </p>
           <p style="margin:0;color:#6b7280;">The form takes about two minutes. If anything needs direct follow-up, you can also reply to this email.</p>
         </div>
