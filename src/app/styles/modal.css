@@ -78,14 +78,28 @@
 }
 
 .ppp-vr-teaser-html img {
+  display: block;
   max-width: 100%;
+  height: auto;
+}
+
+.ppp-vr-teaser-html video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: min(78vh, 720px);
+  border-radius: 12px;
+  object-fit: contain;
+  background: #050810;
 }
 
 .ppp-vr-teaser-html a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  width: 100%;
+  min-height: 0;
   border-radius: 999px;
   text-decoration: none;
 }
