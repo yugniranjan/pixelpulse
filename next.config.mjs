@@ -65,11 +65,30 @@ function normalizeRedirect(row) {
 
   return {
     source: normalizedSource,
-    destination,
+    destination: normalizeRedirectDestination(normalizedSource, destination),
     permanent: ["true", "yes", "1"].includes(
       String(row?.permanent ?? "true").trim().toLowerCase(),
     ),
   };
+}
+
+function normalizeRedirectDestination(source, destination) {
+  if (source !== "/tiktok") {
+    return destination;
+  }
+
+  try {
+    const url = new URL(destination);
+    if (!/(^|\.)tiktok\.com$/i.test(url.hostname)) {
+      return destination;
+    }
+
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch (error) {
+    return "https://www.tiktok.com/@pixel.pulse.playz";
+  }
 }
 
 async function fetchSheetRedirects() {
