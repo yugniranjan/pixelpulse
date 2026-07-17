@@ -29,6 +29,20 @@ function cleanEmail(value = "") {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
 }
 
+function cleanAbsoluteUrl(value = "") {
+  const url = cleanText(value).replace(/[\r\n]+/g, "");
+
+  if (!/^https?:\/\//i.test(url)) {
+    return "";
+  }
+
+  try {
+    return new URL(url).toString();
+  } catch (error) {
+    return "";
+  }
+}
+
 function escapeHtml(value = "") {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -43,7 +57,7 @@ function textToHtml(value = "") {
 
 function applySocialRedirectRow(links, row = {}) {
   const source = cleanText(row.source).replace(/^\//, "").toLowerCase();
-  const destination = cleanText(row.destination);
+  const destination = cleanAbsoluteUrl(row.destination);
 
   if (source in links && destination) {
     links[source] = destination;
