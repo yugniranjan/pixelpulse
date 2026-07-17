@@ -9,9 +9,11 @@ export const runtime = "nodejs";
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+const THANK_YOU_INSTAGRAM_URL =
+  "https://www.instagram.com/pixelpulseplayzone?igsh=NHE0YXZtd2V3bjJi&utm_source=qr";
 const SOCIAL_REDIRECT_FALLBACKS = {
   facebook: "https://www.facebook.com/pixelpulseplay",
-  instagram: "https://www.instagram.com/pixelpulseplay",
+  instagram: THANK_YOU_INSTAGRAM_URL,
   tiktok: "https://www.tiktok.com/@pixelpulseplay",
 };
 
@@ -70,7 +72,7 @@ async function readSocialRedirectLinks() {
   try {
     const sheetRows = await fetchsheetdataNoCache("redirects");
     sheetRows.forEach((row) => applySocialRedirectRow(links, row));
-    return links;
+    return { ...links, instagram: THANK_YOU_INSTAGRAM_URL };
   } catch (error) {
     console.warn("Live redirect sheet unavailable for thank you email:", error);
   }
@@ -88,7 +90,7 @@ async function readSocialRedirectLinks() {
     console.warn("Local social redirects unavailable for thank you email:", error);
   }
 
-  return links;
+  return { ...links, instagram: THANK_YOU_INSTAGRAM_URL };
 }
 
 function renderSocialIconLink({ href, label, iconUrl }) {
