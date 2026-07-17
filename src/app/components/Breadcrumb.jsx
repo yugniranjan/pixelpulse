@@ -20,6 +20,15 @@ export default function Breadcrumbs() {
   });
 
   function formatLabel(slug) {
+    const acronymLabels = {
+      vr: "VR",
+    };
+
+    const normalizedSlug = String(slug || "").trim().toLowerCase();
+    if (acronymLabels[normalizedSlug]) {
+      return acronymLabels[normalizedSlug];
+    }
+
     return slug
       ?.replace(/-/g, " ")
       ?.replace(/\b\w/g, (char) => char.toUpperCase());
