@@ -154,7 +154,7 @@ export default function FeedbackForm({ initial = {} }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const overallRating = Number(form.ratings.overall);
+  const shouldShowGoogleReview = RATINGS.every(([name]) => Number(form.ratings[name]) >= 4);
 
   const average = useMemo(() => {
     const values = Object.values(form.ratings)
@@ -392,7 +392,7 @@ export default function FeedbackForm({ initial = {} }) {
             })}
           </section>
 
-          {overallRating >= 4 ? (
+          {shouldShowGoogleReview ? (
             <section className="ppp-feedback-section ppp-feedback-review">
               <div>
                 <h2>Loved your experience?</h2>

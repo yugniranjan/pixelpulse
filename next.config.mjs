@@ -87,7 +87,7 @@ function normalizeRedirectDestination(source, destination) {
     url.hash = "";
     return url.toString();
   } catch (error) {
-    return "https://www.tiktok.com/@pixel.pulse.playz";
+    return "https://www.tiktok.com/@pixelpulseplay";
   }
 }
 

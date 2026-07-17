@@ -14,6 +14,8 @@ import instagramicon from "@public/assets/images/social_icon/instagram.png";
 import youtubeicon from "@public/assets/images/social_icon/youtube.svg";
 import Script from "next/script";
 
+const TIKTOK_URL = "https://www.tiktok.com/@pixelpulseplay";
+
 function footerHrefForItem(item = {}, locationSlug = "") {
   const path = String(item?.path || "").trim().toLowerCase();
   const parentid = String(item?.parentid || "").trim().toLowerCase();
@@ -115,7 +117,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
       label: "Instagram",
     },
     {
-      href: "/tiktok",
+      href: TIKTOK_URL,
       icon: tiktokicon,
       label: "TikTok",
     },
