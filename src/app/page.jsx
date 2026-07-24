@@ -8,6 +8,7 @@ import MotionImage from "@/components/MotionImage";
 import BlogCard from "@/components/smallComponents/BlogCard";
 import {
   fetchsheetdata,
+  fetchsheetdataNoCache,
   fetchMenuData,
   fetchPageData,
   getWaiverLink,
@@ -21,7 +22,7 @@ import VrTeaserModal from "./components/model/VrTeaserModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
 import { safeImageUrl } from "@/lib/seo";
 
-export const revalidate = 900;
+export const dynamic = "force-dynamic";
 
 const SITE_DATA_GOOGLE_SHEET_ID = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 const SITE_DATA_SHEET_NAMES = [
@@ -721,7 +722,7 @@ const Home = async () => {
       getWaiverLink(location_slug),
       fetchMenuData(location_slug),
       fetchPageData(location_slug, "home"),
-      fetchsheetdata("config", location_slug),
+      fetchsheetdataNoCache("config", location_slug),
       fetchGoogleSiteDataSheets().then(parseSiteDataSheets),
     ]);
   } catch (error) {

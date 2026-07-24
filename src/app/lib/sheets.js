@@ -10,6 +10,43 @@ const waiverLinkCache = new Map();
 const reviewesData = new Map();
 let workbookLoadPromise = null;
 
+function normalizeSheetData(name, sheetData) {
+  if (name !== 'config') {
+    return sheetData;
+  }
+
+  return sheetData.map((m) => {
+    const shiftedSummerPassRow =
+      /^(showSummerPlayPass|summerPlayPass|summerPass)/i.test(
+        String(m.location || "").trim()
+      ) &&
+      !String(m.value || "").trim() &&
+      String(m.key || "").trim();
+    const value = shiftedSummerPassRow ? m.key : m.value;
+
+    return {
+      ...m,
+      location: shiftedSummerPassRow ? "" : m.location,
+      key: shiftedSummerPassRow ? m.location : m.key,
+      value:
+        typeof value === 'string'
+          ? value.replace(/\r?\n|\r/g, "<br/>")
+          : value || "",
+    };
+  });
+}
+
+function filterSheetDataByLocation(sheetData, location) {
+  if (!location || location === 'all') {
+    return sheetData;
+  }
+
+  return sheetData.filter((m) => {
+    const rowLocation = String(m.location ?? "");
+    return rowLocation.includes(location) || rowLocation === "";
+  });
+}
+
 async function populateSheetCache() {
   const now = Date.now();
   const response = await fetch(SHEET_URL, {
@@ -40,34 +77,13 @@ async function populateSheetCache() {
 
   workbook.SheetNames.forEach((name) => {
     const worksheet = workbook.Sheets[name];
-    let sheetData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-
-    if (name === 'config') {
-      sheetData = sheetData.map((m) => {
-        const shiftedSummerPassRow =
-          /^(showSummerPlayPass|summerPlayPass|summerPass)/i.test(
-            String(m.location || "").trim()
-          ) &&
-          !String(m.value || "").trim() &&
-          String(m.key || "").trim();
-        const value = shiftedSummerPassRow ? m.key : m.value;
-
-        return {
-          ...m,
-          location: shiftedSummerPassRow ? "" : m.location,
-          key: shiftedSummerPassRow ? m.location : m.key,
-          value:
-            typeof value === 'string'
-              ? value.replace(/\r?\n|\r/g, "<br/>")
-              : value || "",
-        };
-      });
-    }
+    const sheetData = normalizeSheetData(
+      name,
+      XLSX.utils.sheet_to_json(worksheet, { defval: '' }),
+    );
 
     distinctLocations.forEach((loc) => {
-      const filteredData = sheetData.filter(
-        (m) => m.location?.includes(loc) || m.location === ""
-      );
+      const filteredData = filterSheetDataByLocation(sheetData, loc);
       const cacheKeyLocal = `${name}:${loc}`;
       sheetCache.set(cacheKeyLocal, {
         data: filteredData,
@@ -116,7 +132,7 @@ export async function fetchsheetdata(sheetName, location) {
   }
 }
 
-export async function fetchsheetdataNoCache(sheetName) {
+export async function fetchsheetdataNoCache(sheetName, location) {
   try {
     const response = await fetch(SHEET_URL, { cache: 'no-store' });
 
@@ -132,8 +148,11 @@ export async function fetchsheetdataNoCache(sheetName) {
       return [];
     }
 
-    const jsonLocationsData = XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' });
-    return jsonLocationsData;
+    const jsonLocationsData = normalizeSheetData(
+      sheetName,
+      XLSX.utils.sheet_to_json(worksheetLocationsData, { defval: '' }),
+    );
+    return filterSheetDataByLocation(jsonLocationsData, location);
   } catch (error) {
     console.warn(`Sheet data unavailable for "${sheetName}": ${error.message}`);
     return [];
