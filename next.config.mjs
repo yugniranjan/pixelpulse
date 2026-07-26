@@ -3,6 +3,12 @@ import { readFile } from "node:fs/promises";
 
 const SHEET_ID = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 const REDIRECT_SHEET_NAMES = ["redirects"];
+const SOCIAL_REDIRECT_FALLBACKS = {
+  "/facebook": "https://www.facebook.com/pixelpulseplay",
+  "/instagram": "https://www.instagram.com/pixelpulseplayzone",
+  "/tiktok": "https://www.tiktok.com/@pixelpulseplay",
+  "/youtube": "https://youtube.com/@pixelpulseplayzone?si=sUJmrZ-1n5F973Hr",
+};
 
 function parseCsv(csv) {
   const rows = [];
@@ -73,8 +79,18 @@ function normalizeRedirect(row) {
 }
 
 function normalizeRedirectDestination(source, destination) {
+  const fallback = SOCIAL_REDIRECT_FALLBACKS[source];
+
   if (source !== "/tiktok") {
-    return destination;
+    if (destination.startsWith("/")) {
+      return destination;
+    }
+
+    try {
+      return new URL(destination).toString();
+    } catch (error) {
+      return fallback || destination;
+    }
   }
 
   try {
@@ -87,7 +103,7 @@ function normalizeRedirectDestination(source, destination) {
     url.hash = "";
     return url.toString();
   } catch (error) {
-    return "https://www.tiktok.com/@pixelpulseplay";
+    return fallback || "https://www.tiktok.com/@pixelpulseplay";
   }
 }
 
