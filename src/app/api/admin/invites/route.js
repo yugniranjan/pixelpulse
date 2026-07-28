@@ -423,8 +423,15 @@ export async function PUT(req) {
       ? cleanText(body[name])
       : fallback;
   const origin = getOrigin(req);
-  const inviteUrl = existing.inviteUrl || `${origin}/invite/${slug}`;
   const partyId = bodyText("partyId", existing.partyId || "");
+  const childName = bodyText("childName", existing.childName || "");
+  const childNameChanged = cleanText(existing.childName || "") !== childName;
+  const desiredSlug = childNameChanged ? normalizeInviteSlug(childName) : slug;
+  const updatedSlug =
+    desiredSlug && desiredSlug !== slug
+      ? await getAvailableSlug(desiredSlug)
+      : slug;
+  const inviteUrl = `${origin}/invite/${updatedSlug}`;
   const waiverLink = partyId
     ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
     : existing.waiverLink || `${origin}/waiver`;
@@ -432,11 +439,10 @@ export async function PUT(req) {
     ? `${origin}/feedback?partyId=${encodeURIComponent(partyId)}&date=${encodeURIComponent(bodyText("date", existing.date || ""))}`
     : existing.feedbackUrl || `${origin}/feedback`;
   const updatedAt = new Date();
-  const childName = bodyText("childName", existing.childName || "");
   const title = bodyText("title", existing.title || "Birthday Party");
   const invite = {
     ...existing,
-    slug,
+    slug: updatedSlug,
     partyId,
     active: bodyText("active", existing.active || "1") || "1",
     childName,
@@ -488,8 +494,38 @@ export async function PUT(req) {
 
   if (hasPostgres()) {
     await upsertPostgresInvite(invite);
+    if (updatedSlug !== slug) {
+      await deletePostgresInvite(slug);
+    }
+    if (partyId) {
+      await upsertPostgresPartyWaiver({
+        partyId,
+        primaryParticipant: childName,
+        visitDate: invite.date,
+        visitTime: invite.time,
+        passType: invite.partyPackage || "Birthday Party Package",
+        createdAt: existing.createdAt || updatedAt,
+        updatedAt,
+      });
+    }
   } else {
-    await db.collection("invites").doc(slug).set(invite, { merge: true });
+    await db.collection("invites").doc(updatedSlug).set(invite, { merge: true });
+    if (updatedSlug !== slug) {
+      await db.collection("invites").doc(slug).delete();
+    }
+    if (partyId) {
+      await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).set(
+        {
+          partyId,
+          primaryParticipant: childName,
+          visitDate: invite.date,
+          visitTime: invite.time,
+          passType: invite.partyPackage || "Birthday Party Package",
+          updatedAt,
+        },
+        { merge: true },
+      );
+    }
   }
 
   return NextResponse.json({ success: true, invite });
