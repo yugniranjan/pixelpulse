@@ -430,10 +430,26 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.gift-card__foot div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .gift-card__foot span {
   color: #f2f5f8;
   font-size: 0.74rem;
   font-weight: 750;
+}
+
+.gift-card__foot small {
+  overflow: hidden;
+  color: #8b96a8;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gift-card__foot strong {
@@ -477,6 +493,22 @@
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+}
+
+.gift-admin__row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gift-admin__row-actions button {
+  min-height: 32px;
+  padding: 0 12px;
+}
+
+.gift-admin__row-actions .gift-admin__danger {
+  background: #fef3f2;
+  color: #b42318;
 }
 
 .gift-admin__table-wrap {

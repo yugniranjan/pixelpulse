@@ -305,3 +305,164 @@ export async function redeemGiftCard({ code = "", redeemedBy = "admin" } = {}) {
     error: "This gift card has already been redeemed or is not active.",
   };
 }
+
+export async function updateGiftCard(input = {}) {
+  if (!hasGiftCardStore()) return { error: "Gift card database is not configured." };
+
+  const id = String(input.id || "").trim();
+  const currentCode = normalizeGiftCardCode(input.currentCode || input.code);
+  const code = normalizeGiftCardCode(input.code);
+  const durationMinutes = Number(input.durationMinutes);
+  const priceCents = parsePriceCents(input.price ?? input.priceCents / 100);
+  const senderName = String(input.senderName || "").trim();
+
+  if (!id && !currentCode) return { error: "Gift card id or code is required." };
+  if (!code) return { error: "Gift card code is required." };
+  if (!VALID_DURATIONS.has(durationMinutes)) {
+    return { error: "Duration must be 30, 60, or 90 minutes." };
+  }
+  if (priceCents === null) return { error: "Enter a valid price." };
+
+  if (!hasPostgres()) {
+    const lookupId = id || currentCode;
+    const currentRef = db.collection("giftCards").doc(lookupId);
+    const nextRef = db.collection("giftCards").doc(code);
+    return db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(currentRef);
+      if (!snapshot.exists) return { notFound: true, error: "Gift card not found." };
+
+      const current = { id: snapshot.id, ...snapshot.data() };
+      const normalizedCurrent = normalizeRow(current);
+      if (normalizedCurrent.status !== "active" || normalizedCurrent.redeemedAt) {
+        return { notActive: true, giftCard: normalizedCurrent, error: "Only active gift cards can be edited." };
+      }
+
+      if (code !== lookupId) {
+        const duplicate = await transaction.get(nextRef);
+        if (duplicate.exists) return { duplicate: true, error: "That redemption code already exists." };
+      }
+
+      const now = new Date();
+      const next = {
+        code,
+        durationMinutes,
+        priceCents,
+        recipientName: "",
+        senderName,
+        status: normalizedCurrent.status,
+        createdBy: normalizedCurrent.createdBy,
+        redeemedBy: normalizedCurrent.redeemedBy,
+        redeemedAt: normalizedCurrent.redeemedAt || null,
+        createdAt: current.createdAt || now,
+        updatedAt: now,
+      };
+
+      if (code === lookupId) {
+        transaction.update(currentRef, next);
+      } else {
+        transaction.set(nextRef, next);
+        transaction.delete(currentRef);
+      }
+
+      return { giftCard: normalizeRow({ ...next, id: code }) };
+    });
+  }
+
+  await ensureTable();
+
+  try {
+    const result = await query(
+      `
+        update gift_cards
+        set code = $3,
+            duration_minutes = $4,
+            price_cents = $5,
+            recipient_name = '',
+            sender_name = $6,
+            updated_at = now(),
+            raw = raw || $7::jsonb
+        where (${id ? "id = $1" : "false"} or code = $2)
+          and status = 'active'
+          and redeemed_at is null
+        returning *
+      `,
+      [
+        id,
+        currentCode,
+        code,
+        durationMinutes,
+        priceCents,
+        senderName,
+        JSON.stringify({
+          code,
+          durationMinutes,
+          priceCents,
+          senderName,
+          updatedAt: new Date().toISOString(),
+        }),
+      ],
+    );
+
+    if (result.rows[0]) return { giftCard: normalizeRow(result.rows[0]) };
+
+    const existing = await query(`select * from gift_cards where ${id ? "id = $1" : "false"} or code = $2 limit 1`, [
+      id,
+      currentCode,
+    ]);
+    if (!existing.rows[0]) return { notFound: true, error: "Gift card not found." };
+
+    return { notActive: true, giftCard: normalizeRow(existing.rows[0]), error: "Only active gift cards can be edited." };
+  } catch (error) {
+    if (error?.code === "23505") {
+      return { duplicate: true, error: "That redemption code already exists." };
+    }
+    throw error;
+  }
+}
+
+export async function deleteRedeemedGiftCard({ id = "", code = "" } = {}) {
+  if (!hasGiftCardStore()) return { error: "Gift card database is not configured." };
+
+  const normalizedId = String(id || "").trim();
+  const normalizedCode = normalizeGiftCardCode(code);
+  if (!normalizedId && !normalizedCode) return { error: "Gift card id or code is required." };
+
+  if (!hasPostgres()) {
+    const lookupId = normalizedId || normalizedCode;
+    const ref = db.collection("giftCards").doc(lookupId);
+    return db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) return { notFound: true, error: "Gift card not found." };
+
+      const giftCard = normalizeRow({ id: snapshot.id, ...snapshot.data() });
+      if (giftCard.status !== "redeemed") {
+        return { notRedeemed: true, giftCard, error: "Only redeemed gift cards can be deleted." };
+      }
+
+      transaction.delete(ref);
+      return { giftCard };
+    });
+  }
+
+  await ensureTable();
+
+  const result = await query(
+    `
+      delete from gift_cards
+      where (${normalizedId ? "id = $1" : "false"} or code = $2)
+        and status = 'redeemed'
+      returning *
+    `,
+    [normalizedId, normalizedCode],
+  );
+
+  if (result.rows[0]) return { giftCard: normalizeRow(result.rows[0]) };
+
+  const existing = await query(`select * from gift_cards where ${normalizedId ? "id = $1" : "false"} or code = $2 limit 1`, [
+    normalizedId,
+    normalizedCode,
+  ]);
+  if (!existing.rows[0]) return { notFound: true, error: "Gift card not found." };
+
+  return { notRedeemed: true, giftCard: normalizeRow(existing.rows[0]), error: "Only redeemed gift cards can be deleted." };
+}

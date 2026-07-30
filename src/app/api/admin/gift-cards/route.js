@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import {
   createGiftCard,
+  deleteRedeemedGiftCard,
   hasGiftCardStore,
   listGiftCards,
   redeemGiftCard,
+  updateGiftCard,
 } from "@/lib/giftCards";
 
 export const dynamic = "force-dynamic";
@@ -65,11 +67,40 @@ export async function PATCH(req) {
   if (!hasGiftCardStore()) return dbUnavailable();
 
   const body = await req.json().catch(() => ({}));
-  if (body.action !== "redeem") {
+  if (!["redeem", "update"].includes(body.action)) {
     return NextResponse.json({ error: "Unsupported gift card action." }, { status: 400 });
   }
 
   try {
+    if (body.action === "update") {
+      const result = await updateGiftCard({
+        id: body.id,
+        currentCode: body.currentCode,
+        code: body.code,
+        durationMinutes: body.durationMinutes,
+        price: body.price,
+        senderName: body.senderName,
+      });
+
+      if (result.notFound) {
+        return NextResponse.json({ error: result.error }, { status: 404 });
+      }
+      if (result.duplicate) {
+        return NextResponse.json({ error: result.error }, { status: 409 });
+      }
+      if (result.notActive) {
+        return NextResponse.json(
+          { error: result.error, giftCard: result.giftCard },
+          { status: 409 },
+        );
+      }
+      if (result.error) {
+        return NextResponse.json({ error: result.error }, { status: 400 });
+      }
+
+      return NextResponse.json({ giftCard: result.giftCard });
+    }
+
     const result = await redeemGiftCard({
       code: body.code,
       redeemedBy: body.redeemedBy || "admin",
@@ -92,5 +123,36 @@ export async function PATCH(req) {
   } catch (error) {
     console.error("redeem gift card failed:", error);
     return NextResponse.json({ error: "Unable to redeem gift card." }, { status: 500 });
+  }
+}
+
+export async function DELETE(req) {
+  if (!hasGiftCardStore()) return dbUnavailable();
+
+  const body = await req.json().catch(() => ({}));
+
+  try {
+    const result = await deleteRedeemedGiftCard({
+      id: body.id,
+      code: body.code,
+    });
+
+    if (result.notFound) {
+      return NextResponse.json({ error: result.error }, { status: 404 });
+    }
+    if (result.notRedeemed) {
+      return NextResponse.json(
+        { error: result.error, giftCard: result.giftCard },
+        { status: 409 },
+      );
+    }
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    return NextResponse.json({ giftCard: result.giftCard });
+  } catch (error) {
+    console.error("delete gift card failed:", error);
+    return NextResponse.json({ error: "Unable to delete gift card." }, { status: 500 });
   }
 }
