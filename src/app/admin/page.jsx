@@ -22,18 +22,18 @@ const MODULES = [
     accent: "#a4cf5f",
   },
   {
-    title: "Waiver Reports",
-    desc: "Volume & participants over time, follow-up emails, CSV export.",
-    href: "/admin/waivers/reports",
-    action: "Open reports",
-    accent: "#8b5cf6",
-  },
-  {
     title: "Create Party Links",
     desc: "Birthday invite links, waiver links, SMS copy, and QR codes.",
     href: "/admin/invites",
     action: "Build invites",
     accent: "#fb923c",
+  },
+  {
+    title: "Gift Cards",
+    desc: "Create digital 30, 60, and 90 minute gameplay gift cards.",
+    href: "/admin/gift-cards",
+    action: "Create cards",
+    accent: "#33e6df",
   },
   {
     title: "Blogs",

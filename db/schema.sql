@@ -137,6 +137,25 @@ create index if not exists squad_referrals_referrer_idx on squad_referrals (refe
 create index if not exists squad_referrals_status_idx on squad_referrals (status);
 create unique index if not exists squad_referrals_promo_code_idx on squad_referrals (promo_code);
 
+create table if not exists gift_cards (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  duration_minutes integer not null,
+  price_cents integer not null default 0,
+  recipient_name text,
+  sender_name text,
+  status text not null default 'active',
+  created_by text,
+  redeemed_by text,
+  redeemed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  raw jsonb not null default '{}'::jsonb
+);
+
+create index if not exists gift_cards_status_idx on gift_cards (status);
+create index if not exists gift_cards_created_at_idx on gift_cards (created_at desc);
+
 -- Level Up Rewards. Scoreboard/game events should be copied into the ledger
 -- once, keyed by source_score_id where available. Levels are calculated from
 -- lifetime ledger points; redeeming a reward does not subtract level status.
