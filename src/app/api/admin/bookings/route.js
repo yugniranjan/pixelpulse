@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import {
-  hasPostgres,
+  hasBookingStore,
   listBookings,
   createBooking,
   updateBooking,
@@ -42,7 +42,7 @@ function duplicateResponse(result) {
 }
 
 export async function GET(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasBookingStore()) return dbUnavailable();
 
   const { searchParams } = new URL(req.url);
   try {
@@ -61,7 +61,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasBookingStore()) return dbUnavailable();
 
   let body;
   try {
@@ -83,7 +83,7 @@ export async function POST(req) {
 }
 
 export async function PUT(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasBookingStore()) return dbUnavailable();
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -110,7 +110,7 @@ export async function PUT(req) {
 }
 
 export async function DELETE(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasBookingStore()) return dbUnavailable();
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");

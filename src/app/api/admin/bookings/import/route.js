@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
-import { hasPostgres, bulkImportBookings, existingPartyIds } from "@/lib/bookings";
+import { hasBookingStore, bulkImportBookings, existingPartyIds } from "@/lib/bookings";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -55,7 +55,7 @@ function toDateTime(value) {
 }
 
 export async function POST(req) {
-  if (!hasPostgres()) {
+  if (!hasBookingStore()) {
     return NextResponse.json({ error: "Bookings database is not configured." }, { status: 503 });
   }
 

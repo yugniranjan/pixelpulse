@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { db } from "@/lib/firestore";
 import { hasPostgres } from "@/lib/postgresData";
 import { query } from "@/lib/postgres";
 
@@ -33,8 +34,124 @@ function extractChildren(familyMembers) {
     .filter((child) => child.name);
 }
 
+function iso(value) {
+  if (!value) return "";
+  if (typeof value.toDate === "function") return value.toDate().toISOString();
+  if (value instanceof Date) return value.toISOString();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+function effectiveDate(waiver = {}) {
+  const visitDate = String(waiver.visit?.visitDate || "").trim();
+  if (DATE_RE.test(visitDate)) return visitDate;
+  const submittedAt = iso(waiver.submittedAt);
+  return submittedAt ? submittedAt.slice(0, 10) : "";
+}
+
+function isPartyWaiver(waiver = {}) {
+  return Boolean(String(waiver.visit?.partyId || "").trim());
+}
+
+function inRange(date, from, to) {
+  if (!DATE_RE.test(date)) return false;
+  if (DATE_RE.test(from) && date < from) return false;
+  if (DATE_RE.test(to) && date > to) return false;
+  return true;
+}
+
+function periodStart(kind) {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+
+  if (kind === "week") {
+    const day = start.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    start.setDate(start.getDate() + mondayOffset);
+  } else {
+    start.setDate(1);
+  }
+
+  return start;
+}
+
+async function buildFirestoreReport(from, to) {
+  const snapshot = await db
+    .collection("waivers")
+    .select(
+      "primary",
+      "familyMembers",
+      "visit",
+      "participantCount",
+      "primaryName",
+      "submittedAt",
+    )
+    .orderBy("submittedAt", "desc")
+    .limit(5000)
+    .get();
+
+  const weekStart = periodStart("week");
+  const monthStart = periodStart("month");
+  let weekWaivers = 0;
+  let monthWaivers = 0;
+  const byDateMap = new Map();
+  const rows = [];
+
+  snapshot.docs.forEach((doc) => {
+    const waiver = { id: doc.id, ...(doc.data() || {}) };
+    const submittedAt = iso(waiver.submittedAt);
+    const submittedDate = submittedAt ? new Date(submittedAt) : null;
+
+    if (submittedDate && submittedDate >= weekStart) weekWaivers += 1;
+    if (submittedDate && submittedDate >= monthStart) monthWaivers += 1;
+
+    const date = effectiveDate(waiver);
+    if (!inRange(date, from, to)) return;
+
+    const participants = Number(waiver.participantCount) || 1;
+    const currentDate = byDateMap.get(date) || { date, waivers: 0, participants: 0 };
+    currentDate.waivers += 1;
+    currentDate.participants += participants;
+    byDateMap.set(date, currentDate);
+
+    rows.push({
+      id: doc.id,
+      date,
+      primaryName: waiver.primaryName || waiver.primary?.fullLegalName || "",
+      participants,
+      type: isPartyWaiver(waiver) ? "Party" : "Walk-in",
+      partyId: waiver.visit?.partyId || "",
+      email: waiver.primary?.email || "",
+      phone: waiver.primary?.phone || "",
+      children: extractChildren(waiver.familyMembers),
+      submittedAt,
+    });
+  });
+
+  const totalWaivers = rows.length;
+  const totalParticipants = rows.reduce((sum, row) => sum + row.participants, 0);
+  const partyCount = rows.filter((row) => row.type === "Party").length;
+
+  rows.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+
+  return {
+    range: { from: DATE_RE.test(from) ? from : "", to: DATE_RE.test(to) ? to : "" },
+    summary: {
+      totalWaivers,
+      totalParticipants,
+      partyCount,
+      walkInCount: totalWaivers - partyCount,
+      weekWaivers,
+      monthWaivers,
+    },
+    byDate: [...byDateMap.values()].sort((a, b) => (a.date < b.date ? 1 : -1)),
+    rows,
+  };
+}
+
 export async function GET(req) {
-  if (!hasPostgres()) {
+  if (!hasPostgres() && !db) {
     return NextResponse.json(
       { error: "Reporting database is not configured." },
       { status: 503 },
@@ -44,6 +161,15 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
+
+  if (!hasPostgres()) {
+    try {
+      return NextResponse.json(await buildFirestoreReport(from, to));
+    } catch (error) {
+      console.error("firestore waiver report failed:", error);
+      return NextResponse.json({ error: "Unable to build report." }, { status: 500 });
+    }
+  }
 
   const where = [];
   const params = [];

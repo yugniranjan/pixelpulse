@@ -1,4 +1,5 @@
 import { getPostgresPool, query } from "@/lib/postgres";
+import { db } from "@/lib/firestore";
 
 const VALID_DURATIONS = new Set([30, 60, 90]);
 const VALID_STATUSES = new Set(["active", "redeemed", "void"]);
@@ -7,6 +8,10 @@ let tableReady;
 
 export function hasPostgres() {
   return Boolean(getPostgresPool());
+}
+
+export function hasGiftCardStore() {
+  return hasPostgres() || Boolean(db);
 }
 
 async function ensureTable() {
@@ -40,6 +45,7 @@ async function ensureTable() {
 
 function iso(value) {
   if (!value) return "";
+  if (typeof value.toDate === "function") return value.toDate().toISOString();
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
@@ -64,25 +70,47 @@ export function parsePriceCents(value) {
 
 function normalizeRow(row = {}) {
   const raw = row.raw || {};
+  const durationMinutes = row.duration_minutes ?? row.durationMinutes ?? raw.durationMinutes ?? null;
+  const priceCents = row.price_cents ?? row.priceCents ?? raw.priceCents ?? 0;
   return {
     id: row.id,
     code: row.code || "",
-    durationMinutes: row.duration_minutes ?? raw.durationMinutes ?? null,
-    priceCents: row.price_cents ?? raw.priceCents ?? 0,
-    price: ((row.price_cents ?? raw.priceCents ?? 0) / 100).toFixed(2),
-    recipientName: row.recipient_name || raw.recipientName || "",
-    senderName: row.sender_name || raw.senderName || "",
+    durationMinutes,
+    priceCents,
+    price: (priceCents / 100).toFixed(2),
+    recipientName: row.recipient_name || row.recipientName || raw.recipientName || "",
+    senderName: row.sender_name || row.senderName || raw.senderName || "",
     status: row.status || raw.status || "active",
-    createdBy: row.created_by || raw.createdBy || "",
-    redeemedBy: row.redeemed_by || raw.redeemedBy || "",
-    redeemedAt: iso(row.redeemed_at || raw.redeemedAt),
-    createdAt: iso(row.created_at || raw.createdAt),
-    updatedAt: iso(row.updated_at || raw.updatedAt),
+    createdBy: row.created_by || row.createdBy || raw.createdBy || "",
+    redeemedBy: row.redeemed_by || row.redeemedBy || raw.redeemedBy || "",
+    redeemedAt: iso(row.redeemed_at || row.redeemedAt || raw.redeemedAt),
+    createdAt: iso(row.created_at || row.createdAt || raw.createdAt),
+    updatedAt: iso(row.updated_at || row.updatedAt || raw.updatedAt),
   };
 }
 
 export async function listGiftCards({ limit = 200, q = "", status = "" } = {}) {
-  if (!hasPostgres()) return [];
+  if (!hasGiftCardStore()) return [];
+
+  const maxLimit = Math.min(Math.max(Number(limit) || 200, 1), 1000);
+
+  if (!hasPostgres()) {
+    const snapshot = await db
+      .collection("giftCards")
+      .orderBy("createdAt", "desc")
+      .limit(maxLimit)
+      .get();
+    const needle = String(q || "").trim().toLowerCase();
+    return snapshot.docs
+      .map((doc) => normalizeRow({ id: doc.id, ...doc.data() }))
+      .filter((card) => {
+        if (status && VALID_STATUSES.has(status) && card.status !== status) return false;
+        if (!needle) return true;
+        return [card.code, card.recipientName, card.senderName]
+          .some((value) => String(value || "").toLowerCase().includes(needle));
+      });
+  }
+
   await ensureTable();
 
   const values = [];
@@ -102,7 +130,7 @@ export async function listGiftCards({ limit = 200, q = "", status = "" } = {}) {
     where.push(`status = $${values.length}`);
   }
 
-  values.push(Math.min(Math.max(Number(limit) || 200, 1), 1000));
+  values.push(maxLimit);
   const result = await query(
     `
       select *
@@ -118,8 +146,7 @@ export async function listGiftCards({ limit = 200, q = "", status = "" } = {}) {
 }
 
 export async function createGiftCard(input = {}) {
-  if (!hasPostgres()) return { error: "Postgres is not configured." };
-  await ensureTable();
+  if (!hasGiftCardStore()) return { error: "Gift card database is not configured." };
 
   const code = normalizeGiftCardCode(input.code);
   const durationMinutes = Number(input.durationMinutes);
@@ -133,6 +160,35 @@ export async function createGiftCard(input = {}) {
     return { error: "Duration must be 30, 60, or 90 minutes." };
   }
   if (priceCents === null) return { error: "Enter a valid price." };
+
+  if (!hasPostgres()) {
+    const now = new Date();
+    const ref = db.collection("giftCards").doc(code);
+    const giftCardData = {
+      code,
+      durationMinutes,
+      priceCents,
+      recipientName,
+      senderName,
+      status: "active",
+      createdBy,
+      redeemedBy: "",
+      redeemedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const result = await db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (snapshot.exists) return { duplicate: true, error: "That redemption code already exists." };
+      transaction.set(ref, giftCardData);
+      return { giftCard: normalizeRow({ id: code, ...giftCardData }) };
+    });
+
+    return result;
+  }
+
+  await ensureTable();
 
   try {
     const result = await query(
@@ -172,11 +228,47 @@ export async function createGiftCard(input = {}) {
 }
 
 export async function redeemGiftCard({ code = "", redeemedBy = "admin" } = {}) {
-  if (!hasPostgres()) return { error: "Postgres is not configured." };
-  await ensureTable();
+  if (!hasGiftCardStore()) return { error: "Gift card database is not configured." };
 
   const normalizedCode = normalizeGiftCardCode(code);
   if (!normalizedCode) return { error: "Gift card code is required." };
+
+  if (!hasPostgres()) {
+    const ref = db.collection("giftCards").doc(normalizedCode);
+    return db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) return { notFound: true, error: "Gift card code not found." };
+
+      const current = { id: snapshot.id, ...snapshot.data() };
+      const normalizedCurrent = normalizeRow(current);
+      if (normalizedCurrent.status !== "active" || normalizedCurrent.redeemedAt) {
+        return {
+          alreadyRedeemed: true,
+          giftCard: normalizedCurrent,
+          error: "This gift card has already been redeemed or is not active.",
+        };
+      }
+
+      const now = new Date();
+      const next = {
+        ...current,
+        status: "redeemed",
+        redeemedBy: String(redeemedBy || "admin").trim() || "admin",
+        redeemedAt: now,
+        updatedAt: now,
+      };
+      transaction.update(ref, {
+        status: next.status,
+        redeemedBy: next.redeemedBy,
+        redeemedAt: next.redeemedAt,
+        updatedAt: next.updatedAt,
+      });
+
+      return { giftCard: normalizeRow(next) };
+    });
+  }
+
+  await ensureTable();
 
   const result = await query(
     `

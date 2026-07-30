@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getPostgresPool, query } from "@/lib/postgres";
+import { db } from "@/lib/firestore";
 
 /**
  * Birthday party bookings data layer.
@@ -47,6 +48,10 @@ export function hasPostgres() {
   return Boolean(getPostgresPool());
 }
 
+export function hasBookingStore() {
+  return hasPostgres() || Boolean(db);
+}
+
 async function ensureTable() {
   if (!tableReady) {
     tableReady = query(CREATE_TABLE_SQL).catch((error) => {
@@ -59,6 +64,7 @@ async function ensureTable() {
 
 function iso(value) {
   if (!value) return "";
+  if (typeof value.toDate === "function") return value.toDate().toISOString();
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
@@ -94,26 +100,127 @@ function normalizeBookingRow(row = {}) {
   return {
     id: row.id,
     ...raw,
-    customerName: row.customer_name || raw.customerName || "",
+    customerName: row.customer_name || row.customerName || raw.customerName || "",
     phone: row.phone || raw.phone || "",
     email: row.email || raw.email || "",
-    childName: row.child_name || raw.childName || "",
-    childAge: row.child_age || raw.childAge || "",
+    childName: row.child_name || row.childName || raw.childName || "",
+    childAge: row.child_age || row.childAge || raw.childAge || "",
     package: row.package || raw.package || "",
-    partyId: row.party_id || raw.partyId || "",
-    partySize: row.party_size ?? raw.partySize ?? null,
-    date: row.booking_date || raw.date || "",
-    startTime: row.start_time || raw.startTime || "",
-    endTime: row.end_time || raw.endTime || "",
-    startMinutes: row.start_minutes ?? null,
-    endMinutes: row.end_minutes ?? null,
-    durationMinutes: row.duration_minutes ?? raw.durationMinutes ?? null,
+    partyId: row.party_id || row.partyId || raw.partyId || "",
+    partySize: row.party_size ?? row.partySize ?? raw.partySize ?? null,
+    date: row.booking_date || row.date || raw.date || "",
+    startTime: row.start_time || row.startTime || raw.startTime || "",
+    endTime: row.end_time || row.endTime || raw.endTime || "",
+    startMinutes: row.start_minutes ?? row.startMinutes ?? raw.startMinutes ?? null,
+    endMinutes: row.end_minutes ?? row.endMinutes ?? raw.endMinutes ?? null,
+    durationMinutes: row.duration_minutes ?? row.durationMinutes ?? raw.durationMinutes ?? null,
     status: row.status || raw.status || "confirmed",
     notes: row.notes || raw.notes || "",
-    createdBy: row.created_by || raw.createdBy || "",
-    createdAt: iso(row.created_at || raw.createdAt),
-    updatedAt: iso(row.updated_at || raw.updatedAt),
+    createdBy: row.created_by || row.createdBy || raw.createdBy || "",
+    createdAt: iso(row.created_at || row.createdAt || raw.createdAt),
+    updatedAt: iso(row.updated_at || row.updatedAt || raw.updatedAt),
   };
+}
+
+function firestoreBookingData(id, value, extras = {}) {
+  return {
+    id,
+    customerName: value.customerName || "",
+    phone: value.phone || "",
+    email: value.email || "",
+    childName: value.childName || "",
+    childAge: value.childAge || "",
+    package: value.package || "",
+    partyId: value.partyId || "",
+    partySize: value.partySize ?? null,
+    date: value.date || "",
+    startTime: value.startTime || "",
+    endTime: value.endTime || "",
+    startMinutes: value.startMinutes ?? null,
+    endMinutes: value.endMinutes ?? null,
+    durationMinutes: value.durationMinutes ?? null,
+    status: value.status || "confirmed",
+    notes: value.notes || "",
+    createdBy: value.createdBy || extras.createdBy || "",
+    createdAt: extras.createdAt || value.createdAt || new Date(),
+    updatedAt: extras.updatedAt || new Date(),
+    raw: { ...value, ...extras.raw },
+  };
+}
+
+async function firestoreBookingsSnapshot({ from, to, status, q, date } = {}) {
+  let snapshot;
+  if (isValidDate(date)) {
+    snapshot = await db.collection("partyBookings").where("date", "==", date).get();
+  } else {
+    snapshot = await db.collection("partyBookings").limit(1000).get();
+  }
+
+  const needle = String(q || "").trim().toLowerCase();
+  return snapshot.docs
+    .map((doc) => normalizeBookingRow({ id: doc.id, ...doc.data() }))
+    .filter((booking) => {
+      if (!isValidDate(date)) {
+        if (isValidDate(from) && booking.date < from) return false;
+        if (isValidDate(to) && booking.date > to) return false;
+      }
+      if (status && status !== "all" && booking.status !== status) return false;
+      if (!needle) return true;
+      return [booking.customerName, booking.childName, booking.phone, booking.email, booking.partyId]
+        .some((value) => String(value || "").toLowerCase().includes(needle));
+    })
+    .sort((a, b) => (a.date === b.date ? (a.startMinutes ?? 0) - (b.startMinutes ?? 0) : a.date < b.date ? 1 : -1));
+}
+
+function findDuplicateBookings(bookings, { partyId, email, excludeId } = {}) {
+  const duplicates = bookings.filter((booking) => {
+    if (excludeId && booking.id === excludeId) return false;
+    if (booking.status === "cancelled") return false;
+    return (
+      (partyId && booking.partyId?.toLowerCase() === partyId.toLowerCase()) ||
+      (email && booking.email?.toLowerCase() === email.toLowerCase())
+    );
+  });
+  return duplicates.length ? duplicates : null;
+}
+
+function findConflictingBookings(bookings, value, excludeId) {
+  const conflicts = bookings.filter((booking) => {
+    if (excludeId && booking.id === excludeId) return false;
+    if (booking.status === "cancelled") return false;
+    return (
+      booking.date === value.date &&
+      Number(booking.startMinutes) < value.endMinutes &&
+      Number(booking.endMinutes) > value.startMinutes
+    );
+  });
+  return conflicts.length ? conflicts.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0)) : null;
+}
+
+async function transactionDuplicateBookings(transaction, { partyId, email, excludeId } = {}) {
+  const matches = new Map();
+  const queries = [];
+
+  if (partyId) {
+    queries.push(db.collection("partyBookings").where("partyId", "==", partyId));
+  }
+  if (email) {
+    queries.push(db.collection("partyBookings").where("email", "==", email));
+  }
+
+  const snapshots = [];
+  for (const bookingQuery of queries) {
+    snapshots.push(await transaction.get(bookingQuery));
+  }
+
+  snapshots.forEach((snapshot) => {
+    snapshot.docs.forEach((doc) => {
+      if (excludeId && doc.id === excludeId) return;
+      matches.set(doc.id, normalizeBookingRow({ id: doc.id, ...doc.data() }));
+    });
+  });
+
+  return findDuplicateBookings([...matches.values()], { partyId, email, excludeId });
 }
 
 /**
@@ -222,6 +329,11 @@ function describeDuplicate(rows, value) {
 /* ----------------------------------------------------------------- reads */
 
 export async function listBookings({ from, to, status, q, date } = {}) {
+  if (!hasPostgres()) {
+    if (!db) return [];
+    return firestoreBookingsSnapshot({ from, to, status, q, date });
+  }
+
   await ensureTable();
 
   const where = [];
@@ -263,6 +375,12 @@ export async function listBookings({ from, to, status, q, date } = {}) {
 }
 
 export async function getBookingById(id) {
+  if (!hasPostgres()) {
+    if (!db) return null;
+    const snapshot = await db.collection("partyBookings").doc(id).get();
+    return snapshot.exists ? normalizeBookingRow({ id: snapshot.id, ...snapshot.data() }) : null;
+  }
+
   await ensureTable();
   const result = await query("select * from party_bookings where id = $1", [id]);
   return result.rows.length ? normalizeBookingRow(result.rows[0]) : null;
@@ -280,11 +398,45 @@ export async function createBooking(input = {}) {
   const built = buildBookingValues(input);
   if (!built.ok) return { error: built.error };
 
-  await ensureTable();
   const value = built.value;
   const id = crypto.randomUUID();
   const now = new Date();
   const raw = { ...value, createdBy: input.createdBy || "" };
+
+  if (!hasPostgres()) {
+    if (!db) return { error: "Bookings database is not configured." };
+    return db.runTransaction(async (transaction) => {
+      const dateQuery = db.collection("partyBookings").where("date", "==", value.date);
+      const dateSnapshot = await transaction.get(dateQuery);
+      const duplicate = await transactionDuplicateBookings(transaction, { partyId: value.partyId, email: value.email });
+      const dateBookings = dateSnapshot.docs.map((doc) => normalizeBookingRow({ id: doc.id, ...doc.data() }));
+      if (duplicate) {
+        return {
+          duplicate,
+          duplicateMessage: describeDuplicate(
+            duplicate.map((booking) => ({
+              party_id: booking.partyId,
+              email: booking.email,
+              customer_name: booking.customerName,
+            })),
+            value,
+          ),
+        };
+      }
+      const conflict = findConflictingBookings(dateBookings, value);
+      if (conflict) return { conflict };
+
+      const data = firestoreBookingData(id, { ...value, status: "confirmed", createdBy: String(input.createdBy || "") }, {
+        createdAt: now,
+        updatedAt: now,
+        raw,
+      });
+      transaction.set(db.collection("partyBookings").doc(id), data);
+      return { booking: normalizeBookingRow(data) };
+    });
+  }
+
+  await ensureTable();
 
   const pool = getPostgresPool();
   const client = await pool.connect();
@@ -362,10 +514,59 @@ export async function createBooking(input = {}) {
  * date/time changes. Status-only changes (e.g. cancel) skip the conflict check.
  */
 export async function updateBooking(id, input = {}) {
-  await ensureTable();
-
   const existing = await getBookingById(id);
   if (!existing) return { notFound: true };
+
+  if (!hasPostgres()) {
+    if (!db) return { error: "Bookings database is not configured." };
+
+    if (input.status && Object.keys(input).filter((k) => k !== "status" && k !== "createdBy").length === 0) {
+      const status = input.status === "cancelled" ? "cancelled" : "confirmed";
+      const updatedAt = new Date();
+      await db.collection("partyBookings").doc(id).update({ status, updatedAt });
+      return { booking: { ...existing, status, updatedAt: updatedAt.toISOString() } };
+    }
+
+    const built = buildBookingValues({ ...existing, ...input });
+    if (!built.ok) return { error: built.error };
+    const value = built.value;
+    const status = input.status === "cancelled" ? "cancelled" : existing.status || "confirmed";
+    return db.runTransaction(async (transaction) => {
+      const dateSnapshot = await transaction.get(db.collection("partyBookings").where("date", "==", value.date));
+      const bookings = dateSnapshot.docs.map((doc) => normalizeBookingRow({ id: doc.id, ...doc.data() }));
+      if (status !== "cancelled") {
+        const duplicate = await transactionDuplicateBookings(transaction, {
+          partyId: value.partyId,
+          email: value.email,
+          excludeId: id,
+        });
+        if (duplicate) {
+          return {
+            duplicate,
+            duplicateMessage: describeDuplicate(
+              duplicate.map((booking) => ({
+                party_id: booking.partyId,
+                email: booking.email,
+                customer_name: booking.customerName,
+              })),
+              value,
+            ),
+          };
+        }
+        const conflict = findConflictingBookings(bookings, value, id);
+        if (conflict) return { conflict };
+      }
+      const now = new Date();
+      const data = firestoreBookingData(id, { ...existing, ...value, status }, {
+        createdAt: existing.createdAt ? new Date(existing.createdAt) : now,
+        updatedAt: now,
+      });
+      transaction.set(db.collection("partyBookings").doc(id), data, { merge: true });
+      return { booking: normalizeBookingRow(data) };
+    });
+  }
+
+  await ensureTable();
 
   // Cancel / status-only update.
   if (input.status && Object.keys(input).filter((k) => k !== "status" && k !== "createdBy").length === 0) {
@@ -458,12 +659,34 @@ export async function updateBooking(id, input = {}) {
 }
 
 export async function deleteBooking(id) {
+  if (!hasPostgres()) {
+    if (!db) return false;
+    const ref = db.collection("partyBookings").doc(id);
+    const snapshot = await ref.get();
+    if (!snapshot.exists) return false;
+    await ref.delete();
+    return true;
+  }
+
   await ensureTable();
   const result = await query("delete from party_bookings where id = $1 returning id", [id]);
   return result.rows.length > 0;
 }
 
 export async function existingPartyIds(ids = []) {
+  if (!hasPostgres()) {
+    if (!db) return new Set();
+    const clean = [...new Set(ids.filter(Boolean))];
+    if (!clean.length) return new Set();
+    const existing = new Set();
+    const snapshot = await db.collection("partyBookings").get();
+    snapshot.docs.forEach((doc) => {
+      const partyId = doc.data()?.partyId;
+      if (clean.includes(partyId)) existing.add(partyId);
+    });
+    return existing;
+  }
+
   await ensureTable();
   const clean = [...new Set(ids.filter(Boolean))];
   if (!clean.length) return new Set();
@@ -475,6 +698,12 @@ export async function existingPartyIds(ids = []) {
 }
 
 export async function getBookingByPartyId(partyId) {
+  if (!hasPostgres()) {
+    if (!db) return null;
+    const snapshot = await db.collection("partyBookings").where("partyId", "==", partyId).limit(1).get();
+    return snapshot.docs[0] ? normalizeBookingRow({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() }) : null;
+  }
+
   await ensureTable();
   const result = await query(
     "select * from party_bookings where party_id = $1 order by created_at asc nulls first limit 1",
@@ -492,6 +721,63 @@ export async function getBookingByPartyId(partyId) {
  * Bypasses the overlap/duplicate checks since this is a trusted batch import.
  */
 export async function bulkImportBookings(rows = []) {
+  if (!hasPostgres()) {
+    if (!db) return { inserted: 0, updated: 0, skipped: rows.length, errors: [], total: rows.length };
+    let inserted = 0;
+    let updated = 0;
+    let skipped = 0;
+    const errors = [];
+    for (let index = 0; index < rows.length; index += 1) {
+      const row = rows[index] || {};
+      const customerName = String(row.customerName || "").trim();
+      const date = String(row.date || "").trim();
+      if (!customerName || !isValidDate(date)) {
+        skipped += 1;
+        continue;
+      }
+      try {
+        const existing = row.partyId ? await getBookingByPartyId(String(row.partyId).trim()) : null;
+        const startMinutes = timeToMinutes(String(row.time || "").trim()) ?? 600;
+        const durationRaw = Number(row.durationMinutes);
+        const duration = Number.isFinite(durationRaw) && durationRaw > 0 ? Math.round(durationRaw) : 120;
+        const endMinutes = Math.min(startMinutes + duration, 1440);
+        const base = {
+          customerName,
+          email: String(row.email || "").trim(),
+          phone: String(row.phone || "").trim(),
+          package: String(row.package || "").trim(),
+          notes: String(row.notes || "").trim(),
+          partyId: String(row.partyId || "").trim(),
+          date,
+          startTime: minutesToTime(startMinutes),
+          endTime: minutesToTime(endMinutes),
+          startMinutes,
+          endMinutes,
+          durationMinutes: endMinutes - startMinutes,
+          childName: existing?.childName || "TBD",
+          childAge: existing?.childAge || "TBD",
+          partySize: existing?.partySize || 1,
+          status: existing?.status || "confirmed",
+          createdBy: existing?.createdBy || "import",
+        };
+        const id = existing?.id || crypto.randomUUID();
+        const now = new Date();
+        await db.collection("partyBookings").doc(id).set(
+          firestoreBookingData(id, base, {
+            createdAt: existing?.createdAt ? new Date(existing.createdAt) : now,
+            updatedAt: now,
+          }),
+          { merge: true },
+        );
+        if (existing) updated += 1;
+        else inserted += 1;
+      } catch (error) {
+        errors.push({ row: index + 1, partyId: row.partyId, error: error.message });
+      }
+    }
+    return { inserted, updated, skipped, errors, total: rows.length };
+  }
+
   await ensureTable();
 
   let inserted = 0;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   createGiftCard,
-  hasPostgres,
+  hasGiftCardStore,
   listGiftCards,
   redeemGiftCard,
 } from "@/lib/giftCards";
@@ -17,7 +17,7 @@ function dbUnavailable() {
 }
 
 export async function GET(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasGiftCardStore()) return dbUnavailable();
 
   const { searchParams } = new URL(req.url);
   try {
@@ -34,7 +34,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasGiftCardStore()) return dbUnavailable();
 
   const body = await req.json().catch(() => ({}));
   try {
@@ -62,7 +62,7 @@ export async function POST(req) {
 }
 
 export async function PATCH(req) {
-  if (!hasPostgres()) return dbUnavailable();
+  if (!hasGiftCardStore()) return dbUnavailable();
 
   const body = await req.json().catch(() => ({}));
   if (body.action !== "redeem") {
