@@ -320,29 +320,12 @@
   text-transform: uppercase;
 }
 
-.gift-card__track {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  align-items: center;
-  gap: 4px;
-  margin: 13px 0 12px;
-}
-
-.gift-card__track span {
-  height: 7px;
-  border: 1px solid rgba(242, 245, 248, 0.3);
-  border-radius: 3px;
-  background: rgba(242, 245, 248, 0.14);
-}
-
-.gift-card__track span:nth-child(3n + 1) {
-  height: 12px;
-}
-
-.gift-card__track span.is-active {
-  border-color: var(--accent);
-  background: var(--accent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+.gift-card__line {
+  height: 3px;
+  margin: 16px 0 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent) 0 68%, rgba(242, 245, 248, 0.24) 68% 100%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .gift-card__hero h2 {

@@ -8,7 +8,6 @@ import "../../styles/admin-gift-cards.css";
 
 const GIFT_CARD_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const GIFT_CARD_BACKGROUND = "/assets/images/gift-cards/gameplay-bg.jpg";
-const GIFT_CARD_CHECKPOINTS = [true, false, true, true, false, true, false, true, true, false, true, true];
 
 const PASS_OPTIONS = [
   {
@@ -159,27 +158,28 @@ function drawCoverImage(ctx, image, x, y, width, height) {
   ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
 }
 
-function drawChallengeTrack(ctx, x, y, width, accent) {
-  const stepCount = GIFT_CARD_CHECKPOINTS.length;
-  const gap = width / (stepCount - 1);
-
-  ctx.strokeStyle = "rgba(255,255,255,0.18)";
-  ctx.lineWidth = 4;
+function drawGiftCardLine(ctx, x, y, width, accent) {
+  ctx.strokeStyle = "rgba(242,245,248,0.18)";
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x + width, y);
   ctx.stroke();
 
-  GIFT_CARD_CHECKPOINTS.forEach((active, index) => {
-    const centerX = x + gap * index;
-    const size = index % 3 === 0 ? 26 : 20;
-    roundedRectPath(ctx, centerX - size / 2, y - size / 2, size, size, 5);
-    ctx.fillStyle = active ? accent : "rgba(242,245,248,0.14)";
-    ctx.fill();
-    ctx.strokeStyle = active ? accent : "rgba(242,245,248,0.3)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + width * 0.68, y);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(242,245,248,0.24)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + width * 0.72, y);
+  ctx.lineTo(x + width, y);
+  ctx.stroke();
 }
 
 async function renderGiftCardPng(pass, fields) {
@@ -256,7 +256,7 @@ async function renderGiftCardPng(pass, fields) {
   ctx.font = "900 42px Arial";
   ctx.fillText("MIN", padding + 48 + minutesWidth + 16, 426);
 
-  drawChallengeTrack(ctx, padding + 48, 500, 648, accent);
+  drawGiftCardLine(ctx, padding + 48, 500, 648, accent);
 
   if (pass.badge) {
     const badgeText = pass.badge.toUpperCase();
@@ -352,11 +352,7 @@ function GiftCardPreview({ pass, fields }) {
           <strong>{pass.minutes}</strong>
           <span>Min</span>
         </div>
-        <div className="gift-card__track" aria-hidden="true">
-          {GIFT_CARD_CHECKPOINTS.map((active, index) => (
-            <span className={active ? "is-active" : ""} key={`checkpoint-${index}`} />
-          ))}
-        </div>
+        <div className="gift-card__line" aria-hidden="true" />
         <h2>{pass.name}</h2>
         <p>{pass.tagline}</p>
       </div>
@@ -397,7 +393,7 @@ function standaloneHtml(pass, fields) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pixel Pulse Play Gift Card - ${pass.minutes} Min</title>
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:linear-gradient(180deg,rgba(8,10,14,.72),rgba(16,20,27,.94)),radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),url("https://www.pixelpulseplay.ca${GIFT_CARD_BACKGROUND}"),linear-gradient(180deg,#161c25,#10141b);background-size:auto,auto,cover,auto;background-position:center,center,center top,center;border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.track{display:grid;grid-template-columns:repeat(12,1fr);align-items:center;gap:7px;margin:14px 0 12px}.track span{height:12px;border:1px solid rgba(242,245,248,.3);border-radius:4px;background:rgba(242,245,248,.14)}.track span:nth-child(3n+1){height:18px}.track span.is-active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 10px rgba(164,207,95,.35)}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div,.foot div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot span{font-size:13px;font-weight:750}.foot small{color:#8b96a8;font-size:10px;font-weight:700;line-height:1.25}.foot strong{color:var(--accent);font-size:24px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:linear-gradient(180deg,rgba(8,10,14,.72),rgba(16,20,27,.94)),radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),url("https://www.pixelpulseplay.ca${GIFT_CARD_BACKGROUND}"),linear-gradient(180deg,#161c25,#10141b);background-size:auto,auto,cover,auto;background-position:center,center,center top,center;border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.line{height:4px;margin:16px 0 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent) 0 68%,rgba(242,245,248,.24) 68% 100%);box-shadow:0 0 10px rgba(164,207,95,.24)}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div,.foot div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot span{font-size:13px;font-weight:750}.foot small{color:#8b96a8;font-size:10px;font-weight:700;line-height:1.25}.foot strong{color:var(--accent);font-size:24px}
 </style>
 </head>
 <body>
@@ -406,7 +402,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0
 <div class="inner">
 <div class="eyebrow">Session Length</div>
 <div class="minutes"><strong>${pass.minutes}</strong><span>Min</span></div>
-<div class="track">${GIFT_CARD_CHECKPOINTS.map((active) => `<span class="${active ? "is-active" : ""}"></span>`).join("")}</div>
+<div class="line"></div>
 ${pass.badge ? `<div class="badge">${safeText(pass.badge)}</div>` : ""}
 <h1>${safeText(pass.name)}</h1><p>${safeText(pass.tagline)}</p>
 <div class="divider"></div>
