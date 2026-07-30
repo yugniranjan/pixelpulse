@@ -199,7 +199,7 @@ async function renderGiftCardPng(pass, fields) {
     ctx.stroke();
   }
 
-  ctx.drawImage(logo, padding + 48, padding + 44, 184, 123);
+  ctx.drawImage(logo, padding + 48, padding + 44, 150, 100);
 
   roundedRectPath(ctx, width - padding - 190, padding + 48, 142, 38, 19);
   ctx.fillStyle = `${accent}1f`;
@@ -217,9 +217,10 @@ async function renderGiftCardPng(pass, fields) {
   ctx.fillStyle = "#f2f5f8";
   ctx.font = "900 188px Arial";
   ctx.fillText(String(pass.minutes), padding + 48, 430);
+  const minutesWidth = ctx.measureText(String(pass.minutes)).width;
   ctx.fillStyle = accent;
   ctx.font = "900 42px Arial";
-  ctx.fillText("MIN", padding + 48 + ctx.measureText(String(pass.minutes)).width + 16, 426);
+  ctx.fillText("MIN", padding + 48 + minutesWidth + 16, 426);
 
   ctx.save();
   ctx.translate(padding + 48, 462);
@@ -276,20 +277,20 @@ async function renderGiftCardPng(pass, fields) {
 
   ctx.strokeStyle = "rgba(255,255,255,0.1)";
   ctx.beginPath();
-  ctx.moveTo(padding, 1034);
-  ctx.lineTo(width - padding, 1034);
+  ctx.moveTo(padding, 1008);
+  ctx.lineTo(width - padding, 1008);
   ctx.stroke();
 
   ctx.fillStyle = "#f2f5f8";
   ctx.font = "800 24px Arial";
-  ctx.fillText("pixelpulseplay.ca", padding + 48, 1068);
+  ctx.fillText("pixelpulseplay.ca", padding + 48, 1042);
   ctx.fillStyle = "#8b96a8";
   ctx.font = "700 18px Arial";
-  ctx.fillText(GIFT_CARD_ADDRESS, padding + 48, 1095);
+  ctx.fillText(GIFT_CARD_ADDRESS, padding + 48, 1067);
   ctx.fillStyle = accent;
   ctx.font = "900 42px Arial";
   ctx.textAlign = "right";
-  ctx.fillText(money(fields.price), width - padding - 48, 1084);
+  ctx.fillText(money(fields.price), width - padding - 48, 1058);
   ctx.textAlign = "left";
 
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
