@@ -12,3 +12,6 @@ automatic_scaling:
 handlers:
   - url: /.*
     script: auto
+
+includes:
+  - app.env.yaml
