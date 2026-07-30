@@ -182,6 +182,7 @@ const nextConfig = {
     NEXT_PUBLIC_BASE_URL: process.env.NODE_ENV === "development"
       ? "http://localhost:3000"           // ← local in dev
       : "https://pixelpulseplay.ca",
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
   },
 };
 

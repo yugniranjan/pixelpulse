@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../../styles/contactus.css";
 import { LOCATION_NAME } from "@/lib/constant";
+import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import { toast } from "sonner";
 import TurnstileWidget from "./TurnstileWidget";
 
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const CONTACT_PHONE = "+1 (905) 760-2922";
-const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 const birthdayPackageNotice =
   "Birthday party packages include a hosted party experience and party room time, but they do not reserve the entire facility or play area for private use.";
 
@@ -19,6 +19,7 @@ function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const { siteKey, turnstileEnabled, turnstileLoading } = useTurnstileSiteKey();
   const [formData, setFormData] = useState({
     from: LOCATION_NAME,
     firstName: "",
@@ -53,7 +54,7 @@ function ContactForm() {
       return;
     }
 
-    if (TURNSTILE_ENABLED && !turnstileToken) {
+    if (turnstileLoading || (turnstileEnabled && !turnstileToken)) {
       toast.error("Please complete the verification check.");
       setSubmitStatus("Please complete the verification check.");
       return;
@@ -232,8 +233,9 @@ function ContactForm() {
           </div>
         </div>
 
-        {TURNSTILE_ENABLED ? (
+        {turnstileEnabled ? (
           <TurnstileWidget
+            siteKey={siteKey}
             onVerify={setTurnstileToken}
             onExpire={() => setTurnstileToken("")}
             onError={() => setTurnstileToken("")}
@@ -243,7 +245,7 @@ function ContactForm() {
         <button
           type="submit"
           className="submit-button"
-          disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+          disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}
         >
           {submitting ? "Sending..." : "Send Inquiry"}
         </button>

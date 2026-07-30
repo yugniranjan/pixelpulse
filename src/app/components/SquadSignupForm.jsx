@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
-
-const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 const INITIAL_FORM = {
   childName: "",
@@ -21,6 +20,7 @@ export default function SquadSignupForm({ content = {} }) {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const { siteKey, turnstileEnabled, turnstileLoading } = useTurnstileSiteKey();
   const formContent = {
     eyebrow: content.eyebrow || "Parent sign-up",
     title: content.title || "Join the Squad",
@@ -60,7 +60,7 @@ export default function SquadSignupForm({ content = {} }) {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (TURNSTILE_ENABLED && !turnstileToken) {
+    if (turnstileLoading || (turnstileEnabled && !turnstileToken)) {
       setStatus("Please complete the verification check.");
       return;
     }
@@ -213,15 +213,16 @@ export default function SquadSignupForm({ content = {} }) {
         <span>{formContent.termsText}</span>
       </label>
 
-      {TURNSTILE_ENABLED ? (
+      {turnstileEnabled ? (
         <TurnstileWidget
+          siteKey={siteKey}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
           onError={() => setTurnstileToken("")}
         />
       ) : null}
 
-      <button type="submit" disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}>
+      <button type="submit" disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}>
         {submitting ? "Sending..." : formContent.submitText}
       </button>
 

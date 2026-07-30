@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
-const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
 const birthdayPackageNotice =
   "Birthday party packages do not include private-party privileges or reserve the entire facility/play area.";
@@ -27,6 +27,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const { siteKey, turnstileEnabled, turnstileLoading } = useTurnstileSiteKey();
   const isPrivatePartySelected = formData.selectedPackage
     .toLowerCase()
     .includes("private party");
@@ -39,7 +40,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (TURNSTILE_ENABLED && !turnstileToken) {
+    if (turnstileLoading || (turnstileEnabled && !turnstileToken)) {
       setStatus("Please complete the verification check.");
       return;
     }
@@ -236,8 +237,9 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         </label>
       </div>
 
-      {TURNSTILE_ENABLED ? (
+      {turnstileEnabled ? (
         <TurnstileWidget
+          siteKey={siteKey}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
           onError={() => setTurnstileToken("")}
@@ -246,7 +248,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
       <button
         type="submit"
-        disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+        disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}
       >
         {submitting ? "Sending..." : "Send Birthday Request"}
       </button>

@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import { toast } from "sonner";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
-
-const TURNSTILE_ENABLED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
 const INITIAL_FORM = {
   fullName: "",
@@ -22,6 +21,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const { siteKey, turnstileEnabled, turnstileLoading } = useTurnstileSiteKey();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -37,7 +37,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
       return;
     }
 
-    if (TURNSTILE_ENABLED && !turnstileToken) {
+    if (turnstileLoading || (turnstileEnabled && !turnstileToken)) {
       setStatus("Please complete the verification check.");
       toast.error("Please complete the verification check.");
       return;
@@ -160,8 +160,9 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
           placeholder="Tell us who is playing and when you want to visit."
         />
       </label>
-      {TURNSTILE_ENABLED ? (
+      {turnstileEnabled ? (
         <TurnstileWidget
+          siteKey={siteKey}
           onVerify={setTurnstileToken}
           onExpire={() => setTurnstileToken("")}
           onError={() => setTurnstileToken("")}
@@ -169,7 +170,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
       ) : null}
       <button
         type="submit"
-        disabled={submitting || (TURNSTILE_ENABLED && !turnstileToken)}
+        disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}
       >
         {submitting ? "Sending..." : "Send Inquiry"}
       </button>

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js";
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 let scriptPromise = null;
 
@@ -48,13 +47,13 @@ function loadTurnstileScript() {
   return scriptPromise;
 }
 
-export default function TurnstileWidget({ onVerify, onExpire, onError }) {
+export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }) {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
 
   useEffect(() => {
-    if (!SITE_KEY) {
-      console.warn("NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set; Turnstile is disabled.");
+    if (!siteKey) {
+      console.warn("Turnstile site key is not set; Turnstile is disabled.");
       return undefined;
     }
 
@@ -67,7 +66,7 @@ export default function TurnstileWidget({ onVerify, onExpire, onError }) {
         }
 
         widgetIdRef.current = turnstile.render(containerRef.current, {
-          sitekey: SITE_KEY,
+          sitekey: siteKey,
           callback: (token) => onVerify?.(token),
           "expired-callback": () => onExpire?.(),
           "error-callback": () => onError?.(),
@@ -89,7 +88,7 @@ export default function TurnstileWidget({ onVerify, onExpire, onError }) {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [siteKey]);
 
   return <div ref={containerRef} className="ppp-turnstile" />;
 }
