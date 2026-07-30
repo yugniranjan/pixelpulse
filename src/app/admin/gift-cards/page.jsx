@@ -9,27 +9,39 @@ import "../../styles/admin-gift-cards.css";
 const PASS_OPTIONS = [
   {
     minutes: 30,
-    name: "30 Minute Play Pass",
+    name: "Explorer Pass",
     tagline: "One focused run through every challenge room.",
     codePrefix: "PPP-30",
     price: "19",
+    accent: "#a4cf5f",
+    className: "gift-card--explorer",
     badge: "",
+    pulse:
+      "M0 23 H60 L72 23 L80 8 L88 38 L96 23 H150 L162 23 L170 8 L178 38 L186 23 H240 L252 23 L260 8 L268 38 L276 23 H352",
   },
   {
     minutes: 60,
-    name: "60 Minute Play Pass",
+    name: "All-Access Pass",
     tagline: "The full Pixel Pulse experience across every challenge room.",
     codePrefix: "PPP-60",
     price: "29",
+    accent: "#86b84f",
+    className: "gift-card--all-access",
     badge: "Most Popular",
+    pulse:
+      "M0 23 H40 L50 23 L58 4 L66 42 L74 23 H110 L120 23 L128 4 L136 42 L144 23 H180 L190 23 L198 4 L206 42 L214 23 H250 L260 23 L268 4 L276 42 L284 23 H352",
   },
   {
     minutes: 90,
-    name: "90 Minute Play Pass",
+    name: "Booster Pass",
     tagline: "A fully loaded session with extra replay time.",
     codePrefix: "PPP-90",
     price: "38",
+    accent: "#f2c94c",
+    className: "gift-card--booster",
     badge: "Fully Loaded",
+    pulse:
+      "M0 23 H24 L32 23 L40 1 L48 45 L56 23 H80 L88 23 L96 1 L104 45 L112 23 H136 L144 23 L152 1 L160 45 L168 23 H192 L200 23 L208 1 L216 45 L224 23 H248 L256 23 L264 1 L272 45 L280 23 H304 L312 23 L320 1 L328 45 L336 23 H352",
   },
 ];
 
@@ -98,12 +110,12 @@ function Barcode() {
 
 function GiftCardPreview({ pass, fields }) {
   return (
-    <article className="gift-card">
+    <article className={`gift-card ${pass.className}`} style={{ "--accent": pass.accent }}>
       <div className="gift-card__top">
         <div className="gift-card__brand">
           <Image src="/assets/images/logo.png" alt="Pixel Pulse Play" width={118} height={79} />
         </div>
-        <span className="gift-card__tag">Digital Gift Card</span>
+        <span className="gift-card__tag">Gift Card</span>
       </div>
 
       <div className="gift-card__hero">
@@ -115,6 +127,9 @@ function GiftCardPreview({ pass, fields }) {
           <strong>{pass.minutes}</strong>
           <span>Min</span>
         </div>
+        <svg className="gift-card__pulse" viewBox="0 0 352 46" preserveAspectRatio="none" aria-hidden="true">
+          <path d={pass.pulse} />
+        </svg>
         <h2>{pass.name}</h2>
         <p>{pass.tagline}</p>
       </div>
@@ -152,15 +167,16 @@ function standaloneHtml(pass, fields) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pixel Pulse Play Gift Card - ${pass.minutes} Min</title>
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f2f4f7;color:#101828;font-family:Arial,sans-serif;padding:32px}.card{width:min(420px,100%);background:#fff;border:1px solid #d0d5dd;border-radius:8px;overflow:hidden;box-shadow:0 24px 50px -30px rgba(15,23,42,.35)}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:#050810}.brand img{display:block;width:118px;height:auto}.tag{border:1px solid #a4cf5f;color:#a4cf5f;border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.14em;white-space:nowrap}.inner{padding:24px}.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.eyebrow{color:#667085;font-size:11px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;margin-top:8px;line-height:.8}.minutes strong{font-size:104px;color:#101828}.minutes span{color:#027a48;font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{align-self:flex-start;border-radius:5px;background:#ecfdf3;color:#027a48;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.card h1{margin:14px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#667085;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed #d0d5dd}.names div,.stub div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#667085;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.accent{color:#027a48}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:#101828}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid #eaecf0;background:#f9fafb}.foot strong{color:#027a48;font-size:24px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),linear-gradient(180deg,#161c25,#10141b);border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.pulse{width:100%;height:46px}.pulse path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot strong{color:var(--accent);font-size:24px}
 </style>
 </head>
 <body>
 <article class="card">
-<div class="top"><div class="brand"><img src="https://www.pixelpulseplay.ca/assets/images/logo.png" alt="Pixel Pulse Play"></div><div class="tag">Digital Gift Card</div></div>
+<div class="top"><div class="brand"><img src="https://www.pixelpulseplay.ca/assets/images/logo.png" alt="Pixel Pulse Play"></div><div class="tag">Gift Card</div></div>
 <div class="inner">
 <div class="eyebrow">Session Length</div>
 <div class="minutes"><strong>${pass.minutes}</strong><span>Min</span></div>
+<svg class="pulse" viewBox="0 0 352 46" preserveAspectRatio="none"><path d="${pass.pulse}"/></svg>
 ${pass.badge ? `<div class="badge">${safeText(pass.badge)}</div>` : ""}
 <h1>${safeText(pass.name)}</h1><p>${safeText(pass.tagline)}</p>
 <div class="divider"></div>
