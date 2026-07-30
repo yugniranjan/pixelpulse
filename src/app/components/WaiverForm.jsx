@@ -140,7 +140,7 @@ const DEFAULT_COPY = {
   guardianAcknowledgement:
     "I confirm I am the parent, legal guardian, or authorized adult for every participant under 18 listed in this form and have legal authority to sign this waiver, release, and consent on their behalf.",
   privacyAcknowledgement:
-    "I consent to Pixel Pulse Play collecting, using, storing, and disclosing the information in this form as reasonably needed to administer waivers, operate the venue, manage safety incidents, contact guardians or emergency contacts, and comply with legal or insurance requirements.",
+    "I understand that Pixel Pulse Play needs the information in this form to manage my waiver, keep players safe, contact me if needed, and meet legal and insurance requirements.",
   photoAcknowledgement:
     "<strong>OPTIONAL</strong> - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.",
   finalAcknowledgement:
