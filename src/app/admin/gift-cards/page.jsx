@@ -7,6 +7,8 @@ import "../../styles/admin-waivers.css";
 import "../../styles/admin-gift-cards.css";
 
 const GIFT_CARD_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
+const GIFT_CARD_BACKGROUND = "/assets/images/gift-cards/gameplay-bg.jpg";
+const GIFT_CARD_CHECKPOINTS = [true, false, true, true, false, true, false, true, true, false, true, true];
 
 const PASS_OPTIONS = [
   {
@@ -18,8 +20,6 @@ const PASS_OPTIONS = [
     accent: "#a4cf5f",
     className: "gift-card--explorer",
     badge: "",
-    pulse:
-      "M0 23 H60 L72 23 L80 8 L88 38 L96 23 H150 L162 23 L170 8 L178 38 L186 23 H240 L252 23 L260 8 L268 38 L276 23 H352",
   },
   {
     minutes: 60,
@@ -30,8 +30,6 @@ const PASS_OPTIONS = [
     accent: "#86b84f",
     className: "gift-card--all-access",
     badge: "Most Popular",
-    pulse:
-      "M0 23 H40 L50 23 L58 4 L66 42 L74 23 H110 L120 23 L128 4 L136 42 L144 23 H180 L190 23 L198 4 L206 42 L214 23 H250 L260 23 L268 4 L276 42 L284 23 H352",
   },
   {
     minutes: 90,
@@ -42,8 +40,6 @@ const PASS_OPTIONS = [
     accent: "#f2c94c",
     className: "gift-card--booster",
     badge: "Fully Loaded",
-    pulse:
-      "M0 23 H24 L32 23 L40 1 L48 45 L56 23 H80 L88 23 L96 1 L104 45 L112 23 H136 L144 23 L152 1 L160 45 L168 23 H192 L200 23 L208 1 L216 45 L224 23 H248 L256 23 L264 1 L272 45 L280 23 H304 L312 23 L320 1 L328 45 L336 23 H352",
   },
 ];
 
@@ -99,12 +95,12 @@ function safeText(value = "") {
     .replace(/"/g, "&quot;");
 }
 
-function loadCardLogo() {
+function loadCardImage(src) {
   return new Promise((resolve, reject) => {
     const image = new window.Image();
     image.onload = () => resolve(image);
     image.onerror = reject;
-    image.src = "/assets/images/logo.png";
+    image.src = src;
   });
 }
 
@@ -154,8 +150,43 @@ function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
   });
 }
 
+function drawCoverImage(ctx, image, x, y, width, height) {
+  const scale = Math.max(width / image.width, height / image.height);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = (image.width - sourceWidth) / 2;
+  const sourceY = (image.height - sourceHeight) / 2;
+  ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+}
+
+function drawChallengeTrack(ctx, x, y, width, accent) {
+  const stepCount = GIFT_CARD_CHECKPOINTS.length;
+  const gap = width / (stepCount - 1);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + width, y);
+  ctx.stroke();
+
+  GIFT_CARD_CHECKPOINTS.forEach((active, index) => {
+    const centerX = x + gap * index;
+    const size = index % 3 === 0 ? 26 : 20;
+    roundedRectPath(ctx, centerX - size / 2, y - size / 2, size, size, 5);
+    ctx.fillStyle = active ? accent : "rgba(242,245,248,0.14)";
+    ctx.fill();
+    ctx.strokeStyle = active ? accent : "rgba(242,245,248,0.3)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+}
+
 async function renderGiftCardPng(pass, fields) {
-  const logo = await loadCardLogo();
+  const [logo, background] = await Promise.all([
+    loadCardImage("/assets/images/logo.png"),
+    loadCardImage(GIFT_CARD_BACKGROUND),
+  ]);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   const width = 840;
@@ -171,9 +202,12 @@ async function renderGiftCardPng(pass, fields) {
   roundedRectPath(ctx, padding, padding, width - padding * 2, height - padding * 2, 18);
   ctx.clip();
 
+  drawCoverImage(ctx, background, padding, padding, width - padding * 2, height - padding * 2);
+
   const cardGradient = ctx.createLinearGradient(0, padding, 0, height - padding);
-  cardGradient.addColorStop(0, "#161c25");
-  cardGradient.addColorStop(1, "#10141b");
+  cardGradient.addColorStop(0, "rgba(8, 10, 14, 0.72)");
+  cardGradient.addColorStop(0.42, "rgba(16, 20, 27, 0.78)");
+  cardGradient.addColorStop(1, "rgba(16, 20, 27, 0.95)");
   ctx.fillStyle = cardGradient;
   ctx.fillRect(padding, padding, width - padding * 2, height - padding * 2);
 
@@ -222,15 +256,7 @@ async function renderGiftCardPng(pass, fields) {
   ctx.font = "900 42px Arial";
   ctx.fillText("MIN", padding + 48 + minutesWidth + 16, 426);
 
-  ctx.save();
-  ctx.translate(padding + 48, 462);
-  ctx.scale(648 / 352, 84 / 46);
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 3;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.stroke(new Path2D(pass.pulse));
-  ctx.restore();
+  drawChallengeTrack(ctx, padding + 48, 500, 648, accent);
 
   if (pass.badge) {
     const badgeText = pass.badge.toUpperCase();
@@ -326,9 +352,11 @@ function GiftCardPreview({ pass, fields }) {
           <strong>{pass.minutes}</strong>
           <span>Min</span>
         </div>
-        <svg className="gift-card__pulse" viewBox="0 0 352 46" preserveAspectRatio="none" aria-hidden="true">
-          <path d={pass.pulse} />
-        </svg>
+        <div className="gift-card__track" aria-hidden="true">
+          {GIFT_CARD_CHECKPOINTS.map((active, index) => (
+            <span className={active ? "is-active" : ""} key={`checkpoint-${index}`} />
+          ))}
+        </div>
         <h2>{pass.name}</h2>
         <p>{pass.tagline}</p>
       </div>
@@ -369,7 +397,7 @@ function standaloneHtml(pass, fields) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pixel Pulse Play Gift Card - ${pass.minutes} Min</title>
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),linear-gradient(180deg,#161c25,#10141b);border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.pulse{width:100%;height:46px}.pulse path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div,.foot div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot span{font-size:13px;font-weight:750}.foot small{color:#8b96a8;font-size:10px;font-weight:700;line-height:1.25}.foot strong{color:var(--accent);font-size:24px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:linear-gradient(180deg,rgba(8,10,14,.72),rgba(16,20,27,.94)),radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),url("https://www.pixelpulseplay.ca${GIFT_CARD_BACKGROUND}"),linear-gradient(180deg,#161c25,#10141b);background-size:auto,auto,cover,auto;background-position:center,center,center top,center;border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.track{display:grid;grid-template-columns:repeat(12,1fr);align-items:center;gap:7px;margin:14px 0 12px}.track span{height:12px;border:1px solid rgba(242,245,248,.3);border-radius:4px;background:rgba(242,245,248,.14)}.track span:nth-child(3n+1){height:18px}.track span.is-active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 10px rgba(164,207,95,.35)}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div,.foot div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot span{font-size:13px;font-weight:750}.foot small{color:#8b96a8;font-size:10px;font-weight:700;line-height:1.25}.foot strong{color:var(--accent);font-size:24px}
 </style>
 </head>
 <body>
@@ -378,7 +406,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0
 <div class="inner">
 <div class="eyebrow">Session Length</div>
 <div class="minutes"><strong>${pass.minutes}</strong><span>Min</span></div>
-<svg class="pulse" viewBox="0 0 352 46" preserveAspectRatio="none"><path d="${pass.pulse}"/></svg>
+<div class="track">${GIFT_CARD_CHECKPOINTS.map((active) => `<span class="${active ? "is-active" : ""}"></span>`).join("")}</div>
 ${pass.badge ? `<div class="badge">${safeText(pass.badge)}</div>` : ""}
 <h1>${safeText(pass.name)}</h1><p>${safeText(pass.tagline)}</p>
 <div class="divider"></div>
