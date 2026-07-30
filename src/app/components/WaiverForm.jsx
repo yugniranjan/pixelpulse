@@ -142,7 +142,7 @@ const DEFAULT_COPY = {
   privacyAcknowledgement:
     "I consent to Pixel Pulse Play collecting, using, storing, and disclosing the information in this form as reasonably needed to administer waivers, operate the venue, manage safety incidents, contact guardians or emergency contacts, and comply with legal or insurance requirements.",
   photoAcknowledgement:
-    "Optional - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.",
+    "<strong>OPTIONAL</strong> - I consent to Pixel Pulse Play capturing photos and videos of myself and family members during our visit for marketing, social media, and promotional materials.",
   finalAcknowledgement:
     "<strong>I have read, understood, and voluntarily agree</strong> to all terms in this waiver and release of liability, on behalf of myself and every family member listed above. I confirm I am 18 years of age or older, legally competent to enter this agreement, and signing of my own free will. I understand this agreement is intended to be governed by the laws of Ontario and applicable Canadian law.",
 };
@@ -845,7 +845,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           ))}
           {showPhotoConsent ? <label className={checks.photo ? "is-checked" : ""}>
             <input type="checkbox" checked={checks.photo} onChange={() => toggleCheck("photo")} />
-            <span>{configuredText(waiverContent, "photoAcknowledgement")}</span>
+            <HtmlText html={configuredText(waiverContent, "photoAcknowledgement")} />
           </label> : null}
         </div>
       </section>
