@@ -185,38 +185,16 @@
 }
 
 .gift-card {
-  --accent: #33e6df;
-  --accent-soft: color-mix(in srgb, var(--accent) 15%, transparent);
   position: relative;
   width: min(100%, 420px);
   min-width: 280px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #d0d5dd;
   border-radius: 8px;
-  background:
-    radial-gradient(520px 260px at 8% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%),
-    linear-gradient(180deg, #161c25, #10141b);
-  color: #f2f5f8;
-  box-shadow: 0 30px 60px -26px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: #ffffff;
+  color: #101828;
+  box-shadow: 0 24px 50px -30px rgba(15, 23, 42, 0.35);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.gift-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.28;
-  mask-image: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 85%);
-  pointer-events: none;
-}
-
-.gift-card > * {
-  position: relative;
-  z-index: 1;
 }
 
 .gift-card__top {
@@ -224,7 +202,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 22px 24px 0;
+  padding: 18px 24px;
+  background: #050810;
 }
 
 .gift-card__brand {
@@ -234,51 +213,19 @@
   min-width: 0;
 }
 
-.gift-card__mark {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-}
-
-.gift-card__mark svg {
-  width: 17px;
-  height: 17px;
-}
-
-.gift-card__mark path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.gift-card__brand strong {
-  color: #f2f5f8;
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.gift-card__brand span,
-.gift-card__stub strong,
-.gift-card__foot strong {
-  color: var(--accent);
+.gift-card__brand img {
+  display: block;
+  width: 118px;
+  height: auto;
 }
 
 .gift-card__tag {
   flex: 0 0 auto;
-  border: 1px solid var(--accent);
+  border: 1px solid #a4cf5f;
   border-radius: 999px;
   padding: 5px 10px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--accent);
+  background: rgba(164, 207, 95, 0.12);
+  color: #a4cf5f;
   font-size: 0.58rem;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -286,7 +233,7 @@
 }
 
 .gift-card__hero {
-  padding: 22px 24px 0;
+  padding: 24px 24px 0;
 }
 
 .gift-card__eyebrow-row {
@@ -300,7 +247,7 @@
 .gift-card__eyebrow-row span,
 .gift-card__names span,
 .gift-card__stub span {
-  color: #8b96a8;
+  color: #667085;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.2em;
@@ -310,8 +257,8 @@
 .gift-card__eyebrow-row b {
   border-radius: 5px;
   padding: 4px 8px;
-  background: var(--accent);
-  color: #050810;
+  background: #ecfdf3;
+  color: #027a48;
   font-size: 0.58rem;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -328,7 +275,7 @@
 }
 
 .gift-card__minutes strong {
-  color: #f2f5f8;
+  color: #101828;
   font-size: clamp(4.8rem, 16vw, 6.5rem);
   font-weight: 950;
   letter-spacing: 0;
@@ -336,32 +283,16 @@
 
 .gift-card__minutes span {
   padding-bottom: 14px;
-  color: var(--accent);
+  color: #027a48;
   font-size: 1.35rem;
   font-weight: 950;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.gift-card__pulse {
-  display: block;
-  width: 100%;
-  height: 46px;
-  margin-top: 2px;
-}
-
-.gift-card__pulse path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 5px var(--accent));
-}
-
 .gift-card__hero h2 {
-  margin: 8px 0 5px;
-  color: #f2f5f8;
+  margin: 14px 0 5px;
+  color: #101828;
   font-size: 1.18rem;
   font-weight: 950;
   letter-spacing: 0.02em;
@@ -371,7 +302,7 @@
 .gift-card__hero p {
   margin: 0;
   min-height: 42px;
-  color: #8b96a8;
+  color: #667085;
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.5;
@@ -380,7 +311,7 @@
 .gift-card__divider {
   position: relative;
   margin: 20px 0 0;
-  border-top: 1px dashed rgba(255, 255, 255, 0.18);
+  border-top: 1px dashed #d0d5dd;
 }
 
 .gift-card__divider::before,
@@ -404,7 +335,7 @@
 
 .gift-card__names {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   padding: 18px 24px 0;
 }
@@ -419,7 +350,7 @@
 .gift-card__names strong,
 .gift-card__stub strong {
   overflow: hidden;
-  color: #f2f5f8;
+  color: #101828;
   font-size: 0.9rem;
   font-weight: 850;
   text-overflow: ellipsis;
@@ -444,7 +375,7 @@
 .gift-card__barcode span {
   display: block;
   width: 2px;
-  background: var(--accent);
+  background: #101828;
   opacity: 0.88;
 }
 
@@ -454,16 +385,18 @@
   justify-content: space-between;
   gap: 12px;
   padding: 15px 24px 19px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #eaecf0;
+  background: #f9fafb;
 }
 
 .gift-card__foot span {
-  color: #f2f5f8;
+  color: #475467;
   font-size: 0.74rem;
   font-weight: 750;
 }
 
 .gift-card__foot strong {
+  color: #027a48;
   font-size: 1.45rem;
   font-weight: 950;
 }
@@ -549,22 +482,6 @@
   color: #b42318;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .gift-card__pulse path {
-    animation: giftPulse 2.6s ease-in-out infinite;
-  }
-
-  @keyframes giftPulse {
-    0%,
-    100% {
-      opacity: 0.62;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-}
-
 @media print {
   body * {
     visibility: hidden;
@@ -619,7 +536,7 @@
     align-items: flex-start;
   }
 
-  .gift-card__brand strong {
-    white-space: normal;
+  .gift-card__brand img {
+    width: 104px;
   }
 }
