@@ -16,6 +16,14 @@ const SOCIAL_REDIRECT_FALLBACKS = {
   instagram: THANK_YOU_INSTAGRAM_URL,
   tiktok: "https://www.tiktok.com/@pixelpulseplay",
 };
+const PACKAGE_INCLUSION_LINES = [
+  "Package Inclusions",
+  "- Pizza is provided as per your selected package.",
+  "- Table cloth is included.",
+  "- Cutlery is included.",
+  "- Water, juice, or soda is included as per your package.",
+  "- Only dry snacks and non-alcoholic drinks are allowed from outside.",
+];
 
 function getRequiredEnv(name) {
   const value = process.env[name];
@@ -55,6 +63,21 @@ function escapeHtml(value = "") {
 
 function textToHtml(value = "") {
   return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+function withPackageInclusions(emailText = "") {
+  const text = cleanText(emailText);
+  if (!text || text.includes("Package Inclusions")) return text;
+
+  const marker = "Important Information - Please Read Carefully";
+  const markerIndex = text.indexOf(marker);
+  if (markerIndex < 0) {
+    return [text, "", ...PACKAGE_INCLUSION_LINES].join("\n");
+  }
+
+  const before = text.slice(0, markerIndex).trimEnd();
+  const after = text.slice(markerIndex).trimStart();
+  return [before, "", ...PACKAGE_INCLUSION_LINES, "", after].join("\n");
 }
 
 function applySocialRedirectRow(links, row = {}) {
@@ -192,9 +215,14 @@ function renderConfirmationHtml({ emailText, partyId }) {
   const lines = emailText.split("\n");
   const greetingLines = lines.slice(0, 3);
   const detailStart = lines.findIndex((line) => line.trim() === "Your Party Details");
+  const packageStart = lines.findIndex((line) => line.trim() === "Package Inclusions");
   const importantStart = lines.findIndex((line) => line.trim() === "Important Information - Please Read Carefully");
-  const detailLines = detailStart >= 0 && importantStart > detailStart
-    ? lines.slice(detailStart, importantStart)
+  const detailEnd = packageStart > detailStart ? packageStart : importantStart;
+  const detailLines = detailStart >= 0 && detailEnd > detailStart
+    ? lines.slice(detailStart, detailEnd)
+    : [];
+  const packageLines = packageStart >= 0
+    ? lines.slice(packageStart, importantStart > packageStart ? importantStart : undefined)
     : [];
   const importantLines = importantStart >= 0 ? lines.slice(importantStart) : lines.slice(3);
   const detailRows = detailLines
@@ -233,6 +261,12 @@ function renderConfirmationHtml({ emailText, partyId }) {
                   `).join("")}
                 </tbody>
               </table>
+            </div>
+          ` : ""}
+
+          ${packageLines.length ? `
+            <div style="margin:22px 0;padding:18px;border:1px solid #bbf7d0;border-radius:12px;background:#f0fdf4;">
+              ${renderTextLines(packageLines)}
             </div>
           ` : ""}
 
@@ -335,7 +369,7 @@ export async function POST(request) {
     const waiverUrl = cleanText(body?.waiverUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
     const partyId = cleanText(body?.partyId);
-    const emailText = confirmationEmailText || smsText;
+    const emailText = confirmationEmailText ? withPackageInclusions(confirmationEmailText) : smsText;
 
     if (!to) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
