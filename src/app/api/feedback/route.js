@@ -15,12 +15,25 @@ function ratingLine(label, value) {
 }
 
 function ratingReasonLine(label, value, reason) {
-  if (!value || Number(value) >= 5 || !reason) return "";
-  return `${label} reason: ${reason}`;
+  if (!value || Number(value) >= 4 || !reason) return "";
+  return `${label}: ${reason}`;
 }
 
 function listLines(values = []) {
   return values.length ? values.map((value) => `- ${value}`).join("\n") : "Not provided";
+}
+
+function sentenceValue(value = "") {
+  return cleanText(value)
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function section(title, lines = []) {
+  const body = lines.filter((line) => line !== null && line !== undefined);
+  return body.some((line) => line !== "") ? [title, ...body] : [];
 }
 
 export async function POST(request) {
@@ -69,55 +82,69 @@ export async function POST(request) {
     ? (ratingValues.reduce((total, rating) => total + rating, 0) / ratingValues.length).toFixed(1)
     : "";
 
+  const ratingRows = [
+    ["Overall Fun", ratings.overall, cleanText(ratingReasons.overall)],
+    ["Game Variety", ratings.gameVariety, cleanText(ratingReasons.gameVariety)],
+    ["Staff Friendliness", ratings.staff, cleanText(ratingReasons.staff)],
+    ["Cleanliness", ratings.cleanliness, cleanText(ratingReasons.cleanliness)],
+    ["Technology & Gameplay", ratings.technology, cleanText(ratingReasons.technology)],
+    ["Value for Money", ratings.value, cleanText(ratingReasons.value)],
+  ];
+  const improvementNotes = ratingRows
+    .map(([label, value, reason]) => ratingReasonLine(label, value, reason))
+    .filter(Boolean);
+
   const message = [
     "New Pixel Pulse feedback submission",
+    average ? `Overall session score: ${average}/5` : "Overall session score: Not provided",
+    `Guest: ${name}`,
+    `Reply to: ${email}`,
     "",
-    `Name: ${name}`,
-    `Email: ${email}`,
-    phone ? `Phone: ${phone}` : "",
-    partyId ? `Party ID: ${partyId}` : "",
-    visitDate ? `Visit date: ${visitDate}` : "",
+    ...section("Guest details", [
+      phone ? `Phone: ${phone}` : "",
+      partyId ? `Party ID: ${partyId}` : "",
+      visitDate ? `Visit date: ${visitDate}` : "",
+      `Marketing consent: ${marketingConsent ? "Yes" : "No"}`,
+    ]),
     "",
-    "Visit reason",
-    listLines(visitReasons),
+    ...section("Visit context", [
+      "What brought them in:",
+      listLines(visitReasons),
+      "",
+      "Favourite / played challenges:",
+      listLines(rooms),
+    ]),
     "",
-    "Rooms played",
-    listLines(rooms),
+    ...section("Ratings", [
+      ...ratingRows.map(([label, value]) => ratingLine(label, value)),
+    ]),
     "",
-    "Ratings",
-    ratingLine("Overall Fun", ratings.overall),
-    ratingReasonLine("Overall Fun", ratings.overall, cleanText(ratingReasons.overall)),
-    ratingLine("Game Variety", ratings.gameVariety),
-    ratingReasonLine("Game Variety", ratings.gameVariety, cleanText(ratingReasons.gameVariety)),
-    ratingLine("Staff Friendliness", ratings.staff),
-    ratingReasonLine("Staff Friendliness", ratings.staff, cleanText(ratingReasons.staff)),
-    ratingLine("Cleanliness", ratings.cleanliness),
-    ratingReasonLine("Cleanliness", ratings.cleanliness, cleanText(ratingReasons.cleanliness)),
-    ratingLine("Technology & Gameplay", ratings.technology),
-    ratingReasonLine("Technology & Gameplay", ratings.technology, cleanText(ratingReasons.technology)),
-    ratingLine("Value for Money", ratings.value),
-    ratingReasonLine("Value for Money", ratings.value, cleanText(ratingReasons.value)),
-    average ? `Average: ${average}/5` : "",
+    ...section("Needs attention", [
+      improvementNotes.length ? improvementNotes.join("\n") : "No low-score improvement notes provided.",
+    ]),
     "",
-    `Would recommend: ${recommend || "Not provided"}`,
-    `Will play again: ${returnVisit || "Not provided"}`,
+    ...section("Recommend / return intent", [
+      `Would recommend: ${sentenceValue(recommend) || "Not provided"}`,
+      `Will play again: ${sentenceValue(returnVisit) || "Not provided"}`,
+    ]),
     "",
-    "Biggest win",
-    favoriteMoment || "Not provided",
+    ...section("Guest comments", [
+      "Biggest win:",
+      favoriteMoment || "Not provided",
+      "",
+      "Upgrade idea:",
+      upgradeIdea || "Not provided",
+    ]),
     "",
-    "Upgrade idea",
-    upgradeIdea || "Not provided",
-    "",
-    "Future experiences",
-    listLines(futureExperiences),
-    otherFutureExperience ? `Other idea: ${otherFutureExperience}` : "",
-    "",
-    `Marketing consent: ${marketingConsent ? "Yes" : "No"}`,
-  ].filter((line) => line !== "").join("\n");
+    ...section("Future experience ideas", [
+      listLines(futureExperiences),
+      otherFutureExperience ? `Other idea: ${otherFutureExperience}` : "",
+    ]),
+  ].filter((line) => line !== null && line !== undefined).join("\n");
 
   await sendBrandedEmail({
     to: FEEDBACK_TO,
-    subject: `Pixel Pulse feedback from ${name}`,
+    subject: `Pixel Pulse feedback from ${name}${average ? ` - ${average}/5` : ""}`,
     message,
     replyTo: email,
   });

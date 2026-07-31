@@ -2,6 +2,37 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import {
+  FaBasketball,
+  FaBolt,
+  FaBriefcase,
+  FaBullseye,
+  FaCakeCandles,
+  FaCalendarCheck,
+  FaClockRotateLeft,
+  FaDoorClosed,
+  FaDoorOpen,
+  FaFish,
+  FaFutbol,
+  FaGamepad,
+  FaGhost,
+  FaMedal,
+  FaMountain,
+  FaPeopleGroup,
+  FaPersonWalking,
+  FaPizzaSlice,
+  FaPlus,
+  FaPuzzlePiece,
+  FaQuestion,
+  FaSchool,
+  FaShapes,
+  FaSnowflake,
+  FaThumbsDown,
+  FaTrophy,
+  FaUserGroup,
+  FaUsers,
+  FaVrCardboard,
+} from "react-icons/fa6";
 
 const LOGO_SRC = "/assets/images/logo.png";
 const GOOGLE_REVIEW_URL =
@@ -36,6 +67,35 @@ const VISIT_REASONS = [
   "Returning Player",
 ];
 
+const VISIT_REASON_ICONS = {
+  "Birthday Party": FaCakeCandles,
+  "Family Fun": FaUsers,
+  "Friends Hangout": FaUserGroup,
+  "Date Night": FaCalendarCheck,
+  "Corporate Event": FaBriefcase,
+  "School Group": FaSchool,
+  "Walk-in Visit": FaPersonWalking,
+  "First Visit": FaBolt,
+  "Returning Player": FaClockRotateLeft,
+};
+
+const ROOM_ICONS = {
+  [ALL_ROOMS]: FaShapes,
+  "Laser Maze": FaBolt,
+  "Tile Hunt": FaPuzzlePiece,
+  "T-Rex Heist": FaGhost,
+  "Soccer Challenge": FaFutbol,
+  "Hexa Quest": FaShapes,
+  "Edge Climb": FaMountain,
+  "Shoot It Out": FaBullseye,
+  Basketball: FaBasketball,
+  "Maze Gate": FaDoorOpen,
+  "Pizza Delivery": FaPizzaSlice,
+  "Ball Toss": FaTrophy,
+  Seashells: FaFish,
+  "Arcade Games": FaGamepad,
+};
+
 const RATINGS = [
   ["overall", "Overall Fun"],
   ["gameVariety", "Game Variety"],
@@ -45,33 +105,48 @@ const RATINGS = [
   ["value", "Value for Money"],
 ];
 
-const RECOMMEND_OPTIONS = [
-  ["definitely", "Definitely"],
-  ["probably", "Probably"],
-  ["maybe", "Maybe"],
-  ["probably-not", "Probably Not"],
-  ["no", "No"],
-];
-
 const RETURN_OPTIONS = [
-  ["absolutely", "Absolutely"],
-  ["friends", "Yes, with friends"],
-  ["party", "Yes, for a party"],
-  ["maybe", "Maybe"],
-  ["probably-not", "Probably not"],
+  ["absolutely", FaCalendarCheck, "Absolutely"],
+  ["friends", FaUserGroup, "With Friends"],
+  ["party", FaCakeCandles, "For a Party"],
+  ["maybe", FaQuestion, "Maybe"],
+  ["probably-not", FaThumbsDown, "Probably Not"],
 ];
 
 const FUTURE_EXPERIENCES = [
   "VR Arena",
   "Escape Rooms",
-  "Nerf Arena",
-  "Glow Games",
   "Family Competitions",
   "Team Tournaments",
-  "Adult Nights",
   "More Arcade Games",
   "Seasonal Challenges",
   "Other",
+];
+
+const FUTURE_EXPERIENCE_ICONS = {
+  "VR Arena": FaVrCardboard,
+  "Escape Rooms": FaDoorClosed,
+  "Family Competitions": FaPeopleGroup,
+  "Team Tournaments": FaMedal,
+  "More Arcade Games": FaGamepad,
+  "Seasonal Challenges": FaSnowflake,
+  Other: FaPlus,
+};
+
+const RATING_SMILEYS = [
+  [1, "😞", "Poor"],
+  [2, "🙁", "Okay"],
+  [3, "🙂", "Good"],
+  [4, "😄", "Great"],
+  [5, "🤩", "Amazing"],
+];
+
+const RECOMMEND_SMILEYS = [
+  ["no", "😞", "No"],
+  ["probably-not", "🙁", "Probably Not"],
+  ["maybe", "🙂", "Maybe"],
+  ["probably", "😄", "Probably"],
+  ["definitely", "🤩", "Definitely"],
 ];
 
 const DEFAULT_FORM = {
@@ -124,9 +199,9 @@ function RatingBars({ name, label, value, onChange }) {
   return (
     <div className="ppp-feedback-rating">
       <div className="ppp-feedback-rating__label">{label}</div>
-      <div className="ppp-feedback-bars" aria-label={`${label} rating`}>
-        {[5, 4, 3, 2, 1].map((score) => (
-          <label className="ppp-feedback-bar" key={score} style={{ "--bar-height": `${10 + score * 6}px` }}>
+      <div className="ppp-feedback-smileys" aria-label={`${label} rating`}>
+        {RATING_SMILEYS.map(([score, face, text]) => (
+          <label className="ppp-feedback-smiley" key={score}>
             <input
               type="radio"
               name={`rating-${name}`}
@@ -134,7 +209,10 @@ function RatingBars({ name, label, value, onChange }) {
               checked={String(value) === String(score)}
               onChange={(event) => onChange(event.target.value)}
             />
-            <span>{score}</span>
+            <span>
+              <strong aria-hidden="true">{face}</strong>
+              <em>{text}</em>
+            </span>
           </label>
         ))}
       </div>
@@ -154,7 +232,10 @@ export default function FeedbackForm({ initial = {} }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const shouldShowGoogleReview = RATINGS.every(([name]) => Number(form.ratings[name]) >= 4);
+  const shouldShowGoogleReview =
+    RATINGS.every(([name]) => Number(form.ratings[name]) >= 4) &&
+    ["definitely", "probably"].includes(form.recommend) &&
+    form.returnVisit !== "probably-not";
 
   const average = useMemo(() => {
     const values = Object.values(form.ratings)
@@ -175,7 +256,7 @@ export default function FeedbackForm({ initial = {} }) {
         ...current.ratings,
         [name]: value,
       },
-      ratingReasons: Number(value) >= 5
+      ratingReasons: Number(value) >= 4
         ? {
             ...current.ratingReasons,
             [name]: "",
@@ -274,7 +355,7 @@ export default function FeedbackForm({ initial = {} }) {
         <div className="ppp-feedback-hero-copy">
           <p><strong>Thanks for playing at Pixel Pulse!</strong></p>
           <p>
-            Whether you came with friends, family, or your team, we hope you had an amazing time competing, laughing, and making memories. Now it&apos;s your turn to challenge us: tell us what you loved, what could be better, and what you&apos;d like to see next. Every response is read by our team.
+            Tell us what you loved, what could be better, and what you&apos;d like to see next. Every response is read by our team.
           </p>
         </div>
       </section>
@@ -326,16 +407,22 @@ export default function FeedbackForm({ initial = {} }) {
               </div>
             </div>
             <div className="ppp-feedback-chip-grid">
-              {VISIT_REASONS.map((reason) => (
-                <label className="ppp-feedback-chip" key={reason}>
-                  <input
-                    type="checkbox"
-                    checked={form.visitReasons.includes(reason)}
-                    onChange={() => toggleArrayField("visitReasons", reason)}
-                  />
-                  <span>{reason}</span>
-                </label>
-              ))}
+              {VISIT_REASONS.map((reason) => {
+                const Icon = VISIT_REASON_ICONS[reason] || FaShapes;
+                return (
+                  <label className="ppp-feedback-icon-option" key={reason}>
+                    <input
+                      type="checkbox"
+                      checked={form.visitReasons.includes(reason)}
+                      onChange={() => toggleArrayField("visitReasons", reason)}
+                    />
+                    <span>
+                      <Icon aria-hidden="true" />
+                      <em>{reason}</em>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           </section>
 
@@ -347,16 +434,22 @@ export default function FeedbackForm({ initial = {} }) {
               </div>
             </div>
             <div className="ppp-feedback-chip-grid">
-              {[ALL_ROOMS, ...ROOMS].map((room) => (
-                <label className={`ppp-feedback-chip${room === ALL_ROOMS ? " ppp-feedback-chip--all" : ""}`} key={room}>
-                  <input
-                    type="checkbox"
-                    checked={room === ALL_ROOMS ? allRoomsSelected(form.rooms) : form.rooms.includes(room)}
-                    onChange={() => toggleRoom(room)}
-                  />
-                  <span>{room}</span>
-                </label>
-              ))}
+              {[ALL_ROOMS, ...ROOMS].map((room) => {
+                const Icon = ROOM_ICONS[room] || FaGamepad;
+                return (
+                  <label className={`ppp-feedback-icon-option${room === ALL_ROOMS ? " ppp-feedback-icon-option--all" : ""}`} key={room}>
+                    <input
+                      type="checkbox"
+                      checked={room === ALL_ROOMS ? allRoomsSelected(form.rooms) : form.rooms.includes(room)}
+                      onChange={() => toggleRoom(room)}
+                    />
+                    <span>
+                      <Icon aria-hidden="true" />
+                      <em>{room}</em>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           </section>
 
@@ -377,9 +470,9 @@ export default function FeedbackForm({ initial = {} }) {
                     value={form.ratings[name]}
                     onChange={(value) => updateRating(name, value)}
                   />
-                  {rating > 0 && rating < 5 ? (
+                  {rating > 0 && rating < 4 ? (
                     <label className="ppp-feedback-rating-reason">
-                      <span>{rating <= 3 ? "We would love to make it right. What happened?" : "What could make this a 5?"}</span>
+                      <span>What could make this a 5?</span>
                       <input
                         value={form.ratingReasons[name]}
                         onChange={(event) => updateRatingReason(name, event.target.value)}
@@ -392,18 +485,6 @@ export default function FeedbackForm({ initial = {} }) {
             })}
           </section>
 
-          {shouldShowGoogleReview ? (
-            <section className="ppp-feedback-section ppp-feedback-review">
-              <div>
-                <h2>Loved your experience?</h2>
-                <p>Your review helps more families discover Pixel Pulse.</p>
-              </div>
-              <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
-                Leave us a Google Review
-              </a>
-            </section>
-          ) : null}
-
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
               <div>
@@ -411,9 +492,9 @@ export default function FeedbackForm({ initial = {} }) {
                 <p>Would you recommend Pixel Pulse to your friends?</p>
               </div>
             </div>
-            <div className="ppp-feedback-toggle-group">
-              {RECOMMEND_OPTIONS.map(([value, label]) => (
-                <label className="ppp-feedback-toggle" key={value}>
+            <div className="ppp-feedback-smileys ppp-feedback-smileys--recommend" aria-label="Recommend Score">
+              {RECOMMEND_SMILEYS.map(([value, face, label]) => (
+                <label className="ppp-feedback-smiley" key={value}>
                   <input
                     type="radio"
                     name="recommend"
@@ -421,7 +502,10 @@ export default function FeedbackForm({ initial = {} }) {
                     checked={form.recommend === value}
                     onChange={(event) => updateField("recommend", event.target.value)}
                   />
-                  <span>{label}</span>
+                  <span>
+                    <strong aria-hidden="true">{face}</strong>
+                    <em>{label}</em>
+                  </span>
                 </label>
               ))}
             </div>
@@ -429,8 +513,8 @@ export default function FeedbackForm({ initial = {} }) {
               <h3>Will you play again?</h3>
             </div>
             <div className="ppp-feedback-toggle-group">
-              {RETURN_OPTIONS.map(([value, label]) => (
-                <label className="ppp-feedback-toggle" key={value}>
+              {RETURN_OPTIONS.map(([value, Icon, label]) => (
+                <label className="ppp-feedback-icon-option" key={value}>
                   <input
                     type="radio"
                     name="returnVisit"
@@ -438,7 +522,10 @@ export default function FeedbackForm({ initial = {} }) {
                     checked={form.returnVisit === value}
                     onChange={(event) => updateField("returnVisit", event.target.value)}
                   />
-                  <span>{label}</span>
+                  <span>
+                    <Icon aria-hidden="true" />
+                    <em>{label}</em>
+                  </span>
                 </label>
               ))}
             </div>
@@ -463,22 +550,39 @@ export default function FeedbackForm({ initial = {} }) {
               <h3>What experiences would you love to see next?</h3>
             </div>
             <div className="ppp-feedback-chip-grid">
-              {FUTURE_EXPERIENCES.map((experience) => (
-                <label className="ppp-feedback-chip" key={experience}>
-                  <input
-                    type="checkbox"
-                    checked={form.futureExperiences.includes(experience)}
-                    onChange={() => toggleArrayField("futureExperiences", experience)}
-                  />
-                  <span>{experience}</span>
-                </label>
-              ))}
+              {FUTURE_EXPERIENCES.map((experience) => {
+                const Icon = FUTURE_EXPERIENCE_ICONS[experience] || FaGamepad;
+                return (
+                  <label className="ppp-feedback-icon-option" key={experience}>
+                    <input
+                      type="checkbox"
+                      checked={form.futureExperiences.includes(experience)}
+                      onChange={() => toggleArrayField("futureExperiences", experience)}
+                    />
+                    <span>
+                      <Icon aria-hidden="true" />
+                      <em>{experience}</em>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
             {form.futureExperiences.includes("Other") ? (
               <label className="ppp-feedback-notes ppp-feedback-notes--compact">
                 <span>Other idea</span>
                 <input value={form.otherFutureExperience} onChange={(event) => updateField("otherFutureExperience", event.target.value)} placeholder="Tell us your idea." />
               </label>
+            ) : null}
+            {shouldShowGoogleReview ? (
+              <div className="ppp-feedback-review">
+                <div>
+                  <h2>Loved your experience?</h2>
+                  <p>Your review helps more families discover Pixel Pulse.</p>
+                </div>
+                <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
+                  Leave us a Google Review
+                </a>
+              </div>
             ) : null}
             <label className="ppp-feedback-consent">
               <input
