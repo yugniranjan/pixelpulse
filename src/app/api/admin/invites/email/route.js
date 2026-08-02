@@ -453,7 +453,7 @@ export async function POST(request) {
       to,
       replyTo: CONTACT_EMAIL,
       subject: sendThankYou
-        ? "Thanks for Playing at Pixel Pulse!"
+        ? "Your Next Pixel Pulse Adventure Is On Us ⚡⭐"
         : confirmationEmailText
         ? "Your Pixel Pulse Birthday Party is Confirmed"
         : "Your Party Invite at Pixel Pulse Playzone! 🎉",
