@@ -63,9 +63,9 @@ export async function POST(request) {
   const otherFutureExperience = cleanText(body.otherFutureExperience);
   const marketingConsent = Boolean(body.marketingConsent);
 
-  if (!name || !isEmail(email) || !ratings.overall) {
+  if (!name || !isEmail(email) || !heardAboutUs || !ratings.overall) {
     return NextResponse.json(
-      { error: "Name, valid email, and overall rating are required." },
+      { error: "Name, valid email, how you heard about us, and overall rating are required." },
       { status: 400 },
     );
   }
