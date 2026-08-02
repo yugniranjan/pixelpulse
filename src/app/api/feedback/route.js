@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isEmail, mailerConfigured, sendBrandedEmail } from "@/lib/mailer";
+import { hasFeedbackStore, recordFeedback } from "@/lib/feedback";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -37,13 +38,6 @@ function section(title, lines = []) {
 }
 
 export async function POST(request) {
-  if (!mailerConfigured()) {
-    return NextResponse.json(
-      { error: "Email sending is not configured." },
-      { status: 503 },
-    );
-  }
-
   let body;
   try {
     body = await request.json();
@@ -56,6 +50,7 @@ export async function POST(request) {
   const phone = cleanText(body.phone);
   const visitDate = cleanText(body.visitDate);
   const partyId = cleanText(body.partyId);
+  const heardAboutUs = cleanText(body.heardAboutUs);
   const visitReasons = Array.isArray(body.visitReasons) ? body.visitReasons.map(cleanText).filter(Boolean) : [];
   const rooms = Array.isArray(body.rooms) ? body.rooms.map(cleanText).filter(Boolean) : [];
   const ratings = body.ratings || {};
@@ -72,6 +67,13 @@ export async function POST(request) {
     return NextResponse.json(
       { error: "Name, valid email, and overall rating are required." },
       { status: 400 },
+    );
+  }
+
+  if (!hasFeedbackStore() && !mailerConfigured()) {
+    return NextResponse.json(
+      { error: "Feedback storage and email sending are not configured." },
+      { status: 503 },
     );
   }
 
@@ -104,6 +106,7 @@ export async function POST(request) {
       phone ? `Phone: ${phone}` : "",
       partyId ? `Party ID: ${partyId}` : "",
       visitDate ? `Visit date: ${visitDate}` : "",
+      heardAboutUs ? `Heard about us: ${heardAboutUs}` : "",
       `Marketing consent: ${marketingConsent ? "Yes" : "No"}`,
     ]),
     "",
@@ -142,12 +145,18 @@ export async function POST(request) {
     ]),
   ].filter((line) => line !== null && line !== undefined).join("\n");
 
-  await sendBrandedEmail({
-    to: FEEDBACK_TO,
-    subject: `Pixel Pulse feedback from ${name}${average ? ` - ${average}/5` : ""}`,
-    message,
-    replyTo: email,
-  });
+  if (hasFeedbackStore()) {
+    await recordFeedback(body);
+  }
+
+  if (mailerConfigured()) {
+    await sendBrandedEmail({
+      to: FEEDBACK_TO,
+      subject: `Pixel Pulse feedback from ${name}${average ? ` - ${average}/5` : ""}`,
+      message,
+      replyTo: email,
+    });
+  }
 
   return NextResponse.json({ success: true, average });
 }

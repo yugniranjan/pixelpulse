@@ -248,6 +248,7 @@
 }
 
 .ppp-feedback-grid input,
+.ppp-feedback-grid select,
 .ppp-feedback-notes input,
 .ppp-feedback-notes textarea {
   width: 100%;
@@ -267,6 +268,7 @@
 }
 
 .ppp-feedback-grid input:focus,
+.ppp-feedback-grid select:focus,
 .ppp-feedback-notes input:focus,
 .ppp-feedback-notes textarea:focus {
   border-color: var(--feedback-lime);

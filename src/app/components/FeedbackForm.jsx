@@ -67,6 +67,23 @@ const VISIT_REASONS = [
   "Returning Player",
 ];
 
+const HEARD_ABOUT_OPTIONS = [
+  "Google Search",
+  "Google Maps",
+  "Instagram",
+  "Facebook",
+  "TikTok",
+  "YouTube",
+  "Friend or Family",
+  "Birthday Invitation",
+  "School/Camp",
+  "Marc & Mandy",
+  "Canadian Home Trends",
+  "Walked By",
+  "Returning Customer",
+  "Other",
+];
+
 const VISIT_REASON_ICONS = {
   "Birthday Party": FaCakeCandles,
   "Family Fun": FaUsers,
@@ -154,6 +171,7 @@ const DEFAULT_FORM = {
   email: "",
   phone: "",
   visitDate: "",
+  heardAboutUs: "",
   visitReasons: [],
   rooms: [],
   ratings: {
@@ -228,6 +246,7 @@ export default function FeedbackForm({ initial = {} }) {
     phone: cleanInitial(initial.phone),
     visitDate: cleanInitial(initial.visitDate),
     partyId: cleanInitial(initial.partyId),
+    heardAboutUs: cleanInitial(initial.heardAboutUs),
   }));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -395,6 +414,15 @@ export default function FeedbackForm({ initial = {} }) {
               <label>
                 <span>Phone optional</span>
                 <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Optional phone number" />
+              </label>
+              <label>
+                <span>How did you hear about us?</span>
+                <select value={form.heardAboutUs} onChange={(event) => updateField("heardAboutUs", event.target.value)}>
+                  <option value="">Select one</option>
+                  {HEARD_ABOUT_OPTIONS.map((option) => (
+                    <option value={option} key={option}>{option}</option>
+                  ))}
+                </select>
               </label>
             </div>
           </section>
