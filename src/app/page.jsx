@@ -938,6 +938,57 @@ const Home = async () => {
       href: game.link || attractionHref || "#",
     };
   });
+  const attractionsSection = homepageGames.length > 0 ? (
+    <section className="ppp-section ppp-attractions">
+      <div className="aero-max-container">
+        {(gamesHeading.title || gamesHeading.accent) && (
+          <SectionHeading>
+            {gamesHeading.title} {gamesHeading.accent && <span>{gamesHeading.accent}</span>}
+          </SectionHeading>
+        )}
+        {gamesHeading.subtitle && (
+          <p className="ppp-section__sub">{gamesHeading.subtitle}</p>
+        )}
+        <ul className="ppp-attractions__grid ppp-attractions__carousel" aria-label="All game rooms">
+          {homepageGames.map(({ title, body, meta, image, imageAlt, href }, i) => {
+            return (
+            <li key={i} className="ppp-attractions__item">
+              <Link
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                prefetch={!href.startsWith("http")}
+              >
+                <article className="ppp-attraction-card">
+                  <figure className="ppp-attraction-card__fig">
+                    {image && (
+                      <Image
+                        src={image}
+                        width={400}
+                        height={260}
+                        alt={imageAlt || title}
+                        unoptimized
+                        className="ppp-attraction-card__img"
+                      />
+                    )}
+                    <div className="ppp-attraction-card__overlay">
+                      <h3 className="ppp-attraction-card__title">
+                        {title}
+                      </h3>
+                      {body && <p className="ppp-attraction-card__body">{body}</p>}
+                      {meta && <span className="ppp-attraction-card__meta">{meta}</span>}
+                    </div>
+                  </figure>
+                </article>
+              </Link>
+            </li>
+          );
+          })}
+        </ul>
+
+      </div>
+    </section>
+  ) : null;
 
   return (
     <main className="ppp-home">
@@ -972,54 +1023,7 @@ const Home = async () => {
       </section>
       )}
 
-      {siteData.howItWorks.steps.length > 0 && (
-      <section className="ppp-section ppp-how">
-        <div className="aero-max-container">
-          {(howItWorksHeading.title || howItWorksHeading.accent) && (
-            <SectionHeading>
-              {howItWorksHeading.title} {howItWorksHeading.accent && <span>{howItWorksHeading.accent}</span>}
-            </SectionHeading>
-          )}
-          {howItWorksHeading.subtitle && (
-            <p className="ppp-section__sub">{howItWorksHeading.subtitle}</p>
-          )}
-
-          <ol className="ppp-how__grid">
-            {siteData.howItWorks.steps.map((step, index) => {
-              const normalizedStepTitle = String(step.title || "").toLowerCase();
-              const isArenaStep = normalizedStepTitle.includes("enter the arena");
-              const isPlayCompeteStep =
-                normalizedStepTitle.includes("play") &&
-                (normalizedStepTitle.includes("compete") ||
-                  normalizedStepTitle.includes("complete"));
-              const isBeatGameStep =
-                normalizedStepTitle.includes("beat") &&
-                normalizedStepTitle.includes("game");
-              const cardClassName = [
-                "ppp-how__card",
-                isArenaStep ? "ppp-how__card--arena" : "",
-                isPlayCompeteStep ? "ppp-how__card--play-compete" : "",
-                isBeatGameStep ? "ppp-how__card--beat-game" : "",
-              ]
-                .filter(Boolean)
-                .join(" ");
-
-              return (
-              <li
-                key={step.title}
-                className={cardClassName}
-              >
-                <span className="ppp-how__watermark">{step.n || index + 1}</span>
-                <span className="ppp-how__number">{step.n || index + 1}</span>
-                <h3 className="ppp-how__title">{step.title}</h3>
-                <p className="ppp-how__desc">{step.desc}</p>
-              </li>
-              );
-            })}
-          </ol>
-        </div>
-      </section>
-      )}
+      {attractionsSection}
 
       {howItWorksCta.text && (
       <section className="ppp-mini-cta">
@@ -1039,6 +1043,46 @@ const Home = async () => {
       </section>
       )}
 
+      {siteData.howItWorks.steps.length > 0 && (
+      <section className="ppp-section ppp-how">
+        <div className="aero-max-container">
+          {(howItWorksHeading.title || howItWorksHeading.accent) && (
+            <SectionHeading>
+              {howItWorksHeading.title} {howItWorksHeading.accent && <span>{howItWorksHeading.accent}</span>}
+            </SectionHeading>
+          )}
+          {howItWorksHeading.subtitle && (
+            <p className="ppp-section__sub">{howItWorksHeading.subtitle}</p>
+          )}
+
+          <div className="ppp-how__content">
+            <ol className="ppp-how__steps-card">
+              {siteData.howItWorks.steps.map((step, index) => (
+                <li key={step.title} className="ppp-how__step">
+                  <span className="ppp-how__number">{step.n || index + 1}</span>
+                  <span className="ppp-how__step-copy">
+                    <h3 className="ppp-how__title">{step.title}</h3>
+                    <p className="ppp-how__desc">{step.desc}</p>
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <div className="ppp-how__video" aria-label="Pixel Pulse gameplay video">
+              <video
+                src="/assets/videos/pixel-pulse-experience.mp4"
+                title="Pixel Pulse gameplay video"
+                autoPlay
+                loop
+                muted
+                playsInline
+                controls
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
+
       {/* ── Intro section ── */}
       {showHomepageIntro && (homepageIntroHeading || homepageIntroHeadingAccent || homepageSection1) && (
       <section className="ppp-intro">
@@ -1053,59 +1097,6 @@ const Home = async () => {
           {homepageSection1 && <p className="ppp-intro__body">{homepageSection1}</p>}
         </div>
       </section>
-      )}
-
-      {/* ── Attractions grid ── */}
-      {homepageGames.length > 0 && (
-        <section className="ppp-section ppp-attractions">
-          <div className="aero-max-container">
-            {(gamesHeading.title || gamesHeading.accent) && (
-              <SectionHeading>
-                {gamesHeading.title} {gamesHeading.accent && <span>{gamesHeading.accent}</span>}
-              </SectionHeading>
-            )}
-            {gamesHeading.subtitle && (
-              <p className="ppp-section__sub">{gamesHeading.subtitle}</p>
-            )}
-            <ul className="ppp-attractions__grid ppp-attractions__carousel" aria-label="All game rooms">
-              {homepageGames.map(({ title, body, meta, image, imageAlt, href }, i) => {
-                return (
-                <li key={i} className="ppp-attractions__item">
-                  <Link
-                    href={href}
-                    target={href.startsWith("http") ? "_blank" : undefined}
-                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    prefetch={!href.startsWith("http")}
-                  >
-                    <article className="ppp-attraction-card">
-                      <figure className="ppp-attraction-card__fig">
-                        {image && (
-                          <Image
-                            src={image}
-                            width={400}
-                            height={260}
-                            alt={imageAlt || title}
-                            unoptimized
-                            className="ppp-attraction-card__img"
-                          />
-                        )}
-                        <div className="ppp-attraction-card__overlay">
-                          <h3 className="ppp-attraction-card__title">
-                            {title}
-                          </h3>
-                          {body && <p className="ppp-attraction-card__body">{body}</p>}
-                          {meta && <span className="ppp-attraction-card__meta">{meta}</span>}
-                        </div>
-                      </figure>
-                    </article>
-                  </Link>
-                </li>
-              );
-              })}
-            </ul>
-
-          </div>
-        </section>
       )}
 
       {siteData.pricing.length > 0 && (pricingCta.text || pricingCta.button) && (

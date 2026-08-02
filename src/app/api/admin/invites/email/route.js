@@ -1,21 +1,11 @@
 import { NextResponse } from "next/server";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import nodemailer from "nodemailer";
-import { fetchsheetdataNoCache } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
-const THANK_YOU_INSTAGRAM_URL =
-  "https://www.instagram.com/pixelpulseplayzone?igsh=NHE0YXZtd2V3bjJi&utm_source=qr";
-const SOCIAL_REDIRECT_FALLBACKS = {
-  facebook: "https://www.facebook.com/pixelpulseplay",
-  instagram: THANK_YOU_INSTAGRAM_URL,
-  tiktok: "https://www.tiktok.com/@pixelpulseplay",
-};
 const PACKAGE_INCLUSION_LINES = [
   "Package Inclusions",
   "- Pizza is provided as per your selected package.",
@@ -37,20 +27,6 @@ function cleanText(value = "") {
 function cleanEmail(value = "") {
   const email = cleanText(value).replace(/[\r\n]+/g, "");
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
-}
-
-function cleanAbsoluteUrl(value = "") {
-  const url = cleanText(value).replace(/[\r\n]+/g, "");
-
-  if (!/^https?:\/\//i.test(url)) {
-    return "";
-  }
-
-  try {
-    return new URL(url).toString();
-  } catch (error) {
-    return "";
-  }
 }
 
 function escapeHtml(value = "") {
@@ -78,50 +54,6 @@ function withPackageInclusions(emailText = "") {
   const before = text.slice(0, markerIndex).trimEnd();
   const after = text.slice(markerIndex).trimStart();
   return [before, "", ...PACKAGE_INCLUSION_LINES, "", after].join("\n");
-}
-
-function applySocialRedirectRow(links, row = {}) {
-  const source = cleanText(row.source).replace(/^\//, "").toLowerCase();
-  const destination = cleanAbsoluteUrl(row.destination);
-
-  if (source in links && destination) {
-    links[source] = destination;
-  }
-}
-
-async function readSocialRedirectLinks() {
-  const links = { ...SOCIAL_REDIRECT_FALLBACKS };
-
-  try {
-    const sheetRows = await fetchsheetdataNoCache("redirects");
-    sheetRows.forEach((row) => applySocialRedirectRow(links, row));
-    return { ...links, instagram: THANK_YOU_INSTAGRAM_URL };
-  } catch (error) {
-    console.warn("Live redirect sheet unavailable for thank you email:", error);
-  }
-
-  try {
-    const csv = readFileSync(path.join(process.cwd(), "social_redirects.csv"), "utf8");
-    csv
-      .split(/\r?\n/)
-      .slice(1)
-      .forEach((line) => {
-        const [source, destination] = line.split(",");
-        applySocialRedirectRow(links, { source, destination });
-      });
-  } catch (error) {
-    console.warn("Local social redirects unavailable for thank you email:", error);
-  }
-
-  return { ...links, instagram: THANK_YOU_INSTAGRAM_URL };
-}
-
-function renderSocialIconLink({ href, label, iconUrl }) {
-  return `
-    <a href="${escapeHtml(href)}" aria-label="${escapeHtml(label)}" style="display:inline-block;margin:0 5px;text-decoration:none;">
-      <img src="${escapeHtml(iconUrl)}" alt="${escapeHtml(label)}" width="34" height="34" style="display:block;border:0;width:34px;height:34px;border-radius:50%;" />
-    </a>
-  `;
 }
 
 async function parseEmailRequest(request) {
@@ -279,26 +211,8 @@ function renderConfirmationHtml({ emailText, partyId }) {
   `;
 }
 
-function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, socialLinks, partyId }) {
+function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId }) {
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
-  const iconBaseUrl = websiteLink.replace(/\/+$/, "");
-  const socialIconLinks = [
-    {
-      href: socialLinks.instagram,
-      label: "Instagram",
-      iconUrl: `${iconBaseUrl}/assets/images/social_icon/instagram.png`,
-    },
-    {
-      href: socialLinks.facebook,
-      label: "Facebook",
-      iconUrl: `${iconBaseUrl}/assets/images/social_icon/facebook.png`,
-    },
-    {
-      href: socialLinks.tiktok,
-      label: "TikTok",
-      iconUrl: `${iconBaseUrl}/assets/images/social_icon/tiktok.png`,
-    },
-  ];
 
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
@@ -310,43 +224,35 @@ function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, 
         </div>
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
           <p style="margin:0 0 14px;">${greeting}</p>
-          <p style="margin:0 0 12px;">We loved having you at Pixel Pulse and hope you had an incredible time taking on our immersive challenges, competing with your team, and making unforgettable memories.</p>
-          <p style="margin:0 0 18px;">Whether you came with family, friends, or colleagues, thank you for choosing us to be part of your day. We can't wait to welcome you back for another round!</p>
+          <p style="margin:0 0 18px;">We loved having you and hope you had an amazing time taking on our immersive challenges.</p>
 
-          <h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">Help Us Level Up</h2>
-          <p style="margin:0 0 14px;">We're always looking for ways to make every visit even more exciting. We'd love to hear about your experience and any ideas you have for us.</p>
+          <h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">💬 Help Us Level Up</h2>
+          <p style="margin:0 0 14px;">Your feedback helps us create an even better experience for every player.</p>
+          <p style="margin:0 0 8px;"><strong style="color:#111827;">Share your feedback:</strong></p>
           <p style="margin:18px 0;">
-            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">Share Your Feedback</a>
+            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">${escapeHtml(feedbackUrl)}</a>
           </p>
 
           <div style="margin:24px 0;padding:18px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;">
-            <h2 style="margin:0 0 10px;font-size:20px;line-height:1.25;color:#111827;">Your Next Challenge Awaits!</h2>
-            <p style="margin:0 0 12px;">As a thank you for visiting, here's an exclusive reward just for you.</p>
-            <p style="margin:0 0 8px;"><strong style="color:#111827;">Choose ONE reward on your next visit:</strong></p>
-            <ul style="margin:0 0 12px 20px;padding:0;color:#374151;">
-              <li style="margin:4px 0;"><strong>10% OFF</strong> your next play session, or</li>
-              <li style="margin:4px 0;"><strong>FREE 15 Extra Minutes</strong> with any regular play session.</li>
-            </ul>
-            <p style="margin:0 0 12px;"><strong style="color:#111827;">Offer valid for 14 days from your visit.</strong></p>
-            <p style="margin:0;">Simply show this email when you arrive to redeem your reward.</p>
+            <h2 style="margin:0 0 10px;font-size:20px;line-height:1.25;color:#111827;">🎁 Enjoy a FREE 60-Minute Play Pass</h2>
+            <p style="margin:0 0 12px;">As a thank you for sharing your feedback, we'll send you a <strong style="color:#111827;">FREE 60-Minute Play Pass</strong> for your next visit.*</p>
+            <p style="margin:0;">Complete the feedback form today and get ready for your next adventure!</p>
           </div>
 
-          <p style="margin:0 0 18px;">Challenge your friends, beat your best score, and experience even more action on your next visit!</p>
+          <p style="margin:0 0 8px;"><strong style="color:#111827;">Book your next visit:</strong></p>
           <p style="margin:18px 0;">
-            <a href="${escapeHtml(bookingLink)}" style="display:inline-block;border-radius:8px;background:#a4cf5f;color:#111827;padding:13px 18px;font-weight:800;text-decoration:none;">Book Your Next Visit</a>
+            <a href="${escapeHtml(bookingLink)}" style="display:inline-block;border-radius:8px;background:#a4cf5f;color:#111827;padding:13px 18px;font-weight:800;text-decoration:none;">${escapeHtml(bookingLink)}</a>
           </p>
 
           <p style="margin:22px 0 8px;">Thank you for being part of the Pixel Pulse community.</p>
           <p style="margin:0 0 18px;"><strong style="color:#111827;">Skip the Screen. Enter the Challenge.</strong></p>
-          <p style="margin:0 0 18px;">We can't wait to welcome you back for your next adventure!</p>
-          <p style="margin:0 0 18px;">See you soon,<br /><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
+          <p style="margin:0 0 18px;">See you again soon!</p>
+          <p style="margin:0 0 18px;"><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
           <p style="margin:0;color:#6b7280;">
             Vaughan, Ontario<br />
             <a href="${escapeHtml(websiteLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(websiteLink)}</a>
           </p>
-          <p style="margin:18px 0 0;">
-            ${socialIconLinks.map(renderSocialIconLink).join("")}
-          </p>
+          <p style="margin:18px 0 0;color:#6b7280;font-size:13px;"><em>*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.</em></p>
         </div>
       </div>
     </div>
@@ -363,7 +269,6 @@ export async function POST(request) {
     const firstName = cleanText(body?.firstName);
     const bookingLink = cleanText(body?.bookingLink) || "https://www.pixelpulseplay.ca/booking?type=ticket";
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
-    const socialLinks = await readSocialRedirectLinks();
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const inviteUrl = cleanText(body?.inviteUrl);
     const waiverUrl = cleanText(body?.waiverUrl);
@@ -415,37 +320,35 @@ export async function POST(request) {
           partyId ? `Party ID: ${partyId}` : "",
           "Thanks for Playing at Pixel Pulse!",
           "",
-          "We loved having you at Pixel Pulse and hope you had an incredible time taking on our immersive challenges, competing with your team, and making unforgettable memories.",
+          "We loved having you and hope you had an amazing time taking on our immersive challenges.",
           "",
-          "Whether you came with family, friends, or colleagues, thank you for choosing us to be part of your day. We can't wait to welcome you back for another round!",
+          "💬 Help Us Level Up",
           "",
-          "Help Us Level Up",
-          "We're always looking for ways to make every visit even more exciting. We'd love to hear about your experience and any ideas you have for us.",
+          "Your feedback helps us create an even better experience for every player.",
           "",
-          `Feedback form: ${feedbackUrl}`,
+          "Share your feedback:",
+          feedbackUrl,
           "",
-          "Your Next Challenge Awaits!",
-          "As a thank you for visiting, here's an exclusive reward just for you.",
+          "🎁 Enjoy a FREE 60-Minute Play Pass",
           "",
-          "Choose ONE reward on your next visit:",
-          "- 10% OFF your next play session, or",
-          "- FREE 15 Extra Minutes with any regular play session.",
+          "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
           "",
-          "Offer valid for 14 days from your visit.",
-          "Simply show this email when you arrive to redeem your reward.",
+          "Complete the feedback form today and get ready for your next adventure!",
           "",
-          `Book Your Next Visit: ${bookingLink}`,
+          "Book your next visit:",
+          bookingLink,
           "",
           "Thank you for being part of the Pixel Pulse community.",
+          "",
           "Skip the Screen. Enter the Challenge.",
           "",
-          "See you soon,",
+          "See you again soon!",
+          "",
           "The Pixel Pulse Team",
           "Vaughan, Ontario",
           websiteLink,
-          `Instagram: ${socialLinks.instagram}`,
-          `Facebook: ${socialLinks.facebook}`,
-          `TikTok: ${socialLinks.tiktok}`,
+          "",
+          "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
         ].filter(Boolean).join("\n")
       : confirmationEmailText
       ? [
@@ -460,7 +363,7 @@ export async function POST(request) {
         ].filter(Boolean).join("\n");
 
     const html = sendThankYou
-      ? renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, socialLinks, partyId })
+      ? renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `

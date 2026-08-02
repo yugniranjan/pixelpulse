@@ -32,7 +32,7 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
     .filter(
       (item) =>
         isMenuItemActive(item) &&
-        !["contactus", "contact-us"].includes(item.path?.toLowerCase()),
+        !["about-us", "contactus", "contact-us"].includes(item.path?.toLowerCase()),
     )
     .map((item) => ({
       navName: item.desc,

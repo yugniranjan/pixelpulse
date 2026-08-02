@@ -27,42 +27,35 @@ function buildThankYouPreview(form) {
     "",
     "Thanks for Playing at Pixel Pulse!",
     "",
-    "We loved having you at Pixel Pulse and hope you had an incredible time taking on our immersive challenges, competing with your team, and making unforgettable memories.",
+    "We loved having you and hope you had an amazing time taking on our immersive challenges.",
     "",
-    "Whether you came with family, friends, or colleagues, thank you for choosing us to be part of your day. We can't wait to welcome you back for another round!",
+    "💬 Help Us Level Up",
     "",
-    "Help Us Level Up",
-    "We're always looking for ways to make every visit even more exciting. We'd love to hear about your experience and any ideas you have for us.",
+    "Your feedback helps us create an even better experience for every player.",
     "",
-    `Share your feedback here: ${form.feedbackUrl}`,
+    "Share your feedback:",
+    form.feedbackUrl,
     "",
-    "Your Next Challenge Awaits!",
+    "🎁 Enjoy a FREE 60-Minute Play Pass",
     "",
-    "As a thank you for visiting, here's an exclusive reward just for you.",
+    "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
     "",
-    "Choose ONE reward on your next visit:",
-    "- 10% OFF your next play session, or",
-    "- FREE 15 Extra Minutes with any regular play session.",
+    "Complete the feedback form today and get ready for your next adventure!",
     "",
-    "Offer valid for 14 days from your visit.",
-    "Simply show this email when you arrive to redeem your reward.",
-    "",
-    "Challenge your friends, beat your best score, and experience even more action on your next visit!",
-    "",
-    `Book Your Next Visit: ${form.bookingLink}`,
+    "Book your next visit:",
+    form.bookingLink,
     "",
     "Thank you for being part of the Pixel Pulse community.",
     "",
     "Skip the Screen. Enter the Challenge.",
     "",
-    "We can't wait to welcome you back for your next adventure!",
-    "",
-    "See you soon,",
+    "See you again soon!",
     "",
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
     form.websiteLink,
-    "Social links: Instagram, Facebook, and TikTok are pulled from the redirect sheet.",
+    "",
+    "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
   ].filter((line) => line !== null && line !== undefined).join("\n");
 }
 
@@ -195,7 +188,7 @@ export default function AdminThankYouPage() {
               </Field>
             </div>
             <p className="invite-admin-help">
-              Instagram, Facebook, and TikTok links are pulled from the redirect sheet.
+              Feedback and booking links are included in the thank-you email.
             </p>
           </section>
 
