@@ -263,6 +263,16 @@ export default function FeedbackForm({ initial = {} }) {
     if (!values.length) return "";
     return (values.reduce((total, rating) => total + rating, 0) / values.length).toFixed(1);
   }, [form.ratings]);
+  const ratingChart = useMemo(
+    () =>
+      RATINGS.map(([name, label]) => ({
+        name,
+        label,
+        value: Number(form.ratings[name]) || 0,
+      })),
+    [form.ratings],
+  );
+  const hasRatingChart = ratingChart.some((item) => item.value > 0);
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -511,12 +521,31 @@ export default function FeedbackForm({ initial = {} }) {
                 </div>
               );
             })}
+            {hasRatingChart ? (
+              <div className="ppp-feedback-chart" aria-label="Selected ratings chart">
+                <div className="ppp-feedback-chart__head">
+                  <h3>Your score so far</h3>
+                  {average ? <strong>{average} / 5</strong> : null}
+                </div>
+                <div className="ppp-feedback-chart__bars">
+                  {ratingChart.map((item) => (
+                    <div className="ppp-feedback-chart__row" key={item.name}>
+                      <span>{item.label}</span>
+                      <div className="ppp-feedback-chart__track">
+                        <i style={{ width: `${(item.value / 5) * 100}%` }} />
+                      </div>
+                      <strong>{item.value ? item.value : "-"}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </section>
 
           <section className="ppp-feedback-section">
             <div className="ppp-feedback-section__head">
               <div>
-                <h2>Recommend Score</h2>
+                <h2>How was your Pixel Pulse experience today?</h2>
                 <p>Would you recommend Pixel Pulse to your friends?</p>
               </div>
             </div>
@@ -538,7 +567,7 @@ export default function FeedbackForm({ initial = {} }) {
               ))}
             </div>
             <div className="ppp-feedback-section__subhead">
-              <h3>Will you play again?</h3>
+              <h3>What would bring you back?</h3>
             </div>
             <div className="ppp-feedback-toggle-group">
               {RETURN_OPTIONS.map(([value, Icon, label]) => (

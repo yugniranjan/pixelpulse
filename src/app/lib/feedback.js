@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getPostgresPool, query } from "@/lib/postgres";
+import { createGiftCard } from "@/lib/giftCards";
 
 let tableReady;
 
@@ -30,12 +31,19 @@ async function ensureTable() {
         future_experiences text[] not null default '{}',
         other_future_experience text,
         marketing_consent boolean not null default false,
+        gift_card_id text,
+        gift_card_code text,
+        gift_card_sent_at timestamptz,
         created_at timestamptz not null default now(),
         raw jsonb not null default '{}'::jsonb
       );
+      alter table feedback_submissions add column if not exists gift_card_id text;
+      alter table feedback_submissions add column if not exists gift_card_code text;
+      alter table feedback_submissions add column if not exists gift_card_sent_at timestamptz;
       create index if not exists feedback_submissions_created_at_idx on feedback_submissions (created_at desc);
       create index if not exists feedback_submissions_average_idx on feedback_submissions (average_score);
       create index if not exists feedback_submissions_heard_about_idx on feedback_submissions (heard_about_us);
+      create index if not exists feedback_submissions_gift_card_code_idx on feedback_submissions (gift_card_code);
     `).catch((error) => {
       tableReady = undefined;
       throw error;
@@ -80,6 +88,9 @@ function normalizeRow(row = {}) {
     futureExperiences: row.future_experiences || row.futureExperiences || [],
     otherFutureExperience: row.other_future_experience || row.otherFutureExperience || "",
     marketingConsent: Boolean(row.marketing_consent ?? row.marketingConsent),
+    giftCardId: row.gift_card_id || row.giftCardId || "",
+    giftCardCode: row.gift_card_code || row.giftCardCode || "",
+    giftCardSentAt: iso(row.gift_card_sent_at || row.giftCardSentAt),
     createdAt: iso(row.created_at || row.createdAt),
   };
 }
@@ -214,4 +225,62 @@ export async function listFeedbackSubmissions({ q = "", source = "", minRating =
   );
 
   return result.rows.map(normalizeRow);
+}
+
+function feedbackGiftCardCode() {
+  return `PPP-60-FB-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
+
+export async function issueFeedbackGiftCard(id = "") {
+  if (!hasFeedbackStore()) return { error: "Feedback database is not configured." };
+
+  const feedbackId = cleanText(id);
+  if (!feedbackId) return { error: "Feedback id is required." };
+
+  await ensureTable();
+
+  const feedbackResult = await query("select * from feedback_submissions where id = $1", [feedbackId]);
+  const feedback = feedbackResult.rows[0] ? normalizeRow(feedbackResult.rows[0]) : null;
+
+  if (!feedback) return { notFound: true, error: "Feedback submission not found." };
+  if (feedback.giftCardCode) {
+    return { feedback, giftCard: { id: feedback.giftCardId, code: feedback.giftCardCode } };
+  }
+
+  let created;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const result = await createGiftCard({
+      code: feedbackGiftCardCode(),
+      durationMinutes: 60,
+      price: "0",
+      recipientName: feedback.name,
+      senderName: "Pixel Pulse Team",
+      createdBy: `feedback:${feedback.id}`,
+    });
+
+    if (result.giftCard) {
+      created = result.giftCard;
+      break;
+    }
+    if (!result.duplicate) return { error: result.error || "Unable to create gift card." };
+  }
+
+  if (!created) return { error: "Unable to create a unique gift card code." };
+
+  const updated = await query(
+    `
+      update feedback_submissions
+      set gift_card_id = $2,
+          gift_card_code = $3,
+          gift_card_sent_at = now()
+      where id = $1
+      returning *
+    `,
+    [feedback.id, created.id, created.code],
+  );
+
+  return {
+    feedback: normalizeRow(updated.rows[0]),
+    giftCard: created,
+  };
 }

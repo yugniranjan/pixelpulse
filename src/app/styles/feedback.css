@@ -515,6 +515,68 @@
   box-shadow: 0 0 0 3px rgba(213, 111, 53, 0.14);
 }
 
+.ppp-feedback-chart {
+  display: grid;
+  gap: 0.85rem;
+  border: 1px solid rgba(127, 184, 63, 0.28);
+  border-radius: 8px;
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(247, 251, 234, 0.92), rgba(255, 250, 246, 0.9)),
+    #ffffff;
+}
+
+.ppp-feedback-chart__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ppp-feedback-chart__head h3 {
+  margin: 0;
+  color: var(--feedback-text);
+  font-family: var(--feedback-display);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-feedback-chart__head strong {
+  color: var(--feedback-accent);
+  font-size: 1.05rem;
+}
+
+.ppp-feedback-chart__bars {
+  display: grid;
+  gap: 0.58rem;
+}
+
+.ppp-feedback-chart__row {
+  display: grid;
+  grid-template-columns: minmax(116px, 0.9fr) minmax(120px, 1.6fr) 32px;
+  gap: 0.7rem;
+  align-items: center;
+  color: var(--feedback-muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.ppp-feedback-chart__track {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(19, 36, 54, 0.1);
+}
+
+.ppp-feedback-chart__track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--feedback-lime), var(--feedback-peach));
+}
+
 .ppp-feedback-review {
   display: flex;
   align-items: center;

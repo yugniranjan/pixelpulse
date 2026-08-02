@@ -30,6 +30,23 @@ const RATING_LABELS = {
   value: "Value",
 };
 
+const CHANNEL_GROUPS = {
+  "Google Search": "Search",
+  "Google Maps": "Maps",
+  Instagram: "Social",
+  Facebook: "Social",
+  TikTok: "Social",
+  YouTube: "Social",
+  "Friend or Family": "Referral",
+  "Birthday Invitation": "Referral",
+  "School/Camp": "Groups",
+  "Marc & Mandy": "Media",
+  "Canadian Home Trends": "Media",
+  "Walked By": "Local",
+  "Returning Customer": "Retention",
+  Other: "Other",
+};
+
 function formatDate(value) {
   if (!value) return "Not recorded";
   const date = new Date(value);
@@ -50,6 +67,18 @@ function listValue(values = []) {
   return values?.length ? values.join(", ") : "Not provided";
 }
 
+function countValues(values = []) {
+  const counts = new Map();
+  values.filter(Boolean).forEach((value) => {
+    counts.set(value, (counts.get(value) || 0) + 1);
+  });
+
+  const max = Math.max(...counts.values(), 1);
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value, percent: Math.round((value / max) * 100) }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}
+
 export default function AdminFeedbackPage() {
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +86,8 @@ export default function AdminFeedbackPage() {
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("");
   const [minRating, setMinRating] = useState("");
+  const [issuingId, setIssuingId] = useState("");
+  const [status, setStatus] = useState("");
 
   async function loadFeedback() {
     setLoading(true);
@@ -84,6 +115,35 @@ export default function AdminFeedbackPage() {
     }
   }
 
+  async function issueGiftCard(item) {
+    setIssuingId(item.id);
+    setError("");
+    setStatus("");
+
+    try {
+      const response = await fetch("/api/admin/feedback", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "issue-gift-card", id: item.id }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to issue gift card.");
+        return;
+      }
+
+      setFeedback((current) =>
+        current.map((row) => (row.id === data.feedback.id ? data.feedback : row)),
+      );
+      setStatus(`60-minute gift card sent to ${data.feedback.email}: ${data.giftCard.code}`);
+    } catch (issueError) {
+      setError("Unable to issue gift card.");
+    } finally {
+      setIssuingId("");
+    }
+  }
+
   useEffect(() => {
     loadFeedback();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,7 +157,59 @@ export default function AdminFeedbackPage() {
       : "0.0";
     const promoters = feedback.filter((item) => ["definitely", "probably"].includes(item.recommend)).length;
     const consent = feedback.filter((item) => item.marketingConsent).length;
-    return { total, average, promoters, consent };
+    const lowScores = scores.filter((score) => score > 0 && score < 4).length;
+    const topSource = countValues(feedback.map((item) => item.heardAboutUs || "Not provided"))[0]?.label || "Not provided";
+    const topReason = countValues(feedback.flatMap((item) => item.visitReasons || []))[0]?.label || "Not provided";
+    const promoterRate = total ? Math.round((promoters / total) * 100) : 0;
+    return { total, average, promoters, consent, lowScores, topSource, topReason, promoterRate };
+  }, [feedback]);
+  const sourceChart = useMemo(() => {
+    return countValues(feedback.map((item) => item.heardAboutUs || "Not provided")).slice(0, 8);
+  }, [feedback]);
+  const channelChart = useMemo(
+    () =>
+      countValues(
+        feedback.map((item) => CHANNEL_GROUPS[item.heardAboutUs] || (item.heardAboutUs ? "Other" : "Not provided")),
+      ),
+    [feedback],
+  );
+  const visitReasonChart = useMemo(
+    () => countValues(feedback.flatMap((item) => item.visitReasons || [])).slice(0, 8),
+    [feedback],
+  );
+  const recommendChart = useMemo(
+    () => countValues(feedback.map((item) => sentenceValue(item.recommend) || "Not provided")),
+    [feedback],
+  );
+  const returnChart = useMemo(
+    () => countValues(feedback.map((item) => sentenceValue(item.returnVisit) || "Not provided")),
+    [feedback],
+  );
+  const ratingDistribution = useMemo(
+    () =>
+      [5, 4, 3, 2, 1].map((rating) => {
+        const value = feedback.filter((item) => Math.round(Number(item.averageScore)) === rating).length;
+        const max = Math.max(
+          ...[5, 4, 3, 2, 1].map((score) => feedback.filter((item) => Math.round(Number(item.averageScore)) === score).length),
+          1,
+        );
+        return { label: `${rating} star`, value, percent: Math.round((value / max) * 100) };
+      }),
+    [feedback],
+  );
+  const ratingChart = useMemo(() => {
+    return Object.entries(RATING_LABELS).map(([key, label]) => {
+      const values = feedback.map((item) => Number(item.ratings?.[key])).filter(Boolean);
+      const average = values.length
+        ? values.reduce((sum, value) => sum + value, 0) / values.length
+        : 0;
+      return {
+        key,
+        label,
+        value: average ? average.toFixed(1) : "0.0",
+        percent: Math.round((average / 5) * 100),
+      };
+    });
   }, [feedback]);
 
   return (
@@ -114,8 +226,129 @@ export default function AdminFeedbackPage() {
         <section className="feedback-admin__stats" aria-label="Feedback summary">
           <div className="feedback-admin__stat"><span>Total responses</span><strong>{stats.total}</strong></div>
           <div className="feedback-admin__stat"><span>Average score</span><strong>{stats.average}</strong></div>
-          <div className="feedback-admin__stat"><span>Would recommend</span><strong>{stats.promoters}</strong></div>
+          <div className="feedback-admin__stat"><span>Would recommend</span><strong>{stats.promoterRate}%</strong></div>
           <div className="feedback-admin__stat"><span>Marketing consent</span><strong>{stats.consent}</strong></div>
+        </section>
+
+        <section className="feedback-admin__insights" aria-label="Marketing insights">
+          <article><span>Top source</span><strong>{stats.topSource}</strong></article>
+          <article><span>Top visit reason</span><strong>{stats.topReason}</strong></article>
+          <article><span>Promoters</span><strong>{stats.promoters}</strong></article>
+          <article><span>Needs follow-up</span><strong>{stats.lowScores}</strong></article>
+        </section>
+
+        <section className="feedback-admin__charts" aria-label="Feedback charts">
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>How People Found Us</h2>
+              <span>{sourceChart.length} sources</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {sourceChart.length ? sourceChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              )) : <p>No source data yet.</p>}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>Marketing Channels</h2>
+              <span>Grouped</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {channelChart.length ? channelChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              )) : <p>No channel data yet.</p>}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>Average Ratings</h2>
+              <span>Out of 5</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {ratingChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.key}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>Why People Visit</h2>
+              <span>Visit reason</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {visitReasonChart.length ? visitReasonChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              )) : <p>No visit reason data yet.</p>}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>Rating Distribution</h2>
+              <span>Average score</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {ratingDistribution.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>Recommendation Intent</h2>
+              <span>Advocacy</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {recommendChart.length ? recommendChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              )) : <p>No recommendation data yet.</p>}
+            </div>
+          </article>
+
+          <article className="feedback-admin__chart-card">
+            <div className="feedback-admin__chart-head">
+              <h2>What Brings People Back</h2>
+              <span>Return intent</span>
+            </div>
+            <div className="feedback-admin__bar-chart">
+              {returnChart.length ? returnChart.map((row) => (
+                <div className="feedback-admin__bar-row" key={row.label}>
+                  <span>{row.label}</span>
+                  <div><i style={{ width: `${row.percent}%` }} /></div>
+                  <strong>{row.value}</strong>
+                </div>
+              )) : <p>No return data yet.</p>}
+            </div>
+          </article>
         </section>
 
         <section className="feedback-admin__panel">
@@ -147,58 +380,83 @@ export default function AdminFeedbackPage() {
         </section>
 
         {error ? <p className="feedback-admin__error">{error}</p> : null}
+        {status ? <p className="feedback-admin__status">{status}</p> : null}
         {loading ? <p className="feedback-admin__empty">Loading feedback...</p> : null}
         {!loading && !error && !feedback.length ? <p className="feedback-admin__empty">No feedback submissions yet.</p> : null}
 
         <section className="feedback-admin__list" aria-label="Feedback submissions">
           {feedback.map((item) => (
-            <article className="feedback-admin__card" key={item.id}>
-              <div className="feedback-admin__card-head">
+            <details className="feedback-admin__card" key={item.id}>
+              <summary className="feedback-admin__summary">
                 <div>
                   <h2>{item.name}</h2>
                   <div className="feedback-admin__meta">
                     <span>{item.email}</span>
                     {item.phone ? <span>{item.phone}</span> : null}
-                    <span>Submitted {formatDate(item.createdAt)}</span>
+                    <span>Heard: {item.heardAboutUs || "Not provided"}</span>
+                    <span>Submitted: {formatDate(item.createdAt)}</span>
+                    <span>Visit: {item.visitDate || "Not provided"}</span>
                   </div>
                 </div>
-                <span className="feedback-admin__score">{item.averageScore || "0.0"} / 5</span>
-              </div>
+                <div className="feedback-admin__summary-actions">
+                  {item.giftCardCode ? (
+                    <span className="feedback-admin__gift-status">Gift sent: {item.giftCardCode}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="feedback-admin__gift-button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        issueGiftCard(item);
+                      }}
+                      disabled={issuingId === item.id || !item.email}
+                    >
+                      {issuingId === item.id ? "Sending..." : "Send 60-Min Gift Card"}
+                    </button>
+                  )}
+                  <span className="feedback-admin__score">{item.averageScore || "0.0"} / 5</span>
+                  <span className="feedback-admin__toggle">Details</span>
+                </div>
+              </summary>
 
-              <div className="feedback-admin__tags">
-                <span className="feedback-admin__tag">Heard: {item.heardAboutUs || "Not provided"}</span>
-                <span className="feedback-admin__tag">Visit: {item.visitDate || "Not provided"}</span>
-                {item.partyId ? <span className="feedback-admin__tag">Party ID: {item.partyId}</span> : null}
-                <span className="feedback-admin__tag">Recommend: {sentenceValue(item.recommend) || "Not provided"}</span>
-                <span className="feedback-admin__tag">Return: {sentenceValue(item.returnVisit) || "Not provided"}</span>
-              </div>
+              <div className="feedback-admin__details">
+                <div className="feedback-admin__tags">
+                  <span className="feedback-admin__tag">Heard: {item.heardAboutUs || "Not provided"}</span>
+                  <span className="feedback-admin__tag">Submitted: {formatDate(item.createdAt)}</span>
+                  <span className="feedback-admin__tag">Visit: {item.visitDate || "Not provided"}</span>
+                  <span className="feedback-admin__tag">Gift card: {item.giftCardCode || "Not sent"}</span>
+                  {item.partyId ? <span className="feedback-admin__tag">Party ID: {item.partyId}</span> : null}
+                  <span className="feedback-admin__tag">Recommend: {sentenceValue(item.recommend) || "Not provided"}</span>
+                  <span className="feedback-admin__tag">Return: {sentenceValue(item.returnVisit) || "Not provided"}</span>
+                </div>
 
-              <div className="feedback-admin__grid">
-                <div><span>Visit reasons</span><strong>{listValue(item.visitReasons)}</strong></div>
-                <div><span>Challenges</span><strong>{listValue(item.rooms)}</strong></div>
-                <div><span>Future ideas</span><strong>{listValue(item.futureExperiences)}</strong></div>
-              </div>
+                <div className="feedback-admin__grid">
+                  <div><span>Visit reasons</span><strong>{listValue(item.visitReasons)}</strong></div>
+                  <div><span>Challenges</span><strong>{listValue(item.rooms)}</strong></div>
+                  <div><span>Future ideas</span><strong>{listValue(item.futureExperiences)}</strong></div>
+                </div>
 
-              <div className="feedback-admin__grid">
-                {Object.entries(RATING_LABELS).map(([key, label]) => (
-                  <div key={key}>
-                    <span>{label}</span>
-                    <strong>{item.ratings?.[key] ? `${item.ratings[key]} / 5` : "Not provided"}</strong>
-                  </div>
-                ))}
-              </div>
+                <div className="feedback-admin__grid">
+                  {Object.entries(RATING_LABELS).map(([key, label]) => (
+                    <div key={key}>
+                      <span>{label}</span>
+                      <strong>{item.ratings?.[key] ? `${item.ratings[key]} / 5` : "Not provided"}</strong>
+                    </div>
+                  ))}
+                </div>
 
-              <div className="feedback-admin__comments">
-                <article>
-                  <span>Biggest win</span>
-                  <p>{item.favoriteMoment || "Not provided"}</p>
-                </article>
-                <article>
-                  <span>Upgrade idea</span>
-                  <p>{item.upgradeIdea || "Not provided"}</p>
-                </article>
+                <div className="feedback-admin__comments">
+                  <article>
+                    <span>Biggest win</span>
+                    <p>{item.favoriteMoment || "Not provided"}</p>
+                  </article>
+                  <article>
+                    <span>Upgrade idea</span>
+                    <p>{item.upgradeIdea || "Not provided"}</p>
+                  </article>
+                </div>
               </div>
-            </article>
+            </details>
           ))}
         </section>
       </div>
