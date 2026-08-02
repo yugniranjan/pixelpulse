@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 
 // Safety cap on a single bulk send.
 const MAX_RECIPIENTS = 300;
+const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
 
 function substitute(text, name) {
   return String(text || "").replace(/\{name\}/gi, name || "there");
@@ -58,6 +59,30 @@ export async function POST(req) {
     );
   }
 
+  const attachments = [];
+  let totalAttachmentBytes = 0;
+  for (const item of Array.isArray(body.attachments) ? body.attachments : []) {
+    const filename = String(item?.filename || "attachment").trim().replace(/[/\\]/g, "-");
+    const contentType = String(item?.contentType || "application/octet-stream").trim();
+    const contentBase64 = String(item?.contentBase64 || "").replace(/^data:[^;]+;base64,/, "");
+    if (!contentBase64) continue;
+
+    const content = Buffer.from(contentBase64, "base64");
+    totalAttachmentBytes += content.byteLength;
+    if (totalAttachmentBytes > MAX_ATTACHMENT_BYTES) {
+      return NextResponse.json(
+        { error: "Attachments must be 15 MB or less per send." },
+        { status: 400 },
+      );
+    }
+
+    attachments.push({
+      filename,
+      content,
+      contentType,
+    });
+  }
+
   let sent = 0;
   const failures = [];
   for (const recipient of recipients) {
@@ -66,6 +91,7 @@ export async function POST(req) {
         to: recipient.email,
         subject: substitute(subject, recipient.name),
         message: substitute(message, recipient.name),
+        attachments,
       });
       sent += 1;
     } catch (error) {

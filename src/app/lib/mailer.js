@@ -75,7 +75,7 @@ function brandedHtml(message) {
  * Send one branded email. `subject` and `message` should already have any
  * tokens (e.g. {name}) substituted by the caller.
  */
-export async function sendBrandedEmail({ to, subject, message, replyTo }) {
+export async function sendBrandedEmail({ to, subject, message, replyTo, attachments = [] }) {
   const tx = getTransporter();
   if (!tx) throw new Error("Mailer is not configured.");
 
@@ -88,5 +88,6 @@ export async function sendBrandedEmail({ to, subject, message, replyTo }) {
     subject,
     text: message,
     html: brandedHtml(message),
+    attachments,
   });
 }

@@ -6,6 +6,9 @@ import "../../styles/admin-waivers.css";
 import "../../styles/admin-player-info.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
+const DEFAULT_BOOKING_LINK = "https://www.pixelpulseplay.ca/booking?type=ticket";
+const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
 const PLAYER_SORT_OPTIONS = [
   { value: "newest", label: "Newest players" },
   { value: "points-desc", label: "Score: high to low" },
@@ -124,6 +127,45 @@ function makeEditForm(waiver) {
   };
 }
 
+function buildThankYouEmailText({ firstName, feedbackUrl, bookingLink, websiteLink, partyId }) {
+  return [
+    firstName ? `Hi ${firstName},` : "Hi,",
+    "",
+    partyId ? `Party ID: ${partyId}` : "",
+    "Thanks for Playing at Pixel Pulse!",
+    "",
+    "We loved having you and hope you had an amazing time taking on our immersive challenges.",
+    "",
+    "💬 Help Us Level Up",
+    "",
+    "Your feedback helps us create an even better experience for every player.",
+    "",
+    "Share your feedback:",
+    feedbackUrl,
+    "",
+    "🎁 Enjoy a FREE 60-Minute Play Pass",
+    "",
+    "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
+    "",
+    "Complete the feedback form today and get ready for your next adventure!",
+    "",
+    "Book your next visit:",
+    bookingLink,
+    "",
+    "Thank you for being part of the Pixel Pulse community.",
+    "",
+    "Skip the Screen. Enter the Challenge.",
+    "",
+    "See you again soon!",
+    "",
+    "The Pixel Pulse Team",
+    "Vaughan, Ontario",
+    websiteLink,
+    "",
+    "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
+  ].filter(Boolean).join("\n");
+}
+
 function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
   function update(section, field, value) {
     onChange((current) => ({
@@ -188,7 +230,61 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
   );
 }
 
-function WaiverCard({ waiver, onDelete, onEdit }) {
+function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, status }) {
+  function update(field, value) {
+    onChange((current) => ({ ...current, [field]: value }));
+  }
+
+  return (
+    <div className="waiver-edit-backdrop" role="presentation">
+      <form className="waiver-edit-modal waiver-email-modal" onSubmit={onSend}>
+        <div className="waiver-edit-modal__head">
+          <div>
+            <span className="waiver-admin-kicker">Review before sending</span>
+            <h2>Thank You Email</h2>
+          </div>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
+
+        <section>
+          <h3>Recipient</h3>
+          <div className="waiver-edit-grid">
+            <label><span>Email</span><input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} /></label>
+            <label><span>First name</span><input value={draft.firstName} onChange={(event) => update("firstName", event.target.value)} /></label>
+            <label><span>Party ID</span><input value={draft.partyId} onChange={(event) => update("partyId", event.target.value)} /></label>
+          </div>
+        </section>
+
+        <section>
+          <h3>Links</h3>
+          <div className="waiver-edit-grid">
+            <label><span>Feedback link</span><input required value={draft.feedbackUrl} onChange={(event) => update("feedbackUrl", event.target.value)} /></label>
+            <label><span>Booking link</span><input required value={draft.bookingLink} onChange={(event) => update("bookingLink", event.target.value)} /></label>
+            <label><span>Website</span><input value={draft.websiteLink} onChange={(event) => update("websiteLink", event.target.value)} /></label>
+          </div>
+        </section>
+
+        <section>
+          <h3>Email Content</h3>
+          <label className="waiver-edit-wide waiver-email-content">
+            <span>Review and edit before sending</span>
+            <textarea required value={draft.emailText} onChange={(event) => update("emailText", event.target.value)} />
+          </label>
+        </section>
+
+        {error ? <p className="waiver-admin-error">{error}</p> : null}
+        {status ? <p className="waiver-admin-status">{status}</p> : null}
+
+        <div className="waiver-edit-actions">
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="submit" disabled={sending}>{sending ? "Sending..." : "Send Email"}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
   const [open, setOpen] = useState(false);
   const activeWaiver = waiver;
   const familyMembers = Array.isArray(activeWaiver.familyMembers) ? activeWaiver.familyMembers : [];
@@ -296,6 +392,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Record Actions</h2>
             <div>
+              <button type="button" onClick={() => onThankYouEmail(activeWaiver)}>Thank You Email</button>
               <button type="button" onClick={() => onEdit(activeWaiver)}>Edit Record</button>
               <button type="button" className="is-danger" onClick={() => onDelete(activeWaiver)}>Delete Record</button>
             </div>
@@ -404,6 +501,10 @@ export default function AdminWaiversPage() {
   const [editForm, setEditForm] = useState(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [editError, setEditError] = useState("");
+  const [thankYouDraft, setThankYouDraft] = useState(null);
+  const [sendingThankYou, setSendingThankYou] = useState(false);
+  const [thankYouError, setThankYouError] = useState("");
+  const [thankYouStatus, setThankYouStatus] = useState("");
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(false);
   const [playersError, setPlayersError] = useState("");
@@ -674,6 +775,73 @@ export default function AdminWaiversPage() {
     setEditError("");
   }
 
+  function startThankYouEmail(waiver) {
+    const firstName = waiver.primary?.firstName || "";
+    const partyId = waiver.visit?.partyId || "";
+    const feedbackUrl = partyId
+      ? `${DEFAULT_FEEDBACK_URL}?partyId=${encodeURIComponent(partyId)}`
+      : DEFAULT_FEEDBACK_URL;
+    const draft = {
+      email: waiver.primary?.email || "",
+      firstName,
+      partyId,
+      feedbackUrl,
+      bookingLink: DEFAULT_BOOKING_LINK,
+      websiteLink: DEFAULT_WEBSITE_LINK,
+    };
+
+    setThankYouDraft({
+      ...draft,
+      emailText: buildThankYouEmailText(draft),
+    });
+    setThankYouError("");
+    setThankYouStatus("");
+  }
+
+  function closeThankYouEmail() {
+    setThankYouDraft(null);
+    setThankYouError("");
+    setThankYouStatus("");
+  }
+
+  async function sendThankYouEmail(event) {
+    event.preventDefault();
+    if (!thankYouDraft) return;
+
+    setSendingThankYou(true);
+    setThankYouError("");
+    setThankYouStatus("");
+
+    try {
+      const response = await fetch("/api/admin/invites/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "thank-you",
+          email: thankYouDraft.email,
+          firstName: thankYouDraft.firstName,
+          partyId: thankYouDraft.partyId,
+          feedbackUrl: thankYouDraft.feedbackUrl,
+          bookingLink: thankYouDraft.bookingLink,
+          websiteLink: thankYouDraft.websiteLink,
+          thankYouText: thankYouDraft.emailText,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setThankYouError(data.error || "Unable to send thank you email.");
+        return;
+      }
+
+      setThankYouStatus("Thank you email sent.");
+    } catch (sendError) {
+      setThankYouError("Unable to send thank you email.");
+    } finally {
+      setSendingThankYou(false);
+    }
+  }
+
   async function saveWaiverEdit(event) {
     event.preventDefault();
     if (!editingWaiver || !editForm) return;
@@ -851,6 +1019,7 @@ export default function AdminWaiversPage() {
                         key={waiver.id}
                         onDelete={deleteWaiver}
                         onEdit={startEditWaiver}
+                        onThankYouEmail={startThankYouEmail}
                       />
                     ))}
                     <div className="waiver-data-pagination">
@@ -974,6 +1143,17 @@ export default function AdminWaiversPage() {
           onClose={closeEditWaiver}
           onSave={saveWaiverEdit}
           saving={savingEdit}
+        />
+      ) : null}
+      {thankYouDraft ? (
+        <ThankYouEmailModal
+          draft={thankYouDraft}
+          error={thankYouError}
+          onChange={setThankYouDraft}
+          onClose={closeThankYouEmail}
+          onSend={sendThankYouEmail}
+          sending={sendingThankYou}
+          status={thankYouStatus}
         />
       ) : null}
     </AdminShell>

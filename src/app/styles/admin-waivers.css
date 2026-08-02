@@ -345,6 +345,10 @@
   box-shadow: 0 24px 70px rgba(16, 24, 40, 0.24);
 }
 
+.waiver-email-modal {
+  width: min(1040px, 100%);
+}
+
 .waiver-edit-modal__head,
 .waiver-edit-actions {
   display: flex;
@@ -393,6 +397,29 @@
 .waiver-edit-grid textarea {
   min-height: 90px;
   resize: vertical;
+}
+
+.waiver-email-content {
+  display: grid;
+  gap: 8px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.waiver-email-content textarea {
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  resize: vertical;
+  text-transform: none;
 }
 
 .waiver-edit-wide {

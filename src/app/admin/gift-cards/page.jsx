@@ -8,6 +8,8 @@ import "../../styles/admin-gift-cards.css";
 
 const GIFT_CARD_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const GIFT_CARD_BACKGROUND = "/assets/images/gift-cards/gameplay-bg.jpg";
+const GIFT_CARD_BOOKING_URL = "https://www.pixelpulseplay.ca/booking?type=ticket";
+const GIFT_CARD_WEBSITE_URL = "https://www.pixelpulseplay.ca";
 
 const PASS_OPTIONS = [
   {
@@ -322,6 +324,39 @@ async function renderGiftCardPng(pass, fields) {
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
 }
 
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function buildGiftCardEmailText({ recipientName, pass, fields }) {
+  return [
+    recipientName ? `Hi ${recipientName},` : "Hi,",
+    "",
+    "You have a Pixel Pulse Play gift card waiting for you!",
+    "",
+    `${pass.name}: ${pass.minutes} minutes of immersive challenge-room play`,
+    `Redemption code: ${fields.code}`,
+    `Value: ${money(fields.price)}`,
+    fields.sender ? `From: ${fields.sender}` : "",
+    "",
+    "Your gift card is attached to this email. Bring the redemption code with you when you visit.",
+    "",
+    "Book your visit:",
+    GIFT_CARD_BOOKING_URL,
+    "",
+    "Skip the Screen. Enter the Challenge.",
+    "",
+    "The Pixel Pulse Team",
+    "Vaughan, Ontario",
+    GIFT_CARD_WEBSITE_URL,
+  ].filter(Boolean).join("\n");
+}
+
 function Barcode() {
   const bars = [60, 100, 40, 80, 55, 90, 30, 70, 100, 50, 72, 44];
   return (
@@ -385,6 +420,75 @@ function GiftCardPreview({ pass, fields }) {
   );
 }
 
+function GiftCardEmailModal({ draft, onChange, onClose, onSend, sending, error, status }) {
+  function update(field, value) {
+    onChange((current) => {
+      const next = { ...current, [field]: value };
+      if (field === "recipientName") {
+        const currentDefault = buildGiftCardEmailText({
+          recipientName: current.recipientName,
+          pass: current.pass,
+          fields: current.fields,
+        });
+        if (current.message === currentDefault) {
+          next.message = buildGiftCardEmailText({
+            recipientName: value,
+            pass: current.pass,
+            fields: current.fields,
+          });
+        }
+      }
+      return next;
+    });
+  }
+
+  return (
+    <div className="gift-email-backdrop" role="presentation">
+      <form className="gift-email-modal" onSubmit={onSend}>
+        <div className="gift-email-modal__head">
+          <div>
+            <span>Review before sending</span>
+            <h2>Email Gift Card</h2>
+          </div>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
+
+        <div className="gift-email-grid">
+          <label>
+            <span>Recipient email</span>
+            <input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} />
+          </label>
+          <label>
+            <span>Recipient name</span>
+            <input value={draft.recipientName} onChange={(event) => update("recipientName", event.target.value)} />
+          </label>
+          <label>
+            <span>Subject</span>
+            <input required value={draft.subject} onChange={(event) => update("subject", event.target.value)} />
+          </label>
+        </div>
+
+        <label className="gift-email-content">
+          <span>Email content</span>
+          <textarea required value={draft.message} onChange={(event) => update("message", event.target.value)} />
+        </label>
+
+        <p className="gift-email-note">
+          The gift card PNG will be generated from the current card and attached when you send.
+        </p>
+
+        {error ? <p className="gift-admin__error">{error}</p> : null}
+        {status ? <p className="gift-admin__status">{status}</p> : null}
+
+        <div className="gift-email-actions">
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="submit" disabled={sending}>{sending ? "Sending..." : "Send Gift Card"}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function standaloneHtml(pass, fields) {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -422,6 +526,10 @@ export default function AdminGiftCardsPage() {
   const [redeemingCard, setRedeemingCard] = useState(false);
   const [deletingCardId, setDeletingCardId] = useState("");
   const [editingCardId, setEditingCardId] = useState("");
+  const [emailDraft, setEmailDraft] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailStatus, setEmailStatus] = useState("");
   const [redeemCode, setRedeemCode] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -662,6 +770,100 @@ export default function AdminGiftCardsPage() {
     }
   }
 
+  function openGiftCardEmail(pass, cardFields) {
+    const emailFields = {
+      price: cardFields.price,
+      sender: cardFields.sender || cardFields.senderName || "",
+      code: normalizeCode(cardFields.code),
+    };
+    setEmailDraft({
+      email: "",
+      recipientName: "",
+      subject: `Your ${pass.minutes}-Minute Pixel Pulse Gift Card`,
+      message: buildGiftCardEmailText({ recipientName: "", pass, fields: emailFields }),
+      pass,
+      fields: emailFields,
+    });
+    setEmailError("");
+    setEmailStatus("");
+  }
+
+  function openCurrentGiftCardEmail() {
+    if (!isCurrentCardIssueable) {
+      setError("Save this gift card before emailing it.");
+      return;
+    }
+
+    openGiftCardEmail(selectedPass, {
+      price: currentSavedRecord.price,
+      sender: currentSavedRecord.senderName || "",
+      code: currentSavedRecord.code,
+    });
+  }
+
+  function openSavedGiftCardEmail(card) {
+    const pass = PASS_OPTIONS.find((option) => option.minutes === Number(card.durationMinutes)) || PASS_OPTIONS[1];
+    openGiftCardEmail(pass, {
+      price: card.price,
+      sender: card.senderName || "",
+      code: card.code,
+    });
+  }
+
+  function closeGiftCardEmail() {
+    setEmailDraft(null);
+    setEmailError("");
+    setEmailStatus("");
+  }
+
+  async function sendGiftCardEmail(event) {
+    event.preventDefault();
+    if (!emailDraft) return;
+
+    setSendingEmail(true);
+    setEmailError("");
+    setEmailStatus("");
+
+    try {
+      const imageBlob = await renderGiftCardPng(emailDraft.pass, emailDraft.fields);
+      if (!imageBlob) {
+        setEmailError("Unable to create gift card attachment.");
+        return;
+      }
+
+      const imageBase64 = await blobToBase64(imageBlob);
+      const response = await fetch("/api/admin/send-email", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: emailDraft.subject,
+          message: emailDraft.message,
+          recipients: [{ email: emailDraft.email, name: emailDraft.recipientName }],
+          attachments: [
+            {
+              filename: `pixel-pulse-gift-card-${emailDraft.fields.code}.png`,
+              contentType: "image/png",
+              contentBase64: imageBase64,
+            },
+          ],
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setEmailError(data.error || "Unable to send gift card email.");
+        return;
+      }
+
+      setEmailStatus("Gift card email sent.");
+    } catch (sendError) {
+      setEmailError("Unable to send gift card email.");
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
   function downloadCard() {
     const html = standaloneHtml(selectedPass, fields);
     const blob = new Blob([html], { type: "text/html" });
@@ -787,6 +989,9 @@ export default function AdminGiftCardsPage() {
               <button type="button" className="gift-admin__secondary" onClick={downloadImage} disabled={!isCurrentCardIssueable}>
                 Download PNG
               </button>
+              <button type="button" className="gift-admin__secondary" onClick={openCurrentGiftCardEmail} disabled={!isCurrentCardIssueable}>
+                Email Gift Card
+              </button>
             </div>
           </form>
 
@@ -864,9 +1069,14 @@ export default function AdminGiftCardsPage() {
                       <td>
                         <div className="gift-admin__row-actions">
                           {card.status === "active" ? (
-                            <button type="button" onClick={() => editGiftCard(card)}>
-                              Edit
-                            </button>
+                            <>
+                              <button type="button" onClick={() => openSavedGiftCardEmail(card)}>
+                                Email
+                              </button>
+                              <button type="button" onClick={() => editGiftCard(card)}>
+                                Edit
+                              </button>
+                            </>
                           ) : null}
                           {card.status === "redeemed" ? (
                             <button
@@ -892,6 +1102,17 @@ export default function AdminGiftCardsPage() {
           </div>
         </section>
       </div>
+      {emailDraft ? (
+        <GiftCardEmailModal
+          draft={emailDraft}
+          error={emailError}
+          onChange={setEmailDraft}
+          onClose={closeGiftCardEmail}
+          onSend={sendGiftCardEmail}
+          sending={sendingEmail}
+          status={emailStatus}
+        />
+      ) : null}
     </AdminShell>
   );
 }

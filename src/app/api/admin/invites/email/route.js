@@ -259,6 +259,23 @@ function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, 
   `;
 }
 
+function renderCustomThankYouHtml({ text, partyId }) {
+  return `
+    <div style="margin:0;padding:0;background:#f3f4f6;">
+      <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
+        <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
+          <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
+          <h1 style="margin:0;font-size:28px;line-height:1.15;">Thanks for Playing at Pixel Pulse!</h1>
+          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
+        </div>
+        <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
+          ${textToHtml(text)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function POST(request) {
   try {
     const { body, attachments } = await parseEmailRequest(request);
@@ -269,9 +286,9 @@ export async function POST(request) {
     const firstName = cleanText(body?.firstName);
     const bookingLink = cleanText(body?.bookingLink) || "https://www.pixelpulseplay.ca/booking?type=ticket";
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
+    const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const inviteUrl = cleanText(body?.inviteUrl);
-    const waiverUrl = cleanText(body?.waiverUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
     const partyId = cleanText(body?.partyId);
     const emailText = confirmationEmailText ? withPackageInclusions(confirmationEmailText) : smsText;
@@ -313,43 +330,45 @@ export async function POST(request) {
       },
     });
 
+    const defaultThankYouText = [
+      firstName ? `Hi ${firstName},` : "Hi,",
+      "",
+      partyId ? `Party ID: ${partyId}` : "",
+      "Thanks for Playing at Pixel Pulse!",
+      "",
+      "We loved having you and hope you had an amazing time taking on our immersive challenges.",
+      "",
+      "💬 Help Us Level Up",
+      "",
+      "Your feedback helps us create an even better experience for every player.",
+      "",
+      "Share your feedback:",
+      feedbackUrl,
+      "",
+      "🎁 Enjoy a FREE 60-Minute Play Pass",
+      "",
+      "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
+      "",
+      "Complete the feedback form today and get ready for your next adventure!",
+      "",
+      "Book your next visit:",
+      bookingLink,
+      "",
+      "Thank you for being part of the Pixel Pulse community.",
+      "",
+      "Skip the Screen. Enter the Challenge.",
+      "",
+      "See you again soon!",
+      "",
+      "The Pixel Pulse Team",
+      "Vaughan, Ontario",
+      websiteLink,
+      "",
+      "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
+    ].filter(Boolean).join("\n");
+
     const text = sendThankYou
-      ? [
-          firstName ? `Hi ${firstName},` : "Hi,",
-          "",
-          partyId ? `Party ID: ${partyId}` : "",
-          "Thanks for Playing at Pixel Pulse!",
-          "",
-          "We loved having you and hope you had an amazing time taking on our immersive challenges.",
-          "",
-          "💬 Help Us Level Up",
-          "",
-          "Your feedback helps us create an even better experience for every player.",
-          "",
-          "Share your feedback:",
-          feedbackUrl,
-          "",
-          "🎁 Enjoy a FREE 60-Minute Play Pass",
-          "",
-          "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
-          "",
-          "Complete the feedback form today and get ready for your next adventure!",
-          "",
-          "Book your next visit:",
-          bookingLink,
-          "",
-          "Thank you for being part of the Pixel Pulse community.",
-          "",
-          "Skip the Screen. Enter the Challenge.",
-          "",
-          "See you again soon!",
-          "",
-          "The Pixel Pulse Team",
-          "Vaughan, Ontario",
-          websiteLink,
-          "",
-          "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
-        ].filter(Boolean).join("\n")
+      ? thankYouText || defaultThankYouText
       : confirmationEmailText
       ? [
           partyId ? `Party ID: ${partyId}` : "",
@@ -363,7 +382,9 @@ export async function POST(request) {
         ].filter(Boolean).join("\n");
 
     const html = sendThankYou
-      ? renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId })
+      ? thankYouText
+        ? renderCustomThankYouHtml({ text: thankYouText, partyId })
+        : renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `

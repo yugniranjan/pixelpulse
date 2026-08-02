@@ -16,6 +16,7 @@ import {
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "./lib/constant";
 import SectionHeading from "./components/home/SectionHeading";
+import ExploreChallengesCarousel from "./components/home/ExploreChallengesCarousel";
 import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
 import VrTeaserModal from "./components/model/VrTeaserModal";
@@ -949,43 +950,7 @@ const Home = async () => {
         {gamesHeading.subtitle && (
           <p className="ppp-section__sub">{gamesHeading.subtitle}</p>
         )}
-        <ul className="ppp-attractions__grid ppp-attractions__carousel" aria-label="All game rooms">
-          {homepageGames.map(({ title, body, meta, image, imageAlt, href }, i) => {
-            return (
-            <li key={i} className="ppp-attractions__item">
-              <Link
-                href={href}
-                target={href.startsWith("http") ? "_blank" : undefined}
-                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                prefetch={!href.startsWith("http")}
-              >
-                <article className="ppp-attraction-card">
-                  <figure className="ppp-attraction-card__fig">
-                    {image && (
-                      <Image
-                        src={image}
-                        width={400}
-                        height={260}
-                        alt={imageAlt || title}
-                        unoptimized
-                        className="ppp-attraction-card__img"
-                      />
-                    )}
-                    <div className="ppp-attraction-card__overlay">
-                      <h3 className="ppp-attraction-card__title">
-                        {title}
-                      </h3>
-                      {body && <p className="ppp-attraction-card__body">{body}</p>}
-                      {meta && <span className="ppp-attraction-card__meta">{meta}</span>}
-                    </div>
-                  </figure>
-                </article>
-              </Link>
-            </li>
-          );
-          })}
-        </ul>
-
+        <ExploreChallengesCarousel games={homepageGames} />
       </div>
     </section>
   ) : null;

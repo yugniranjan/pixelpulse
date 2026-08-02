@@ -550,6 +550,119 @@
   color: #b42318;
 }
 
+.gift-email-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 8, 16, 0.62);
+}
+
+.gift-email-modal {
+  display: grid;
+  gap: 18px;
+  width: min(960px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: auto;
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  padding: 22px;
+  background: #ffffff;
+  color: #101828;
+  box-shadow: 0 24px 70px rgba(16, 24, 40, 0.24);
+}
+
+.gift-email-modal__head,
+.gift-email-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.gift-email-modal__head h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.gift-email-modal__head span,
+.gift-email-grid label span,
+.gift-email-content span {
+  color: #475467;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.gift-email-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gift-email-grid label,
+.gift-email-content {
+  display: grid;
+  gap: 6px;
+}
+
+.gift-email-grid input,
+.gift-email-content textarea {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font: inherit;
+}
+
+.gift-email-content textarea {
+  min-height: 320px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.gift-email-note {
+  margin: 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #eef4ff;
+  color: #175cd3;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.gift-email-actions {
+  justify-content: flex-end;
+}
+
+.gift-email-actions button,
+.gift-email-modal__head button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #eef4ff;
+  color: #175cd3;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.gift-email-actions button[type="submit"] {
+  background: #a4cf5f;
+  color: #050810;
+}
+
+.gift-email-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 @media print {
   body * {
     visibility: hidden;
@@ -595,6 +708,10 @@
   }
 
   .gift-admin__segmented {
+    grid-template-columns: 1fr;
+  }
+
+  .gift-email-grid {
     grid-template-columns: 1fr;
   }
 
