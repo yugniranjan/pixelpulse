@@ -9,6 +9,7 @@ import "../../styles/admin-gift-cards.css";
 const GIFT_CARD_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const GIFT_CARD_BACKGROUND = "/assets/images/gift-cards/gameplay-bg.jpg";
 const GIFT_CARD_WEBSITE_URL = "https://www.pixelpulseplay.ca";
+const GIFT_CARD_VALIDITY_TEXT = "Valid for 30 days from issue. Terms and conditions apply.";
 
 const PASS_OPTIONS = [
   {
@@ -85,14 +86,6 @@ function shortDate(value = "") {
   return Number.isNaN(date.getTime())
     ? String(value).slice(0, 10)
     : date.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function safeText(value = "") {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 function loadCardImage(src) {
@@ -295,6 +288,9 @@ async function renderGiftCardPng(pass, fields) {
   ctx.fillStyle = accent;
   ctx.font = "900 32px Arial";
   ctx.fillText(fields.code || `${pass.codePrefix}-XXXXXX`, padding + 48, 974);
+  ctx.fillStyle = "#8b96a8";
+  ctx.font = "800 18px Arial";
+  ctx.fillText(GIFT_CARD_VALIDITY_TEXT, padding + 48, 1000);
 
   const bars = [60, 100, 40, 80, 55, 90, 30, 70, 100, 50, 72, 44];
   bars.forEach((barHeight, index) => {
@@ -344,6 +340,7 @@ function buildGiftCardEmailText({ recipientName, pass, fields }) {
     fields.sender ? `From: ${fields.sender}` : "",
     "",
     "Your gift card is attached to this email. Bring the redemption code with you when you visit.",
+    GIFT_CARD_VALIDITY_TEXT,
     "",
     "Skip the Screen. Enter the Challenge.",
     "",
@@ -404,6 +401,8 @@ function GiftCardPreview({ pass, fields }) {
         </div>
         <Barcode />
       </div>
+
+      <p className="gift-card__validity">{GIFT_CARD_VALIDITY_TEXT}</p>
 
       <div className="gift-card__foot">
         <div>
@@ -483,35 +482,6 @@ function GiftCardEmailModal({ draft, onChange, onClose, onSend, sending, error, 
       </form>
     </div>
   );
-}
-
-function standaloneHtml(pass, fields) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Pulse Play Gift Card - ${pass.minutes} Min</title>
-<style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f2f5f8;font-family:Arial,sans-serif;padding:32px}.card{--accent:${pass.accent};width:min(420px,100%);background:linear-gradient(180deg,rgba(8,10,14,.72),rgba(16,20,27,.94)),radial-gradient(520px 260px at 8% -10%,rgba(164,207,95,.14),transparent 62%),url("https://www.pixelpulseplay.ca${GIFT_CARD_BACKGROUND}"),linear-gradient(180deg,#161c25,#10141b);background-size:auto,auto,cover,auto;background-position:center,center,center top,center;border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -25px #000;position:relative}.card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;opacity:.28}.inner{position:relative;padding:24px}.top,.stub,.foot,.names{display:flex;justify-content:space-between;gap:16px}.top{position:relative;z-index:1;padding:24px 24px 0}.brand img{display:block;width:92px;height:auto}.accent{color:var(--accent)}.tag{border:1px solid var(--accent);color:var(--accent);background:rgba(164,207,95,.12);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.eyebrow{margin-top:30px;color:#8b96a8;font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.minutes{display:flex;align-items:flex-end;gap:8px;line-height:.8}.minutes strong{font-size:104px}.minutes span{color:var(--accent);font-weight:900;font-size:24px;text-transform:uppercase;padding-bottom:12px}.badge{display:inline-flex;border-radius:5px;background:var(--accent);color:#050810;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.line{height:4px;margin:16px 0 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent) 0 68%,rgba(242,245,248,.24) 68% 100%);box-shadow:0 0 10px rgba(164,207,95,.24)}.card h1{margin:8px 0 4px;font-size:24px;text-transform:uppercase}.card p{margin:0;color:#8b96a8;font-size:13px;line-height:1.5}.divider{margin:22px -24px;border-top:1px dashed rgba(255,255,255,.2)}.names div,.stub div,.foot div{display:grid;gap:5px}.names span,.stub span{font-size:10px;color:#8b96a8;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.names strong,.stub strong{font-size:14px}.barcode{display:flex;align-items:flex-end;gap:2px;height:34px}.barcode span{width:2px;background:var(--accent)}.foot{margin:20px -24px -24px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.08)}.foot span{font-size:13px;font-weight:750}.foot small{color:#8b96a8;font-size:10px;font-weight:700;line-height:1.25}.foot strong{color:var(--accent);font-size:24px}
-</style>
-</head>
-<body>
-<article class="card">
-<div class="top"><div class="brand"><img src="https://www.pixelpulseplay.ca/assets/images/logo.png" alt="Pixel Pulse Play"></div><div class="tag">Gift Card</div></div>
-<div class="inner">
-<div class="eyebrow">Session Length</div>
-<div class="minutes"><strong>${pass.minutes}</strong><span>Min</span></div>
-<div class="line"></div>
-${pass.badge ? `<div class="badge">${safeText(pass.badge)}</div>` : ""}
-<h1>${safeText(pass.name)}</h1><p>${safeText(pass.tagline)}</p>
-<div class="divider"></div>
-<div class="names"><div><span>From</span><strong>${safeText(fields.sender || "Pixel Pulse Friend")}</strong></div></div>
-<div class="stub" style="margin-top:20px"><div><span>Redemption Code</span><strong class="accent">${safeText(fields.code || `${pass.codePrefix}-XXXXXX`)}</strong></div><div class="barcode">${[60,100,40,80,55,90,30,70,100,50,72,44].map((h) => `<span style="height:${h}%"></span>`).join("")}</div></div>
-<div class="foot"><div><span>pixelpulseplay.ca</span><small>${safeText(GIFT_CARD_ADDRESS)}</small></div><strong>${money(fields.price)}</strong></div>
-</div></article>
-</body>
-</html>`;
 }
 
 export default function AdminGiftCardsPage() {
@@ -861,44 +831,6 @@ export default function AdminGiftCardsPage() {
     }
   }
 
-  function downloadCard() {
-    const html = standaloneHtml(selectedPass, fields);
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `pixel-pulse-gift-card-${selectedPass.minutes}-min.html`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  async function downloadImage() {
-    setStatus("");
-    setError("");
-
-    try {
-      const blob = await renderGiftCardPng(selectedPass, fields);
-      if (!blob) {
-        setError("Unable to create gift card image.");
-        return;
-      }
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `pixel-pulse-gift-card-${selectedPass.minutes}-min.png`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-      setStatus("Gift card image downloaded.");
-    } catch (imageError) {
-      setError("Unable to create gift card image.");
-    }
-  }
-
   return (
     <AdminShell>
       <div className="gift-admin">
@@ -963,7 +895,7 @@ export default function AdminGiftCardsPage() {
               <p className="gift-admin__notice">Editing an active saved gift card. Update to save changes, or cancel to create a new card.</p>
             ) : null}
             {!isCurrentCardSaved ? (
-              <p className="gift-admin__notice">Save this card before printing or sharing so the redemption code is tracked.</p>
+              <p className="gift-admin__notice">Save this card before emailing it so the redemption code is tracked.</p>
             ) : currentSavedRecord?.status === "redeemed" ? (
               <p className="gift-admin__notice gift-admin__notice--redeemed">This code is already redeemed.</p>
             ) : null}
@@ -977,15 +909,6 @@ export default function AdminGiftCardsPage() {
                   Cancel Edit
                 </button>
               ) : null}
-              <button type="button" className="gift-admin__secondary" onClick={() => window.print()} disabled={!isCurrentCardIssueable}>
-                Print
-              </button>
-              <button type="button" className="gift-admin__secondary" onClick={downloadCard} disabled={!isCurrentCardIssueable}>
-                Download HTML
-              </button>
-              <button type="button" className="gift-admin__secondary" onClick={downloadImage} disabled={!isCurrentCardIssueable}>
-                Download PNG
-              </button>
               <button type="button" className="gift-admin__secondary" onClick={openCurrentGiftCardEmail} disabled={!isCurrentCardIssueable}>
                 Email Gift Card
               </button>

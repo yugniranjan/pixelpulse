@@ -54,6 +54,9 @@ function renderGiftCardEmailHtml(message = "") {
             if (line === "The Pixel Pulse Team") {
               return `<p style="margin:18px 0 6px;"><strong style="color:#111827;">${escapeHtml(line)}</strong></p>`;
             }
+            if (line.startsWith("Valid for 30 days from issue.")) {
+              return `<p style="margin:4px 0 16px;color:#6b7280;font-size:13px;"><em>${escapeHtml(line)}</em></p>`;
+            }
             if (/^https?:\/\//i.test(line)) {
               return `<p style="margin:0 0 12px;"><a href="${escapeHtml(line)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(line)}</a></p>`;
             }
@@ -72,7 +75,7 @@ function renderGiftCardEmailHtml(message = "") {
             </table>
           ` : ""}
           <div style="margin:22px 0 0;padding:14px 16px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;color:#374151;">
-            The gift card image is attached to this email. Please bring the redemption code when you visit.
+            The gift card image is attached to this email. Please bring the redemption code when you visit. Valid for 30 days from issue. Terms and conditions apply.
           </div>
         </div>
       </div>

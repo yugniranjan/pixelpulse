@@ -769,14 +769,11 @@ export default function AdminWaiversPage() {
   function startThankYouEmail(waiver) {
     const firstName = waiver.primary?.firstName || "";
     const partyId = waiver.visit?.partyId || "";
-    const feedbackUrl = partyId
-      ? `${DEFAULT_FEEDBACK_URL}?partyId=${encodeURIComponent(partyId)}`
-      : DEFAULT_FEEDBACK_URL;
     const draft = {
       email: waiver.primary?.email || "",
       firstName,
       partyId,
-      feedbackUrl,
+      feedbackUrl: DEFAULT_FEEDBACK_URL,
       websiteLink: DEFAULT_WEBSITE_LINK,
     };
 

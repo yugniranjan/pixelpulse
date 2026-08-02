@@ -417,6 +417,14 @@
   opacity: 0.88;
 }
 
+.gift-card__validity {
+  margin: -2px 24px 13px;
+  color: #b8c1cf;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
 .gift-card__foot {
   display: flex;
   align-items: center;
