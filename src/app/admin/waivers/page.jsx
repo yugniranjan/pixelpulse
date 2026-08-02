@@ -7,7 +7,6 @@ import "../../styles/admin-player-info.css";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
-const DEFAULT_BOOKING_LINK = "https://www.pixelpulseplay.ca/booking?type=ticket";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
 const PLAYER_SORT_OPTIONS = [
   { value: "newest", label: "Newest players" },
@@ -127,7 +126,7 @@ function makeEditForm(waiver) {
   };
 }
 
-function buildThankYouEmailText({ firstName, feedbackUrl, bookingLink, websiteLink, partyId }) {
+function buildThankYouEmailText({ firstName, feedbackUrl, websiteLink, partyId }) {
   return [
     firstName ? `Hi ${firstName},` : "Hi,",
     "",
@@ -149,20 +148,13 @@ function buildThankYouEmailText({ firstName, feedbackUrl, bookingLink, websiteLi
     "",
     "Complete the feedback form today and get ready for your next adventure!",
     "",
-    "Book your next visit:",
-    bookingLink,
-    "",
     "Thank you for being part of the Pixel Pulse community.",
-    "",
-    "Skip the Screen. Enter the Challenge.",
     "",
     "See you again soon!",
     "",
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
     websiteLink,
-    "",
-    "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
   ].filter(Boolean).join("\n");
 }
 
@@ -259,7 +251,6 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
           <h3>Links</h3>
           <div className="waiver-edit-grid">
             <label><span>Feedback link</span><input required value={draft.feedbackUrl} onChange={(event) => update("feedbackUrl", event.target.value)} /></label>
-            <label><span>Booking link</span><input required value={draft.bookingLink} onChange={(event) => update("bookingLink", event.target.value)} /></label>
             <label><span>Website</span><input value={draft.websiteLink} onChange={(event) => update("websiteLink", event.target.value)} /></label>
           </div>
         </section>
@@ -786,7 +777,6 @@ export default function AdminWaiversPage() {
       firstName,
       partyId,
       feedbackUrl,
-      bookingLink: DEFAULT_BOOKING_LINK,
       websiteLink: DEFAULT_WEBSITE_LINK,
     };
 
@@ -822,7 +812,6 @@ export default function AdminWaiversPage() {
           firstName: thankYouDraft.firstName,
           partyId: thankYouDraft.partyId,
           feedbackUrl: thankYouDraft.feedbackUrl,
-          bookingLink: thankYouDraft.bookingLink,
           websiteLink: thankYouDraft.websiteLink,
           thankYouText: thankYouDraft.emailText,
         }),

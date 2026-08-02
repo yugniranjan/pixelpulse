@@ -41,6 +41,64 @@ function textToHtml(value = "") {
   return escapeHtml(value).replace(/\n/g, "<br />");
 }
 
+function renderEmailButton({ href, label, variant = "dark" }) {
+  const background = variant === "lime" ? "#a4cf5f" : "#111827";
+  const color = variant === "lime" ? "#111827" : "#ffffff";
+  return `
+    <p style="margin:18px 0;">
+      <a href="${escapeHtml(href)}" style="display:inline-block;border-radius:10px;background:${background};color:${color};padding:13px 18px;font-weight:800;text-decoration:none;">${escapeHtml(label)}</a>
+    </p>
+  `;
+}
+
+function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
+  const feedback = cleanText(feedbackUrl);
+  const website = cleanText(websiteLink);
+  const lines = String(text || "").split("\n");
+  let html = "";
+  let skipNextFeedbackUrl = false;
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    if (feedback && trimmed === feedback && skipNextFeedbackUrl) {
+      skipNextFeedbackUrl = false;
+      return;
+    }
+
+    if (trimmed === "Share your feedback:") {
+      skipNextFeedbackUrl = true;
+      html += `<p style="margin:0 0 8px;"><strong style="color:#111827;">${escapeHtml(trimmed)}</strong></p>`;
+      html += renderEmailButton({ href: feedback, label: "Share Feedback" });
+      return;
+    }
+
+    if (trimmed === "💬 Help Us Level Up" || trimmed === "🎁 Enjoy a FREE 60-Minute Play Pass") {
+      html += `<h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">${escapeHtml(trimmed)}</h2>`;
+      return;
+    }
+
+    if (trimmed === "Thanks for Playing at Pixel Pulse!") {
+      return;
+    }
+
+    if (website && trimmed === website) {
+      html += `<p style="margin:0;color:#6b7280;"><a href="${escapeHtml(website)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(website)}</a></p>`;
+      return;
+    }
+
+    if (trimmed === "The Pixel Pulse Team") {
+      html += `<p style="margin:0 0 6px;"><strong style="color:#111827;">${escapeHtml(trimmed)}</strong></p>`;
+      return;
+    }
+
+    html += `<p style="margin:0 0 14px;color:#374151;">${escapeHtml(trimmed)}</p>`;
+  });
+
+  return html;
+}
+
 function withPackageInclusions(emailText = "") {
   const text = cleanText(emailText);
   if (!text || text.includes("Package Inclusions")) return text;
@@ -211,7 +269,7 @@ function renderConfirmationHtml({ emailText, partyId }) {
   `;
 }
 
-function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId }) {
+function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
 
   return `
@@ -229,9 +287,7 @@ function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, 
           <h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">💬 Help Us Level Up</h2>
           <p style="margin:0 0 14px;">Your feedback helps us create an even better experience for every player.</p>
           <p style="margin:0 0 8px;"><strong style="color:#111827;">Share your feedback:</strong></p>
-          <p style="margin:18px 0;">
-            <a href="${escapeHtml(feedbackUrl)}" style="display:inline-block;border-radius:8px;background:#111827;color:#ffffff;padding:13px 18px;font-weight:700;text-decoration:none;">${escapeHtml(feedbackUrl)}</a>
-          </p>
+          ${renderEmailButton({ href: feedbackUrl, label: "Share Feedback" })}
 
           <div style="margin:24px 0;padding:18px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;">
             <h2 style="margin:0 0 10px;font-size:20px;line-height:1.25;color:#111827;">🎁 Enjoy a FREE 60-Minute Play Pass</h2>
@@ -239,27 +295,20 @@ function renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, 
             <p style="margin:0;">Complete the feedback form today and get ready for your next adventure!</p>
           </div>
 
-          <p style="margin:0 0 8px;"><strong style="color:#111827;">Book your next visit:</strong></p>
-          <p style="margin:18px 0;">
-            <a href="${escapeHtml(bookingLink)}" style="display:inline-block;border-radius:8px;background:#a4cf5f;color:#111827;padding:13px 18px;font-weight:800;text-decoration:none;">${escapeHtml(bookingLink)}</a>
-          </p>
-
           <p style="margin:22px 0 8px;">Thank you for being part of the Pixel Pulse community.</p>
-          <p style="margin:0 0 18px;"><strong style="color:#111827;">Skip the Screen. Enter the Challenge.</strong></p>
           <p style="margin:0 0 18px;">See you again soon!</p>
           <p style="margin:0 0 18px;"><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
           <p style="margin:0;color:#6b7280;">
             Vaughan, Ontario<br />
             <a href="${escapeHtml(websiteLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(websiteLink)}</a>
           </p>
-          <p style="margin:18px 0 0;color:#6b7280;font-size:13px;"><em>*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.</em></p>
         </div>
       </div>
     </div>
   `;
 }
 
-function renderCustomThankYouHtml({ text, partyId }) {
+function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId }) {
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
@@ -269,7 +318,7 @@ function renderCustomThankYouHtml({ text, partyId }) {
           ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
         </div>
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
-          ${textToHtml(text)}
+          ${renderThankYouTextHtml({ text, feedbackUrl, websiteLink })}
         </div>
       </div>
     </div>
@@ -284,7 +333,6 @@ export async function POST(request) {
     const confirmationEmailText = cleanText(body?.confirmationEmailText);
     const feedbackUrl = cleanText(body?.feedbackUrl);
     const firstName = cleanText(body?.firstName);
-    const bookingLink = cleanText(body?.bookingLink) || "https://www.pixelpulseplay.ca/booking?type=ticket";
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
     const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
@@ -351,20 +399,13 @@ export async function POST(request) {
       "",
       "Complete the feedback form today and get ready for your next adventure!",
       "",
-      "Book your next visit:",
-      bookingLink,
-      "",
       "Thank you for being part of the Pixel Pulse community.",
-      "",
-      "Skip the Screen. Enter the Challenge.",
       "",
       "See you again soon!",
       "",
       "The Pixel Pulse Team",
       "Vaughan, Ontario",
       websiteLink,
-      "",
-      "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
     ].filter(Boolean).join("\n");
 
     const text = sendThankYou
@@ -383,8 +424,8 @@ export async function POST(request) {
 
     const html = sendThankYou
       ? thankYouText
-        ? renderCustomThankYouHtml({ text: thankYouText, partyId })
-        : renderThankYouHtml({ firstName, feedbackUrl, bookingLink, websiteLink, partyId })
+        ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl, websiteLink, partyId })
+        : renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `

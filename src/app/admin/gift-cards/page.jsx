@@ -8,7 +8,6 @@ import "../../styles/admin-gift-cards.css";
 
 const GIFT_CARD_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const GIFT_CARD_BACKGROUND = "/assets/images/gift-cards/gameplay-bg.jpg";
-const GIFT_CARD_BOOKING_URL = "https://www.pixelpulseplay.ca/booking?type=ticket";
 const GIFT_CARD_WEBSITE_URL = "https://www.pixelpulseplay.ca";
 
 const PASS_OPTIONS = [
@@ -345,9 +344,6 @@ function buildGiftCardEmailText({ recipientName, pass, fields }) {
     fields.sender ? `From: ${fields.sender}` : "",
     "",
     "Your gift card is attached to this email. Bring the redemption code with you when you visit.",
-    "",
-    "Book your visit:",
-    GIFT_CARD_BOOKING_URL,
     "",
     "Skip the Screen. Enter the Challenge.",
     "",
@@ -839,6 +835,7 @@ export default function AdminGiftCardsPage() {
         body: JSON.stringify({
           subject: emailDraft.subject,
           message: emailDraft.message,
+          template: "gift-card",
           recipients: [{ email: emailDraft.email, name: emailDraft.recipientName }],
           attachments: [
             {

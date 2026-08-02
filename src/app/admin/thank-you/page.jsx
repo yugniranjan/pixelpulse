@@ -6,7 +6,6 @@ import "../../styles/admin-waivers.css";
 import AdminShell from "@/components/AdminShell";
 
 const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
-const DEFAULT_BOOKING_LINK = "https://www.pixelpulseplay.ca/booking?type=ticket";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
 
 function Field({ label, required = false, children }) {
@@ -42,20 +41,13 @@ function buildThankYouPreview(form) {
     "",
     "Complete the feedback form today and get ready for your next adventure!",
     "",
-    "Book your next visit:",
-    form.bookingLink,
-    "",
     "Thank you for being part of the Pixel Pulse community.",
-    "",
-    "Skip the Screen. Enter the Challenge.",
     "",
     "See you again soon!",
     "",
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
     form.websiteLink,
-    "",
-    "*One complimentary 60-minute play pass per family. Valid for 30 days from issue. Terms apply.",
   ].filter((line) => line !== null && line !== undefined).join("\n");
 }
 
@@ -65,7 +57,6 @@ export default function AdminThankYouPage() {
     email: "",
     partyId: "",
     feedbackUrl: DEFAULT_FEEDBACK_URL,
-    bookingLink: DEFAULT_BOOKING_LINK,
     websiteLink: DEFAULT_WEBSITE_LINK,
   });
   const [status, setStatus] = useState("");
@@ -96,7 +87,6 @@ export default function AdminThankYouPage() {
       payload.append("firstName", form.firstName);
       payload.append("partyId", form.partyId);
       payload.append("feedbackUrl", form.feedbackUrl);
-      payload.append("bookingLink", form.bookingLink);
       payload.append("websiteLink", form.websiteLink);
       attachments.forEach((file) => {
         payload.append("attachments", file);
@@ -173,13 +163,6 @@ export default function AdminThankYouPage() {
                   onChange={(event) => updateField("feedbackUrl", event.target.value)}
                 />
               </Field>
-              <Field label="Booking link" required>
-                <input
-                  required
-                  value={form.bookingLink}
-                  onChange={(event) => updateField("bookingLink", event.target.value)}
-                />
-              </Field>
               <Field label="Website">
                 <input
                   value={form.websiteLink}
@@ -188,7 +171,7 @@ export default function AdminThankYouPage() {
               </Field>
             </div>
             <p className="invite-admin-help">
-              Feedback and booking links are included in the thank-you email.
+              The feedback link is sent as a button in the thank-you email.
             </p>
           </section>
 
@@ -225,11 +208,6 @@ export default function AdminThankYouPage() {
               <span>Feedback Link</span>
               <a href={form.feedbackUrl} target="_blank" rel="noopener noreferrer">{form.feedbackUrl}</a>
               <button type="button" onClick={() => copyText(form.feedbackUrl)}>Copy</button>
-            </div>
-            <div>
-              <span>Booking Link</span>
-              <a href={form.bookingLink} target="_blank" rel="noopener noreferrer">{form.bookingLink}</a>
-              <button type="button" onClick={() => copyText(form.bookingLink)}>Copy</button>
             </div>
             <div>
               <span>Thank You Email Text</span>
