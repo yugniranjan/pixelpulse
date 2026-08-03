@@ -768,10 +768,12 @@ export default function AdminWaiversPage() {
 
   function startThankYouEmail(waiver) {
     const firstName = waiver.primary?.firstName || "";
+    const name = [waiver.primary?.firstName, waiver.primary?.lastName].filter(Boolean).join(" ");
     const partyId = waiver.visit?.partyId || "";
     const draft = {
       email: waiver.primary?.email || "",
       firstName,
+      name,
       partyId,
       feedbackUrl: DEFAULT_FEEDBACK_URL,
       websiteLink: DEFAULT_WEBSITE_LINK,
@@ -807,6 +809,7 @@ export default function AdminWaiversPage() {
           type: "thank-you",
           email: thankYouDraft.email,
           firstName: thankYouDraft.firstName,
+          name: thankYouDraft.name,
           partyId: thankYouDraft.partyId,
           feedbackUrl: thankYouDraft.feedbackUrl,
           websiteLink: thankYouDraft.websiteLink,

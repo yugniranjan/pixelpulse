@@ -51,6 +51,34 @@ function renderEmailButton({ href, label, variant = "dark" }) {
   `;
 }
 
+function appendFeedbackRecipient(feedbackUrl, { name = "", email = "" } = {}) {
+  const base = cleanText(feedbackUrl);
+  if (!base) return "";
+
+  try {
+    const url = new URL(base, "https://www.pixelpulseplay.ca");
+    const recipientName = cleanText(name);
+    const recipientEmail = cleanEmail(email);
+
+    if (recipientName) url.searchParams.set("name", recipientName);
+    if (recipientEmail) url.searchParams.set("email", recipientEmail);
+
+    return /^https?:\/\//i.test(base)
+      ? url.toString()
+      : `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    const separator = base.includes("?") ? "&" : "?";
+    const params = new URLSearchParams();
+    const recipientName = cleanText(name);
+    const recipientEmail = cleanEmail(email);
+
+    if (recipientName) params.set("name", recipientName);
+    if (recipientEmail) params.set("email", recipientEmail);
+
+    return params.toString() ? `${base}${separator}${params.toString()}` : base;
+  }
+}
+
 function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
   const feedback = cleanText(feedbackUrl);
   const website = cleanText(websiteLink);
@@ -333,6 +361,7 @@ export async function POST(request) {
     const confirmationEmailText = cleanText(body?.confirmationEmailText);
     const feedbackUrl = cleanText(body?.feedbackUrl);
     const firstName = cleanText(body?.firstName);
+    const feedbackName = cleanText(body?.name) || firstName;
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
     const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
@@ -351,6 +380,10 @@ export async function POST(request) {
         { status: 400 },
       );
     }
+
+    const personalizedFeedbackUrl = sendThankYou
+      ? appendFeedbackRecipient(feedbackUrl, { name: feedbackName, email: to })
+      : feedbackUrl;
 
     if (!sendThankYou && (!emailText || !inviteUrl)) {
       return NextResponse.json(
@@ -391,7 +424,7 @@ export async function POST(request) {
       "Your feedback helps us create an even better experience for every player.",
       "",
       "Share your feedback:",
-      feedbackUrl,
+      personalizedFeedbackUrl,
       "",
       "🎁 Enjoy a FREE 60-Minute Play Pass",
       "",
@@ -409,7 +442,9 @@ export async function POST(request) {
     ].filter(Boolean).join("\n");
 
     const text = sendThankYou
-      ? thankYouText || defaultThankYouText
+      ? thankYouText
+        ? thankYouText.replaceAll(feedbackUrl, personalizedFeedbackUrl)
+        : defaultThankYouText
       : confirmationEmailText
       ? [
           partyId ? `Party ID: ${partyId}` : "",
@@ -424,8 +459,8 @@ export async function POST(request) {
 
     const html = sendThankYou
       ? thankYouText
-        ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl, websiteLink, partyId })
-        : renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId })
+        ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
+        : renderThankYouHtml({ firstName, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId })
       : `

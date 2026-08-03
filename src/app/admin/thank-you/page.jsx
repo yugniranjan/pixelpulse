@@ -85,6 +85,7 @@ export default function AdminThankYouPage() {
       payload.append("type", "thank-you");
       payload.append("email", form.email);
       payload.append("firstName", form.firstName);
+      payload.append("name", form.firstName);
       payload.append("partyId", form.partyId);
       payload.append("feedbackUrl", form.feedbackUrl);
       payload.append("websiteLink", form.websiteLink);
