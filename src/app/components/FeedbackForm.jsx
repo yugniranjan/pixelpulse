@@ -170,7 +170,6 @@ const DEFAULT_FORM = {
   name: "",
   email: "",
   phone: "",
-  visitDate: "",
   heardAboutUs: "",
   visitReasons: [],
   rooms: [],
@@ -244,7 +243,6 @@ export default function FeedbackForm({ initial = {} }) {
     name: cleanInitial(initial.name),
     email: cleanInitial(initial.email),
     phone: cleanInitial(initial.phone),
-    visitDate: cleanInitial(initial.visitDate),
     partyId: cleanInitial(initial.partyId),
     heardAboutUs: cleanInitial(initial.heardAboutUs),
   }));
@@ -416,10 +414,6 @@ export default function FeedbackForm({ initial = {} }) {
               <label>
                 <span>Email *</span>
                 <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="you@example.com" required />
-              </label>
-              <label>
-                <span>Visit date</span>
-                <input type="date" value={form.visitDate} onChange={(event) => updateField("visitDate", event.target.value)} />
               </label>
               <label>
                 <span>Phone optional</span>

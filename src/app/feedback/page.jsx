@@ -27,7 +27,6 @@ export default async function FeedbackPage({ searchParams }) {
     name: searchValue(params, "name"),
     email: searchValue(params, "email"),
     phone: searchValue(params, "phone"),
-    visitDate: searchValue(params, "visitDate") || searchValue(params, "date"),
     partyId: searchValue(params, "partyId"),
   };
 
