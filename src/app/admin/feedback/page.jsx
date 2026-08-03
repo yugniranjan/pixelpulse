@@ -87,6 +87,7 @@ export default function AdminFeedbackPage() {
   const [source, setSource] = useState("");
   const [minRating, setMinRating] = useState("");
   const [issuingId, setIssuingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const [status, setStatus] = useState("");
 
   async function loadFeedback() {
@@ -141,6 +142,34 @@ export default function AdminFeedbackPage() {
       setError("Unable to issue gift card.");
     } finally {
       setIssuingId("");
+    }
+  }
+
+  async function deleteFeedback(item) {
+    const confirmed = window.confirm(`Delete feedback from ${item.name || item.email || "this guest"}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeletingId(item.id);
+    setError("");
+    setStatus("");
+
+    try {
+      const response = await fetch(`/api/admin/feedback?id=${encodeURIComponent(item.id)}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to delete feedback.");
+        return;
+      }
+
+      setFeedback((current) => current.filter((row) => row.id !== item.id));
+      setStatus(`Deleted feedback from ${item.name || item.email || "guest"}.`);
+    } catch (deleteError) {
+      setError("Unable to delete feedback.");
+    } finally {
+      setDeletingId("");
     }
   }
 
@@ -414,6 +443,17 @@ export default function AdminFeedbackPage() {
                       {issuingId === item.id ? "Sending..." : "Send 60-Min Gift Card"}
                     </button>
                   )}
+                  <button
+                    type="button"
+                    className="feedback-admin__delete-button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      deleteFeedback(item);
+                    }}
+                    disabled={deletingId === item.id}
+                  >
+                    {deletingId === item.id ? "Deleting..." : "Delete"}
+                  </button>
                   <span className="feedback-admin__score">{item.averageScore || "0.0"} / 5</span>
                   <span className="feedback-admin__toggle">Details</span>
                 </div>

@@ -227,6 +227,24 @@ export async function listFeedbackSubmissions({ q = "", source = "", minRating =
   return result.rows.map(normalizeRow);
 }
 
+export async function deleteFeedbackSubmission(id = "") {
+  if (!hasFeedbackStore()) return { error: "Feedback database is not configured." };
+
+  const feedbackId = cleanText(id);
+  if (!feedbackId) return { error: "Feedback id is required." };
+
+  await ensureTable();
+
+  const result = await query(
+    "delete from feedback_submissions where id = $1 returning id, name, email",
+    [feedbackId],
+  );
+
+  if (!result.rows[0]) return { notFound: true, error: "Feedback submission not found." };
+
+  return { deleted: result.rows[0] };
+}
+
 function feedbackGiftCardCode() {
   return `PPP-60-FB-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 }

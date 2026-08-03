@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { hasFeedbackStore, issueFeedbackGiftCard, listFeedbackSubmissions } from "@/lib/feedback";
+import { deleteFeedbackSubmission, hasFeedbackStore, issueFeedbackGiftCard, listFeedbackSubmissions } from "@/lib/feedback";
 import { isEmail, mailerConfigured, sendBrandedEmail } from "@/lib/mailer";
 
 export const dynamic = "force-dynamic";
@@ -138,4 +138,27 @@ export async function PATCH(request) {
     feedback: result.feedback,
     giftCard: result.giftCard,
   });
+}
+
+export async function DELETE(request) {
+  if (!hasFeedbackStore()) {
+    return NextResponse.json(
+      { error: "Feedback database is not configured." },
+      { status: 503 },
+    );
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id") || "";
+
+  try {
+    const result = await deleteFeedbackSubmission(id);
+    if (result.notFound) return NextResponse.json({ error: result.error }, { status: 404 });
+    if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
+
+    return NextResponse.json({ success: true, deleted: result.deleted });
+  } catch (error) {
+    console.error("delete feedback failed:", error);
+    return NextResponse.json({ error: "Unable to delete feedback." }, { status: 500 });
+  }
 }
