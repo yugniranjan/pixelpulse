@@ -289,8 +289,7 @@ export async function issueFeedbackGiftCard(id = "") {
     `
       update feedback_submissions
       set gift_card_id = $2,
-          gift_card_code = $3,
-          gift_card_sent_at = now()
+          gift_card_code = $3
       where id = $1
       returning *
     `,
@@ -301,4 +300,27 @@ export async function issueFeedbackGiftCard(id = "") {
     feedback: normalizeRow(updated.rows[0]),
     giftCard: created,
   };
+}
+
+export async function markFeedbackGiftCardSent(id = "") {
+  if (!hasFeedbackStore()) return { error: "Feedback database is not configured." };
+
+  const feedbackId = cleanText(id);
+  if (!feedbackId) return { error: "Feedback id is required." };
+
+  await ensureTable();
+
+  const result = await query(
+    `
+      update feedback_submissions
+      set gift_card_sent_at = now()
+      where id = $1
+      returning *
+    `,
+    [feedbackId],
+  );
+
+  if (!result.rows[0]) return { notFound: true, error: "Feedback submission not found." };
+
+  return { feedback: normalizeRow(result.rows[0]) };
 }

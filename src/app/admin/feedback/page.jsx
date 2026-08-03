@@ -47,6 +47,25 @@ const CHANNEL_GROUPS = {
   Other: "Other",
 };
 
+const DEFAULT_GIFT_CARD_SUBJECT = "Your FREE 60-Minute Pixel Pulse Play Pass";
+const DEFAULT_GIFT_CARD_MESSAGE = [
+  "Hi {name},",
+  "",
+  "Thanks for sharing your feedback with Pixel Pulse!",
+  "",
+  "As promised, here is your FREE 60-Minute Play Pass for your next visit.",
+  "",
+  "Redemption code: {code}",
+  "Value: FREE 60-Minute Play Pass",
+  "From: Pixel Pulse Team",
+  "",
+  "Valid for 30 days from issue. Terms and conditions apply.",
+  "",
+  "The Pixel Pulse Team",
+  "Vaughan, Ontario",
+  "https://www.pixelpulseplay.ca",
+].join("\n");
+
 function formatDate(value) {
   if (!value) return "Not recorded";
   const date = new Date(value);
@@ -79,6 +98,13 @@ function countValues(values = []) {
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
 }
 
+function renderPreview(value = "", item = {}) {
+  return String(value || "")
+    .replace(/\{name\}/gi, item.name || "there")
+    .replace(/\{email\}/gi, item.email || "")
+    .replace(/\{code\}/gi, item.giftCardCode || "Generated when sent");
+}
+
 export default function AdminFeedbackPage() {
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +114,8 @@ export default function AdminFeedbackPage() {
   const [minRating, setMinRating] = useState("");
   const [issuingId, setIssuingId] = useState("");
   const [deletingId, setDeletingId] = useState("");
+  const [giftEmailDraft, setGiftEmailDraft] = useState(null);
+  const [giftEmailError, setGiftEmailError] = useState("");
   const [status, setStatus] = useState("");
 
   async function loadFeedback() {
@@ -116,21 +144,59 @@ export default function AdminFeedbackPage() {
     }
   }
 
-  async function issueGiftCard(item) {
+  function openGiftEmail(item) {
+    setGiftEmailDraft({
+      item,
+      subject: DEFAULT_GIFT_CARD_SUBJECT,
+      message: DEFAULT_GIFT_CARD_MESSAGE,
+      reviewing: false,
+    });
+    setError("");
+    setGiftEmailError("");
+    setStatus("");
+  }
+
+  function updateGiftEmail(field, value) {
+    setGiftEmailDraft((current) => current ? { ...current, [field]: value } : current);
+    setGiftEmailError("");
+  }
+
+  function reviewGiftEmail() {
+    if (!giftEmailDraft?.subject.trim() || !giftEmailDraft?.message.trim()) {
+      setGiftEmailError("Gift card email subject and message are required.");
+      return;
+    }
+    if (!/\{code\}/i.test(giftEmailDraft.message)) {
+      setGiftEmailError("Gift card email message must include the {code} placeholder.");
+      return;
+    }
+    setGiftEmailError("");
+    setGiftEmailDraft((current) => current ? { ...current, reviewing: true } : current);
+  }
+
+  async function issueGiftCard() {
+    if (!giftEmailDraft?.item) return;
+    const item = giftEmailDraft.item;
     setIssuingId(item.id);
     setError("");
+    setGiftEmailError("");
     setStatus("");
 
     try {
       const response = await fetch("/api/admin/feedback", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "issue-gift-card", id: item.id }),
+        body: JSON.stringify({
+          action: "issue-gift-card",
+          id: item.id,
+          emailSubject: giftEmailDraft.subject,
+          emailMessage: giftEmailDraft.message,
+        }),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Unable to issue gift card.");
+        setGiftEmailError(data.error || "Unable to issue gift card.");
         return;
       }
 
@@ -138,8 +204,9 @@ export default function AdminFeedbackPage() {
         current.map((row) => (row.id === data.feedback.id ? data.feedback : row)),
       );
       setStatus(`60-minute gift card sent to ${data.feedback.email}: ${data.giftCard.code}`);
+      setGiftEmailDraft(null);
     } catch (issueError) {
-      setError("Unable to issue gift card.");
+      setGiftEmailError("Unable to issue gift card.");
     } finally {
       setIssuingId("");
     }
@@ -428,7 +495,7 @@ export default function AdminFeedbackPage() {
                   </div>
                 </div>
                 <div className="feedback-admin__summary-actions">
-                  {item.giftCardCode ? (
+                  {item.giftCardCode && item.giftCardSentAt ? (
                     <span className="feedback-admin__gift-status">Gift sent: {item.giftCardCode}</span>
                   ) : (
                     <button
@@ -436,11 +503,11 @@ export default function AdminFeedbackPage() {
                       className="feedback-admin__gift-button"
                       onClick={(event) => {
                         event.preventDefault();
-                        issueGiftCard(item);
+                        openGiftEmail(item);
                       }}
                       disabled={issuingId === item.id || !item.email}
                     >
-                      {issuingId === item.id ? "Sending..." : "Send 60-Min Gift Card"}
+                      {issuingId === item.id ? "Sending..." : item.giftCardCode ? "Review & Send Gift" : "Review Gift Email"}
                     </button>
                   )}
                   <button
@@ -499,6 +566,80 @@ export default function AdminFeedbackPage() {
             </details>
           ))}
         </section>
+
+        {giftEmailDraft ? (
+          <div className="feedback-email-overlay" role="dialog" aria-modal="true" onClick={() => setGiftEmailDraft(null)}>
+            <div className="feedback-email-modal" onClick={(event) => event.stopPropagation()}>
+              <button
+                type="button"
+                className="feedback-email-modal__close"
+                onClick={() => setGiftEmailDraft(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              <h2>Review Gift Card Email</h2>
+              <p className="feedback-email-modal__to">
+                To <strong>{giftEmailDraft.item.email}</strong>
+              </p>
+
+              {giftEmailDraft.reviewing ? (
+                <div className="feedback-email-modal__review">
+                  <div className="feedback-email-modal__banner">
+                    Cross-check the email before sending. The gift card code will be generated when you confirm.
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Subject</dt>
+                      <dd>{renderPreview(giftEmailDraft.subject, giftEmailDraft.item)}</dd>
+                    </div>
+                    <div>
+                      <dt>Message</dt>
+                      <dd className="feedback-email-modal__preview">
+                        {renderPreview(giftEmailDraft.message, giftEmailDraft.item)}
+                      </dd>
+                    </div>
+                  </dl>
+                  {giftEmailError ? <p className="feedback-email-modal__error">{giftEmailError}</p> : null}
+                  <div className="feedback-email-modal__actions">
+                    <button
+                      type="button"
+                      className="feedback-email-modal__ghost"
+                      onClick={() => setGiftEmailDraft((current) => current ? { ...current, reviewing: false } : current)}
+                      disabled={issuingId === giftEmailDraft.item.id}
+                    >
+                      Back to edit
+                    </button>
+                    <button type="button" onClick={issueGiftCard} disabled={issuingId === giftEmailDraft.item.id}>
+                      {issuingId === giftEmailDraft.item.id ? "Sending..." : "Confirm & Send"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <label className="feedback-email-modal__field">
+                    <span>Subject</span>
+                    <input value={giftEmailDraft.subject} onChange={(event) => updateGiftEmail("subject", event.target.value)} />
+                  </label>
+                  <label className="feedback-email-modal__field">
+                    <span>Message</span>
+                    <textarea rows={13} value={giftEmailDraft.message} onChange={(event) => updateGiftEmail("message", event.target.value)} />
+                  </label>
+                  <p className="feedback-email-modal__help">Use {"{name}"} for the guest name and keep {"{code}"} where the redemption code should appear.</p>
+                  {giftEmailError ? <p className="feedback-email-modal__error">{giftEmailError}</p> : null}
+                  <div className="feedback-email-modal__actions">
+                    <button type="button" className="feedback-email-modal__ghost" onClick={() => setGiftEmailDraft(null)}>
+                      Cancel
+                    </button>
+                    <button type="button" onClick={reviewGiftEmail}>
+                      Review & Send
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        ) : null}
       </div>
     </AdminShell>
   );

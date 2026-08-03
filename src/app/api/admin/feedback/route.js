@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deleteFeedbackSubmission, hasFeedbackStore, issueFeedbackGiftCard, listFeedbackSubmissions } from "@/lib/feedback";
+import { deleteFeedbackSubmission, hasFeedbackStore, issueFeedbackGiftCard, listFeedbackSubmissions, markFeedbackGiftCardSent } from "@/lib/feedback";
 import { isEmail, mailerConfigured, sendBrandedEmail } from "@/lib/mailer";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +38,17 @@ function escapeHtml(value = "") {
     .replace(/"/g, "&quot;");
 }
 
+function textToHtml(value = "") {
+  return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+function applyTemplate(value = "", values = {}) {
+  return String(value || "")
+    .replace(/\{name\}/gi, values.name || "")
+    .replace(/\{code\}/gi, values.code || "")
+    .replace(/\{email\}/gi, values.email || "");
+}
+
 function giftCardEmailText({ name, code }) {
   return [
     name ? `Hi ${name},` : "Hi,",
@@ -58,7 +69,9 @@ function giftCardEmailText({ name, code }) {
   ].join("\n");
 }
 
-function giftCardEmailHtml({ name, code }) {
+function giftCardEmailHtml({ name, code, message }) {
+  const emailMessage = message || giftCardEmailText({ name, code });
+
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:660px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
@@ -68,29 +81,7 @@ function giftCardEmailHtml({ name, code }) {
           <h1 style="margin:0;font-size:28px;line-height:1.15;">Your FREE 60-Minute Play Pass</h1>
         </div>
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
-          <p style="margin:0 0 14px;">${name ? `Hi ${escapeHtml(name)},` : "Hi,"}</p>
-          <p style="margin:0 0 14px;">Thanks for sharing your feedback with Pixel Pulse. As promised, here is your FREE 60-Minute Play Pass for your next visit.</p>
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:20px 0;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#f9fafb;">
-            <tbody>
-              <tr>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;font-weight:800;width:42%;">Redemption code</td>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#111827;font-size:17px;font-weight:900;">${escapeHtml(code)}</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;font-weight:800;">Value</td>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#111827;font-size:15px;font-weight:700;">FREE 60-Minute Play Pass</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;font-weight:800;">From</td>
-                <td style="padding:10px 12px;border-top:1px solid #e5e7eb;color:#111827;font-size:15px;font-weight:700;">Pixel Pulse Team</td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="margin:22px 0 18px;padding:14px 16px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;color:#374151;">
-            Valid for 30 days from issue. Terms and conditions apply.
-          </div>
-          <p style="margin:0 0 6px;"><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
-          <p style="margin:0;color:#6b7280;">Vaughan, Ontario<br /><a href="https://www.pixelpulseplay.ca" style="color:#175cd3;text-decoration:none;">https://www.pixelpulseplay.ca</a></p>
+          <div style="white-space:normal;">${textToHtml(emailMessage)}</div>
         </div>
       </div>
     </div>
@@ -110,6 +101,16 @@ export async function PATCH(request) {
     return NextResponse.json({ error: "Unsupported feedback action." }, { status: 400 });
   }
 
+  const requestedSubject = String(body.emailSubject || "").trim();
+  const requestedMessage = String(body.emailMessage || "").trim();
+
+  if (requestedMessage && !/\{code\}/i.test(requestedMessage)) {
+    return NextResponse.json(
+      { error: "Email message must include the {code} placeholder." },
+      { status: 400 },
+    );
+  }
+
   const result = await issueFeedbackGiftCard(body.id);
   if (result.notFound) return NextResponse.json({ error: result.error }, { status: 404 });
   if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
@@ -122,20 +123,31 @@ export async function PATCH(request) {
     return NextResponse.json({ error: "Email sending is not configured." }, { status: 503 });
   }
 
-  const message = giftCardEmailText({
-    name: result.feedback.name,
+  const templateValues = {
+    name: result.feedback.name || "there",
+    email: result.feedback.email,
     code: result.giftCard.code,
-  });
+  };
+  const subject = applyTemplate(
+    requestedSubject || "Your FREE 60-Minute Pixel Pulse Play Pass",
+    templateValues,
+  );
+  const message = applyTemplate(
+    requestedMessage || giftCardEmailText({ name: result.feedback.name, code: "{code}" }),
+    templateValues,
+  );
 
   await sendBrandedEmail({
     to: result.feedback.email,
-    subject: "Your FREE 60-Minute Pixel Pulse Play Pass",
+    subject,
     message,
-    html: giftCardEmailHtml({ name: result.feedback.name, code: result.giftCard.code }),
+    html: giftCardEmailHtml({ name: result.feedback.name, code: result.giftCard.code, message }),
   });
 
+  const sentResult = await markFeedbackGiftCardSent(result.feedback.id);
+
   return NextResponse.json({
-    feedback: result.feedback,
+    feedback: sentResult.feedback || result.feedback,
     giftCard: result.giftCard,
   });
 }
