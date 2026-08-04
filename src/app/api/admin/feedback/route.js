@@ -42,6 +42,27 @@ function textToHtml(value = "") {
   return escapeHtml(value).replace(/\n/g, "<br />");
 }
 
+function giftCardMessageToHtml(value = "") {
+  return String(value || "")
+    .split("\n")
+    .map((line) => {
+      const trimmed = line.trim();
+      if (/^Redemption code:/i.test(trimmed) || /^Value:/i.test(trimmed)) {
+        const [label, ...rest] = trimmed.split(":");
+        const detail = rest.join(":").trim();
+        return `
+          <div style="margin:10px 0;padding:12px 14px;border:1px solid #d8e6b8;border-radius:12px;background:#f7fbea;">
+            <span style="display:block;margin:0 0 3px;color:#3f6212;font-size:12px;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;">${escapeHtml(label)}</span>
+            <strong style="display:block;color:#111827;font-size:${/^Redemption code/i.test(trimmed) ? "20px" : "16px"};line-height:1.3;">${escapeHtml(detail)}</strong>
+          </div>
+        `;
+      }
+
+      return line ? textToHtml(line) : "<br />";
+    })
+    .join("");
+}
+
 function applyTemplate(value = "", values = {}) {
   return String(value || "")
     .replace(/\{name\}/gi, values.name || "")
@@ -81,7 +102,7 @@ function giftCardEmailHtml({ name, code, message }) {
           <h1 style="margin:0;font-size:28px;line-height:1.15;">Your FREE 60-Minute Play Pass</h1>
         </div>
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
-          <div style="white-space:normal;">${textToHtml(emailMessage)}</div>
+          <div style="white-space:normal;">${giftCardMessageToHtml(emailMessage)}</div>
         </div>
       </div>
     </div>
