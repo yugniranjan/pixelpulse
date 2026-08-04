@@ -47,23 +47,32 @@ const CHANNEL_GROUPS = {
   Other: "Other",
 };
 
-const DEFAULT_GIFT_CARD_SUBJECT = "Your FREE 60-Minute Pixel Pulse Play Pass";
+const DEFAULT_GIFT_CARD_SUBJECT = "Thank You For Your Feedback. Here's Your FREE 60-Minute Pixel Pulse Play Pass!";
 const DEFAULT_GIFT_CARD_MESSAGE = [
   "Hi {name},",
   "",
-  "Thanks for sharing your feedback with Pixel Pulse!",
+  "Thank you for taking the time to share your feedback. We truly appreciate it and are committed to continuously improving based on suggestions from guests like you.",
   "",
   "As promised, here is your FREE 60-Minute Play Pass for your next visit.",
   "",
   "Redemption code: {code}",
   "Value: FREE 60-Minute Play Pass",
-  "From: Pixel Pulse Team",
   "",
   "Valid for 30 days from issue. Terms and conditions apply.",
+  "",
+  "If you enjoyed your experience, we'd be incredibly grateful if you could share it with others by leaving us a Google review. And we'll send you one more complimentary 60-minute Play Pass for your next visit!",
+  "",
+  "Leave your review here: https://g.page/r/CQzE8tFOGzEYEBM/review",
+  "Generate QR code",
+  "",
+  "Looking forward to seeing you soon.",
   "",
   "The Pixel Pulse Team",
   "Vaughan, Ontario",
   "https://www.pixelpulseplay.ca",
+  "",
+  "960, Edgeley Blvd, Vaughan, ON, L4K 4V4",
+  "Visit www.pixelpulseplay.ca  Call: (905)-760-2922",
 ].join("\n");
 
 function formatDate(value) {
@@ -147,6 +156,7 @@ export default function AdminFeedbackPage() {
   function openGiftEmail(item) {
     setGiftEmailDraft({
       item,
+      recipientEmail: item.email || "",
       subject: DEFAULT_GIFT_CARD_SUBJECT,
       message: DEFAULT_GIFT_CARD_MESSAGE,
       reviewing: false,
@@ -162,8 +172,8 @@ export default function AdminFeedbackPage() {
   }
 
   function reviewGiftEmail() {
-    if (!giftEmailDraft?.subject.trim() || !giftEmailDraft?.message.trim()) {
-      setGiftEmailError("Gift card email subject and message are required.");
+    if (!giftEmailDraft?.recipientEmail.trim() || !giftEmailDraft?.subject.trim() || !giftEmailDraft?.message.trim()) {
+      setGiftEmailError("Recipient email, subject, and message are required.");
       return;
     }
     if (!/\{code\}/i.test(giftEmailDraft.message)) {
@@ -189,6 +199,7 @@ export default function AdminFeedbackPage() {
         body: JSON.stringify({
           action: "issue-gift-card",
           id: item.id,
+          recipientEmail: giftEmailDraft.recipientEmail,
           emailSubject: giftEmailDraft.subject,
           emailMessage: giftEmailDraft.message,
         }),
@@ -203,7 +214,7 @@ export default function AdminFeedbackPage() {
       setFeedback((current) =>
         current.map((row) => (row.id === data.feedback.id ? data.feedback : row)),
       );
-      setStatus(`60-minute gift card sent to ${data.feedback.email}: ${data.giftCard.code}`);
+      setStatus(`60-minute gift card sent to ${data.sentTo || giftEmailDraft.recipientEmail}: ${data.giftCard.code}`);
       setGiftEmailDraft(null);
     } catch (issueError) {
       setGiftEmailError("Unable to issue gift card.");
@@ -579,9 +590,6 @@ export default function AdminFeedbackPage() {
                 ×
               </button>
               <h2>Review Gift Card Email</h2>
-              <p className="feedback-email-modal__to">
-                To <strong>{giftEmailDraft.item.email}</strong>
-              </p>
 
               {giftEmailDraft.reviewing ? (
                 <div className="feedback-email-modal__review">
@@ -589,6 +597,10 @@ export default function AdminFeedbackPage() {
                     Cross-check the email before sending. The gift card code will be generated when you confirm.
                   </div>
                   <dl>
+                    <div>
+                      <dt>To</dt>
+                      <dd>{giftEmailDraft.recipientEmail}</dd>
+                    </div>
                     <div>
                       <dt>Subject</dt>
                       <dd>{renderPreview(giftEmailDraft.subject, giftEmailDraft.item)}</dd>
@@ -617,6 +629,14 @@ export default function AdminFeedbackPage() {
                 </div>
               ) : (
                 <>
+                  <label className="feedback-email-modal__field">
+                    <span>To</span>
+                    <input
+                      type="email"
+                      value={giftEmailDraft.recipientEmail}
+                      onChange={(event) => updateGiftEmail("recipientEmail", event.target.value)}
+                    />
+                  </label>
                   <label className="feedback-email-modal__field">
                     <span>Subject</span>
                     <input value={giftEmailDraft.subject} onChange={(event) => updateGiftEmail("subject", event.target.value)} />

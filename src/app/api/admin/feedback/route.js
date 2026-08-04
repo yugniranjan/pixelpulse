@@ -5,6 +5,10 @@ import { isEmail, mailerConfigured, sendBrandedEmail } from "@/lib/mailer";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const GOOGLE_REVIEW_URL = "https://g.page/r/CQzE8tFOGzEYEBM/review";
+const PIXEL_PULSE_URL = "https://www.pixelpulseplay.ca";
+const DEFAULT_FEEDBACK_REWARD_SUBJECT = "Thank You For Your Feedback. Here's Your FREE 60-Minute Pixel Pulse Play Pass!";
+
 export async function GET(request) {
   if (!hasFeedbackStore()) {
     return NextResponse.json(
@@ -43,6 +47,8 @@ function textToHtml(value = "") {
 }
 
 function giftCardMessageToHtml(value = "") {
+  const reviewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(GOOGLE_REVIEW_URL)}`;
+
   return String(value || "")
     .split("\n")
     .map((line) => {
@@ -56,6 +62,29 @@ function giftCardMessageToHtml(value = "") {
             <strong style="display:block;color:#111827;font-size:${/^Redemption code/i.test(trimmed) ? "20px" : "16px"};line-height:1.3;">${escapeHtml(detail)}</strong>
           </div>
         `;
+      }
+
+      if (/^Leave your review here:/i.test(trimmed)) {
+        const url = trimmed.replace(/^Leave your review here:\s*/i, "") || GOOGLE_REVIEW_URL;
+        return `
+          <p style="margin:18px 0 8px;color:#374151;"><strong style="color:#111827;">Leave your review here:</strong></p>
+          <p style="margin:0 0 16px;">
+            <a href="${escapeHtml(url)}" style="display:inline-block;border-radius:10px;background:#111827;color:#ffffff;padding:12px 16px;font-weight:800;text-decoration:none;">Leave a Google Review</a>
+          </p>
+        `;
+      }
+
+      if (/^Generate QR code$/i.test(trimmed)) {
+        return `
+          <div style="margin:14px 0 20px;padding:14px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;display:inline-block;">
+            <img src="${escapeHtml(reviewQrUrl)}" alt="Google review QR code" width="180" height="180" style="display:block;border:0;" />
+            <p style="margin:8px 0 0;color:#667085;font-size:12px;text-align:center;">Scan to leave a review</p>
+          </div>
+        `;
+      }
+
+      if (trimmed === PIXEL_PULSE_URL || trimmed === "www.pixelpulseplay.ca") {
+        return `<p style="margin:0 0 14px;"><a href="${PIXEL_PULSE_URL}" style="color:#175cd3;text-decoration:none;">${escapeHtml(trimmed)}</a></p>`;
       }
 
       return line ? textToHtml(line) : "<br />";
@@ -74,19 +103,28 @@ function giftCardEmailText({ name, code }) {
   return [
     name ? `Hi ${name},` : "Hi,",
     "",
-    "Thanks for sharing your feedback with Pixel Pulse!",
+    "Thank you for taking the time to share your feedback. We truly appreciate it and are committed to continuously improving based on suggestions from guests like you.",
     "",
     "As promised, here is your FREE 60-Minute Play Pass for your next visit.",
     "",
     `Redemption code: ${code}`,
     "Value: FREE 60-Minute Play Pass",
-    "From: Pixel Pulse Team",
     "",
     "Valid for 30 days from issue. Terms and conditions apply.",
     "",
+    "If you enjoyed your experience, we'd be incredibly grateful if you could share it with others by leaving us a Google review. And we'll send you one more complimentary 60-minute Play Pass for your next visit!",
+    "",
+    `Leave your review here: ${GOOGLE_REVIEW_URL}`,
+    "Generate QR code",
+    "",
+    "Looking forward to seeing you soon.",
+    "",
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
-    "https://www.pixelpulseplay.ca",
+    PIXEL_PULSE_URL,
+    "",
+    "960, Edgeley Blvd, Vaughan, ON, L4K 4V4",
+    "Visit www.pixelpulseplay.ca  Call: (905)-760-2922",
   ].join("\n");
 }
 
@@ -124,6 +162,7 @@ export async function PATCH(request) {
 
   const requestedSubject = String(body.emailSubject || "").trim();
   const requestedMessage = String(body.emailMessage || "").trim();
+  const requestedRecipientEmail = String(body.recipientEmail || "").trim();
 
   if (requestedMessage && !/\{code\}/i.test(requestedMessage)) {
     return NextResponse.json(
@@ -136,8 +175,10 @@ export async function PATCH(request) {
   if (result.notFound) return NextResponse.json({ error: result.error }, { status: 404 });
   if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
 
-  if (!isEmail(result.feedback?.email)) {
-    return NextResponse.json({ error: "Feedback recipient does not have a valid email." }, { status: 400 });
+  const recipientEmail = requestedRecipientEmail || result.feedback?.email;
+
+  if (!isEmail(recipientEmail)) {
+    return NextResponse.json({ error: "Recipient does not have a valid email." }, { status: 400 });
   }
 
   if (!mailerConfigured()) {
@@ -146,11 +187,11 @@ export async function PATCH(request) {
 
   const templateValues = {
     name: result.feedback.name || "there",
-    email: result.feedback.email,
+    email: recipientEmail,
     code: result.giftCard.code,
   };
   const subject = applyTemplate(
-    requestedSubject || "Your FREE 60-Minute Pixel Pulse Play Pass",
+    requestedSubject || DEFAULT_FEEDBACK_REWARD_SUBJECT,
     templateValues,
   );
   const message = applyTemplate(
@@ -159,7 +200,7 @@ export async function PATCH(request) {
   );
 
   await sendBrandedEmail({
-    to: result.feedback.email,
+    to: recipientEmail,
     subject,
     message,
     html: giftCardEmailHtml({ name: result.feedback.name, code: result.giftCard.code, message }),
@@ -170,6 +211,7 @@ export async function PATCH(request) {
   return NextResponse.json({
     feedback: sentResult.feedback || result.feedback,
     giftCard: result.giftCard,
+    sentTo: recipientEmail,
   });
 }
 
