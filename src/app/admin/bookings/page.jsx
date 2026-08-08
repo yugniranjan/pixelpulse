@@ -7,6 +7,16 @@ import "../../styles/admin-waivers.css";
 import "../../styles/admin-bookings.css";
 
 const PACKAGE_OPTIONS = ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"];
+const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
+const HOW_TO_PLAY_LINES = [
+  "",
+  "— HOW TO PLAY —",
+  "Before your visit, watch this quick video with your players so everyone knows what to expect:",
+  `Watch: ${HOW_TO_PLAY_VIDEO_URL}`,
+  "When you arrive, our team will welcome your group, complete check-in, and explain the game rules.",
+  "Players choose their challenge rooms, then rotate through active games like Run, Jump, React, and Challenge.",
+  "Each room is played one group at a time, and our staff guides the flow so the party stays safe, organized, and fun.",
+];
 
 const DURATION_OPTIONS = [
   { value: 60, label: "1 hour" },
@@ -354,6 +364,7 @@ export default function AdminBookingsPage() {
       "• Cutlery is included.",
       "• Water, juice, or soda is included as per your package.",
       "• Only dry snacks and non-alcoholic drinks are allowed from outside.",
+      ...HOW_TO_PLAY_LINES,
       "",
       "— LOCATION & CONTACT —",
       "Pixel Pulse Play Zone",

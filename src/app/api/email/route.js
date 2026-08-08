@@ -9,8 +9,10 @@ const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png
 const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
 const PRIVATE_PARTY_EMAIL = CONTACT_EMAIL;
 const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
+const PRIVATE_PARTY_PHONE_DISPLAY = "(905) 760-2922";
+const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
 const BIRTHDAY_PACKAGE_NOTICE =
-  "Disclaimer: Birthday party packages should not be treated as private parties. They do not include private-party privileges and do not reserve the entire facility or play area.";
+  "Our birthday party packages include your reserved party space, while the play areas remain open to other guests during regular operating hours. If you'd like exclusive access to the entire facility, please contact us at (905) 760-2922 or connect@pixelpulseplay.ca to inquire about our private party packages.";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitBuckets = new Map();
@@ -273,17 +275,23 @@ export async function POST(request) {
     const autoReplyPrivatePartyText = isBirthdayPackageInquiry
       ? [
           "",
-          "Are you looking for a private party?",
+          "Important:",
           BIRTHDAY_PACKAGE_NOTICE,
-          `For private-party access, please contact us directly at ${PRIVATE_PARTY_PHONE} or ${PRIVATE_PARTY_EMAIL} so our team can confirm availability and details.`,
+          "",
+          "How to play:",
+          `Watch this quick video before your visit: ${HOW_TO_PLAY_VIDEO_URL}`,
         ]
       : [];
     const autoReplyPrivatePartyHtml = isBirthdayPackageInquiry
       ? `
               <div style="margin:18px 0 14px;padding:16px;border-radius:18px;background:rgba(251,174,123,0.1);border:1px solid rgba(251,174,123,0.24);">
-                <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fbae7b;font-weight:800;">Are you looking for a private party?</div>
+                <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fbae7b;font-weight:800;">Important</div>
                 <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
-                  ${BIRTHDAY_PACKAGE_NOTICE} For private-party access, please contact us directly at <a href="tel:+19057602922" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_PHONE}</a> or <a href="mailto:${PRIVATE_PARTY_EMAIL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_EMAIL}</a> so our team can confirm availability and details.
+                  Our birthday party packages include your reserved party space, while the play areas remain open to other guests during regular operating hours. If you'd like <strong style="color:#ffffff;">exclusive access to the entire facility</strong>, please contact us at <a href="tel:+19057602922" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_PHONE_DISPLAY}</a> or <a href="mailto:${PRIVATE_PARTY_EMAIL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_EMAIL}</a> to inquire about our private party packages.
+                </p>
+                <p style="margin:14px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
+                  Watch this quick video before your visit:
+                  <a href="${HOW_TO_PLAY_VIDEO_URL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">How to Play</a>
                 </p>
               </div>
         `

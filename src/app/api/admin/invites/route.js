@@ -26,6 +26,16 @@ const DEFAULT_GREETING = "Hi,";
 const DEFAULT_GUEST_LINE = "You are invited!";
 const DEFAULT_PARTY_INTRO =
   "🎉 Get ready for an epic birthday adventure filled with games, laughs, challenges, and nonstop fun! We’re celebrating at Pixel Pulse Playzone and you’re invited to join the action! 🎮⚡";
+const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
+const HOW_TO_PLAY_LINES = [
+  "",
+  "How to Play",
+  "Before your visit, watch this quick video with your players so everyone knows what to expect:",
+  `Video: ${HOW_TO_PLAY_VIDEO_URL}`,
+  "When you arrive, our team will welcome your group, complete check-in, and explain the game rules.",
+  "Players choose their challenge rooms, then rotate through active games like Run, Jump, React, and Challenge.",
+  "Each room is played one group at a time, and our staff guides the flow so the party stays safe, organized, and fun.",
+];
 
 function cleanText(value = "") {
   return String(value || "").trim();
@@ -184,6 +194,7 @@ function buildConfirmationEmailText(invite = {}) {
     "- Cutlery is included.",
     "- Water, juice, or soda is included as per your package.",
     "- Only dry snacks and non-alcoholic drinks are allowed from outside.",
+    ...HOW_TO_PLAY_LINES,
     "",
     "Important Information - Please Read Carefully",
     "1. This is a Scheduled Party Package",
