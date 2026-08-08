@@ -7,12 +7,12 @@ import "../../styles/admin-waivers.css";
 import "../../styles/admin-bookings.css";
 
 const PACKAGE_OPTIONS = ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"];
-const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
+const HOW_TO_PLAY_URL = "https://www.pixelpulseplay.ca/how-to-play";
 const HOW_TO_PLAY_LINES = [
   "",
   "— HOW TO PLAY —",
   "Before your visit, watch this quick video with your players so everyone knows what to expect:",
-  `Watch: ${HOW_TO_PLAY_VIDEO_URL}`,
+  `Watch: ${HOW_TO_PLAY_URL}`,
   "When you arrive, our team will welcome your group, complete check-in, and explain the game rules.",
   "Players choose their challenge rooms, then rotate through active games like Run, Jump, React, and Challenge.",
   "Each room is played one group at a time, and our staff guides the flow so the party stays safe, organized, and fun.",

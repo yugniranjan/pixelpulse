@@ -10,7 +10,7 @@ const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
 const PRIVATE_PARTY_EMAIL = CONTACT_EMAIL;
 const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
 const PRIVATE_PARTY_PHONE_DISPLAY = "(905) 760-2922";
-const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
+const HOW_TO_PLAY_URL = "https://www.pixelpulseplay.ca/how-to-play";
 const BIRTHDAY_PACKAGE_NOTICE =
   "Our birthday party packages include your reserved party space, while the play areas remain open to other guests during regular operating hours. If you'd like exclusive access to the entire facility, please contact us at (905) 760-2922 or connect@pixelpulseplay.ca to inquire about our private party packages.";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
@@ -279,7 +279,7 @@ export async function POST(request) {
           BIRTHDAY_PACKAGE_NOTICE,
           "",
           "How to play:",
-          `Watch this quick video before your visit: ${HOW_TO_PLAY_VIDEO_URL}`,
+          `Watch this quick video before your visit: ${HOW_TO_PLAY_URL}`,
         ]
       : [];
     const autoReplyPrivatePartyHtml = isBirthdayPackageInquiry
@@ -291,7 +291,7 @@ export async function POST(request) {
                 </p>
                 <p style="margin:14px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
                   Watch this quick video before your visit:
-                  <a href="${HOW_TO_PLAY_VIDEO_URL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">How to Play</a>
+                  <a href="${HOW_TO_PLAY_URL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">How to Play</a>
                 </p>
               </div>
         `

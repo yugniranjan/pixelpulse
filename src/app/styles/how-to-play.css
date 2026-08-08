@@ -1,0 +1,168 @@
+.ppp-how-page {
+  --how-bg: #080d14;
+  --how-ink: #f8fbff;
+  --how-muted: rgba(248, 251, 255, 0.72);
+  --how-panel: rgba(15, 23, 34, 0.9);
+  --how-border: rgba(255, 255, 255, 0.13);
+  --how-lime: #a4cf5f;
+  --how-coral: #fbae7b;
+  --how-pink: #ff2d78;
+  --font-display: "Barlow Condensed", Impact, sans-serif;
+  --font-body: "DM Sans", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(164, 207, 95, 0.12), transparent 34%),
+    linear-gradient(225deg, rgba(255, 45, 120, 0.12), transparent 38%),
+    #080d14;
+  color: var(--how-ink);
+  font-family: var(--font-body);
+}
+
+.ppp-how-page * {
+  box-sizing: border-box;
+}
+
+.ppp-how-shell {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.ppp-how-hero {
+  padding: clamp(4rem, 7vw, 7rem) 0 clamp(2.6rem, 5vw, 4.5rem);
+}
+
+.ppp-how-hero .ppp-how-shell {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.35rem, 3vw, 2.4rem);
+  align-items: center;
+}
+
+.ppp-how-kicker,
+.ppp-how-section-head span {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  color: var(--how-lime);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ppp-how-copy h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 8vw, 6.4rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.ppp-how-copy {
+  max-width: 860px;
+  text-align: center;
+}
+
+.ppp-how-copy p {
+  max-width: 48rem;
+  margin: 1.1rem auto 0;
+  color: var(--how-muted);
+  font-size: clamp(1.02rem, 1.8vw, 1.24rem);
+  line-height: 1.65;
+}
+
+.ppp-how-video {
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 1040px);
+  border: 1px solid rgba(164, 207, 95, 0.32);
+  border-radius: 8px;
+  background: #000;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  aspect-ratio: 16 / 9;
+}
+
+.ppp-how-video::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  z-index: 1;
+  background: linear-gradient(90deg, var(--how-lime), var(--how-coral), var(--how-pink));
+}
+
+.ppp-how-video video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.ppp-how-section {
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+  background: rgba(255, 255, 255, 0.035);
+  border-top: 1px solid var(--how-border);
+  border-bottom: 1px solid var(--how-border);
+}
+
+.ppp-how-section-head {
+  max-width: 680px;
+  margin-bottom: 1.35rem;
+}
+
+.ppp-how-section-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-how-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ppp-how-steps article {
+  min-height: 220px;
+  padding: 1.25rem;
+  border: 1px solid var(--how-border);
+  border-radius: 8px;
+  background: var(--how-panel);
+}
+
+.ppp-how-steps article > span {
+  color: var(--how-coral);
+  font-weight: 900;
+}
+
+.ppp-how-steps h3 {
+  margin: 1rem 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ppp-how-steps p {
+  margin: 0;
+  color: var(--how-muted);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .ppp-how-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 560px) {
+  .ppp-how-steps {
+    grid-template-columns: 1fr;
+  }
+
+}

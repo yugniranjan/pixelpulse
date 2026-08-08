@@ -37,9 +37,26 @@ async function ensureTable() {
         created_at timestamptz not null default now(),
         raw jsonb not null default '{}'::jsonb
       );
+      alter table feedback_submissions add column if not exists phone text;
+      alter table feedback_submissions add column if not exists visit_date text;
+      alter table feedback_submissions add column if not exists party_id text;
+      alter table feedback_submissions add column if not exists heard_about_us text;
+      alter table feedback_submissions add column if not exists visit_reasons text[] not null default '{}';
+      alter table feedback_submissions add column if not exists rooms text[] not null default '{}';
+      alter table feedback_submissions add column if not exists ratings jsonb not null default '{}'::jsonb;
+      alter table feedback_submissions add column if not exists rating_reasons jsonb not null default '{}'::jsonb;
+      alter table feedback_submissions add column if not exists average_score numeric(3, 1);
+      alter table feedback_submissions add column if not exists recommend text;
+      alter table feedback_submissions add column if not exists return_visit text;
+      alter table feedback_submissions add column if not exists favorite_moment text;
+      alter table feedback_submissions add column if not exists upgrade_idea text;
+      alter table feedback_submissions add column if not exists future_experiences text[] not null default '{}';
+      alter table feedback_submissions add column if not exists other_future_experience text;
+      alter table feedback_submissions add column if not exists marketing_consent boolean not null default false;
       alter table feedback_submissions add column if not exists gift_card_id text;
       alter table feedback_submissions add column if not exists gift_card_code text;
       alter table feedback_submissions add column if not exists gift_card_sent_at timestamptz;
+      alter table feedback_submissions add column if not exists raw jsonb not null default '{}'::jsonb;
       create index if not exists feedback_submissions_created_at_idx on feedback_submissions (created_at desc);
       create index if not exists feedback_submissions_average_idx on feedback_submissions (average_score);
       create index if not exists feedback_submissions_heard_about_idx on feedback_submissions (heard_about_us);

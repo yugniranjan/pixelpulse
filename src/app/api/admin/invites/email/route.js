@@ -14,7 +14,7 @@ const PACKAGE_INCLUSION_LINES = [
   "- Water, juice, or soda is included as per your package.",
   "- Only dry snacks and non-alcoholic drinks are allowed from outside.",
 ];
-const HOW_TO_PLAY_VIDEO_URL = "https://youtu.be/YpmeCPEJYiI";
+const HOW_TO_PLAY_URL = "https://www.pixelpulseplay.ca/how-to-play";
 
 function getRequiredEnv(name) {
   const value = process.env[name];
@@ -212,10 +212,14 @@ function renderTextLines(lines = []) {
       return;
     }
 
-    if (trimmed === `Video: ${HOW_TO_PLAY_VIDEO_URL}` || trimmed === HOW_TO_PLAY_VIDEO_URL) {
+    if (
+      trimmed === `Video: ${HOW_TO_PLAY_URL}` ||
+      trimmed === `Watch: ${HOW_TO_PLAY_URL}` ||
+      trimmed === HOW_TO_PLAY_URL
+    ) {
       html += `
         <p style="margin:12px 0 16px;">
-          <a href="${escapeHtml(HOW_TO_PLAY_VIDEO_URL)}" style="display:inline-block;border-radius:10px;background:#111827;color:#ffffff;padding:12px 16px;font-weight:800;text-decoration:none;">Watch How to Play</a>
+          <a href="${escapeHtml(HOW_TO_PLAY_URL)}" style="display:inline-block;border-radius:10px;background:#111827;color:#ffffff;padding:12px 16px;font-weight:800;text-decoration:none;">Watch How to Play</a>
         </p>
       `;
       return;

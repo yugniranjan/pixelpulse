@@ -7,6 +7,7 @@ const STANDALONE_PATHS = new Set([
   "/birthday-party-bookings-vaughan",
   "/concessions-tv",
   "/feedback",
+  "/how-to-play",
   "/level-up-rewards",
   "/private-party",
   "/squad",
