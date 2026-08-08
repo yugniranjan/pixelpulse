@@ -11,8 +11,30 @@ const PRIVATE_PARTY_EMAIL = CONTACT_EMAIL;
 const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
 const PRIVATE_PARTY_PHONE_DISPLAY = "(905) 760-2922";
 const HOW_TO_PLAY_URL = "https://www.pixelpulseplay.ca/how-to-play";
-const BIRTHDAY_PACKAGE_NOTICE =
-  "Our birthday party packages include your reserved party space, while the play areas remain open to other guests during regular operating hours. If you'd like exclusive access to the entire facility, please contact us at (905) 760-2922 or connect@pixelpulseplay.ca to inquire about our private party packages.";
+const BIRTHDAY_PACKAGE_REPLY_LINES = [
+  "Here’s a quick overview of how our birthday parties work:",
+  "",
+  "Your Party Package Includes",
+  "- Access to all 13 immersive challenge rooms for the duration specified in your chosen package.",
+  "- Arcade cards can be purchased separately at a 10% discount.",
+  "- Pizza and beverages as included in your selected package.",
+  "- Reserved party room with tablecloth, plates, cups, and cutlery.",
+  "- Dedicated party host throughout the celebration.",
+  "- You can order coffee, slushies, extra drinks, water or snacks over the counter.",
+  "",
+  "How the Children Play",
+  "Children play the challenge rooms in their own groups and can try multiple games during their scheduled playtime. Each room accommodates one group of up to 5 at a time. Our team helps guide the children and manage room rotation. If a room is occupied, the group can wait or move to another available challenge room.",
+  `How to Play: ${HOW_TO_PLAY_URL}`,
+  "",
+  "Important to Know",
+  "- Birthday packages take place during regular operating hours and are not private facility rentals. If you are looking for a private party, ask for a custom package as per your requirement.",
+  "- Other parties and walk-in guests may be present, but unrelated groups are not mixed inside the challenge rooms.",
+  "- Outside cake, dry snacks, and non-alcoholic beverages are welcome.",
+  "- Please arrive 15 minutes early for check-in and ensure all participants complete the waiver.",
+  "- Comfortable clothing and closed-toe shoes are recommended.",
+  "",
+  "We would love to celebrate with you!",
+];
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitBuckets = new Map();
@@ -273,25 +295,44 @@ export async function POST(request) {
       includesText(message, "private party");
     const isBirthdayPackageInquiry = isBirthdayInquiry && !isPrivatePartyInquiry;
     const autoReplyPrivatePartyText = isBirthdayPackageInquiry
-      ? [
-          "",
-          "Important:",
-          BIRTHDAY_PACKAGE_NOTICE,
-          "",
-          "How to play:",
-          `Watch this quick video before your visit: ${HOW_TO_PLAY_URL}`,
-        ]
+      ? ["", ...BIRTHDAY_PACKAGE_REPLY_LINES]
       : [];
     const autoReplyPrivatePartyHtml = isBirthdayPackageInquiry
       ? `
-              <div style="margin:18px 0 14px;padding:16px;border-radius:18px;background:rgba(251,174,123,0.1);border:1px solid rgba(251,174,123,0.24);">
-                <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fbae7b;font-weight:800;">Important</div>
-                <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
-                  Our birthday party packages include your reserved party space, while the play areas remain open to other guests during regular operating hours. If you'd like <strong style="color:#ffffff;">exclusive access to the entire facility</strong>, please contact us at <a href="tel:+19057602922" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_PHONE_DISPLAY}</a> or <a href="mailto:${PRIVATE_PARTY_EMAIL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">${PRIVATE_PARTY_EMAIL}</a> to inquire about our private party packages.
+              <div style="margin:18px 0 14px;padding:16px;border-radius:14px;background:#f9fafb;border:1px solid #e5e7eb;">
+                <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:#374151;">
+                  Here’s a quick overview of how our birthday parties work:
                 </p>
-                <p style="margin:14px 0 0;font-size:15px;line-height:1.7;color:#e2e8f0;">
-                  Watch this quick video before your visit:
-                  <a href="${HOW_TO_PLAY_URL}" style="color:#fbae7b;text-decoration:none;font-weight:700;">How to Play</a>
+
+                <h2 style="margin:18px 0 8px;font-size:18px;line-height:1.3;color:#111827;">Your Party Package Includes</h2>
+                <ul style="margin:0 0 16px 20px;padding:0;color:#374151;font-size:15px;line-height:1.7;">
+                  <li>Access to all 13 immersive challenge rooms for the duration specified in your chosen package.</li>
+                  <li>Arcade cards can be purchased separately at a 10% discount.</li>
+                  <li>Pizza and beverages as included in your selected package.</li>
+                  <li>Reserved party room with tablecloth, plates, cups, and cutlery.</li>
+                  <li>Dedicated party host throughout the celebration.</li>
+                  <li>You can order coffee, slushies, extra drinks, water or snacks over the counter.</li>
+                </ul>
+
+                <h2 style="margin:18px 0 8px;font-size:18px;line-height:1.3;color:#111827;">How the Children Play</h2>
+                <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#374151;">
+                  Children play the challenge rooms in their own groups and can try multiple games during their scheduled playtime. Each room accommodates one group of up to 5 at a time. Our team helps guide the children and manage room rotation. If a room is occupied, the group can wait or move to another available challenge room.
+                </p>
+                <p style="margin:0 0 16px;">
+                  <a href="${HOW_TO_PLAY_URL}" style="display:inline-block;border-radius:10px;background:#a4cf5f;color:#111827;padding:12px 16px;text-decoration:none;font-size:15px;font-weight:800;">Watch How to Play</a>
+                </p>
+
+                <h2 style="margin:18px 0 8px;font-size:18px;line-height:1.3;color:#111827;">Important to Know</h2>
+                <ul style="margin:0 0 16px 20px;padding:0;color:#374151;font-size:15px;line-height:1.7;">
+                  <li>Birthday packages take place during regular operating hours and are not private facility rentals. If you are looking for a private party, ask for a custom package as per your requirement.</li>
+                  <li>Other parties and walk-in guests may be present, but unrelated groups are not mixed inside the challenge rooms.</li>
+                  <li>Outside cake, dry snacks, and non-alcoholic beverages are welcome.</li>
+                  <li>Please arrive 15 minutes early for check-in and ensure all participants complete the waiver.</li>
+                  <li>Comfortable clothing and closed-toe shoes are recommended.</li>
+                </ul>
+
+                <p style="margin:0;font-size:15px;line-height:1.7;color:#374151;">
+                  We would love to celebrate with you!
                 </p>
               </div>
         `
@@ -334,63 +375,84 @@ export async function POST(request) {
 
     if (email) {
       const autoReplySubject = `We received your Pixel Pulse Play inquiry`;
-      const autoReplyText = [
-        `Hi ${fullName || "there"},`,
-        "",
-        "Thanks for reaching out to Pixel Pulse Play.",
-        `We received your inquiry about ${selectedEvent || "your visit"} and our team will get back to you soon.`,
-        "",
-        "What happens next:",
-        "- We review your message",
-        "- We follow up with the right next steps or booking details",
-        "- We help you plan the smoothest visit possible",
-        ...autoReplyPrivatePartyText,
-        "",
-        `Explore attractions: ${ATTRACTIONS_URL}`,
-        "",
-        "If your request is time-sensitive, you can also reply directly to this email.",
-        "",
-        "Pixel Pulse Play",
-        CONTACT_EMAIL,
-      ].join("\n");
+      const autoReplyText = isBirthdayPackageInquiry
+        ? [
+            `Hi ${fullName || "there"},`,
+            "",
+            "Thank you for your inquiry. Our team will get back to you within 24 hours.",
+            ...autoReplyPrivatePartyText,
+            "",
+            "Pixel Pulse Play",
+            CONTACT_EMAIL,
+          ].join("\n")
+        : [
+            `Hi ${fullName || "there"},`,
+            "",
+            "Thanks for reaching out to Pixel Pulse Play.",
+            `We received your inquiry about ${selectedEvent || "your visit"} and our team will get back to you soon.`,
+            "",
+            "What happens next:",
+            "- We review your message",
+            "- We follow up with the right next steps or booking details",
+            "- We help you plan the smoothest visit possible",
+            "",
+            `How to Play: ${HOW_TO_PLAY_URL}`,
+            "",
+            `Explore attractions: ${ATTRACTIONS_URL}`,
+            "",
+            "If your request is time-sensitive, you can also reply directly to this email.",
+            "",
+            "Pixel Pulse Play",
+            CONTACT_EMAIL,
+          ].join("\n");
 
       const autoReplyHtml = `
-        <div style="margin:0;padding:24px 14px;background:#050810;font-family:Arial,sans-serif;color:#f8fafc;">
-          <div style="max-width:720px;margin:0 auto;border:1px solid rgba(164,207,95,0.16);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#121923 0%,#090e16 100%);box-shadow:0 18px 42px rgba(0,0,0,0.28);">
-            <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.08);background:linear-gradient(90deg,rgba(164,207,95,0.14),rgba(251,174,123,0.12));">
+        <div style="margin:0;padding:24px 14px;background:#f3f4f6;font-family:Arial,sans-serif;color:#111827;">
+          <div style="max-width:720px;margin:0 auto;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden;background:#ffffff;box-shadow:0 18px 42px rgba(15,23,42,0.08);">
+            <div style="padding:18px 22px;border-bottom:1px solid #e5e7eb;background:#ffffff;">
               <img src="${LOGO_URL}" alt="Pixel Pulse Play" style="display:block;width:170px;max-width:100%;height:auto;margin:0 0 14px;" />
-              
-             
+            </div>
 
             <div style="padding:22px;">
-              <p style="margin:0 0 14px;font-size:17px;line-height:1.7;color:#f8fafc;">
+              <p style="margin:0 0 14px;font-size:17px;line-height:1.7;color:#111827;">
                 Hi ${safeName},
               </p>
-              <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
-                Thank you for contacting <strong style="color:#ffffff;">Pixel Pulse Play Zone</strong>.
-              </p>
-              <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#cbd5e1;">
-               We will get back to you within 24 hours.
-              </p>
+              ${
+                isBirthdayPackageInquiry
+                  ? `
+                    <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#374151;">
+                      Thank you for your inquiry. Our team will get back to you within 24 hours.
+                    </p>
+                  `
+                  : `
+                    <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#374151;">
+                      Thank you for contacting <strong style="color:#111827;">Pixel Pulse Play Zone</strong>.
+                    </p>
+                    <p style="margin:0 0 14px;font-size:16px;line-height:1.8;color:#374151;">
+                      We will get back to you within 24 hours.
+                    </p>
+                  `
+              }
 
               ${autoReplyPrivatePartyHtml}
 
-              <div style="margin-top:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-                <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#a4cf5f;font-weight:800;">Explore the experience</div>
-                <div style="margin-top:12px;">
-                  <a href="${ATTRACTIONS_URL}" style="color:#fbae7b;text-decoration:none;font-size:15px;font-weight:700;">View Attractions</a>
-                </div>
-               
-              </div>
-
-              
-
-             
+              ${
+                isBirthdayPackageInquiry
+                  ? ""
+                  : `
+                    <div style="margin-top:14px;padding:14px 16px;border-radius:14px;background:#f9fafb;border:1px solid #e5e7eb;">
+                      <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#4d7c0f;font-weight:800;">Explore the experience</div>
+                      <div style="margin-top:12px;display:block;">
+                        <a href="${HOW_TO_PLAY_URL}" style="display:inline-block;margin:0 10px 10px 0;border-radius:10px;background:#a4cf5f;color:#111827;padding:12px 16px;text-decoration:none;font-size:15px;font-weight:800;">Watch How to Play</a>
+                        <a href="${ATTRACTIONS_URL}" style="display:inline-block;margin:0 0 10px;border-radius:10px;background:#fbae7b;color:#111827;padding:12px 16px;text-decoration:none;font-size:15px;font-weight:800;">View Attractions</a>
+                      </div>
+                    </div>
+                  `
+              }
             </div>
 
-            <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-size:14px;line-height:1.7;color:#94a3b8;">
-              
-              <a href="https://www.pixelpulseplay.ca/" style="color:#fbae7b;text-decoration:none;">Visit us at: www.pixelpulseplay.ca</a>
+            <div style="padding:16px 22px;border-top:1px solid #e5e7eb;background:#f9fafb;font-size:14px;line-height:1.7;color:#6b7280;">
+              <a href="https://www.pixelpulseplay.ca/" style="color:#175cd3;text-decoration:none;">Visit us at: www.pixelpulseplay.ca</a>
             </div>
           </div>
         </div>

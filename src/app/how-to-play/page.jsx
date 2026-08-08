@@ -24,20 +24,20 @@ export const metadata = {
 
 const steps = [
   {
-    title: "Check in",
-    body: "Our team welcomes your group, confirms waivers, and gives players the game briefing.",
+    title: "Check In & Get Your Wristband",
+    body: "Complete your waiver, collect your Pixel Pulse wristband, and get a quick game briefing from our team. Your wristband unlocks every challenge and tracks your scores automatically.",
   },
   {
-    title: "Choose rooms",
-    body: "Pick from interactive challenge rooms built around speed, reaction, teamwork, and focus.",
+    title: "Choose a Room & Game Variant",
+    body: "Explore 13 immersive challenge rooms. Each room features multiple game variants and difficulty levels, so every visit can be a new experience. Simply tap your wristband to start.",
   },
   {
-    title: "Play the challenge",
-    body: "Run, jump, react, solve, and compete while each room tracks the action.",
+    title: "Play, Score & Compete",
+    body: "Run, jump, react, solve, and work together as every game tracks your points in real time. Replay your favourite rooms or try a different game variant to improve your score.",
   },
   {
-    title: "Repeat and improve",
-    body: "Rotate through more rooms, chase better scores, and keep the friendly competition going.",
+    title: "Check Your Results & Check Out",
+    body: "See your final score and leaderboard ranking, celebrate your achievements, and don't forget to return your wristband before you leave. We'll be ready for your next challenge!",
   },
 ];
 
@@ -47,11 +47,15 @@ export default function HowToPlayPage() {
       <section className="ppp-how-hero">
         <div className="ppp-how-shell">
           <div className="ppp-how-copy">
-            <span className="ppp-how-kicker">Before you play</span>
-            <h1>How to Play at Pixel Pulse</h1>
+            <span className="ppp-how-kicker">Ready to Play?</span>
+            <h1>It&apos;s as easy as <strong>Tap. Play. Repeat.</strong></h1>
             <p>
-              Watch this quick guide before your visit so everyone knows what to
-              expect inside the challenge rooms.
+              Whether you&apos;re visiting with family, friends, or teammates, every
+              challenge room offers multiple games, different difficulty levels,
+              and endless replayability.
+            </p>
+            <p>
+              Watch the video to see how your Pixel Pulse adventure begins.
             </p>
           </div>
 
@@ -67,8 +71,7 @@ export default function HowToPlayPage() {
       <section className="ppp-how-section">
         <div className="ppp-how-shell">
           <div className="ppp-how-section-head">
-            <span>Game flow</span>
-            <h2>What happens when you arrive</h2>
+            <h2>What Happens When You Arrive</h2>
           </div>
 
           <div className="ppp-how-steps">
