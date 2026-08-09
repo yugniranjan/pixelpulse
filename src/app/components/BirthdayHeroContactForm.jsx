@@ -6,8 +6,6 @@ import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
-const birthdayPackageNotice =
-  "Birthday party packages do not include private-party privileges or reserve the entire facility/play area.";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -216,10 +214,6 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
               <span>
                 Each additional participant beyond your package is charged{" "}
                 <strong>$14.99</strong>, paid at the venue.
-              </span>
-              <span>
-                <strong>Birthday package note:</strong> {birthdayPackageNotice}{" "}
-                <a href={CONTACT_FORM_URL}>Send a private-party request</a>
               </span>
             </>
           )}
