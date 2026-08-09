@@ -165,7 +165,7 @@
 
 .waiver-data-filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1.5fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto minmax(92px, 0.45fr) auto;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(170px, 0.9fr) minmax(92px, 0.45fr) auto;
   gap: 10px;
   align-items: end;
 }
@@ -422,6 +422,26 @@
   text-transform: none;
 }
 
+.waiver-email-recipients textarea {
+  width: 100%;
+  min-height: 104px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #101828;
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  text-transform: none;
+}
+
+.waiver-email-help {
+  margin: 0;
+  color: #667085;
+  font-size: 0.86rem;
+  text-transform: none;
+}
+
 .waiver-edit-wide {
   grid-column: 1 / -1;
 }
@@ -552,7 +572,14 @@
   overflow-wrap: anywhere;
 }
 
+.waiver-party-groups__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .waiver-party-groups__grid button {
+  flex: 1 1 140px;
   min-height: 40px;
   border: 0;
   border-radius: 8px;

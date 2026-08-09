@@ -66,6 +66,42 @@ function normalizeSearchValue(value = "") {
   return String(value || "").trim().toLowerCase();
 }
 
+function uniqueValues(values = []) {
+  return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean)));
+}
+
+function peopleSearchValues(waiver = {}) {
+  const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
+  return [
+    waiver.primaryName,
+    participantName(waiver.primary),
+    waiver.primary?.firstName,
+    waiver.primary?.lastName,
+    waiver.primary?.email,
+    waiver.primary?.phone,
+    waiver.primary?.city,
+    ...familyMembers.flatMap((member) => [
+      participantName(member),
+      member.firstName,
+      member.lastName,
+      member.email,
+      member.phone,
+    ]),
+  ];
+}
+
+function partyIdValue(waiver = {}) {
+  return String(waiver.visit?.partyId || "").trim();
+}
+
+function partyMatchesFilter(waiver = {}, filter = "all") {
+  const partyId = partyIdValue(waiver);
+  if (filter === "has") return Boolean(partyId);
+  if (filter === "none") return !partyId;
+  if (filter.startsWith("party:")) return partyId === filter.slice("party:".length);
+  return true;
+}
+
 function localDateString(date = new Date()) {
   return [
     date.getFullYear(),
@@ -227,6 +263,8 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
     onChange((current) => ({ ...current, [field]: value }));
   }
 
+  const isPartySend = draft.mode === "party";
+
   return (
     <div className="waiver-edit-backdrop" role="presentation">
       <form className="waiver-edit-modal waiver-email-modal" onSubmit={onSend}>
@@ -241,8 +279,17 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
         <section>
           <h3>Recipient</h3>
           <div className="waiver-edit-grid">
-            <label><span>Email</span><input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} /></label>
-            <label><span>First name</span><input value={draft.firstName} onChange={(event) => update("firstName", event.target.value)} /></label>
+            {isPartySend ? (
+              <label className="waiver-edit-wide waiver-email-recipients">
+                <span>Recipients for Party ID {draft.partyId} (one email per line)</span>
+                <textarea required value={draft.emailsText} onChange={(event) => update("emailsText", event.target.value)} />
+              </label>
+            ) : (
+              <>
+                <label><span>Email</span><input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} /></label>
+                <label><span>First name</span><input value={draft.firstName} onChange={(event) => update("firstName", event.target.value)} /></label>
+              </>
+            )}
             <label><span>Party ID</span><input value={draft.partyId} onChange={(event) => update("partyId", event.target.value)} /></label>
           </div>
         </section>
@@ -261,6 +308,9 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
             <span>Review and edit before sending</span>
             <textarea required value={draft.emailText} onChange={(event) => update("emailText", event.target.value)} />
           </label>
+          {isPartySend ? (
+            <p className="waiver-email-help">For party sends, use {"{firstName}"} or {"{name}"} if you want each email personalized.</p>
+          ) : null}
         </section>
 
         {error ? <p className="waiver-admin-error">{error}</p> : null}
@@ -485,7 +535,7 @@ export default function AdminWaiversPage() {
   const [query, setQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [partyOnly, setPartyOnly] = useState(false);
+  const [partyFilter, setPartyFilter] = useState("all");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [editingWaiver, setEditingWaiver] = useState(null);
@@ -560,47 +610,34 @@ export default function AdminWaiversPage() {
 
   const filteredWaivers = useMemo(() => {
     const needle = normalizeSearchValue(query);
-    const hasExactPartyIdMatch = Boolean(needle) && waivers.some(
-      (waiver) => normalizeSearchValue(waiver.visit?.partyId) === needle,
-    );
 
     return waivers.filter((waiver) => {
-      const partyId = normalizeSearchValue(waiver.visit?.partyId);
       const searchableValues = [
-        waiver.primaryName,
-        waiver.primary?.email,
-        waiver.primary?.phone,
+        ...peopleSearchValues(waiver),
         waiver.visit?.partyId,
         waiver.visit?.partyName,
         waiver.visit?.visitDate,
         effectiveWaiverDate(waiver),
         waiver.visit?.passType,
       ];
-      const matchesSearch = !needle || (
-        hasExactPartyIdMatch
-          ? partyId === needle
-          : searchableValues
-            .filter(Boolean)
-            .some((value) => normalizeSearchValue(value).includes(needle))
-      );
+      const matchesSearch = !needle || searchableValues
+        .filter(Boolean)
+        .some((value) => normalizeSearchValue(value).includes(needle));
 
       const waiverDate = effectiveWaiverDate(waiver);
       const matchesFrom = !dateFrom || waiverDate >= dateFrom;
       const matchesTo = !dateTo || waiverDate <= dateTo;
-      const matchesParty = !partyOnly || Boolean(waiver.visit?.partyId);
+      const matchesParty = partyMatchesFilter(waiver, partyFilter);
 
       return matchesSearch && matchesFrom && matchesTo && matchesParty;
     });
-  }, [dateFrom, dateTo, partyOnly, query, waivers]);
+  }, [dateFrom, dateTo, partyFilter, query, waivers]);
   const searchSuggestions = useMemo(() => {
     const values = new Set();
 
     waivers.forEach((waiver) => {
       [
-        waiver.primaryName,
-        participantName(waiver.primary),
-        waiver.primary?.email,
-        waiver.primary?.phone,
+        ...peopleSearchValues(waiver),
         waiver.visit?.partyId,
         waiver.visit?.partyName,
         waiver.visit?.passType,
@@ -654,6 +691,10 @@ export default function AdminWaiversPage() {
       (b.latestSubmittedAt || "").localeCompare(a.latestSubmittedAt || ""),
     );
   }, [waivers]);
+  const partyFilterOptions = useMemo(
+    () => partyGroups.map((group) => group.partyId),
+    [partyGroups],
+  );
   const todayVisits = useMemo(() => {
     const today = localDateString();
     return waivers
@@ -671,7 +712,7 @@ export default function AdminWaiversPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [dateFrom, dateTo, pageSize, partyOnly, query]);
+  }, [dateFrom, dateTo, pageSize, partyFilter, query]);
 
   const filteredPlayers = useMemo(() => {
     const needle = playerQuery.trim().toLowerCase();
@@ -739,7 +780,7 @@ export default function AdminWaiversPage() {
     setQuery("");
     setDateFrom("");
     setDateTo("");
-    setPartyOnly(false);
+    setPartyFilter("all");
   }
 
   function clearPlayerFilters() {
@@ -750,7 +791,7 @@ export default function AdminWaiversPage() {
 
   function viewPartyWaivers(partyId) {
     setQuery(partyId);
-    setPartyOnly(false);
+    setPartyFilter(`party:${partyId}`);
     setPage(1);
   }
 
@@ -780,12 +821,52 @@ export default function AdminWaiversPage() {
     };
 
     setThankYouDraft({
+      mode: "single",
       ...draft,
       emailText: buildThankYouEmailText(draft),
     });
     setThankYouError("");
     setThankYouStatus("");
   }
+
+  function startPartyThankYouEmail(partyId) {
+    const partyWaivers = waivers.filter((waiver) => partyIdValue(waiver) === partyId);
+    const recipients = uniqueValues(partyWaivers.map((waiver) => waiver.primary?.email)).map((email) => {
+      const waiver = partyWaivers.find((item) => String(item.primary?.email || "").trim() === email);
+      const firstName = waiver?.primary?.firstName || "";
+      return {
+        email,
+        firstName,
+        name: [waiver?.primary?.firstName, waiver?.primary?.lastName].filter(Boolean).join(" "),
+      };
+    });
+
+    if (!recipients.length) {
+      setError(`No recipient emails found for Party ID ${partyId}.`);
+      return;
+    }
+
+    const draft = {
+      email: recipients[0]?.email || "",
+      firstName: "{firstName}",
+      name: "{name}",
+      partyId,
+      feedbackUrl: DEFAULT_FEEDBACK_URL,
+      websiteLink: DEFAULT_WEBSITE_LINK,
+    };
+
+    setThankYouDraft({
+      mode: "party",
+      recipients,
+      emailsText: recipients.map((recipient) => recipient.email).join("\n"),
+      ...draft,
+      emailText: buildThankYouEmailText(draft),
+    });
+    setThankYouError("");
+    setThankYouStatus("");
+  }
+
+  const selectedPartyId = partyFilter.startsWith("party:") ? partyFilter.slice("party:".length) : "";
 
   function closeThankYouEmail() {
     setThankYouDraft(null);
@@ -801,31 +882,64 @@ export default function AdminWaiversPage() {
     setThankYouError("");
     setThankYouStatus("");
 
-    try {
-      const response = await fetch("/api/admin/invites/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "thank-you",
-          email: thankYouDraft.email,
-          firstName: thankYouDraft.firstName,
-          name: thankYouDraft.name,
-          partyId: thankYouDraft.partyId,
-          feedbackUrl: thankYouDraft.feedbackUrl,
-          websiteLink: thankYouDraft.websiteLink,
-          thankYouText: thankYouDraft.emailText,
-        }),
-      });
-      const data = await response.json();
+    const recipientEmails = thankYouDraft.mode === "party"
+      ? uniqueValues(String(thankYouDraft.emailsText || "").split(/\n|,/))
+      : uniqueValues([thankYouDraft.email]);
 
-      if (!response.ok) {
-        setThankYouError(data.error || "Unable to send thank you email.");
-        return;
+    if (!recipientEmails.length) {
+      setThankYouError("Please enter at least one recipient email.");
+      setSendingThankYou(false);
+      return;
+    }
+
+    try {
+      const sendOne = async (email) => {
+        const matchedRecipient = (thankYouDraft.recipients || []).find(
+          (recipient) => normalizeSearchValue(recipient.email) === normalizeSearchValue(email),
+        ) || {};
+        const firstName = thankYouDraft.mode === "party"
+          ? matchedRecipient.firstName || ""
+          : thankYouDraft.firstName;
+        const name = thankYouDraft.mode === "party"
+          ? matchedRecipient.name || firstName
+          : thankYouDraft.name;
+        const personalizedText = String(thankYouDraft.emailText || "")
+          .replaceAll("{firstName}", firstName || "there")
+          .replaceAll("{name}", name || firstName || "there")
+          .replaceAll("{email}", email);
+
+        const response = await fetch("/api/admin/invites/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "thank-you",
+            email,
+            firstName,
+            name,
+            partyId: thankYouDraft.partyId,
+            feedbackUrl: thankYouDraft.feedbackUrl,
+            websiteLink: thankYouDraft.websiteLink,
+            thankYouText: personalizedText,
+          }),
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `Unable to send thank you email to ${email}.`);
+        }
+      };
+
+      for (const email of recipientEmails) {
+        await sendOne(email);
       }
 
-      setThankYouStatus("Thank you email sent.");
+      setThankYouStatus(
+        recipientEmails.length === 1
+          ? "Thank you email sent."
+          : `Thank you email sent to ${recipientEmails.length} recipients.`,
+      );
     } catch (sendError) {
-      setThankYouError("Unable to send thank you email.");
+      setThankYouError(sendError?.message || "Unable to send thank you email.");
     } finally {
       setSendingThankYou(false);
     }
@@ -945,9 +1059,14 @@ export default function AdminWaiversPage() {
                             <div><dt>Date</dt><dd>{group.visitDate || "Not set"}</dd></div>
                             <div><dt>Time</dt><dd>{group.visitTime || "Not set"}</dd></div>
                           </dl>
-                          <button type="button" onClick={() => viewPartyWaivers(group.partyId)}>
-                            View Party
-                          </button>
+                          <div className="waiver-party-groups__actions">
+                            <button type="button" onClick={() => viewPartyWaivers(group.partyId)}>
+                              View Party
+                            </button>
+                            <button type="button" onClick={() => startPartyThankYouEmail(group.partyId)}>
+                              Thank You Party
+                            </button>
+                          </div>
                         </article>
                       ))}
                     </div>
@@ -985,9 +1104,20 @@ export default function AdminWaiversPage() {
                       <span>To</span>
                       <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
                     </label>
-                    <label className="waiver-data-checkbox">
-                      <input type="checkbox" checked={partyOnly} onChange={(event) => setPartyOnly(event.target.checked)} />
-                      <span>Has party ID</span>
+                    <label>
+                      <span>Party ID</span>
+                      <select value={partyFilter} onChange={(event) => setPartyFilter(event.target.value)}>
+                        <option value="all">All records</option>
+                        <option value="has">Has party ID</option>
+                        <option value="none">No party ID</option>
+                        {partyFilterOptions.length ? (
+                          <optgroup label="Party IDs">
+                            {partyFilterOptions.map((partyId) => (
+                              <option value={`party:${partyId}`} key={partyId}>{partyId}</option>
+                            ))}
+                          </optgroup>
+                        ) : null}
+                      </select>
                     </label>
                     <label>
                       <span>Show</span>
@@ -997,6 +1127,11 @@ export default function AdminWaiversPage() {
                         ))}
                       </select>
                     </label>
+                    {selectedPartyId ? (
+                      <button type="button" onClick={() => startPartyThankYouEmail(selectedPartyId)}>
+                        Thank You Party
+                      </button>
+                    ) : null}
                     <button type="button" onClick={clearFilters}>Clear</button>
                   </div>
                 </div>
