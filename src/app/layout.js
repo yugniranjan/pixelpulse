@@ -291,19 +291,23 @@ export default async function RootLayout({ children }) {
           </>
         </TrackingVisibility>
         <Toaster position="top-right" />
-        <ChromeVisibility>
-          <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
-          <Breadcrumbs />
-          <FloatingWaiverButton />
-        </ChromeVisibility>
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-        <ChromeVisibility>
-          <Footer
-            location_slug={location_slug}
-            configdata={configdata}
-            menudata={menudata}
-          />
-        </ChromeVisibility>
+        <div className="ppp-site-shell">
+          <ChromeVisibility>
+            <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
+            <Breadcrumbs />
+            <FloatingWaiverButton />
+          </ChromeVisibility>
+          <div className="ppp-site-content">
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+          </div>
+          <ChromeVisibility>
+            <Footer
+              location_slug={location_slug}
+              configdata={configdata}
+              menudata={menudata}
+            />
+          </ChromeVisibility>
+        </div>
         <div id="modal-root"></div>
       </body>
     </html>

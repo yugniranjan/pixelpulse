@@ -21,6 +21,25 @@ body {
     Roboto, sans-serif;
 }
 
+body {
+  min-height: 100dvh;
+}
+
+.ppp-site-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ppp-site-content {
+  flex: 1 0 auto;
+  min-width: 0;
+}
+
+.aero_footer_section-bg {
+  flex-shrink: 0;
+}
+
 .ppp-subcategory-hero__text,
 .ppp-groupdetail-hero__text,
 .ppp-party-hero__text,
