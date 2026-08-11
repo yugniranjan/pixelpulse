@@ -102,6 +102,71 @@ function partyMatchesFilter(waiver = {}, filter = "all") {
   return true;
 }
 
+function excelText(value = "") {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function safeFilePart(value = "") {
+  return String(value || "all")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "all";
+}
+
+function downloadExcelFile(filename, rows = []) {
+  if (!rows.length || typeof window === "undefined") return;
+
+  const tableRows = rows
+    .map((row) => `<tr>${row.map((cell) => `<td>${excelText(cell)}</td>`).join("")}</tr>`)
+    .join("");
+  const html = `<!doctype html><html><head><meta charset="utf-8" /></head><body><table>${tableRows}</table></body></html>`;
+  const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename.endsWith(".xls") ? filename : `${filename}.xls`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function waiverExportRow(waiver = {}) {
+  const familyMembers = Array.isArray(waiver.familyMembers) ? waiver.familyMembers : [];
+  const children = familyMembers.filter((member) => member.type === "minor");
+  const additionalAdults = familyMembers.filter((member) => member.type !== "minor");
+
+  return [
+    waiver.id,
+    effectiveWaiverDate(waiver),
+    waiver.submittedAt || "",
+    partyIdValue(waiver),
+    partyIdValue(waiver) ? "Party ID" : "No party ID",
+    waiver.visit?.partyName || "",
+    waiver.visit?.passType || "",
+    waiver.visit?.visitTime || "",
+    waiver.primaryName || participantName(waiver.primary),
+    waiver.primary?.firstName || "",
+    waiver.primary?.lastName || "",
+    waiver.primary?.email || "",
+    waiver.primary?.phone || "",
+    waiver.primary?.city || "",
+    waiverParticipantCount(waiver),
+    children.map(participantName).join("; "),
+    children.map((child) => child.dob || "").filter(Boolean).join("; "),
+    additionalAdults.map(participantName).join("; "),
+    waiver.visit?.emergencyName || "",
+    waiver.visit?.emergencyRelation || "",
+    waiver.visit?.emergencyPhone || "",
+    waiver.source || "",
+  ];
+}
+
 function localDateString(date = new Date()) {
   return [
     date.getFullYear(),
@@ -789,6 +854,41 @@ export default function AdminWaiversPage() {
     setPlayerDateTo("");
   }
 
+  function exportWaiverRows(exportRows, label) {
+    if (!exportRows.length) return;
+
+    const header = [
+      "Waiver ID",
+      "Visit Date",
+      "Submitted At",
+      "Party ID",
+      "Party ID Status",
+      "Party Name",
+      "Pass Type",
+      "Visit Time",
+      "Primary Name",
+      "First Name",
+      "Last Name",
+      "Email",
+      "Phone",
+      "City",
+      "Participants",
+      "Children",
+      "Children DOBs",
+      "Additional Adults",
+      "Emergency Name",
+      "Emergency Relation",
+      "Emergency Phone",
+      "Source",
+    ];
+    const fromPart = dateFrom || "start";
+    const toPart = dateTo || "today";
+    downloadExcelFile(
+      `waiver-data-${safeFilePart(label)}-${fromPart}-to-${toPart}.xls`,
+      [header, ...exportRows.map(waiverExportRow)],
+    );
+  }
+
   function viewPartyWaivers(partyId) {
     setQuery(partyId);
     setPartyFilter(`party:${partyId}`);
@@ -1133,6 +1233,25 @@ export default function AdminWaiversPage() {
                       </button>
                     ) : null}
                     <button type="button" onClick={clearFilters}>Clear</button>
+                  </div>
+                  <div className="waiver-export-actions" aria-label="Export waiver data">
+                    <button type="button" onClick={() => exportWaiverRows(filteredWaivers, "filtered")} disabled={!filteredWaivers.length}>
+                      Export Filtered Excel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => exportWaiverRows(filteredWaivers.filter((waiver) => partyIdValue(waiver)), "party-id")}
+                      disabled={!filteredWaivers.some((waiver) => partyIdValue(waiver))}
+                    >
+                      Export Party ID Excel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => exportWaiverRows(filteredWaivers.filter((waiver) => !partyIdValue(waiver)), "no-party-id")}
+                      disabled={!filteredWaivers.some((waiver) => !partyIdValue(waiver))}
+                    >
+                      Export No Party ID Excel
+                    </button>
                   </div>
                 </div>
                 {visibleWaivers.length ? (
