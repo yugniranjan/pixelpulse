@@ -213,7 +213,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
             <>
               <span>
                 Each additional participant beyond your package is charged{" "}
-                <strong>$14.99</strong>, paid at the venue.
+                <strong>$25</strong>, paid at the venue.
               </span>
             </>
           )}
