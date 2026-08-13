@@ -125,12 +125,12 @@ function playerEmailDeliveryStatus(player = {}) {
   const thankYou = playerThankYouState(player);
   if (thankYou.sent) return "Email delivered";
   if (thankYou.feedbackReceived) return "Feedback received";
-  if (playerReadyForThankYou(player)) return "Session Complete — Email Not Delivered";
+  if (playerReadyForThankYou(player)) return "Session Complete — Send Email";
   return "Session not complete";
 }
 
 function playerNeedsThankYouEmail(player = {}) {
-  return playerEmailDeliveryStatus(player) === "Session Complete — Email Not Delivered";
+  return playerEmailDeliveryStatus(player) === "Session Complete — Send Email";
 }
 
 function sortPlayerEmailGroups(groups = [], sort = "newest") {
