@@ -277,6 +277,45 @@ export async function listFeedbackSubmissions({ q = "", source = "", minRating =
   return result.rows.map(normalizeRow);
 }
 
+export async function listFeedbackEmailStatuses(emails = []) {
+  if (!hasFeedbackStore()) return {};
+
+  await ensureTable();
+
+  const uniqueEmails = Array.from(
+    new Set(
+      emails
+        .map(normalizeComparable)
+        .filter(Boolean),
+    ),
+  );
+
+  if (!uniqueEmails.length) return {};
+
+  const result = await query(
+    `
+      select lower(trim(email)) as email,
+             count(*)::int as count,
+             max(created_at) as latest_feedback_at
+      from feedback_submissions
+      where lower(trim(email)) = any($1::text[])
+      group by lower(trim(email))
+    `,
+    [uniqueEmails],
+  );
+
+  return Object.fromEntries(
+    result.rows.map((row) => [
+      row.email,
+      {
+        received: Number(row.count) > 0,
+        count: Number(row.count) || 0,
+        latestFeedbackAt: iso(row.latest_feedback_at),
+      },
+    ]),
+  );
+}
+
 export async function deleteFeedbackSubmission(id = "") {
   if (!hasFeedbackStore()) return { error: "Feedback database is not configured." };
 

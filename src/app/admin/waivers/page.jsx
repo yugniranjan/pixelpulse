@@ -8,6 +8,7 @@ import "../../styles/admin-player-info.css";
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
+const THANK_YOU_STATS_START_DATE = "2026-08-01";
 const PLAYER_SORT_OPTIONS = [
   { value: "newest", label: "Newest players" },
   { value: "points-desc", label: "Score: high to low" },
@@ -107,6 +108,14 @@ function thankYouSentDetails(waiver = {}) {
   };
 }
 
+function feedbackReceivedDetails(waiver = {}) {
+  const details = waiver.feedbackStatus || {};
+  return {
+    received: Boolean(details.received || details.latestFeedbackAt),
+    latestFeedbackAt: details.latestFeedbackAt || "",
+  };
+}
+
 function partyMatchesFilter(waiver = {}, filter = "all") {
   const partyId = partyIdValue(waiver);
   if (filter === "has") return Boolean(partyId);
@@ -193,6 +202,10 @@ function effectiveWaiverDate(waiver = {}) {
   const visitDate = waiver.visit?.visitDate;
   if (/^\d{4}-\d{2}-\d{2}$/.test(visitDate || "")) return visitDate;
   return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : "";
+}
+
+function waiverSubmittedDate(waiver = {}) {
+  return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : effectiveWaiverDate(waiver);
 }
 
 function waiverParticipantCount(waiver = {}) {
@@ -412,6 +425,8 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
   const attractions = Array.isArray(activeWaiver.attractions) ? activeWaiver.attractions : [];
   const partyDate = partyDateValue(activeWaiver);
   const thankYouSent = thankYouSentDetails(activeWaiver);
+  const feedbackReceived = feedbackReceivedDetails(activeWaiver);
+  const thankYouDisabled = thankYouSent.sent || feedbackReceived.received;
 
   return (
     <article className="waiver-admin-card">
@@ -515,13 +530,18 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Record Actions</h2>
             <div>
-              <button type="button" onClick={() => onThankYouEmail(activeWaiver)} disabled={thankYouSent.sent}>Thank You Email</button>
+              <button type="button" onClick={() => onThankYouEmail(activeWaiver)} disabled={thankYouDisabled}>Thank You Email</button>
               <button type="button" onClick={() => onEdit(activeWaiver)}>Edit Record</button>
               <button type="button" className="is-danger" onClick={() => onDelete(activeWaiver)}>Delete Record</button>
             </div>
             {thankYouSent.sent ? (
               <p className="waiver-email-already-sent">
                 Thank you email already sent{thankYouSent.sentAt ? ` on ${formatDateTime(thankYouSent.sentAt)}` : ""}.
+              </p>
+            ) : null}
+            {!thankYouSent.sent && feedbackReceived.received ? (
+              <p className="waiver-email-already-sent">
+                Feedback already received{feedbackReceived.latestFeedbackAt ? ` on ${formatDateTime(feedbackReceived.latestFeedbackAt)}` : ""}.
               </p>
             ) : null}
           </section>
@@ -746,14 +766,25 @@ export default function AdminWaiversPage() {
     [waivers],
   );
   const thankYouEmailStats = useMemo(() => {
-    return waivers.reduce(
-      (stats, waiver) => {
-        if (!waiver.primary?.email) return stats;
-        if (thankYouSentDetails(waiver).sent) {
-          stats.sent += 1;
-        } else {
-          stats.pending += 1;
-        }
+    const emails = new Map();
+
+    waivers.forEach((waiver) => {
+      if (waiverSubmittedDate(waiver) < THANK_YOU_STATS_START_DATE) return;
+      const email = normalizeSearchValue(waiver.primary?.email);
+      if (!email) return;
+      emails.set(email, {
+        sent: Boolean(
+          emails.get(email)?.sent ||
+          thankYouSentDetails(waiver).sent ||
+          feedbackReceivedDetails(waiver).received
+        ),
+      });
+    });
+
+    return Array.from(emails.values()).reduce(
+      (stats, email) => {
+        if (email.sent) stats.sent += 1;
+        else stats.pending += 1;
         return stats;
       },
       { sent: 0, pending: 0 },
@@ -949,6 +980,10 @@ export default function AdminWaiversPage() {
       setThankYouError("Thank you email already sent to this user.");
       return;
     }
+    if (feedbackReceivedDetails(waiver).received) {
+      setThankYouError("Feedback has already been received from this user.");
+      return;
+    }
 
     const firstName = waiver.primary?.firstName || "";
     const name = [waiver.primary?.firstName, waiver.primary?.lastName].filter(Boolean).join(" ");
@@ -973,7 +1008,11 @@ export default function AdminWaiversPage() {
   }
 
   function startPartyThankYouEmail(partyId) {
-    const partyWaivers = waivers.filter((waiver) => partyIdValue(waiver) === partyId && !thankYouSentDetails(waiver).sent);
+    const partyWaivers = waivers.filter((waiver) =>
+      partyIdValue(waiver) === partyId &&
+      !thankYouSentDetails(waiver).sent &&
+      !feedbackReceivedDetails(waiver).received
+    );
     const recipients = uniqueValues(partyWaivers.map((waiver) => waiver.primary?.email)).map((email) => {
       const waiver = partyWaivers.find((item) => String(item.primary?.email || "").trim() === email);
       const firstName = waiver?.primary?.firstName || "";

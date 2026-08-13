@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
+import { listFeedbackEmailStatuses } from "@/lib/feedback";
 import {
   deletePostgresWaiver,
   getPostgresWaiverById,
@@ -53,6 +54,26 @@ function partyIdValue(waiver = {}) {
   return String(waiver.visit?.partyId || "").trim();
 }
 
+function normalizeEmail(value = "") {
+  return cleanText(value).toLowerCase();
+}
+
+async function enrichFeedbackDetails(waivers = []) {
+  const statuses = await listFeedbackEmailStatuses(
+    waivers.map((waiver) => waiver.primary?.email),
+  );
+
+  return waivers.map((waiver) => {
+    const status = statuses[normalizeEmail(waiver.primary?.email)];
+    if (!status) return waiver;
+
+    return {
+      ...waiver,
+      feedbackStatus: status,
+    };
+  });
+}
+
 function withPartyAdminDetails(waiver = {}, partyDetails = {}) {
   const partyId = partyIdValue(waiver);
   const detail = partyId ? partyDetails[partyId] : null;
@@ -99,14 +120,16 @@ export async function GET(req) {
     if (id) {
       const includeSignature = searchParams.get("includeSignature") === "1";
       const waiver = await getPostgresWaiverById(id, { includeSignature });
-      const enriched = waiver ? (await enrichPostgresPartyDetails([waiver]))[0] : null;
+      const partyEnriched = waiver ? (await enrichPostgresPartyDetails([waiver])) : [];
+      const enriched = partyEnriched.length ? (await enrichFeedbackDetails(partyEnriched))[0] : null;
       return waiver
         ? NextResponse.json({ waiver: enriched })
         : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
     }
 
     const waivers = await listPostgresWaivers(limit, { includeSignature: false });
-    return NextResponse.json({ waivers: await enrichPostgresPartyDetails(waivers) });
+    const partyEnriched = await enrichPostgresPartyDetails(waivers);
+    return NextResponse.json({ waivers: await enrichFeedbackDetails(partyEnriched) });
   }
 
   if (!db) {
@@ -125,7 +148,8 @@ export async function GET(req) {
     const waiver = serializeWaiver(snapshot, {
       includeSignature: searchParams.get("includeSignature") === "1",
     });
-    const enriched = (await enrichFirestorePartyDetails([waiver]))[0];
+    const partyEnriched = await enrichFirestorePartyDetails([waiver]);
+    const enriched = (await enrichFeedbackDetails(partyEnriched))[0];
     return NextResponse.json({ waiver: enriched });
   }
 
@@ -152,7 +176,7 @@ export async function GET(req) {
   const waivers = snapshot.docs.map((doc) => serializeWaiver(doc, { includeSignature: false }));
 
   return NextResponse.json({
-    waivers: await enrichFirestorePartyDetails(waivers),
+    waivers: await enrichFeedbackDetails(await enrichFirestorePartyDetails(waivers)),
   });
 }
 
