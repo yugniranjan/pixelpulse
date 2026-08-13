@@ -204,7 +204,8 @@ export async function listPostgresWaivers(limit = 300, { includeSignature = fals
       source,
       user_agent,
       submitted_at,
-      updated_at
+      updated_at,
+      raw
     `;
   const result = await query(
     `select ${columns} from waivers order by submitted_at desc nulls last limit $1`,
@@ -228,7 +229,8 @@ export async function getPostgresWaiverById(id, { includeSignature = false } = {
       source,
       user_agent,
       submitted_at,
-      updated_at
+      updated_at,
+      raw
     `;
   const result = await query(`select ${columns} from waivers where id = $1`, [id]);
   return result.rows[0] ? normalizeWaiverRow(result.rows[0], { includeSignature }) : null;
@@ -329,6 +331,28 @@ export async function updatePostgresWaiver(id, updateData) {
   return getPostgresWaiverById(id);
 }
 
+export async function markPostgresWaiverThankYouSent(id, { email = "", sentAt = new Date() } = {}) {
+  const timestamp = sentAt instanceof Date ? sentAt : new Date(sentAt);
+  const marker = {
+    thankYouEmail: {
+      sent: true,
+      email,
+      sentAt: timestamp.toISOString(),
+    },
+  };
+  const result = await query(
+    `
+      update waivers
+      set raw = raw || $2::jsonb,
+          updated_at = $3
+      where id = $1
+    `,
+    [id, json(marker, {}), timestamp],
+  );
+  if (result.rowCount === 0) return null;
+  return getPostgresWaiverById(id);
+}
+
 export async function deletePostgresWaiver(id) {
   const result = await query("delete from waivers where id = $1", [id]);
   return result.rowCount > 0;
@@ -337,6 +361,14 @@ export async function deletePostgresWaiver(id) {
 export async function getPostgresPartyWaiver(partyId) {
   const result = await query("select * from party_waivers where party_id = $1", [partyId]);
   return result.rows[0] ? normalizePartyWaiverRow(result.rows[0]) : null;
+}
+
+export async function listPostgresPartyWaiversByIds(partyIds = []) {
+  const ids = Array.from(new Set(partyIds.map((id) => String(id || "").trim()).filter(Boolean)));
+  if (!ids.length) return [];
+
+  const result = await query("select * from party_waivers where party_id = any($1::text[])", [ids]);
+  return result.rows.map(normalizePartyWaiverRow);
 }
 
 export async function upsertPostgresPartyWaiver(partyWaiver) {

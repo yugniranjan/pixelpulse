@@ -336,8 +336,8 @@ export default function FeedbackForm({ initial = {} }) {
     event.preventDefault();
     setError("");
 
-    if (!form.name.trim() || !form.email.trim() || !form.heardAboutUs || !form.ratings.overall) {
-      setError("Please add your name, email, how you heard about us, and overall fun rating.");
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.heardAboutUs || !form.ratings.overall) {
+      setError("Please add your name, email, phone number, how you heard about us, and overall fun rating.");
       return;
     }
 
@@ -416,8 +416,8 @@ export default function FeedbackForm({ initial = {} }) {
                 <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="you@example.com" required />
               </label>
               <label>
-                <span>Phone optional</span>
-                <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Optional phone number" />
+                <span>Phone *</span>
+                <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Phone number" required />
               </label>
               <label>
                 <span>How did you hear about us? *</span>

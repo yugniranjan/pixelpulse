@@ -331,11 +331,23 @@
   cursor: pointer;
 }
 
-.waiver-record-actions button:hover,
+.waiver-record-actions button:hover:not(:disabled),
 .waiver-edit-actions button:hover,
 .waiver-edit-modal__head button:hover {
   border-color: #a4cf5f;
   color: #3f6212;
+}
+
+.waiver-record-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.waiver-email-already-sent {
+  margin: 10px 0 0;
+  color: #667085;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .waiver-record-actions button.is-danger {

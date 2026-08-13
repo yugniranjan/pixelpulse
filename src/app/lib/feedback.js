@@ -74,6 +74,14 @@ function cleanText(value = "") {
   return String(value || "").trim();
 }
 
+function normalizeComparable(value = "") {
+  return cleanText(value).toLowerCase();
+}
+
+function normalizePhone(value = "") {
+  return cleanText(value).replace(/[^\d+]/g, "");
+}
+
 function cleanArray(values = []) {
   return Array.isArray(values) ? values.map(cleanText).filter(Boolean) : [];
 }
@@ -193,6 +201,31 @@ export async function recordFeedback(input = {}) {
   );
 
   return normalizeRow(result.rows[0]);
+}
+
+export async function findDuplicateFeedback(input = {}) {
+  if (!hasFeedbackStore()) return null;
+
+  await ensureTable();
+  const name = normalizeComparable(input.name);
+  const email = normalizeComparable(input.email);
+  const phone = normalizePhone(input.phone);
+  if (!name || !email || !phone) return null;
+
+  const result = await query(
+    `
+      select id, name, email, phone, created_at
+      from feedback_submissions
+      where lower(trim(name)) = $1
+        and lower(trim(email)) = $2
+        and regexp_replace(coalesce(phone, ''), '[^0-9+]', '', 'g') = $3
+      order by created_at desc
+      limit 1
+    `,
+    [name, email, phone],
+  );
+
+  return result.rows[0] ? normalizeRow(result.rows[0]) : null;
 }
 
 export async function listFeedbackSubmissions({ q = "", source = "", minRating = "", limit = 200 } = {}) {

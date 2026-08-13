@@ -22,7 +22,7 @@ function Field({ label, required = false, children }) {
 
 function buildThankYouPreview(form) {
   return [
-    form.firstName ? `Hi ${form.firstName},` : "Hi,",
+    form.firstName ? `Hi ${form.firstName},` : "Hi {firstName},",
     "",
     "Thanks for Playing at Pixel Pulse!",
     "",
@@ -54,7 +54,7 @@ function buildThankYouPreview(form) {
 export default function AdminThankYouPage() {
   const [form, setForm] = useState({
     firstName: "",
-    email: "",
+    emails: "",
     partyId: "",
     feedbackUrl: DEFAULT_FEEDBACK_URL,
     websiteLink: DEFAULT_WEBSITE_LINK,
@@ -65,6 +65,14 @@ export default function AdminThankYouPage() {
   const [attachments, setAttachments] = useState([]);
 
   const previewText = useMemo(() => buildThankYouPreview(form), [form]);
+  const recipientEmails = useMemo(
+    () =>
+      form.emails
+        .split(/[\n,;]+/)
+        .map((email) => email.trim())
+        .filter(Boolean),
+    [form.emails],
+  );
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -74,40 +82,51 @@ export default function AdminThankYouPage() {
     await navigator.clipboard.writeText(text);
   }
 
-  async function sendThankYouEmail(event) {
+  async function sendPromotionalEmail(event) {
     event.preventDefault();
     setSending(true);
     setStatus("");
     setError("");
 
+    if (!recipientEmails.length) {
+      setError("Please enter at least one email address.");
+      setSending(false);
+      return;
+    }
+
     try {
-      const payload = new FormData();
-      payload.append("type", "thank-you");
-      payload.append("email", form.email);
-      payload.append("firstName", form.firstName);
-      payload.append("name", form.firstName);
-      payload.append("partyId", form.partyId);
-      payload.append("feedbackUrl", form.feedbackUrl);
-      payload.append("websiteLink", form.websiteLink);
-      attachments.forEach((file) => {
-        payload.append("attachments", file);
-      });
+      for (const email of recipientEmails) {
+        const payload = new FormData();
+        payload.append("type", "thank-you");
+        payload.append("email", email);
+        payload.append("firstName", form.firstName);
+        payload.append("name", form.firstName);
+        payload.append("partyId", form.partyId);
+        payload.append("feedbackUrl", form.feedbackUrl);
+        payload.append("websiteLink", form.websiteLink);
+        attachments.forEach((file) => {
+          payload.append("attachments", file);
+        });
 
-      const response = await fetch("/api/admin/invites/email", {
-        method: "POST",
-        credentials: "same-origin",
-        body: payload,
-      });
-      const data = await response.json();
+        const response = await fetch("/api/admin/invites/email", {
+          method: "POST",
+          credentials: "same-origin",
+          body: payload,
+        });
+        const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || "Unable to send thank you email.");
-        return;
+        if (!response.ok) {
+          throw new Error(data.error || `Unable to send promotional email to ${email}.`);
+        }
       }
 
-      setStatus("Thank you email sent.");
+      setStatus(
+        recipientEmails.length === 1
+          ? "Promotional email sent."
+          : `Promotional email sent individually to ${recipientEmails.length} recipients.`,
+      );
     } catch (sendError) {
-      setError("Unable to send thank you email.");
+      setError(sendError?.message || "Unable to send promotional email.");
     } finally {
       setSending(false);
     }
@@ -119,14 +138,14 @@ export default function AdminThankYouPage() {
         <div className="invite-admin-header waiver-admin-header--dashboard">
           <div>
             <span className="waiver-admin-kicker">Admin dashboard</span>
-            <h1>Thank You Email</h1>
-            <p>Send post-visit thank-you, feedback, and reward emails from one place.</p>
+            <h1>Promotional Email</h1>
+            <p>Send post-visit promotional, feedback, and reward emails from one place.</p>
           </div>
         </div>
 
-        <form className="invite-admin-form" onSubmit={sendThankYouEmail}>
+        <form className="invite-admin-form" onSubmit={sendPromotionalEmail}>
           <section>
-            <h2>Recipient</h2>
+            <h2>Recipients</h2>
             <div className="invite-admin-grid">
               <Field label="First name">
                 <input
@@ -135,13 +154,12 @@ export default function AdminThankYouPage() {
                   placeholder="First name"
                 />
               </Field>
-              <Field label="Email" required>
-                <input
+              <Field label="Email addresses" required>
+                <textarea
                   required
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => updateField("email", event.target.value)}
-                  placeholder="name@example.com"
+                  value={form.emails}
+                  onChange={(event) => updateField("emails", event.target.value)}
+                  placeholder="name@example.com&#10;another@example.com"
                 />
               </Field>
               <Field label="Party ID">
@@ -172,7 +190,7 @@ export default function AdminThankYouPage() {
               </Field>
             </div>
             <p className="invite-admin-help">
-              The feedback link is sent as a button in the thank-you email.
+              Add one email per line, or separate emails with commas. Each recipient receives an individual email.
             </p>
           </section>
 
@@ -198,20 +216,24 @@ export default function AdminThankYouPage() {
           {status ? <p className="invite-admin-status">{status}</p> : null}
 
           <button type="submit" disabled={sending}>
-            {sending ? "Sending..." : "Send Thank You Email"}
+            {sending ? "Sending..." : "Send Promotional Email"}
           </button>
         </form>
 
         <section className="invite-admin-result">
-          <h2>Email Preview</h2>
+          <h2>Promotional Email Preview</h2>
           <div className="invite-admin-output">
+            <div>
+              <span>Recipients</span>
+              <p>{recipientEmails.length ? `${recipientEmails.length} recipient${recipientEmails.length === 1 ? "" : "s"}` : "No recipients yet"}</p>
+            </div>
             <div>
               <span>Feedback Link</span>
               <a href={form.feedbackUrl} target="_blank" rel="noopener noreferrer">{form.feedbackUrl}</a>
               <button type="button" onClick={() => copyText(form.feedbackUrl)}>Copy</button>
             </div>
             <div>
-              <span>Thank You Email Text</span>
+              <span>Promotional Email Text</span>
               <textarea readOnly value={previewText} />
               <button type="button" onClick={() => copyText(previewText)}>Copy</button>
             </div>

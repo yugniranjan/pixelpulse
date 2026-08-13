@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isEmail } from "@/lib/mailer";
-import { hasFeedbackStore, recordFeedback } from "@/lib/feedback";
+import { findDuplicateFeedback, hasFeedbackStore, recordFeedback } from "@/lib/feedback";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,12 +19,13 @@ export async function POST(request) {
 
   const name = cleanText(body.name);
   const email = cleanText(body.email);
+  const phone = cleanText(body.phone);
   const heardAboutUs = cleanText(body.heardAboutUs);
   const ratings = body.ratings || {};
 
-  if (!name || !isEmail(email) || !heardAboutUs || !ratings.overall) {
+  if (!name || !isEmail(email) || !phone || !heardAboutUs || !ratings.overall) {
     return NextResponse.json(
-      { error: "Name, valid email, how you heard about us, and overall rating are required." },
+      { error: "Name, valid email, phone number, how you heard about us, and overall rating are required." },
       { status: 400 },
     );
   }
@@ -42,6 +43,14 @@ export async function POST(request) {
   const average = ratingValues.length
     ? (ratingValues.reduce((total, rating) => total + rating, 0) / ratingValues.length).toFixed(1)
     : "";
+
+  const duplicate = await findDuplicateFeedback({ name, email, phone });
+  if (duplicate) {
+    return NextResponse.json(
+      { error: "Feedback has already been submitted with this name, phone number, and email." },
+      { status: 409 },
+    );
+  }
 
   await recordFeedback(body);
 

@@ -94,6 +94,19 @@ function partyIdValue(waiver = {}) {
   return String(waiver.visit?.partyId || "").trim();
 }
 
+function partyDateValue(waiver = {}) {
+  return String(waiver.visit?.partyDate || waiver.visit?.visitDate || "").trim();
+}
+
+function thankYouSentDetails(waiver = {}) {
+  const details = waiver.thankYouEmail || waiver.raw?.thankYouEmail || {};
+  return {
+    sent: Boolean(details.sent || details.sentAt),
+    email: details.email || "",
+    sentAt: details.sentAt || "",
+  };
+}
+
 function partyMatchesFilter(waiver = {}, filter = "all") {
   const partyId = partyIdValue(waiver);
   if (filter === "has") return Boolean(partyId);
@@ -144,6 +157,7 @@ function waiverExportRow(waiver = {}) {
   return [
     waiver.id,
     effectiveWaiverDate(waiver),
+    partyDateValue(waiver),
     waiver.submittedAt || "",
     partyIdValue(waiver),
     partyIdValue(waiver) ? "Party ID" : "No party ID",
@@ -396,6 +410,8 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
   const familyMembers = Array.isArray(activeWaiver.familyMembers) ? activeWaiver.familyMembers : [];
   const { children, additionalAdults } = splitFamilyMembers(familyMembers);
   const attractions = Array.isArray(activeWaiver.attractions) ? activeWaiver.attractions : [];
+  const partyDate = partyDateValue(activeWaiver);
+  const thankYouSent = thankYouSentDetails(activeWaiver);
 
   return (
     <article className="waiver-admin-card">
@@ -410,7 +426,7 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
         </span>
         <span>
           <strong>{activeWaiver.visit?.partyId || "No party ID"}</strong>
-          <em>{activeWaiver.visit?.visitDate || "No visit date"}</em>
+          <em>{partyDate ? `Party date: ${partyDate}` : "No party date"}</em>
         </span>
         <span>
           <strong>{activeWaiver.participantCount || 1}</strong>
@@ -444,6 +460,7 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
               <div><dt>Pass</dt><dd>{activeWaiver.visit?.passType || "Not provided"}</dd></div>
               <div><dt>Party ID</dt><dd>{activeWaiver.visit?.partyId || "Not provided"}</dd></div>
               <div><dt>Party name</dt><dd>{activeWaiver.visit?.partyName || "Not provided"}</dd></div>
+              <div><dt>Party date</dt><dd>{partyDate || "Not provided"}</dd></div>
               <div><dt>Visit date</dt><dd>{activeWaiver.visit?.visitDate || "Not provided"}</dd></div>
               <div><dt>Party time</dt><dd>{activeWaiver.visit?.visitTime || "Not provided"}</dd></div>
               <div><dt>Emergency contact</dt><dd>{activeWaiver.visit?.emergencyName || "Not provided"}</dd></div>
@@ -498,10 +515,15 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Record Actions</h2>
             <div>
-              <button type="button" onClick={() => onThankYouEmail(activeWaiver)}>Thank You Email</button>
+              <button type="button" onClick={() => onThankYouEmail(activeWaiver)} disabled={thankYouSent.sent}>Thank You Email</button>
               <button type="button" onClick={() => onEdit(activeWaiver)}>Edit Record</button>
               <button type="button" className="is-danger" onClick={() => onDelete(activeWaiver)}>Delete Record</button>
             </div>
+            {thankYouSent.sent ? (
+              <p className="waiver-email-already-sent">
+                Thank you email already sent{thankYouSent.sentAt ? ` on ${formatDateTime(thankYouSent.sentAt)}` : ""}.
+              </p>
+            ) : null}
           </section>
         </div>
       ) : null}
@@ -723,6 +745,20 @@ export default function AdminWaiversPage() {
       ),
     [waivers],
   );
+  const thankYouEmailStats = useMemo(() => {
+    return waivers.reduce(
+      (stats, waiver) => {
+        if (!waiver.primary?.email) return stats;
+        if (thankYouSentDetails(waiver).sent) {
+          stats.sent += 1;
+        } else {
+          stats.pending += 1;
+        }
+        return stats;
+      },
+      { sent: 0, pending: 0 },
+    );
+  }, [waivers]);
   const partyGroups = useMemo(() => {
     const groups = new Map();
 
@@ -860,6 +896,7 @@ export default function AdminWaiversPage() {
     const header = [
       "Waiver ID",
       "Visit Date",
+      "Party Date",
       "Submitted At",
       "Party ID",
       "Party ID Status",
@@ -908,6 +945,11 @@ export default function AdminWaiversPage() {
   }
 
   function startThankYouEmail(waiver) {
+    if (thankYouSentDetails(waiver).sent) {
+      setThankYouError("Thank you email already sent to this user.");
+      return;
+    }
+
     const firstName = waiver.primary?.firstName || "";
     const name = [waiver.primary?.firstName, waiver.primary?.lastName].filter(Boolean).join(" ");
     const partyId = waiver.visit?.partyId || "";
@@ -922,6 +964,7 @@ export default function AdminWaiversPage() {
 
     setThankYouDraft({
       mode: "single",
+      waiverId: waiver.id,
       ...draft,
       emailText: buildThankYouEmailText(draft),
     });
@@ -930,7 +973,7 @@ export default function AdminWaiversPage() {
   }
 
   function startPartyThankYouEmail(partyId) {
-    const partyWaivers = waivers.filter((waiver) => partyIdValue(waiver) === partyId);
+    const partyWaivers = waivers.filter((waiver) => partyIdValue(waiver) === partyId && !thankYouSentDetails(waiver).sent);
     const recipients = uniqueValues(partyWaivers.map((waiver) => waiver.primary?.email)).map((email) => {
       const waiver = partyWaivers.find((item) => String(item.primary?.email || "").trim() === email);
       const firstName = waiver?.primary?.firstName || "";
@@ -942,7 +985,7 @@ export default function AdminWaiversPage() {
     });
 
     if (!recipients.length) {
-      setError(`No recipient emails found for Party ID ${partyId}.`);
+      setError(`No unsent recipient emails found for Party ID ${partyId}.`);
       return;
     }
 
@@ -974,6 +1017,26 @@ export default function AdminWaiversPage() {
     setThankYouStatus("");
   }
 
+  async function markWaiverThankYouSent(waiver, email) {
+    if (!waiver?.id) return null;
+
+    const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(waiver.id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "mark-thank-you-sent",
+        email,
+      }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Thank you email was sent, but the waiver could not be marked.");
+    }
+
+    return data.waiver;
+  }
+
   async function sendThankYouEmail(event) {
     event.preventDefault();
     if (!thankYouDraft) return;
@@ -993,6 +1056,7 @@ export default function AdminWaiversPage() {
     }
 
     try {
+      const sentWaivers = [];
       const sendOne = async (email) => {
         const matchedRecipient = (thankYouDraft.recipients || []).find(
           (recipient) => normalizeSearchValue(recipient.email) === normalizeSearchValue(email),
@@ -1027,10 +1091,27 @@ export default function AdminWaiversPage() {
         if (!response.ok) {
           throw new Error(data.error || `Unable to send thank you email to ${email}.`);
         }
+
+        const matchingWaivers = thankYouDraft.mode === "party"
+          ? waivers.filter((waiver) =>
+              partyIdValue(waiver) === thankYouDraft.partyId &&
+              normalizeSearchValue(waiver.primary?.email) === normalizeSearchValue(email),
+            )
+          : waivers.filter((waiver) => waiver.id === thankYouDraft.waiverId);
+
+        for (const waiver of matchingWaivers) {
+          const updatedWaiver = await markWaiverThankYouSent(waiver, email);
+          if (updatedWaiver) sentWaivers.push(updatedWaiver);
+        }
       };
 
       for (const email of recipientEmails) {
         await sendOne(email);
+      }
+
+      if (sentWaivers.length) {
+        const updatedById = new Map(sentWaivers.map((waiver) => [waiver.id, waiver]));
+        setWaivers((current) => current.map((waiver) => updatedById.get(waiver.id) || waiver));
       }
 
       setThankYouStatus(
@@ -1126,6 +1207,14 @@ export default function AdminWaiversPage() {
               <article>
                 <span>Visits Today</span>
                 <strong>{todayVisits}</strong>
+              </article>
+              <article>
+                <span>Emails To Send</span>
+                <strong>{thankYouEmailStats.pending}</strong>
+              </article>
+              <article>
+                <span>Emails Already Sent</span>
+                <strong>{thankYouEmailStats.sent}</strong>
               </article>
               <article>
                 <span>Latest</span>
