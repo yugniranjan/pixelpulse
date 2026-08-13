@@ -353,6 +353,74 @@ export async function markPostgresWaiverThankYouSent(id, { email = "", sentAt = 
   return getPostgresWaiverById(id);
 }
 
+export async function listPostgresWaiverThankYouEmailStatuses(emails = []) {
+  const normalizedEmails = Array.from(
+    new Set(
+      emails
+        .map((email) => String(email || "").trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  );
+
+  if (!normalizedEmails.length) return {};
+
+  const emailExpr = "lower(trim(coalesce(primary_participant->>'email', raw->'primary'->>'email', raw->>'primaryEmail', '')))";
+  const sentExpr = "(coalesce(raw->'thankYouEmail'->>'sent','false') = 'true' or raw->'thankYouEmail'->>'sentAt' is not null)";
+  const result = await query(
+    `
+      select ${emailExpr} as email,
+             bool_or(${sentExpr}) as sent,
+             max(nullif(raw->'thankYouEmail'->>'sentAt', '')::timestamptz) as sent_at
+      from waivers
+      where ${emailExpr} = any($1::text[])
+      group by ${emailExpr}
+    `,
+    [normalizedEmails],
+  );
+
+  return Object.fromEntries(
+    result.rows.map((row) => [
+      row.email,
+      {
+        sent: Boolean(row.sent),
+        sentAt: iso(row.sent_at),
+      },
+    ]),
+  );
+}
+
+export async function markPostgresWaiversThankYouSentByEmail(email = "", { sentAt = new Date() } = {}) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) return { count: 0 };
+
+  const timestamp = sentAt instanceof Date ? sentAt : new Date(sentAt);
+  const marker = {
+    thankYouEmail: {
+      sent: true,
+      email: normalizedEmail,
+      sentAt: timestamp.toISOString(),
+    },
+  };
+  const emailExpr = "lower(trim(coalesce(primary_participant->>'email', raw->'primary'->>'email', raw->>'primaryEmail', '')))";
+  const result = await query(
+    `
+      update waivers
+      set raw = raw || $2::jsonb,
+          updated_at = $3
+      where ${emailExpr} = $1
+    `,
+    [normalizedEmail, json(marker, {}), timestamp],
+  );
+
+  return {
+    count: result.rowCount,
+    status: {
+      sent: result.rowCount > 0,
+      sentAt: timestamp.toISOString(),
+    },
+  };
+}
+
 export async function deletePostgresWaiver(id) {
   const result = await query("delete from waivers where id = $1", [id]);
   return result.rowCount > 0;

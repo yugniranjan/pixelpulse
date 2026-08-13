@@ -22,6 +22,13 @@ import { safeImageUrl } from "@/lib/seo";
 const ABOUT_BUILDING_IMAGE_FALLBACK =
   "https://storage.googleapis.com/pixel-pulse-play/web/pixelmainbuilding.jpg";
 const ABOUT_BUILDING_IMAGE_REDIRECT_SOURCE = "/about-building-image";
+const FUNDRAISING_GROUP_EVENT_CARD = {
+  pageid: "fund-raising-fallback",
+  path: "fund-raising",
+  desc: "Fundraising Events",
+  metatitle: "Bring your school, team, club, or community group together for an active Pixel Pulse fundraiser.",
+  smallimage: "https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.webp",
+};
 
 function stripHtml(html = "") {
   return html
@@ -251,6 +258,10 @@ const Category = async ({ params }) => {
         String(item?.path || "").trim().toLowerCase() === "fund-raising"
       )) || []
     : attractionItems;
+  const groupEventCards = isGroupsEventsPage &&
+    !groupEventItems.some((item) => String(item?.path || "").trim().toLowerCase() === "fund-raising")
+    ? [...groupEventItems, FUNDRAISING_GROUP_EVENT_CARD]
+    : groupEventItems;
   const configCta = getCtaContent(configData);
   const pageCta = getCtaContent(pageData || {});
   const ctaContent = {
@@ -541,7 +552,7 @@ const Category = async ({ params }) => {
                   </div>
 
                   <section className="ppp-groups-grid">
-                    {groupEventItems.map((item, i) => (
+                    {groupEventCards.map((item, i) => (
                       <article className="ppp-group-card-modern" key={item.pageid || i}>
                         <Link
                           href={`${category_slug}/${item?.path}`}

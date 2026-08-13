@@ -19,7 +19,7 @@ function Field({ label, required = false, children }) {
   );
 }
 
-function buildThankYouPreview(form) {
+function buildThankYouPreview(form = {}) {
   return [
     form.firstName ? `Hi ${form.firstName},` : "Hi {firstName},",
     "",
@@ -39,7 +39,7 @@ function buildThankYouPreview(form) {
     "",
     "The Pixel Pulse Team",
     "Vaughan, Ontario",
-    form.websiteLink,
+    form.websiteLink || DEFAULT_WEBSITE_LINK,
   ].filter((line) => line !== null && line !== undefined).join("\n");
 }
 
@@ -49,13 +49,14 @@ export default function AdminThankYouPage() {
     emails: "",
     partyId: "",
     websiteLink: DEFAULT_WEBSITE_LINK,
+    emailText: buildThankYouPreview({ websiteLink: DEFAULT_WEBSITE_LINK }),
   });
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
   const [attachments, setAttachments] = useState([]);
 
-  const previewText = useMemo(() => buildThankYouPreview(form), [form]);
+  const previewText = form.emailText;
   const recipientEmails = useMemo(
     () =>
       form.emails
@@ -94,7 +95,7 @@ export default function AdminThankYouPage() {
         payload.append("name", form.firstName);
         payload.append("partyId", form.partyId);
         payload.append("websiteLink", form.websiteLink);
-        payload.append("promotionalText", previewText);
+        payload.append("promotionalText", form.emailText);
         attachments.forEach((file) => {
           payload.append("attachments", file);
         });
@@ -179,6 +180,19 @@ export default function AdminThankYouPage() {
           </section>
 
           <section>
+            <h2>Email Content</h2>
+            <div className="invite-admin-grid">
+              <Field label="Review and edit" required>
+                <textarea
+                  required
+                  value={form.emailText}
+                  onChange={(event) => updateField("emailText", event.target.value)}
+                />
+              </Field>
+            </div>
+          </section>
+
+          <section>
             <h2>Attachments</h2>
             <div className="invite-admin-grid">
               <Field label="Receipts or files">
@@ -213,7 +227,7 @@ export default function AdminThankYouPage() {
             </div>
             <div>
               <span>Promotional Email Text</span>
-              <textarea readOnly value={previewText} />
+              <textarea readOnly value={form.emailText} />
               <button type="button" onClick={() => copyText(previewText)}>Copy</button>
             </div>
           </div>

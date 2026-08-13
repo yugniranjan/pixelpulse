@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { listFeedbackEmailStatuses } from "@/lib/feedback";
 import { getPostgresPool, query } from "@/lib/postgres";
+import { listPostgresWaiverThankYouEmailStatuses } from "@/lib/postgresData";
 import { ensureRewardsTables } from "@/lib/rewards";
 
 export const dynamic = "force-dynamic";
@@ -180,7 +182,21 @@ export async function GET(req) {
     [limit, locationId],
   );
 
+  const players = result.rows.map(serializePlayer);
+  const emails = players.map((player) => player.email);
+  const [feedbackStatuses, thankYouStatuses] = await Promise.all([
+    listFeedbackEmailStatuses(emails),
+    listPostgresWaiverThankYouEmailStatuses(emails),
+  ]);
+
   return NextResponse.json({
-    players: result.rows.map(serializePlayer),
+    players: players.map((player) => {
+      const email = String(player.email || "").trim().toLowerCase();
+      return {
+        ...player,
+        feedbackStatus: feedbackStatuses[email] || null,
+        thankYouEmail: thankYouStatuses[email] || null,
+      };
+    }),
   });
 }

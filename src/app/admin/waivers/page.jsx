@@ -8,9 +8,8 @@ import "../../styles/admin-player-info.css";
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
-const THANK_YOU_STATS_START_DATE = "2026-08-01";
 const PLAYER_SORT_OPTIONS = [
-  { value: "newest", label: "Newest players" },
+  { value: "newest", label: "Newest activity" },
   { value: "points-desc", label: "Score: high to low" },
   { value: "points-asc", label: "Score: low to high" },
   { value: "repeat-desc", label: "Repeat visits: high to low" },
@@ -99,21 +98,81 @@ function partyDateValue(waiver = {}) {
   return String(waiver.visit?.partyDate || waiver.visit?.visitDate || "").trim();
 }
 
-function thankYouSentDetails(waiver = {}) {
-  const details = waiver.thankYouEmail || waiver.raw?.thankYouEmail || {};
+function playerThankYouState(player = {}) {
+  const thankYou = player.thankYouEmail || {};
+  const feedback = player.feedbackStatus || {};
   return {
-    sent: Boolean(details.sent || details.sentAt),
-    email: details.email || "",
-    sentAt: details.sentAt || "",
+    sent: Boolean(thankYou.sent || thankYou.sentAt),
+    sentAt: thankYou.sentAt || "",
+    feedbackReceived: Boolean(feedback.received || feedback.latestFeedbackAt),
+    feedbackAt: feedback.latestFeedbackAt || "",
   };
 }
 
-function feedbackReceivedDetails(waiver = {}) {
-  const details = waiver.feedbackStatus || {};
-  return {
-    received: Boolean(details.received || details.latestFeedbackAt),
-    latestFeedbackAt: details.latestFeedbackAt || "",
-  };
+function playerSortDate(player = {}) {
+  return player.lastScoreAt || player.createdAt || player.dateSigned || "";
+}
+
+function sortPlayerEmailGroups(groups = [], sort = "newest") {
+  return [...groups].sort((a, b) => {
+    if (sort === "points-desc") {
+      return (b.lifetimePoints || 0) - (a.lifetimePoints || 0) || (b.latestActivityAt || "").localeCompare(a.latestActivityAt || "");
+    }
+    if (sort === "points-asc") {
+      return (a.lifetimePoints || 0) - (b.lifetimePoints || 0) || (b.latestActivityAt || "").localeCompare(a.latestActivityAt || "");
+    }
+    if (sort === "repeat-desc") {
+      return (b.repeatVisits || 0) - (a.repeatVisits || 0) || (b.latestActivityAt || "").localeCompare(a.latestActivityAt || "");
+    }
+    if (sort === "rewards-desc") {
+      return (b.availableRewards || 0) - (a.availableRewards || 0) || (b.latestActivityAt || "").localeCompare(a.latestActivityAt || "");
+    }
+
+    return (b.latestActivityAt || "").localeCompare(a.latestActivityAt || "");
+  });
+}
+
+function buildPlayerEmailGroups(players = [], sort = "newest") {
+  const groups = new Map();
+
+  players.forEach((player) => {
+    const email = normalizeSearchValue(player.email);
+    const key = email || `no-email:${player.id}`;
+    const current = groups.get(key) || {
+      id: key,
+      email: player.email || "",
+      primaryPlayer: player,
+      players: [],
+      latestActivityAt: playerSortDate(player),
+      lifetimePoints: 0,
+      repeatVisits: 0,
+      scoreEvents: 0,
+      availableRewards: 0,
+      redeemedRewards: 0,
+      thankYouEmail: player.thankYouEmail || null,
+      feedbackStatus: player.feedbackStatus || null,
+    };
+
+    current.players.push(player);
+    current.lifetimePoints += Number(player.lifetimePoints || 0);
+    current.repeatVisits += Number(player.repeatVisits || 0);
+    current.scoreEvents += Number(player.scoreEvents || 0);
+    current.availableRewards += Number(player.availableRewards || 0);
+    current.redeemedRewards += Number(player.redeemedRewards || 0);
+
+    if ((playerSortDate(player) || "").localeCompare(current.latestActivityAt || "") > 0) {
+      current.latestActivityAt = playerSortDate(player);
+      current.primaryPlayer = player;
+    }
+
+    const state = playerThankYouState(player);
+    if (state.sent) current.thankYouEmail = player.thankYouEmail || current.thankYouEmail || {};
+    if (state.feedbackReceived) current.feedbackStatus = player.feedbackStatus || current.feedbackStatus || {};
+
+    groups.set(key, current);
+  });
+
+  return sortPlayerEmailGroups(Array.from(groups.values()), sort);
 }
 
 function partyMatchesFilter(waiver = {}, filter = "all") {
@@ -202,10 +261,6 @@ function effectiveWaiverDate(waiver = {}) {
   const visitDate = waiver.visit?.visitDate;
   if (/^\d{4}-\d{2}-\d{2}$/.test(visitDate || "")) return visitDate;
   return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : "";
-}
-
-function waiverSubmittedDate(waiver = {}) {
-  return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : effectiveWaiverDate(waiver);
 }
 
 function waiverParticipantCount(waiver = {}) {
@@ -355,8 +410,6 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
     onChange((current) => ({ ...current, [field]: value }));
   }
 
-  const isPartySend = draft.mode === "party";
-
   return (
     <div className="waiver-edit-backdrop" role="presentation">
       <form className="waiver-edit-modal waiver-email-modal" onSubmit={onSend}>
@@ -371,17 +424,8 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
         <section>
           <h3>Recipient</h3>
           <div className="waiver-edit-grid">
-            {isPartySend ? (
-              <label className="waiver-edit-wide waiver-email-recipients">
-                <span>Recipients for Party ID {draft.partyId} (one email per line)</span>
-                <textarea required value={draft.emailsText} onChange={(event) => update("emailsText", event.target.value)} />
-              </label>
-            ) : (
-              <>
-                <label><span>Email</span><input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} /></label>
-                <label><span>First name</span><input value={draft.firstName} onChange={(event) => update("firstName", event.target.value)} /></label>
-              </>
-            )}
+            <label><span>Email</span><input required type="email" value={draft.email} onChange={(event) => update("email", event.target.value)} /></label>
+            <label><span>First name</span><input value={draft.firstName} onChange={(event) => update("firstName", event.target.value)} /></label>
             <label><span>Party ID</span><input value={draft.partyId} onChange={(event) => update("partyId", event.target.value)} /></label>
           </div>
         </section>
@@ -400,9 +444,6 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
             <span>Review and edit before sending</span>
             <textarea required value={draft.emailText} onChange={(event) => update("emailText", event.target.value)} />
           </label>
-          {isPartySend ? (
-            <p className="waiver-email-help">For party sends, use {"{firstName}"} or {"{name}"} if you want each email personalized.</p>
-          ) : null}
         </section>
 
         {error ? <p className="waiver-admin-error">{error}</p> : null}
@@ -417,16 +458,13 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
   );
 }
 
-function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
+function WaiverCard({ waiver, onDelete, onEdit }) {
   const [open, setOpen] = useState(false);
   const activeWaiver = waiver;
   const familyMembers = Array.isArray(activeWaiver.familyMembers) ? activeWaiver.familyMembers : [];
   const { children, additionalAdults } = splitFamilyMembers(familyMembers);
   const attractions = Array.isArray(activeWaiver.attractions) ? activeWaiver.attractions : [];
   const partyDate = partyDateValue(activeWaiver);
-  const thankYouSent = thankYouSentDetails(activeWaiver);
-  const feedbackReceived = feedbackReceivedDetails(activeWaiver);
-  const thankYouDisabled = thankYouSent.sent || feedbackReceived.received;
 
   return (
     <article className="waiver-admin-card">
@@ -530,20 +568,9 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Record Actions</h2>
             <div>
-              <button type="button" onClick={() => onThankYouEmail(activeWaiver)} disabled={thankYouDisabled}>Thank You Email</button>
               <button type="button" onClick={() => onEdit(activeWaiver)}>Edit Record</button>
               <button type="button" className="is-danger" onClick={() => onDelete(activeWaiver)}>Delete Record</button>
             </div>
-            {thankYouSent.sent ? (
-              <p className="waiver-email-already-sent">
-                Thank you email already sent{thankYouSent.sentAt ? ` on ${formatDateTime(thankYouSent.sentAt)}` : ""}.
-              </p>
-            ) : null}
-            {!thankYouSent.sent && feedbackReceived.received ? (
-              <p className="waiver-email-already-sent">
-                Feedback already received{feedbackReceived.latestFeedbackAt ? ` on ${formatDateTime(feedbackReceived.latestFeedbackAt)}` : ""}.
-              </p>
-            ) : null}
           </section>
         </div>
       ) : null}
@@ -551,24 +578,27 @@ function WaiverCard({ waiver, onDelete, onEdit, onThankYouEmail }) {
   );
 }
 
-function PlayerCard({ player }) {
+function PlayerCard({ group, onThankYouEmail }) {
   const [open, setOpen] = useState(false);
+  const player = group.primaryPlayer || {};
   const currentLevel = player.currentLevel;
   const nextLevel = player.nextLevel;
+  const thankYouState = playerThankYouState(group);
+  const thankYouDisabled = Boolean(!group.email || thankYouState.sent || thankYouState.feedbackReceived);
 
   return (
     <article className="waiver-admin-card">
       <button type="button" className="waiver-admin-card__summary player-admin-card__summary" onClick={() => setOpen((current) => !current)}>
         <span>
-          <strong>{player.fullName}</strong>
-          <em>{player.email || "No email"}</em>
+          <strong>{group.email || "No email"}</strong>
+          <em>{group.players.length} player{group.players.length === 1 ? "" : "s"} linked</em>
         </span>
         <span>
-          <strong>{player.playerId}</strong>
-          <em>Player ID</em>
+          <strong>{player.fullName || "Unnamed"}</strong>
+          <em>Newest player</em>
         </span>
         <span>
-          <strong>{formatNumber(player.lifetimePoints)}</strong>
+          <strong>{formatNumber(group.lifetimePoints)}</strong>
           <em>Lifetime points</em>
         </span>
         <span>
@@ -576,57 +606,78 @@ function PlayerCard({ player }) {
           <em>{currentLevel?.rewardName || nextRewardSummary(player)}</em>
         </span>
         <span>
-          <strong>{formatNumber(player.repeatVisits)}</strong>
+          <strong>{formatNumber(group.repeatVisits)}</strong>
           <em>Repeat visits</em>
         </span>
         <span>
-          <strong>{player.availableRewards || 0}</strong>
+          <strong>{group.availableRewards || 0}</strong>
           <em>Available rewards</em>
         </span>
         <span>
-          <strong>{formatDateTime(player.createdAt)}</strong>
-          <em>Created</em>
+          <strong>{formatDateTime(group.latestActivityAt)}</strong>
+          <em>Newest activity</em>
         </span>
       </button>
 
       {open ? (
         <div className="waiver-admin-card__details">
           <section>
-            <h2>Player</h2>
+            <h2>Email Group</h2>
             <dl>
-              <div><dt>Player ID</dt><dd>{player.playerId}</dd></div>
-              <div><dt>First name</dt><dd>{player.firstName || "Not provided"}</dd></div>
-              <div><dt>Last name</dt><dd>{player.lastName || "Not provided"}</dd></div>
-              <div><dt>Date of birth</dt><dd>{formatDate(player.dateOfBirth)}</dd></div>
-              <div><dt>Email</dt><dd>{player.email || "Not provided"}</dd></div>
+              <div><dt>Email</dt><dd>{group.email || "Not provided"}</dd></div>
+              <div><dt>Players</dt><dd>{group.players.length}</dd></div>
+              <div><dt>Newest activity</dt><dd>{formatDateTime(group.latestActivityAt)}</dd></div>
+              <div><dt>Latest player</dt><dd>{player.fullName || "Unnamed"}</dd></div>
             </dl>
           </section>
 
           <section>
-            <h2>Record</h2>
-            <dl>
-              <div><dt>Signee ID</dt><dd>{player.signeeId || "Not provided"}</dd></div>
-              <div><dt>Location</dt><dd>{player.locationName || "Vaughan"}</dd></div>
-              <div><dt>Location ID</dt><dd>{player.locationId || "2"}</dd></div>
-              <div><dt>Date signed</dt><dd>{formatDateTime(player.dateSigned)}</dd></div>
-              <div><dt>Updated</dt><dd>{formatDateTime(player.updatedAt)}</dd></div>
-            </dl>
+            <h2>Linked Players</h2>
+            <div className="waiver-admin-members">
+              {group.players.map((item) => (
+                <div key={item.id}>
+                  <strong>{item.fullName || "Unnamed"}</strong>
+                  <span>Player ID: {item.playerId}</span>
+                  <span>DOB: {formatDate(item.dateOfBirth)}</span>
+                  <span>Signed: {formatDateTime(item.dateSigned)}</span>
+                  <span>Last score: {formatDateTime(item.lastScoreAt)}</span>
+                </div>
+              ))}
+            </div>
           </section>
 
           <section className="player-scorecard">
-            <h2>Scorecard</h2>
+            <h2>Combined Scorecard</h2>
             <dl>
-              <div><dt>Lifetime points</dt><dd>{formatNumber(player.lifetimePoints)}</dd></div>
+              <div><dt>Lifetime points</dt><dd>{formatNumber(group.lifetimePoints)}</dd></div>
               <div><dt>Current level</dt><dd>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level yet"}</dd></div>
               <div><dt>Current reward</dt><dd>{currentLevel?.rewardName || "Not unlocked"}</dd></div>
               <div><dt>Next reward</dt><dd>{nextLevel ? `Level ${nextLevel.levelNumber}: ${nextLevel.rewardName}` : "Top level reached"}</dd></div>
               <div><dt>Next milestone</dt><dd>{nextRewardSummary(player)}</dd></div>
-              <div><dt>Repeat visits</dt><dd>{formatNumber(player.repeatVisits)}</dd></div>
-              <div><dt>Score events</dt><dd>{formatNumber(player.scoreEvents)}</dd></div>
-              <div><dt>Last score</dt><dd>{formatDateTime(player.lastScoreAt)}</dd></div>
-              <div><dt>Available rewards</dt><dd>{formatNumber(player.availableRewards)}</dd></div>
-              <div><dt>Redeemed rewards</dt><dd>{formatNumber(player.redeemedRewards)}</dd></div>
+              <div><dt>Repeat visits</dt><dd>{formatNumber(group.repeatVisits)}</dd></div>
+              <div><dt>Score events</dt><dd>{formatNumber(group.scoreEvents)}</dd></div>
+              <div><dt>Available rewards</dt><dd>{formatNumber(group.availableRewards)}</dd></div>
+              <div><dt>Redeemed rewards</dt><dd>{formatNumber(group.redeemedRewards)}</dd></div>
             </dl>
+          </section>
+
+          <section className="waiver-admin-card__wide waiver-record-actions">
+            <h2>Player Email</h2>
+            <div>
+              <button type="button" onClick={() => onThankYouEmail(group)} disabled={thankYouDisabled}>
+                Thank You Email
+              </button>
+            </div>
+            {thankYouState.sent ? (
+              <p className="waiver-email-already-sent">
+                Thank you email already sent{thankYouState.sentAt ? ` on ${formatDateTime(thankYouState.sentAt)}` : ""}.
+              </p>
+            ) : null}
+            {!thankYouState.sent && thankYouState.feedbackReceived ? (
+              <p className="waiver-email-already-sent">
+                Feedback already received{thankYouState.feedbackAt ? ` on ${formatDateTime(thankYouState.feedbackAt)}` : ""}.
+              </p>
+            ) : null}
           </section>
         </div>
       ) : null}
@@ -659,7 +710,7 @@ export default function AdminWaiversPage() {
   const [playerQuery, setPlayerQuery] = useState("");
   const [playerDateFrom, setPlayerDateFrom] = useState("");
   const [playerDateTo, setPlayerDateTo] = useState("");
-  const [playerSort, setPlayerSort] = useState("points-desc");
+  const [playerSort, setPlayerSort] = useState("newest");
   const [playerPageSize, setPlayerPageSize] = useState(25);
   const [playerPage, setPlayerPage] = useState(1);
 
@@ -765,31 +816,6 @@ export default function AdminWaiversPage() {
       ),
     [waivers],
   );
-  const thankYouEmailStats = useMemo(() => {
-    const emails = new Map();
-
-    waivers.forEach((waiver) => {
-      if (waiverSubmittedDate(waiver) < THANK_YOU_STATS_START_DATE) return;
-      const email = normalizeSearchValue(waiver.primary?.email);
-      if (!email) return;
-      emails.set(email, {
-        sent: Boolean(
-          emails.get(email)?.sent ||
-          thankYouSentDetails(waiver).sent ||
-          feedbackReceivedDetails(waiver).received
-        ),
-      });
-    });
-
-    return Array.from(emails.values()).reduce(
-      (stats, email) => {
-        if (email.sent) stats.sent += 1;
-        else stats.pending += 1;
-        return stats;
-      },
-      { sent: 0, pending: 0 },
-    );
-  }, [waivers]);
   const partyGroups = useMemo(() => {
     const groups = new Map();
 
@@ -887,13 +913,21 @@ export default function AdminWaiversPage() {
       return (b.createdAt || "").localeCompare(a.createdAt || "") || (b.playerId || 0) - (a.playerId || 0);
     });
   }, [playerDateFrom, playerDateTo, playerQuery, playerSort, players]);
-  const playerTotalPages = Math.max(1, Math.ceil(filteredPlayers.length / playerPageSize));
+  const playerEmailGroups = useMemo(
+    () => buildPlayerEmailGroups(filteredPlayers, playerSort),
+    [filteredPlayers, playerSort],
+  );
+  const allPlayerEmailGroups = useMemo(
+    () => buildPlayerEmailGroups(players, playerSort),
+    [players, playerSort],
+  );
+  const playerTotalPages = Math.max(1, Math.ceil(playerEmailGroups.length / playerPageSize));
   const currentPlayerPage = Math.min(playerPage, playerTotalPages);
   const playerPageStart = (currentPlayerPage - 1) * playerPageSize;
   const playerPageEnd = playerPageStart + playerPageSize;
-  const visiblePlayers = filteredPlayers.slice(playerPageStart, playerPageEnd);
-  const firstVisiblePlayer = filteredPlayers.length ? playerPageStart + 1 : 0;
-  const lastVisiblePlayer = Math.min(playerPageEnd, filteredPlayers.length);
+  const visiblePlayerGroups = playerEmailGroups.slice(playerPageStart, playerPageEnd);
+  const firstVisiblePlayer = playerEmailGroups.length ? playerPageStart + 1 : 0;
+  const lastVisiblePlayer = Math.min(playerPageEnd, playerEmailGroups.length);
   const latestPlayer = players[0];
   const topPlayer = useMemo(
     () => players.reduce((leader, player) => (
@@ -905,6 +939,27 @@ export default function AdminWaiversPage() {
     () => players.filter((player) => Number(player.repeatVisits || 0) > 1).length,
     [players],
   );
+  const playerEmailStats = useMemo(() => {
+    const emails = new Map();
+
+    allPlayerEmailGroups
+      .filter((group) => group.email)
+      .forEach((group) => {
+        const state = playerThankYouState(group);
+        emails.set(normalizeSearchValue(group.email), {
+          sent: Boolean(emails.get(normalizeSearchValue(group.email))?.sent || state.sent || state.feedbackReceived),
+        });
+      });
+
+    return Array.from(emails.values()).reduce(
+      (stats, email) => {
+        if (email.sent) stats.sent += 1;
+        else stats.pending += 1;
+        return stats;
+      },
+      { sent: 0, pending: 0 },
+    );
+  }, [allPlayerEmailGroups]);
 
   useEffect(() => {
     setPlayerPage(1);
@@ -977,80 +1032,42 @@ export default function AdminWaiversPage() {
     setEditError("");
   }
 
-  function startThankYouEmail(waiver) {
-    if (thankYouSentDetails(waiver).sent) {
-      setThankYouError("Thank you email already sent to this user.");
-      return;
-    }
-    if (feedbackReceivedDetails(waiver).received) {
-      setThankYouError("Feedback has already been received from this user.");
+  function startPlayerThankYouEmail(group) {
+    const email = normalizeSearchValue(group.email);
+    if (!email) {
+      setThankYouError("This player group does not have an email address.");
       return;
     }
 
-    const firstName = waiver.primary?.firstName || "";
-    const name = [waiver.primary?.firstName, waiver.primary?.lastName].filter(Boolean).join(" ");
-    const partyId = waiver.visit?.partyId || "";
+    const state = playerThankYouState(group);
+    if (state.sent) {
+      setThankYouError("Thank you email already sent to this email ID.");
+      return;
+    }
+    if (state.feedbackReceived) {
+      setThankYouError("Feedback has already been received from this email ID.");
+      return;
+    }
+
+    const player = group.primaryPlayer || {};
     const draft = {
-      email: waiver.primary?.email || "",
-      firstName,
-      name,
-      partyId,
+      email: group.email || "",
+      firstName: player.firstName || "",
+      name: player.fullName || [player.firstName, player.lastName].filter(Boolean).join(" "),
+      partyId: "",
       feedbackUrl: DEFAULT_FEEDBACK_URL,
       websiteLink: DEFAULT_WEBSITE_LINK,
     };
 
     setThankYouDraft({
-      mode: "single",
-      waiverId: waiver.id,
+      mode: "player",
       ...draft,
       emailText: buildThankYouEmailText(draft),
     });
     setThankYouError("");
     setThankYouStatus("");
+    setActiveTab("players");
   }
-
-  function startPartyThankYouEmail(partyId) {
-    const partyWaivers = waivers.filter((waiver) =>
-      partyIdValue(waiver) === partyId &&
-      !thankYouSentDetails(waiver).sent &&
-      !feedbackReceivedDetails(waiver).received
-    );
-    const recipients = uniqueValues(partyWaivers.map((waiver) => waiver.primary?.email)).map((email) => {
-      const waiver = partyWaivers.find((item) => String(item.primary?.email || "").trim() === email);
-      const firstName = waiver?.primary?.firstName || "";
-      return {
-        email,
-        firstName,
-        name: [waiver?.primary?.firstName, waiver?.primary?.lastName].filter(Boolean).join(" "),
-      };
-    });
-
-    if (!recipients.length) {
-      setError(`No unsent recipient emails found for Party ID ${partyId}.`);
-      return;
-    }
-
-    const draft = {
-      email: recipients[0]?.email || "",
-      firstName: "{firstName}",
-      name: "{name}",
-      partyId,
-      feedbackUrl: DEFAULT_FEEDBACK_URL,
-      websiteLink: DEFAULT_WEBSITE_LINK,
-    };
-
-    setThankYouDraft({
-      mode: "party",
-      recipients,
-      emailsText: recipients.map((recipient) => recipient.email).join("\n"),
-      ...draft,
-      emailText: buildThankYouEmailText(draft),
-    });
-    setThankYouError("");
-    setThankYouStatus("");
-  }
-
-  const selectedPartyId = partyFilter.startsWith("party:") ? partyFilter.slice("party:".length) : "";
 
   function closeThankYouEmail() {
     setThankYouDraft(null);
@@ -1058,24 +1075,22 @@ export default function AdminWaiversPage() {
     setThankYouStatus("");
   }
 
-  async function markWaiverThankYouSent(waiver, email) {
-    if (!waiver?.id) return null;
-
-    const response = await fetch(`/api/admin/waivers?id=${encodeURIComponent(waiver.id)}`, {
+  async function markEmailThankYouSent(email) {
+    const response = await fetch("/api/admin/waivers", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "mark-thank-you-sent",
+        action: "mark-thank-you-sent-by-email",
         email,
       }),
     });
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Thank you email was sent, but the waiver could not be marked.");
+      throw new Error(data.error || "Thank you email was sent, but the email could not be marked.");
     }
 
-    return data.waiver;
+    return data.status;
   }
 
   async function sendThankYouEmail(event) {
@@ -1097,7 +1112,6 @@ export default function AdminWaiversPage() {
     }
 
     try {
-      const sentWaivers = [];
       const sendOne = async (email) => {
         const matchedRecipient = (thankYouDraft.recipients || []).find(
           (recipient) => normalizeSearchValue(recipient.email) === normalizeSearchValue(email),
@@ -1133,26 +1147,22 @@ export default function AdminWaiversPage() {
           throw new Error(data.error || `Unable to send thank you email to ${email}.`);
         }
 
-        const matchingWaivers = thankYouDraft.mode === "party"
-          ? waivers.filter((waiver) =>
-              partyIdValue(waiver) === thankYouDraft.partyId &&
-              normalizeSearchValue(waiver.primary?.email) === normalizeSearchValue(email),
-            )
-          : waivers.filter((waiver) => waiver.id === thankYouDraft.waiverId);
-
-        for (const waiver of matchingWaivers) {
-          const updatedWaiver = await markWaiverThankYouSent(waiver, email);
-          if (updatedWaiver) sentWaivers.push(updatedWaiver);
-        }
+        const status = await markEmailThankYouSent(email);
+        const normalizedEmail = normalizeSearchValue(email);
+        setPlayers((current) => current.map((player) =>
+          normalizeSearchValue(player.email) === normalizedEmail
+            ? { ...player, thankYouEmail: { ...(player.thankYouEmail || {}), ...(status || {}), sent: true } }
+            : player
+        ));
+        setWaivers((current) => current.map((waiver) =>
+          normalizeSearchValue(waiver.primary?.email) === normalizedEmail
+            ? { ...waiver, thankYouEmail: { ...(waiver.thankYouEmail || {}), ...(status || {}), sent: true } }
+            : waiver
+        ));
       };
 
       for (const email of recipientEmails) {
         await sendOne(email);
-      }
-
-      if (sentWaivers.length) {
-        const updatedById = new Map(sentWaivers.map((waiver) => [waiver.id, waiver]));
-        setWaivers((current) => current.map((waiver) => updatedById.get(waiver.id) || waiver));
       }
 
       setThankYouStatus(
@@ -1233,6 +1243,9 @@ export default function AdminWaiversPage() {
           <button type="button" className={activeTab === "waivers" ? "is-active" : ""} onClick={() => setActiveTab("waivers")}>Waivers</button>
           <button type="button" className={activeTab === "players" ? "is-active" : ""} onClick={() => setActiveTab("players")}>Players</button>
         </div>
+        <p className="waiver-admin-tab-note">
+          To send thank you emails, use the Players tab. Player records are grouped by email ID so each customer receives only one email.
+        </p>
 
         {activeTab === "waivers" ? (
           <>
@@ -1248,14 +1261,6 @@ export default function AdminWaiversPage() {
               <article>
                 <span>Visits Today</span>
                 <strong>{todayVisits}</strong>
-              </article>
-              <article>
-                <span>Emails To Send</span>
-                <strong>{thankYouEmailStats.pending}</strong>
-              </article>
-              <article>
-                <span>Emails Already Sent</span>
-                <strong>{thankYouEmailStats.sent}</strong>
               </article>
               <article>
                 <span>Latest</span>
@@ -1293,9 +1298,6 @@ export default function AdminWaiversPage() {
                           <div className="waiver-party-groups__actions">
                             <button type="button" onClick={() => viewPartyWaivers(group.partyId)}>
                               View Party
-                            </button>
-                            <button type="button" onClick={() => startPartyThankYouEmail(group.partyId)}>
-                              Thank You Party
                             </button>
                           </div>
                         </article>
@@ -1358,11 +1360,6 @@ export default function AdminWaiversPage() {
                         ))}
                       </select>
                     </label>
-                    {selectedPartyId ? (
-                      <button type="button" onClick={() => startPartyThankYouEmail(selectedPartyId)}>
-                        Thank You Party
-                      </button>
-                    ) : null}
                     <button type="button" onClick={clearFilters}>Clear</button>
                   </div>
                   <div className="waiver-export-actions" aria-label="Export waiver data">
@@ -1393,7 +1390,6 @@ export default function AdminWaiversPage() {
                         key={waiver.id}
                         onDelete={deleteWaiver}
                         onEdit={startEditWaiver}
-                        onThankYouEmail={startThankYouEmail}
                       />
                     ))}
                     <div className="waiver-data-pagination">
@@ -1421,11 +1417,19 @@ export default function AdminWaiversPage() {
               </article>
               <article>
                 <span>Filtered</span>
-                <strong>{filteredPlayers.length}</strong>
+                <strong>{playerEmailGroups.length}</strong>
               </article>
               <article>
                 <span>Repeat Visitors</span>
                 <strong>{repeatVisitors}</strong>
+              </article>
+              <article>
+                <span>Emails To Send</span>
+                <strong>{playerEmailStats.pending}</strong>
+              </article>
+              <article>
+                <span>Emails Already Sent</span>
+                <strong>{playerEmailStats.sent}</strong>
               </article>
               <article>
                 <span>Top Score</span>
@@ -1446,8 +1450,8 @@ export default function AdminWaiversPage() {
                   <div>
                     <h2>Vaughan Players Scorecards</h2>
                     <p>
-                      Showing {firstVisiblePlayer}-{lastVisiblePlayer} of {filteredPlayers.length}
-                      {filteredPlayers.length === players.length ? " records" : ` filtered records from ${players.length} total`}
+                      Showing {firstVisiblePlayer}-{lastVisiblePlayer} of {playerEmailGroups.length}
+                      {playerEmailGroups.length === allPlayerEmailGroups.length ? " email groups" : ` filtered email groups from ${allPlayerEmailGroups.length} total`}
                     </p>
                   </div>
                   <div className="waiver-data-filters player-data-filters">
@@ -1487,10 +1491,14 @@ export default function AdminWaiversPage() {
                   </div>
                 </div>
 
-                {visiblePlayers.length ? (
+                {visiblePlayerGroups.length ? (
                   <>
-                    {visiblePlayers.map((player) => (
-                      <PlayerCard player={player} key={player.id} />
+                    {visiblePlayerGroups.map((group) => (
+                      <PlayerCard
+                        group={group}
+                        key={group.id}
+                        onThankYouEmail={startPlayerThankYouEmail}
+                      />
                     ))}
                     <div className="waiver-data-pagination">
                       <span>Page {currentPlayerPage} of {playerTotalPages}</span>

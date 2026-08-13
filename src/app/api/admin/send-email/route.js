@@ -7,6 +7,13 @@ export const runtime = "nodejs";
 // Safety cap on a single bulk send.
 const MAX_RECIPIENTS = 300;
 const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+const BUSINESS_NAME = "Pixel Pulse Play Zone";
+const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
+const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
+const SITE_URL = "https://www.pixelpulseplay.ca";
+const PHONE_DISPLAY = "(905) 760-2922";
+const PHONE_TEL = "+19057602922";
+const ADDRESS = "960 Edgeley Blvd, Vaughan, ON L4K 4V4";
 
 function substitute(text, name) {
   return String(text || "").replace(/\{name\}/gi, name || "there");
@@ -38,12 +45,11 @@ function renderGiftCardEmailHtml(message = "") {
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:660px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
-        <div style="height:5px;background:linear-gradient(90deg,#a4cf5f,#fbae7b,#f59e0b);border-radius:14px 14px 0 0;"></div>
-        <div style="background:#111827;color:#ffffff;padding:24px;">
-          <p style="margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
-          <h1 style="margin:0;font-size:28px;line-height:1.15;">Your Pixel Pulse Gift Card</h1>
+        <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:22px 24px;">
+          <img src="${LOGO_URL}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
+          <h1 style="margin:0;font-size:28px;line-height:1.15;color:#ffffff;">Your Pixel Pulse Gift Card</h1>
         </div>
-        <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
+        <div style="background:#ffffff;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
           ${paragraphs.map((line) => {
             if (line === "You have a Pixel Pulse Play gift card waiting for you!") {
               return `<h2 style="margin:0 0 16px;font-size:22px;line-height:1.25;color:#111827;">${escapeHtml(line)}</h2>`;
@@ -57,8 +63,8 @@ function renderGiftCardEmailHtml(message = "") {
             if (line.startsWith("Valid for 30 days from issue.")) {
               return `<p style="margin:4px 0 16px;color:#6b7280;font-size:13px;"><em>${escapeHtml(line)}</em></p>`;
             }
-            if (/^https?:\/\//i.test(line)) {
-              return `<p style="margin:0 0 12px;"><a href="${escapeHtml(line)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(line)}</a></p>`;
+            if (/^https?:\/\/(www\.)?pixelpulseplay\.ca\/?$/i.test(line) || line === "Vaughan, Ontario" || line === ADDRESS) {
+              return "";
             }
             return `<p style="margin:0 0 14px;color:#374151;">${escapeHtml(line)}</p>`;
           }).join("")}
@@ -77,6 +83,14 @@ function renderGiftCardEmailHtml(message = "") {
           <div style="margin:22px 0 0;padding:14px 16px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;color:#374151;">
             The gift card image is attached to this email. Please bring the redemption code when you visit. Valid for 30 days from issue. Terms and conditions apply.
           </div>
+        </div>
+        <div style="background:#050505;color:#ffffff;border-radius:0 0 14px 14px;padding:20px 24px;font-size:13px;line-height:1.7;">
+          <strong style="display:block;margin:0 0 6px;color:#ffffff;">${BUSINESS_NAME}</strong>
+          <a href="${SITE_URL}" style="color:#a4cf5f;text-decoration:none;">www.pixelpulseplay.ca</a><br />
+          <a href="mailto:${CONTACT_EMAIL}" style="color:#ffffff;text-decoration:none;">${CONTACT_EMAIL}</a>
+          <span style="color:#9ca3af;"> | </span>
+          <a href="tel:${PHONE_TEL}" style="color:#ffffff;text-decoration:none;">${PHONE_DISPLAY}</a><br />
+          <span style="color:#d1d5db;">${ADDRESS}</span>
         </div>
       </div>
     </div>

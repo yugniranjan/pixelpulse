@@ -7,6 +7,7 @@ import {
   hasPostgres,
   listPostgresPartyWaiversByIds,
   listPostgresWaivers,
+  markPostgresWaiversThankYouSentByEmail,
   markPostgresWaiverThankYouSent,
   updatePostgresWaiver,
 } from "@/lib/postgresData";
@@ -267,12 +268,31 @@ export async function PATCH(req) {
   }
 
   const id = getWaiverId(req);
+  const body = await req.json();
+  const action = cleanText(body.action);
+
+  if (action === "mark-thank-you-sent-by-email") {
+    const email = cleanText(body.email);
+    if (!email) {
+      return NextResponse.json({ error: "Email is required." }, { status: 400 });
+    }
+
+    const sentAt = new Date();
+    if (hasPostgres()) {
+      const result = await markPostgresWaiversThankYouSentByEmail(email, { sentAt });
+      return NextResponse.json({ success: true, ...result });
+    }
+
+    return NextResponse.json(
+      { error: "Email-based thank you marking requires Postgres." },
+      { status: 503 },
+    );
+  }
+
   if (!id) {
     return NextResponse.json({ error: "Waiver ID is required." }, { status: 400 });
   }
 
-  const body = await req.json();
-  const action = cleanText(body.action);
   if (action !== "mark-thank-you-sent") {
     return NextResponse.json({ error: "Unsupported waiver action." }, { status: 400 });
   }

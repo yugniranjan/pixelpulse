@@ -5,6 +5,11 @@ export const runtime = "nodejs";
 
 const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
+const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
+const SITE_URL = "https://www.pixelpulseplay.ca";
+const PHONE_DISPLAY = "(905) 760-2922";
+const PHONE_TEL = "+19057602922";
+const ADDRESS = "960 Edgeley Blvd, Vaughan, ON L4K 4V4";
 const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
 const PACKAGE_INCLUSION_LINES = [
   "Package Inclusions",
@@ -49,6 +54,31 @@ function renderEmailButton({ href, label, variant = "dark" }) {
     <p style="margin:18px 0;">
       <a href="${escapeHtml(href)}" style="display:inline-block;border-radius:10px;background:${background};color:${color};padding:13px 18px;font-weight:800;text-decoration:none;">${escapeHtml(label)}</a>
     </p>
+  `;
+}
+
+function renderBrandedEmailShell({ title, partyId = "", children = "" }) {
+  return `
+    <div style="margin:0;padding:0;background:#f3f4f6;">
+      <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
+        <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:22px 24px;">
+          <img src="${LOGO_URL}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
+          <h1 style="margin:0;font-size:28px;line-height:1.15;color:#ffffff;">${escapeHtml(title)}</h1>
+          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
+        </div>
+        <div style="background:#ffffff;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
+          ${children}
+        </div>
+        <div style="background:#050505;color:#ffffff;border-radius:0 0 14px 14px;padding:20px 24px;font-size:13px;line-height:1.7;">
+          <strong style="display:block;margin:0 0 6px;color:#ffffff;">${BUSINESS_NAME}</strong>
+          <a href="${SITE_URL}" style="color:#a4cf5f;text-decoration:none;">www.pixelpulseplay.ca</a><br />
+          <a href="mailto:${CONTACT_EMAIL}" style="color:#ffffff;text-decoration:none;">${CONTACT_EMAIL}</a>
+          <span style="color:#9ca3af;"> | </span>
+          <a href="tel:${PHONE_TEL}" style="color:#ffffff;text-decoration:none;">${PHONE_DISPLAY}</a><br />
+          <span style="color:#d1d5db;">${ADDRESS}</span>
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -112,8 +142,11 @@ function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
       return;
     }
 
-    if (website && trimmed === website) {
-      html += `<p style="margin:0;color:#6b7280;"><a href="${escapeHtml(website)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(website)}</a></p>`;
+    if (website && trimmed.replace(/\/$/, "") === website.replace(/\/$/, "")) {
+      return;
+    }
+
+    if (trimmed === "Vaughan, Ontario" || trimmed === ADDRESS) {
       return;
     }
 
@@ -315,15 +348,10 @@ function renderConfirmationHtml({ emailText, partyId }) {
 function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
 
-  return `
-    <div style="margin:0;padding:0;background:#f3f4f6;">
-      <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
-        <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
-          <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
-          <h1 style="margin:0;font-size:28px;line-height:1.15;">Thanks for Playing at Pixel Pulse!</h1>
-          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
-        </div>
-        <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
+  return renderBrandedEmailShell({
+    title: "Thanks for Playing at Pixel Pulse!",
+    partyId,
+    children: `
           <p style="margin:0 0 14px;">${greeting}</p>
           <p style="margin:0 0 18px;">We loved having you and hope you had an amazing time taking on our immersive challenges.</p>
 
@@ -341,31 +369,16 @@ function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
           <p style="margin:22px 0 8px;">Thank you for being part of the Pixel Pulse community.</p>
           <p style="margin:0 0 18px;">See you again soon!</p>
           <p style="margin:0 0 18px;"><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
-          <p style="margin:0;color:#6b7280;">
-            Vaughan, Ontario<br />
-            <a href="${escapeHtml(websiteLink)}" style="color:#175cd3;text-decoration:none;">${escapeHtml(websiteLink)}</a>
-          </p>
-        </div>
-      </div>
-    </div>
-  `;
+    `,
+  });
 }
 
-function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId }) {
-  return `
-    <div style="margin:0;padding:0;background:#f3f4f6;">
-      <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
-        <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
-          <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
-          <h1 style="margin:0;font-size:28px;line-height:1.15;">Thanks for Playing at Pixel Pulse!</h1>
-          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
-        </div>
-        <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
-          ${renderThankYouTextHtml({ text, feedbackUrl, websiteLink })}
-        </div>
-      </div>
-    </div>
-  `;
+function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, title = "Thanks for Playing at Pixel Pulse!" }) {
+  return renderBrandedEmailShell({
+    title,
+    partyId,
+    children: renderThankYouTextHtml({ text, feedbackUrl, websiteLink }),
+  });
 }
 
 export async function POST(request) {
@@ -484,7 +497,13 @@ export async function POST(request) {
         ].filter(Boolean).join("\n");
 
     const html = sendPromotional
-      ? renderCustomThankYouHtml({ text: promotionalText, feedbackUrl: "", websiteLink, partyId })
+      ? renderCustomThankYouHtml({
+          text: promotionalText,
+          feedbackUrl: "",
+          websiteLink,
+          partyId,
+          title: "Your Next Pixel Pulse Adventure Is On Us",
+        })
       : sendThankYou
       ? thankYouText
         ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })

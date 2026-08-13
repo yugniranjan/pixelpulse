@@ -75,6 +75,13 @@
   box-shadow: 0 6px 16px rgba(164, 207, 95, 0.4);
 }
 
+.waiver-admin-page--dashboard .waiver-admin-tab-note {
+  margin: -8px 0 20px;
+  color: var(--pi-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* ---- KPI cards with cycling accent bars ---- */
 .waiver-admin-page--dashboard .waiver-admin-stats {
   gap: 16px;
