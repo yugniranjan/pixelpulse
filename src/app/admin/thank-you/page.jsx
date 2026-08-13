@@ -5,7 +5,6 @@ import "../../styles/admin-invites.css";
 import "../../styles/admin-waivers.css";
 import AdminShell from "@/components/AdminShell";
 
-const DEFAULT_FEEDBACK_URL = "https://www.pixelpulseplay.ca/feedback";
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
 
 function Field({ label, required = false, children }) {
@@ -28,18 +27,11 @@ function buildThankYouPreview(form) {
     "",
     "We loved having you and hope you had an amazing time taking on our immersive challenges.",
     "",
-    "💬 Help Us Level Up",
+    "Enjoy a FREE 60-Minute Play Pass",
     "",
-    "Your feedback helps us create an even better experience for every player.",
+    "As a thank you for visiting, we'd love to invite you back for another Pixel Pulse adventure.",
     "",
-    "Share your feedback:",
-    form.feedbackUrl,
-    "",
-    "🎁 Enjoy a FREE 60-Minute Play Pass",
-    "",
-    "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
-    "",
-    "Complete the feedback form today and get ready for your next adventure!",
+    "Bring your family, friends, or teammates and take on more immersive challenge rooms.",
     "",
     "Thank you for being part of the Pixel Pulse community.",
     "",
@@ -56,7 +48,6 @@ export default function AdminThankYouPage() {
     firstName: "",
     emails: "",
     partyId: "",
-    feedbackUrl: DEFAULT_FEEDBACK_URL,
     websiteLink: DEFAULT_WEBSITE_LINK,
   });
   const [status, setStatus] = useState("");
@@ -97,13 +88,13 @@ export default function AdminThankYouPage() {
     try {
       for (const email of recipientEmails) {
         const payload = new FormData();
-        payload.append("type", "thank-you");
+        payload.append("type", "promotional");
         payload.append("email", email);
         payload.append("firstName", form.firstName);
         payload.append("name", form.firstName);
         payload.append("partyId", form.partyId);
-        payload.append("feedbackUrl", form.feedbackUrl);
         payload.append("websiteLink", form.websiteLink);
+        payload.append("promotionalText", previewText);
         attachments.forEach((file) => {
           payload.append("attachments", file);
         });
@@ -139,7 +130,7 @@ export default function AdminThankYouPage() {
           <div>
             <span className="waiver-admin-kicker">Admin dashboard</span>
             <h1>Promotional Email</h1>
-            <p>Send post-visit promotional, feedback, and reward emails from one place.</p>
+            <p>Send post-visit promotional and reward emails from one place.</p>
           </div>
         </div>
 
@@ -175,13 +166,6 @@ export default function AdminThankYouPage() {
           <section>
             <h2>Links</h2>
             <div className="invite-admin-grid">
-              <Field label="Feedback link" required>
-                <input
-                  required
-                  value={form.feedbackUrl}
-                  onChange={(event) => updateField("feedbackUrl", event.target.value)}
-                />
-              </Field>
               <Field label="Website">
                 <input
                   value={form.websiteLink}
@@ -226,11 +210,6 @@ export default function AdminThankYouPage() {
             <div>
               <span>Recipients</span>
               <p>{recipientEmails.length ? `${recipientEmails.length} recipient${recipientEmails.length === 1 ? "" : "s"}` : "No recipients yet"}</p>
-            </div>
-            <div>
-              <span>Feedback Link</span>
-              <a href={form.feedbackUrl} target="_blank" rel="noopener noreferrer">{form.feedbackUrl}</a>
-              <button type="button" onClick={() => copyText(form.feedbackUrl)}>Copy</button>
             </div>
             <div>
               <span>Promotional Email Text</span>

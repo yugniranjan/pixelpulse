@@ -379,7 +379,9 @@ export async function POST(request) {
     const feedbackName = cleanText(body?.name) || firstName;
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
     const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
+    const promotionalText = cleanText(body?.promotionalText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
+    const sendPromotional = body?.type === "promotional";
     const inviteUrl = cleanText(body?.inviteUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
     const partyId = cleanText(body?.partyId);
@@ -396,11 +398,18 @@ export async function POST(request) {
       );
     }
 
+    if (sendPromotional && !promotionalText) {
+      return NextResponse.json(
+        { error: "Promotional email text is required." },
+        { status: 400 },
+      );
+    }
+
     const personalizedFeedbackUrl = sendThankYou
       ? appendFeedbackRecipient(feedbackUrl, { name: feedbackName, email: to })
       : feedbackUrl;
 
-    if (!sendThankYou && (!emailText || !inviteUrl)) {
+    if (!sendThankYou && !sendPromotional && (!emailText || !inviteUrl)) {
       return NextResponse.json(
         { error: "Email text and invite URL are required." },
         { status: 400 },
@@ -456,7 +465,9 @@ export async function POST(request) {
       websiteLink,
     ].filter(Boolean).join("\n");
 
-    const text = sendThankYou
+    const text = sendPromotional
+      ? promotionalText
+      : sendThankYou
       ? thankYouText
         ? thankYouText.replaceAll(feedbackUrl, personalizedFeedbackUrl)
         : defaultThankYouText
@@ -472,7 +483,9 @@ export async function POST(request) {
           qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
         ].filter(Boolean).join("\n");
 
-    const html = sendThankYou
+    const html = sendPromotional
+      ? renderCustomThankYouHtml({ text: promotionalText, feedbackUrl: "", websiteLink, partyId })
+      : sendThankYou
       ? thankYouText
         ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
         : renderThankYouHtml({ firstName, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
@@ -502,7 +515,9 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: sendThankYou
+      subject: sendPromotional
+        ? "Your Next Pixel Pulse Adventure Is On Us"
+        : sendThankYou
         ? "Your Next Pixel Pulse Adventure Is On Us ⚡⭐"
         : confirmationEmailText
         ? "Your Pixel Pulse Birthday Party is Confirmed"
