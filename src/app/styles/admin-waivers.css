@@ -261,7 +261,7 @@
 }
 
 .player-admin-card__summary {
-  grid-template-columns: minmax(180px, 1.25fr) minmax(92px, 0.65fr) minmax(120px, 0.75fr) minmax(140px, 0.9fr) minmax(96px, 0.55fr) minmax(110px, 0.55fr) minmax(150px, 0.9fr);
+  grid-template-columns: minmax(220px, 1.15fr) minmax(280px, 1.35fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(190px, 1fr);
 }
 
 .player-email-status strong {

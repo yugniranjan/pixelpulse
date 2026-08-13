@@ -621,8 +621,6 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
 function PlayerCard({ group, onThankYouEmail }) {
   const [open, setOpen] = useState(false);
   const player = group.primaryPlayer || {};
-  const currentLevel = player.currentLevel;
-  const nextLevel = player.nextLevel;
   const thankYouState = playerThankYouState(group);
   const readyForThankYou = playerReadyForThankYou(group);
   const thankYouDisabled = Boolean(!group.email || !readyForThankYou || thankYouState.sent || thankYouState.feedbackReceived);
@@ -652,22 +650,6 @@ function PlayerCard({ group, onThankYouEmail }) {
         <span>
           <strong>{group.wristbandTranDate ? formatDateTime(group.wristbandTranDate) : "No wristband"}</strong>
           <em>{group.playerEndTime ? "Already played" : "Latest wristband"}</em>
-        </span>
-        <span>
-          <strong>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level"}</strong>
-          <em>{currentLevel?.rewardName || nextRewardSummary(player)}</em>
-        </span>
-        <span>
-          <strong>{formatNumber(group.repeatVisits)}</strong>
-          <em>Repeat visits</em>
-        </span>
-        <span>
-          <strong>{group.availableRewards || 0}</strong>
-          <em>Available rewards</em>
-        </span>
-        <span>
-          <strong>{formatDateTime(group.latestActivityAt)}</strong>
-          <em>Newest activity</em>
         </span>
       </button>
 
@@ -736,21 +718,6 @@ function PlayerCard({ group, onThankYouEmail }) {
                 </div>
               ))}
             </div>
-          </section>
-
-          <section className="player-scorecard">
-            <h2>Combined Scorecard</h2>
-            <dl>
-              <div><dt>Lifetime points</dt><dd>{formatNumber(group.lifetimePoints)}</dd></div>
-              <div><dt>Current level</dt><dd>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level yet"}</dd></div>
-              <div><dt>Current reward</dt><dd>{currentLevel?.rewardName || "Not unlocked"}</dd></div>
-              <div><dt>Next reward</dt><dd>{nextLevel ? `Level ${nextLevel.levelNumber}: ${nextLevel.rewardName}` : "Top level reached"}</dd></div>
-              <div><dt>Next milestone</dt><dd>{nextRewardSummary(player)}</dd></div>
-              <div><dt>Repeat visits</dt><dd>{formatNumber(group.repeatVisits)}</dd></div>
-              <div><dt>Score events</dt><dd>{formatNumber(group.scoreEvents)}</dd></div>
-              <div><dt>Available rewards</dt><dd>{formatNumber(group.availableRewards)}</dd></div>
-              <div><dt>Redeemed rewards</dt><dd>{formatNumber(group.redeemedRewards)}</dd></div>
-            </dl>
           </section>
 
           <section className="waiver-admin-card__wide waiver-record-actions">
