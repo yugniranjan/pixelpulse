@@ -31,6 +31,11 @@ function serializePlayer(row) {
     email: row.email || "",
     partyId: row.party_id || "",
     partyDate: row.party_date || "",
+    wristbandCode: row.wristband_code || "",
+    wristbandTranDate: row.wristband_tran_date ? row.wristband_tran_date.toISOString() : "",
+    playerStartTime: row.player_start_time ? row.player_start_time.toISOString() : "",
+    playerEndTime: row.player_end_time ? row.player_end_time.toISOString() : "",
+    wristbandStatusFlag: row.wristband_status_flag || "",
     dateSigned: row.DateSigned ? row.DateSigned.toISOString() : "",
     signeeId: row.SigneeID,
     locationId: row.LocationID,
@@ -159,6 +164,19 @@ export async function GET(req) {
         ) waiver_people
         WHERE email IS NOT NULL AND email <> ''
         ORDER BY email, submitted_at DESC NULLS LAST
+      ),
+      latest_wristband AS (
+        SELECT DISTINCT ON (wt."PlayerID")
+          wt."PlayerID" AS player_id,
+          wt."wristbandCode" AS wristband_code,
+          wt."WristbandTranDate" AS wristband_tran_date,
+          wt."playerStartTime" AS player_start_time,
+          wt."playerEndTime" AS player_end_time,
+          wt."wristbandStatusFlag" AS wristband_status_flag
+        FROM public."WristbandTrans" wt
+        INNER JOIN recent_players rp ON rp."PlayerID" = wt."PlayerID"
+        WHERE wt."LocationID" = $2
+        ORDER BY wt."PlayerID", coalesce(wt."updatedAt", wt."createdAt", wt."WristbandTranDate") DESC NULLS LAST, wt."WristbandTranID" DESC
       )
       SELECT
         p."PlayerID",
@@ -168,6 +186,11 @@ export async function GET(req) {
         p.email,
         waiver_party_details.party_id,
         waiver_party_details.party_date,
+        latest_wristband.wristband_code,
+        latest_wristband.wristband_tran_date,
+        latest_wristband.player_start_time,
+        latest_wristband.player_end_time,
+        latest_wristband.wristband_status_flag,
         p."DateSigned",
         p."SigneeID",
         p."LocationID",
@@ -192,6 +215,7 @@ export async function GET(req) {
       LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
       LEFT JOIN waiver_party_details
         ON waiver_party_details.email = lower(coalesce(p.email, ''))
+      LEFT JOIN latest_wristband ON latest_wristband.player_id = p."PlayerID"
       LEFT JOIN scorecards scorecard ON scorecard.player_id = p."PlayerID"
       LEFT JOIN LATERAL (
         SELECT *

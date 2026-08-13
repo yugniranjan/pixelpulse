@@ -113,6 +113,14 @@ function playerSortDate(player = {}) {
   return player.lastScoreAt || player.createdAt || player.dateSigned || "";
 }
 
+function playerPlayedStatus(player = {}) {
+  return player.playerEndTime ? "Already played" : "Not completed";
+}
+
+function playerReadyForThankYou(player = {}) {
+  return playerPlayedStatus(player) === "Already played";
+}
+
 function sortPlayerEmailGroups(groups = [], sort = "newest") {
   return [...groups].sort((a, b) => {
     if (sort === "points-desc") {
@@ -146,6 +154,11 @@ function buildPlayerEmailGroups(players = [], sort = "newest") {
       latestActivityAt: playerSortDate(player),
       partyId: player.partyId || "",
       partyDate: player.partyDate || "",
+      wristbandCode: player.wristbandCode || "",
+      wristbandTranDate: player.wristbandTranDate || "",
+      playerStartTime: player.playerStartTime || "",
+      playerEndTime: player.playerEndTime || "",
+      wristbandStatusFlag: player.wristbandStatusFlag || "",
       lifetimePoints: 0,
       repeatVisits: 0,
       scoreEvents: 0,
@@ -170,6 +183,14 @@ function buildPlayerEmailGroups(players = [], sort = "newest") {
     if (player.partyId && (!current.partyDate || String(player.partyDate || "").localeCompare(String(current.partyDate || "")) >= 0)) {
       current.partyId = player.partyId;
       current.partyDate = player.partyDate || current.partyDate;
+    }
+
+    if (player.wristbandTranDate && (!current.wristbandTranDate || String(player.wristbandTranDate).localeCompare(String(current.wristbandTranDate)) >= 0)) {
+      current.wristbandCode = player.wristbandCode || current.wristbandCode;
+      current.wristbandTranDate = player.wristbandTranDate;
+      current.playerStartTime = player.playerStartTime || "";
+      current.playerEndTime = player.playerEndTime || "";
+      current.wristbandStatusFlag = player.wristbandStatusFlag || "";
     }
 
     const state = playerThankYouState(player);
@@ -591,7 +612,8 @@ function PlayerCard({ group, onThankYouEmail }) {
   const currentLevel = player.currentLevel;
   const nextLevel = player.nextLevel;
   const thankYouState = playerThankYouState(group);
-  const thankYouDisabled = Boolean(!group.email || thankYouState.sent || thankYouState.feedbackReceived);
+  const readyForThankYou = playerReadyForThankYou(group);
+  const thankYouDisabled = Boolean(!group.email || !readyForThankYou || thankYouState.sent || thankYouState.feedbackReceived);
 
   return (
     <article className="waiver-admin-card">
@@ -607,6 +629,10 @@ function PlayerCard({ group, onThankYouEmail }) {
         <span>
           <strong>{group.partyId || "No party ID"}</strong>
           <em>{group.partyDate ? `Party date ${formatDate(group.partyDate)}` : "Party ID"}</em>
+        </span>
+        <span>
+          <strong>{group.wristbandTranDate ? formatDateTime(group.wristbandTranDate) : "No wristband"}</strong>
+          <em>{group.playerEndTime ? "Already played" : "Latest wristband"}</em>
         </span>
         <span>
           <strong>{formatNumber(group.lifetimePoints)}</strong>
@@ -639,6 +665,12 @@ function PlayerCard({ group, onThankYouEmail }) {
               <div><dt>Players</dt><dd>{group.players.length}</dd></div>
               <div><dt>Party ID</dt><dd>{group.partyId || "Not provided"}</dd></div>
               <div><dt>Party date</dt><dd>{formatDate(group.partyDate)}</dd></div>
+              <div><dt>Wristband code</dt><dd>{group.wristbandCode || "Not provided"}</dd></div>
+              <div><dt>Wristband transaction</dt><dd>{formatDateTime(group.wristbandTranDate)}</dd></div>
+              <div><dt>Player start time</dt><dd>{formatDateTime(group.playerStartTime)}</dd></div>
+              <div><dt>Player end time</dt><dd>{formatDateTime(group.playerEndTime)}</dd></div>
+              <div><dt>Play status</dt><dd>{playerPlayedStatus(group)}</dd></div>
+              <div><dt>Wristband status</dt><dd>{group.wristbandStatusFlag || "Not provided"}</dd></div>
               <div><dt>Newest activity</dt><dd>{formatDateTime(group.latestActivityAt)}</dd></div>
               <div><dt>Latest player</dt><dd>{player.fullName || "Unnamed"}</dd></div>
             </dl>
@@ -653,6 +685,11 @@ function PlayerCard({ group, onThankYouEmail }) {
                   <span>Player ID: {item.playerId}</span>
                   <span>Party ID: {item.partyId || "Not provided"}</span>
                   <span>Party date: {formatDate(item.partyDate)}</span>
+                  <span>Wristband: {item.wristbandCode || "Not provided"}</span>
+                  <span>Wristband transaction: {formatDateTime(item.wristbandTranDate)}</span>
+                  <span>Start: {formatDateTime(item.playerStartTime)}</span>
+                  <span>End: {formatDateTime(item.playerEndTime)}</span>
+                  <span>Play status: {playerPlayedStatus(item)}</span>
                   <span>DOB: {formatDate(item.dateOfBirth)}</span>
                   <span>Signed: {formatDateTime(item.dateSigned)}</span>
                   <span>Last score: {formatDateTime(item.lastScoreAt)}</span>
@@ -693,6 +730,11 @@ function PlayerCard({ group, onThankYouEmail }) {
                 Feedback already received{thankYouState.feedbackAt ? ` on ${formatDateTime(thankYouState.feedbackAt)}` : ""}.
               </p>
             ) : null}
+            {!thankYouState.sent && !thankYouState.feedbackReceived && !readyForThankYou ? (
+              <p className="waiver-email-already-sent">
+                Thank you email becomes available after the session is complete.
+              </p>
+            ) : null}
           </section>
         </div>
       ) : null}
@@ -725,6 +767,7 @@ export default function AdminWaiversPage() {
   const [playerQuery, setPlayerQuery] = useState("");
   const [playerDateFrom, setPlayerDateFrom] = useState("");
   const [playerDateTo, setPlayerDateTo] = useState("");
+  const [playerGameStatusFilter, setPlayerGameStatusFilter] = useState("all");
   const [playerSort, setPlayerSort] = useState("newest");
   const [playerPageSize, setPlayerPageSize] = useState(25);
   const [playerPage, setPlayerPage] = useState(1);
@@ -928,9 +971,17 @@ export default function AdminWaiversPage() {
       return (b.createdAt || "").localeCompare(a.createdAt || "") || (b.playerId || 0) - (a.playerId || 0);
     });
   }, [playerDateFrom, playerDateTo, playerQuery, playerSort, players]);
-  const playerEmailGroups = useMemo(
+  const playerEmailGroupsUnfiltered = useMemo(
     () => buildPlayerEmailGroups(filteredPlayers, playerSort),
     [filteredPlayers, playerSort],
+  );
+  const playerEmailGroups = useMemo(
+    () => playerEmailGroupsUnfiltered.filter((group) => {
+      if (playerGameStatusFilter === "ended") return Boolean(group.playerEndTime);
+      if (playerGameStatusFilter === "not-started") return !group.playerStartTime && !group.playerEndTime;
+      return true;
+    }),
+    [playerEmailGroupsUnfiltered, playerGameStatusFilter],
   );
   const allPlayerEmailGroups = useMemo(
     () => buildPlayerEmailGroups(players, playerSort),
@@ -961,15 +1012,20 @@ export default function AdminWaiversPage() {
       .filter((group) => group.email)
       .forEach((group) => {
         const state = playerThankYouState(group);
-        emails.set(normalizeSearchValue(group.email), {
-          sent: Boolean(emails.get(normalizeSearchValue(group.email))?.sent || state.sent || state.feedbackReceived),
+        const email = normalizeSearchValue(group.email);
+        emails.set(email, {
+          sent: Boolean(emails.get(email)?.sent || state.sent || state.feedbackReceived),
+          ready: Boolean(emails.get(email)?.ready || playerReadyForThankYou(group)),
         });
       });
 
     return Array.from(emails.values()).reduce(
       (stats, email) => {
-        if (email.sent) stats.sent += 1;
-        else stats.pending += 1;
+        if (email.sent) {
+          stats.sent += 1;
+        } else if (email.ready) {
+          stats.pending += 1;
+        }
         return stats;
       },
       { sent: 0, pending: 0 },
@@ -978,7 +1034,7 @@ export default function AdminWaiversPage() {
 
   useEffect(() => {
     setPlayerPage(1);
-  }, [playerDateFrom, playerDateTo, playerPageSize, playerQuery, playerSort]);
+  }, [playerDateFrom, playerDateTo, playerGameStatusFilter, playerPageSize, playerQuery, playerSort]);
 
   function clearFilters() {
     setQuery("");
@@ -991,6 +1047,7 @@ export default function AdminWaiversPage() {
     setPlayerQuery("");
     setPlayerDateFrom("");
     setPlayerDateTo("");
+    setPlayerGameStatusFilter("all");
   }
 
   function exportWaiverRows(exportRows, label) {
@@ -1061,6 +1118,10 @@ export default function AdminWaiversPage() {
     }
     if (state.feedbackReceived) {
       setThankYouError("Feedback has already been received from this email ID.");
+      return;
+    }
+    if (!playerReadyForThankYou(group)) {
+      setThankYouError("Thank you email can be sent only after the session is complete.");
       return;
     }
 
@@ -1439,7 +1500,7 @@ export default function AdminWaiversPage() {
                 <strong>{repeatVisitors}</strong>
               </article>
               <article>
-                <span>Emails To Send</span>
+                <span>Session Complete — Email Not Delivered</span>
                 <strong>{playerEmailStats.pending}</strong>
               </article>
               <article>
@@ -1485,6 +1546,14 @@ export default function AdminWaiversPage() {
                     <label>
                       <span>Signed To</span>
                       <input type="date" value={playerDateTo} onChange={(event) => setPlayerDateTo(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Game Status</span>
+                      <select value={playerGameStatusFilter} onChange={(event) => setPlayerGameStatusFilter(event.target.value)}>
+                        <option value="all">All players</option>
+                        <option value="ended">Already played</option>
+                        <option value="not-started">Not started</option>
+                      </select>
                     </label>
                     <label>
                       <span>Sort</span>
