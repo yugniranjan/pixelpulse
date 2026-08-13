@@ -800,6 +800,7 @@ export default function AdminWaiversPage() {
       const current = groups.get(partyId) || {
         partyId,
         partyName: waiver.visit?.partyName || "",
+        partyDate: partyDateValue(waiver),
         visitDate: waiver.visit?.visitDate || "",
         visitTime: waiver.visit?.visitTime || "",
         records: 0,
@@ -810,6 +811,7 @@ export default function AdminWaiversPage() {
       current.records += 1;
       current.participants += waiverParticipantCount(waiver);
       current.partyName ||= waiver.visit?.partyName || "";
+      current.partyDate ||= partyDateValue(waiver);
       current.visitDate ||= effectiveWaiverDate(waiver);
       current.visitTime ||= waiver.visit?.visitTime || "";
       if (!current.latestSubmittedAt || waiver.submittedAt > current.latestSubmittedAt) {
@@ -1284,7 +1286,8 @@ export default function AdminWaiversPage() {
                           <dl>
                             <div><dt>Waivers</dt><dd>{group.records}</dd></div>
                             <div><dt>Players</dt><dd>{group.participants}</dd></div>
-                            <div><dt>Date</dt><dd>{group.visitDate || "Not set"}</dd></div>
+                            <div><dt>Party Date</dt><dd>{group.partyDate || "Not set"}</dd></div>
+                            <div><dt>Visit Date</dt><dd>{group.visitDate || "Not set"}</dd></div>
                             <div><dt>Time</dt><dd>{group.visitTime || "Not set"}</dd></div>
                           </dl>
                           <div className="waiver-party-groups__actions">
