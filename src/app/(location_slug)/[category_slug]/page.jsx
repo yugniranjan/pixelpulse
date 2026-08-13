@@ -245,6 +245,12 @@ const Category = async ({ params }) => {
         !childSearchText.includes("safety information")
       );
     }) || [];
+  const groupEventItems = isGroupsEventsPage
+    ? attractionsData?.[0]?.children?.filter((item) => (
+        item?.isactive == 1 ||
+        String(item?.path || "").trim().toLowerCase() === "fund-raising"
+      )) || []
+    : attractionItems;
   const configCta = getCtaContent(configData);
   const pageCta = getCtaContent(pageData || {});
   const ctaContent = {
@@ -535,7 +541,7 @@ const Category = async ({ params }) => {
                   </div>
 
                   <section className="ppp-groups-grid">
-                    {attractionItems.map((item, i) => (
+                    {groupEventItems.map((item, i) => (
                       <article className="ppp-group-card-modern" key={item.pageid || i}>
                         <Link
                           href={`${category_slug}/${item?.path}`}
