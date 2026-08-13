@@ -7,6 +7,7 @@ import AdminShell from "@/components/AdminShell";
 
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
 const DEFAULT_PROMOTIONAL_SUBJECT = "Your Next Pixel Pulse Adventure Is On Us";
+const DEFAULT_PROMOTIONAL_LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 
 function Field({ label, required = false, className = "", children }) {
   return (
@@ -50,6 +51,8 @@ export default function AdminThankYouPage() {
     emails: "",
     partyId: "",
     subject: DEFAULT_PROMOTIONAL_SUBJECT,
+    headerTitle: DEFAULT_PROMOTIONAL_SUBJECT,
+    logoUrl: DEFAULT_PROMOTIONAL_LOGO_URL,
     websiteLink: DEFAULT_WEBSITE_LINK,
     emailText: buildThankYouPreview({ websiteLink: DEFAULT_WEBSITE_LINK }),
   });
@@ -92,6 +95,8 @@ export default function AdminThankYouPage() {
         payload.append("name", form.firstName);
         payload.append("partyId", form.partyId);
         payload.append("subject", form.subject);
+        payload.append("headerTitle", form.headerTitle);
+        payload.append("logoUrl", form.logoUrl);
         payload.append("websiteLink", form.websiteLink);
         payload.append("promotionalText", form.emailText);
         attachments.forEach((file) => {
@@ -171,6 +176,13 @@ export default function AdminThankYouPage() {
                   onChange={(event) => updateField("websiteLink", event.target.value)}
                 />
               </Field>
+              <Field label="Logo URL">
+                <input
+                  value={form.logoUrl}
+                  onChange={(event) => updateField("logoUrl", event.target.value)}
+                  placeholder="https://..."
+                />
+              </Field>
             </div>
             <p className="invite-admin-help">
               Add one email per line, or separate emails with commas. Each recipient receives an individual email.
@@ -185,6 +197,13 @@ export default function AdminThankYouPage() {
                   required
                   value={form.subject}
                   onChange={(event) => updateField("subject", event.target.value)}
+                />
+              </Field>
+              <Field label="Header title" required>
+                <input
+                  required
+                  value={form.headerTitle}
+                  onChange={(event) => updateField("headerTitle", event.target.value)}
                 />
               </Field>
               <Field label="Review and edit" required className="invite-admin-field--review">

@@ -57,12 +57,14 @@ function renderEmailButton({ href, label, variant = "dark" }) {
   `;
 }
 
-function renderBrandedEmailShell({ title, partyId = "", children = "" }) {
+function renderBrandedEmailShell({ title, partyId = "", children = "", logoUrl = LOGO_URL }) {
+  const imageUrl = cleanText(logoUrl) || LOGO_URL;
+
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
         <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:22px 24px;">
-          <img src="${LOGO_URL}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
+          <img src="${escapeHtml(imageUrl)}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
           <h1 style="margin:0;font-size:28px;line-height:1.15;color:#ffffff;">${escapeHtml(title)}</h1>
           ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
         </div>
@@ -373,10 +375,11 @@ function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
   });
 }
 
-function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, title = "Thanks for Playing at Pixel Pulse!" }) {
+function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, title = "Thanks for Playing at Pixel Pulse!", logoUrl = LOGO_URL }) {
   return renderBrandedEmailShell({
     title,
     partyId,
+    logoUrl,
     children: renderThankYouTextHtml({ text, feedbackUrl, websiteLink }),
   });
 }
@@ -392,6 +395,8 @@ export async function POST(request) {
     const feedbackName = cleanText(body?.name) || firstName;
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
     const customSubject = cleanText(body?.subject);
+    const headerTitle = cleanText(body?.headerTitle);
+    const logoUrl = cleanText(body?.logoUrl);
     const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
     const promotionalText = cleanText(body?.promotionalText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
@@ -503,7 +508,8 @@ export async function POST(request) {
           feedbackUrl: "",
           websiteLink,
           partyId,
-          title: "Your Next Pixel Pulse Adventure Is On Us",
+          title: headerTitle || customSubject || "Your Next Pixel Pulse Adventure Is On Us",
+          logoUrl,
         })
       : sendThankYou
       ? thankYouText
