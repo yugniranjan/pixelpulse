@@ -6,10 +6,11 @@ import "../../styles/admin-waivers.css";
 import AdminShell from "@/components/AdminShell";
 
 const DEFAULT_WEBSITE_LINK = "https://www.pixelpulseplay.ca";
+const DEFAULT_PROMOTIONAL_SUBJECT = "Your Next Pixel Pulse Adventure Is On Us";
 
-function Field({ label, required = false, children }) {
+function Field({ label, required = false, className = "", children }) {
   return (
-    <label className="invite-admin-field">
+    <label className={`invite-admin-field${className ? ` ${className}` : ""}`}>
       <span>
         {label}
         {required ? <b aria-label="required">*</b> : null}
@@ -48,6 +49,7 @@ export default function AdminThankYouPage() {
     firstName: "",
     emails: "",
     partyId: "",
+    subject: DEFAULT_PROMOTIONAL_SUBJECT,
     websiteLink: DEFAULT_WEBSITE_LINK,
     emailText: buildThankYouPreview({ websiteLink: DEFAULT_WEBSITE_LINK }),
   });
@@ -56,7 +58,6 @@ export default function AdminThankYouPage() {
   const [sending, setSending] = useState(false);
   const [attachments, setAttachments] = useState([]);
 
-  const previewText = form.emailText;
   const recipientEmails = useMemo(
     () =>
       form.emails
@@ -68,10 +69,6 @@ export default function AdminThankYouPage() {
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
-  }
-
-  async function copyText(text) {
-    await navigator.clipboard.writeText(text);
   }
 
   async function sendPromotionalEmail(event) {
@@ -94,6 +91,7 @@ export default function AdminThankYouPage() {
         payload.append("firstName", form.firstName);
         payload.append("name", form.firstName);
         payload.append("partyId", form.partyId);
+        payload.append("subject", form.subject);
         payload.append("websiteLink", form.websiteLink);
         payload.append("promotionalText", form.emailText);
         attachments.forEach((file) => {
@@ -182,7 +180,14 @@ export default function AdminThankYouPage() {
           <section>
             <h2>Email Content</h2>
             <div className="invite-admin-grid">
-              <Field label="Review and edit" required>
+              <Field label="Subject" required>
+                <input
+                  required
+                  value={form.subject}
+                  onChange={(event) => updateField("subject", event.target.value)}
+                />
+              </Field>
+              <Field label="Review and edit" required className="invite-admin-field--review">
                 <textarea
                   required
                   value={form.emailText}
@@ -217,21 +222,6 @@ export default function AdminThankYouPage() {
             {sending ? "Sending..." : "Send Promotional Email"}
           </button>
         </form>
-
-        <section className="invite-admin-result">
-          <h2>Promotional Email Preview</h2>
-          <div className="invite-admin-output">
-            <div>
-              <span>Recipients</span>
-              <p>{recipientEmails.length ? `${recipientEmails.length} recipient${recipientEmails.length === 1 ? "" : "s"}` : "No recipients yet"}</p>
-            </div>
-            <div>
-              <span>Promotional Email Text</span>
-              <textarea readOnly value={form.emailText} />
-              <button type="button" onClick={() => copyText(previewText)}>Copy</button>
-            </div>
-          </div>
-        </section>
       </div>
     </AdminShell>
   );

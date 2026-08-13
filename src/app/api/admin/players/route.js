@@ -29,6 +29,8 @@ function serializePlayer(row) {
     fullName: [row.FirstName, row.LastName].filter(Boolean).join(" ").trim() || "Unnamed",
     dateOfBirth: row.DateOfBirth ? row.DateOfBirth.toISOString() : "",
     email: row.email || "",
+    partyId: row.party_id || "",
+    partyDate: row.party_date || "",
     dateSigned: row.DateSigned ? row.DateSigned.toISOString() : "",
     signeeId: row.SigneeID,
     locationId: row.LocationID,
@@ -124,6 +126,39 @@ export async function GET(req) {
         FROM scoreboard
         FULL OUTER JOIN manual_adjustments
           ON manual_adjustments.player_id = scoreboard.player_id
+      ),
+      waiver_party_details AS (
+        SELECT DISTINCT ON (email)
+          email,
+          party_id,
+          party_date
+        FROM (
+          SELECT
+            lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) AS email,
+            coalesce(w.visit->>'partyId', '') AS party_id,
+            coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
+            w.submitted_at
+          FROM waivers w
+          WHERE coalesce(w.visit->>'partyId', '') <> ''
+
+          UNION ALL
+
+          SELECT
+            lower(nullif(trim(coalesce(member->>'email', w.primary_participant->>'email', '')), '')) AS email,
+            coalesce(w.visit->>'partyId', '') AS party_id,
+            coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
+            w.submitted_at
+          FROM waivers w
+          CROSS JOIN LATERAL jsonb_array_elements(
+            CASE
+              WHEN jsonb_typeof(w.family_members) = 'array' THEN w.family_members
+              ELSE '[]'::jsonb
+            END
+          ) member
+          WHERE coalesce(w.visit->>'partyId', '') <> ''
+        ) waiver_people
+        WHERE email IS NOT NULL AND email <> ''
+        ORDER BY email, submitted_at DESC NULLS LAST
       )
       SELECT
         p."PlayerID",
@@ -131,6 +166,8 @@ export async function GET(req) {
         p."LastName",
         p."DateOfBirth",
         p.email,
+        waiver_party_details.party_id,
+        waiver_party_details.party_date,
         p."DateSigned",
         p."SigneeID",
         p."LocationID",
@@ -153,6 +190,8 @@ export async function GET(req) {
         coalesce(reward_counts.redeemed_rewards, 0)::integer AS redeemed_rewards
       FROM recent_players p
       LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
+      LEFT JOIN waiver_party_details
+        ON waiver_party_details.email = lower(coalesce(p.email, ''))
       LEFT JOIN scorecards scorecard ON scorecard.player_id = p."PlayerID"
       LEFT JOIN LATERAL (
         SELECT *

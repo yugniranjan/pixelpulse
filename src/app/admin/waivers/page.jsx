@@ -144,6 +144,8 @@ function buildPlayerEmailGroups(players = [], sort = "newest") {
       primaryPlayer: player,
       players: [],
       latestActivityAt: playerSortDate(player),
+      partyId: player.partyId || "",
+      partyDate: player.partyDate || "",
       lifetimePoints: 0,
       repeatVisits: 0,
       scoreEvents: 0,
@@ -163,6 +165,11 @@ function buildPlayerEmailGroups(players = [], sort = "newest") {
     if ((playerSortDate(player) || "").localeCompare(current.latestActivityAt || "") > 0) {
       current.latestActivityAt = playerSortDate(player);
       current.primaryPlayer = player;
+    }
+
+    if (player.partyId && (!current.partyDate || String(player.partyDate || "").localeCompare(String(current.partyDate || "")) >= 0)) {
+      current.partyId = player.partyId;
+      current.partyDate = player.partyDate || current.partyDate;
     }
 
     const state = playerThankYouState(player);
@@ -598,6 +605,10 @@ function PlayerCard({ group, onThankYouEmail }) {
           <em>Newest player</em>
         </span>
         <span>
+          <strong>{group.partyId || "No party ID"}</strong>
+          <em>{group.partyDate ? `Party date ${formatDate(group.partyDate)}` : "Party ID"}</em>
+        </span>
+        <span>
           <strong>{formatNumber(group.lifetimePoints)}</strong>
           <em>Lifetime points</em>
         </span>
@@ -626,6 +637,8 @@ function PlayerCard({ group, onThankYouEmail }) {
             <dl>
               <div><dt>Email</dt><dd>{group.email || "Not provided"}</dd></div>
               <div><dt>Players</dt><dd>{group.players.length}</dd></div>
+              <div><dt>Party ID</dt><dd>{group.partyId || "Not provided"}</dd></div>
+              <div><dt>Party date</dt><dd>{formatDate(group.partyDate)}</dd></div>
               <div><dt>Newest activity</dt><dd>{formatDateTime(group.latestActivityAt)}</dd></div>
               <div><dt>Latest player</dt><dd>{player.fullName || "Unnamed"}</dd></div>
             </dl>
@@ -638,6 +651,8 @@ function PlayerCard({ group, onThankYouEmail }) {
                 <div key={item.id}>
                   <strong>{item.fullName || "Unnamed"}</strong>
                   <span>Player ID: {item.playerId}</span>
+                  <span>Party ID: {item.partyId || "Not provided"}</span>
+                  <span>Party date: {formatDate(item.partyDate)}</span>
                   <span>DOB: {formatDate(item.dateOfBirth)}</span>
                   <span>Signed: {formatDateTime(item.dateSigned)}</span>
                   <span>Last score: {formatDateTime(item.lastScoreAt)}</span>

@@ -391,6 +391,7 @@ export async function POST(request) {
     const firstName = cleanText(body?.firstName);
     const feedbackName = cleanText(body?.name) || firstName;
     const websiteLink = cleanText(body?.websiteLink) || "https://www.pixelpulseplay.ca";
+    const customSubject = cleanText(body?.subject);
     const thankYouText = cleanText(body?.thankYouText || body?.thankYouEmailText);
     const promotionalText = cleanText(body?.promotionalText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
@@ -535,7 +536,7 @@ export async function POST(request) {
       to,
       replyTo: CONTACT_EMAIL,
       subject: sendPromotional
-        ? "Your Next Pixel Pulse Adventure Is On Us"
+        ? customSubject || "Your Next Pixel Pulse Adventure Is On Us"
         : sendThankYou
         ? "Your Next Pixel Pulse Adventure Is On Us ⚡⭐"
         : confirmationEmailText

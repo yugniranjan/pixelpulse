@@ -78,6 +78,14 @@
   resize: vertical;
 }
 
+.invite-admin-field--review {
+  grid-column: 1 / -1;
+}
+
+.invite-admin-field--review textarea {
+  min-height: 420px;
+}
+
 .invite-admin-form button,
 .invite-admin-output button,
 .invite-admin-list__header button,
