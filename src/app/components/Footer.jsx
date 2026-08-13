@@ -15,6 +15,12 @@ import youtubeicon from "@public/assets/images/social_icon/youtube.svg";
 import Script from "next/script";
 
 const TIKTOK_URL = "https://www.tiktok.com/@pixelpulseplay";
+const GROUP_EVENT_FOOTER_LINKS = [
+  { path: "private-party", label: "Private Party" },
+  { path: "corporate-parties-events-groups", label: "Corporate Parties" },
+  { path: "school-groups", label: "School / Groups" },
+  { path: "fund-raising", label: "Fund Raising" },
+];
 
 function footerHrefForItem(item = {}, locationSlug = "") {
   const path = String(item?.path || "").trim().toLowerCase();
@@ -82,6 +88,16 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
       href: footerHrefForItem(item, location_slug),
     }));
   const companyLinks = [...companyStaticLinks, ...sheetCompanyLinks];
+  const groupSheetChildren = groupsData?.[0]?.children || [];
+  const groupLinks = GROUP_EVENT_FOOTER_LINKS.map((fallback) => {
+    const sheetItem = groupSheetChildren.find(
+      (item) => String(item?.path || "").trim().toLowerCase() === fallback.path,
+    );
+    return {
+      label: sheetItem?.desc || fallback.label,
+      href: "/group-events",
+    };
+  });
   const companyChildren = companyData?.[0]?.children || [];
   const blogChildren = blogsData?.[0]?.children || [];
   const blogFallbacks = getFallbackBlogs();
@@ -195,10 +211,10 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
 
           <ul>
             <li>Groups</li>
-            {groupsData?.[0]?.children?.map((item, i) => (
-              <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
-                  {item?.desc}
+            {groupLinks.map((item) => (
+              <li key={item.label}>
+                <Link href={item.href} prefetch>
+                  {item.label}
                 </Link>
               </li>
             ))}

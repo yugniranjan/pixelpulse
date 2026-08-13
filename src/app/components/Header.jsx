@@ -26,19 +26,36 @@ const Header = ({ location_slug, menudata, configdata, token }) => {
   const contactHref = ctaContent.contactHref || `/${location_slug}/contactus`;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const navItems = [
-    { navName: "Home", navUrl: "", href: "/" },
-    ...(Array.isArray(menudata) ? menudata : [])
-    .filter(
-      (item) =>
+  const hiddenHeaderPaths = new Set([
+    "about-us",
+    "contactus",
+    "contact-us",
+    "private-party",
+    "corporate-parties-events-groups",
+    "school-groups",
+    "fund-raising",
+  ]);
+  const sheetNavItems = (Array.isArray(menudata) ? menudata : [])
+    .filter((item) => {
+      const path = item.path?.toLowerCase();
+      const parentid = item.parentid?.toLowerCase();
+      return (
         isMenuItemActive(item) &&
-        !["about-us", "contactus", "contact-us"].includes(item.path?.toLowerCase()),
-    )
+        path &&
+        (!parentid || parentid === path) &&
+        !hiddenHeaderPaths.has(path)
+      );
+    })
     .map((item) => ({
       navName: item.desc,
       navUrl: item.path.toLowerCase(),
       href: `/${item.path.toLowerCase()}`,
-    })),
+    }));
+  const hasGroupEvents = sheetNavItems.some((item) => item.navUrl === "group-events");
+  const navItems = [
+    { navName: "Home", navUrl: "", href: "/" },
+    ...sheetNavItems,
+    ...(hasGroupEvents ? [] : [{ navName: "Group Events", navUrl: "group-events", href: "/group-events" }]),
   ];
   const visibleNavItems =
     normalizedPathname === "/"
