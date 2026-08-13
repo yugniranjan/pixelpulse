@@ -121,6 +121,18 @@ function playerReadyForThankYou(player = {}) {
   return playerPlayedStatus(player) === "Already played";
 }
 
+function playerEmailDeliveryStatus(player = {}) {
+  const thankYou = playerThankYouState(player);
+  if (thankYou.sent) return "Email delivered";
+  if (thankYou.feedbackReceived) return "Feedback received";
+  if (playerReadyForThankYou(player)) return "Session Complete — Email Not Delivered";
+  return "Session not complete";
+}
+
+function playerNeedsThankYouEmail(player = {}) {
+  return playerEmailDeliveryStatus(player) === "Session Complete — Email Not Delivered";
+}
+
 function sortPlayerEmailGroups(groups = [], sort = "newest") {
   return [...groups].sort((a, b) => {
     if (sort === "points-desc") {
@@ -622,6 +634,13 @@ function PlayerCard({ group, onThankYouEmail }) {
           <strong>{group.email || "No email"}</strong>
           <em>{group.players.length} player{group.players.length === 1 ? "" : "s"} linked</em>
         </span>
+        <span className={playerNeedsThankYouEmail(group) ? "player-email-status is-needed" : "player-email-status"}>
+          <strong>
+            {playerNeedsThankYouEmail(group) ? <span aria-hidden="true">!</span> : null}
+            {playerEmailDeliveryStatus(group)}
+          </strong>
+          <em>Email delivery status</em>
+        </span>
         <span>
           <strong>{player.fullName || "Unnamed"}</strong>
           <em>Newest player</em>
@@ -633,10 +652,6 @@ function PlayerCard({ group, onThankYouEmail }) {
         <span>
           <strong>{group.wristbandTranDate ? formatDateTime(group.wristbandTranDate) : "No wristband"}</strong>
           <em>{group.playerEndTime ? "Already played" : "Latest wristband"}</em>
-        </span>
-        <span>
-          <strong>{formatNumber(group.lifetimePoints)}</strong>
-          <em>Lifetime points</em>
         </span>
         <span>
           <strong>{currentLevel ? `Level ${currentLevel.levelNumber}` : "No level"}</strong>
@@ -658,21 +673,50 @@ function PlayerCard({ group, onThankYouEmail }) {
 
       {open ? (
         <div className="waiver-admin-card__details">
+          <section className="player-session-panel">
+            <div className="player-session-panel__head">
+              <div>
+                <h2>Session Timing</h2>
+                <p>{playerEmailDeliveryStatus(group)}</p>
+              </div>
+              <span>{playerPlayedStatus(group)}</span>
+            </div>
+            <dl className="player-session-timing">
+              <div>
+                <dt>Wristband activated</dt>
+                <dd>{formatDateTime(group.playerStartTime || group.wristbandTranDate)}</dd>
+              </div>
+              <div>
+                <dt>Session end time</dt>
+                <dd>{formatDateTime(group.playerEndTime)}</dd>
+              </div>
+              <div>
+                <dt>Wristband transaction date</dt>
+                <dd>{formatDateTime(group.wristbandTranDate)}</dd>
+              </div>
+              <div>
+                <dt>Wristband code</dt>
+                <dd>{group.wristbandCode || "Not provided"}</dd>
+              </div>
+              <div>
+                <dt>Wristband status</dt>
+                <dd>{group.wristbandStatusFlag || "Not provided"}</dd>
+              </div>
+              <div>
+                <dt>Party date</dt>
+                <dd>{formatDate(group.partyDate)}</dd>
+              </div>
+            </dl>
+          </section>
+
           <section>
-            <h2>Email Group</h2>
+            <h2>Player Group</h2>
             <dl>
               <div><dt>Email</dt><dd>{group.email || "Not provided"}</dd></div>
-              <div><dt>Players</dt><dd>{group.players.length}</dd></div>
-              <div><dt>Party ID</dt><dd>{group.partyId || "Not provided"}</dd></div>
-              <div><dt>Party date</dt><dd>{formatDate(group.partyDate)}</dd></div>
-              <div><dt>Wristband code</dt><dd>{group.wristbandCode || "Not provided"}</dd></div>
-              <div><dt>Wristband transaction</dt><dd>{formatDateTime(group.wristbandTranDate)}</dd></div>
-              <div><dt>Player start time</dt><dd>{formatDateTime(group.playerStartTime)}</dd></div>
-              <div><dt>Player end time</dt><dd>{formatDateTime(group.playerEndTime)}</dd></div>
-              <div><dt>Play status</dt><dd>{playerPlayedStatus(group)}</dd></div>
-              <div><dt>Wristband status</dt><dd>{group.wristbandStatusFlag || "Not provided"}</dd></div>
-              <div><dt>Newest activity</dt><dd>{formatDateTime(group.latestActivityAt)}</dd></div>
+              <div><dt>Players linked</dt><dd>{group.players.length}</dd></div>
               <div><dt>Latest player</dt><dd>{player.fullName || "Unnamed"}</dd></div>
+              <div><dt>Party ID</dt><dd>{group.partyId || "Not provided"}</dd></div>
+              <div><dt>Newest activity</dt><dd>{formatDateTime(group.latestActivityAt)}</dd></div>
             </dl>
           </section>
 
@@ -684,15 +728,11 @@ function PlayerCard({ group, onThankYouEmail }) {
                   <strong>{item.fullName || "Unnamed"}</strong>
                   <span>Player ID: {item.playerId}</span>
                   <span>Party ID: {item.partyId || "Not provided"}</span>
-                  <span>Party date: {formatDate(item.partyDate)}</span>
                   <span>Wristband: {item.wristbandCode || "Not provided"}</span>
-                  <span>Wristband transaction: {formatDateTime(item.wristbandTranDate)}</span>
-                  <span>Start: {formatDateTime(item.playerStartTime)}</span>
-                  <span>End: {formatDateTime(item.playerEndTime)}</span>
+                  <span>Activated: {formatDateTime(item.playerStartTime || item.wristbandTranDate)}</span>
+                  <span>Ended: {formatDateTime(item.playerEndTime)}</span>
                   <span>Play status: {playerPlayedStatus(item)}</span>
-                  <span>DOB: {formatDate(item.dateOfBirth)}</span>
-                  <span>Signed: {formatDateTime(item.dateSigned)}</span>
-                  <span>Last score: {formatDateTime(item.lastScoreAt)}</span>
+                  <span>Email delivery status: {playerEmailDeliveryStatus(item)}</span>
                 </div>
               ))}
             </div>
@@ -716,7 +756,12 @@ function PlayerCard({ group, onThankYouEmail }) {
           <section className="waiver-admin-card__wide waiver-record-actions">
             <h2>Player Email</h2>
             <div>
-              <button type="button" onClick={() => onThankYouEmail(group)} disabled={thankYouDisabled}>
+              <button
+                type="button"
+                className="waiver-thank-you-action"
+                onClick={() => onThankYouEmail(group)}
+                disabled={thankYouDisabled}
+              >
                 Thank You Email
               </button>
             </div>

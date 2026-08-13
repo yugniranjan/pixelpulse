@@ -264,12 +264,73 @@
   grid-template-columns: minmax(180px, 1.25fr) minmax(92px, 0.65fr) minmax(120px, 0.75fr) minmax(140px, 0.9fr) minmax(96px, 0.55fr) minmax(110px, 0.55fr) minmax(150px, 0.9fr);
 }
 
+.player-email-status strong {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.player-email-status strong > span {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #f79009;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 0 0 3px rgba(247, 144, 9, 0.16);
+}
+
+.player-email-status.is-needed strong {
+  color: #b54708;
+}
+
 .player-scorecard {
   grid-column: 1 / -1;
 }
 
 .player-scorecard dl {
   grid-template-columns: repeat(5, minmax(130px, 1fr));
+}
+
+.player-session-panel {
+  grid-column: 1 / -1;
+}
+
+.player-session-panel__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.player-session-panel__head p {
+  margin: 4px 0 0;
+  color: #667085;
+  font-weight: 800;
+}
+
+.player-session-panel__head > span {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #ecfdf3;
+  color: #027a48;
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.player-session-timing {
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+}
+
+.player-session-timing dd {
+  font-size: 1rem;
+  font-weight: 900;
 }
 
 .waiver-data-pagination {
@@ -336,6 +397,20 @@
 .waiver-edit-modal__head button:hover {
   border-color: #a4cf5f;
   color: #3f6212;
+}
+
+.waiver-record-actions .waiver-thank-you-action:not(:disabled) {
+  border-color: #a4cf5f;
+  background: linear-gradient(135deg, #a4cf5f, #fbae7b);
+  color: #050810;
+  box-shadow: 0 10px 24px rgba(164, 207, 95, 0.35);
+}
+
+.waiver-record-actions .waiver-thank-you-action:hover:not(:disabled) {
+  border-color: #8fbd4a;
+  color: #050810;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(164, 207, 95, 0.42);
 }
 
 .waiver-record-actions button:disabled {
