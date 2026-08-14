@@ -114,11 +114,12 @@ function playerSortDate(player = {}) {
 }
 
 function playerPlayedStatus(player = {}) {
-  return player.playerEndTime ? "Already played" : "Not completed";
+  if (!player.playerEndTime) return "Not completed";
+  return new Date(player.playerEndTime).getTime() <= Date.now() ? "Already played" : "In progress";
 }
 
 function playerReadyForThankYou(player = {}) {
-  return playerPlayedStatus(player) === "Already played";
+  return player.playerEndTime && new Date(player.playerEndTime).getTime() <= Date.now();
 }
 
 function playerEmailDeliveryStatus(player = {}) {
@@ -649,7 +650,7 @@ function PlayerCard({ group, onThankYouEmail }) {
         </span>
         <span>
           <strong>{group.playerEndTime ? formatDateTime(group.playerEndTime) : "No session end time"}</strong>
-          <em>{group.playerEndTime ? "Session end time - Already played" : "Session end time"}</em>
+          <em>{group.playerEndTime ? `Session end time - ${playerPlayedStatus(group)}` : "Session end time"}</em>
         </span>
       </button>
 
@@ -672,7 +673,7 @@ function PlayerCard({ group, onThankYouEmail }) {
                 <dt>Session end time</dt>
                 <dd>
                   {formatDateTime(group.playerEndTime)}
-                  <span className={group.playerEndTime ? "player-session-status is-complete" : "player-session-status"}>
+                  <span className={playerReadyForThankYou(group) ? "player-session-status is-complete" : "player-session-status"}>
                     {playerPlayedStatus(group)}
                   </span>
                 </dd>
@@ -994,7 +995,7 @@ export default function AdminWaiversPage() {
   );
   const playerEmailGroups = useMemo(
     () => playerEmailGroupsUnfiltered.filter((group) => {
-      if (playerGameStatusFilter === "ended") return Boolean(group.playerEndTime);
+      if (playerGameStatusFilter === "ended") return playerReadyForThankYou(group);
       if (playerGameStatusFilter === "not-started") return !group.playerStartTime && !group.playerEndTime;
       return true;
     }),

@@ -132,11 +132,16 @@ export async function GET(req) {
         FULL OUTER JOIN manual_adjustments
           ON manual_adjustments.player_id = scoreboard.player_id
       ),
-      waiver_party_details AS (
-        SELECT DISTINCT ON (email)
+      waiver_party_people AS (
+        SELECT
           email,
           party_id,
-          party_date
+          party_date,
+          CASE
+            WHEN party_date ~ '^\\d{4}-\\d{2}-\\d{2}$' THEN party_date::date
+            ELSE NULL
+          END AS party_visit_date,
+          submitted_at
         FROM (
           SELECT
             lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) AS email,
@@ -163,7 +168,6 @@ export async function GET(req) {
           WHERE coalesce(w.visit->>'partyId', '') <> ''
         ) waiver_people
         WHERE email IS NOT NULL AND email <> ''
-        ORDER BY email, submitted_at DESC NULLS LAST
       ),
       latest_wristband AS (
         SELECT DISTINCT ON (wt."PlayerID")
@@ -213,9 +217,29 @@ export async function GET(req) {
         coalesce(reward_counts.redeemed_rewards, 0)::integer AS redeemed_rewards
       FROM recent_players p
       LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
-      LEFT JOIN waiver_party_details
-        ON waiver_party_details.email = lower(coalesce(p.email, ''))
       LEFT JOIN latest_wristband ON latest_wristband.player_id = p."PlayerID"
+      LEFT JOIN LATERAL (
+        SELECT
+          wpp.party_id,
+          wpp.party_date
+        FROM waiver_party_people wpp
+        WHERE wpp.email = lower(coalesce(p.email, ''))
+          AND (
+            wpp.party_visit_date IS NULL
+            OR wpp.party_visit_date = (
+              coalesce(
+                latest_wristband.player_end_time,
+                latest_wristband.player_start_time,
+                latest_wristband.wristband_tran_date,
+                p."createdAt"
+              ) AT TIME ZONE 'America/Toronto'
+            )::date
+          )
+        ORDER BY
+          CASE WHEN wpp.party_visit_date IS NULL THEN 1 ELSE 0 END,
+          wpp.submitted_at DESC NULLS LAST
+        LIMIT 1
+      ) waiver_party_details ON true
       LEFT JOIN scorecards scorecard ON scorecard.player_id = p."PlayerID"
       LEFT JOIN LATERAL (
         SELECT *
