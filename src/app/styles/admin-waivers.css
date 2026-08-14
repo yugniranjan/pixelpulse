@@ -260,6 +260,45 @@
   grid-template-columns: minmax(220px, 1.4fr) minmax(140px, 0.75fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr) minmax(92px, 0.45fr) auto;
 }
 
+.player-visit-tabs {
+  display: inline-flex;
+  width: fit-content;
+  gap: 6px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 4px;
+  background: #ffffff;
+}
+
+.player-visit-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 7px;
+  padding: 10px 14px;
+  background: transparent;
+  color: #344054;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.player-visit-tabs button.is-active,
+.player-visit-tabs button:hover {
+  background: #a4cf5f;
+  color: #050810;
+}
+
+.player-visit-tabs span {
+  display: inline-grid;
+  min-width: 24px;
+  place-items: center;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: rgba(16, 24, 40, 0.08);
+  font-size: 0.78rem;
+}
+
 .player-admin-card__summary {
   grid-template-columns: minmax(220px, 1.15fr) minmax(280px, 1.35fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(190px, 1fr);
 }
@@ -322,12 +361,31 @@
 }
 
 .player-visit-card__toggle {
+  display: inline-grid;
+  place-items: center;
+  justify-self: end;
+  width: 42px;
+  height: 42px;
   border: 1px solid #d0d5dd;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 999px;
+  padding: 0;
   background: #ffffff;
   color: #344054;
-  font-weight: 900;
+  font-size: 1.2rem;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.player-visit-card__toggle:hover {
+  border-color: #a4cf5f;
+  background: #f6fbef;
+}
+
+.player-visit-card__toggle svg {
+  transition: transform 160ms ease;
+}
+
+.player-visit-card__toggle.is-open svg {
+  transform: rotate(180deg);
 }
 
 .player-email-status strong {
@@ -1184,6 +1242,16 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
 
   .player-visit-card__summary {
     grid-template-columns: 1fr;
+  }
+
+  .player-visit-tabs {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .player-visit-tabs button {
+    justify-content: center;
   }
 
   .waiver-data-pagination {

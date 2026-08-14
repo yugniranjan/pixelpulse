@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { IoChevronDown } from "react-icons/io5";
 import AdminShell from "@/components/AdminShell";
 import "../../styles/admin-waivers.css";
 import "../../styles/admin-player-info.css";
@@ -656,8 +657,14 @@ function PlayerCard({ group, onThankYouEmail }) {
           >
             {thankYouButtonLabel}
           </button>
-          <button type="button" className="player-visit-card__toggle" onClick={() => setOpen((current) => !current)}>
-            {open ? "Hide Details" : "View Details"}
+          <button
+            type="button"
+            className={open ? "player-visit-card__toggle is-open" : "player-visit-card__toggle"}
+            onClick={() => setOpen((current) => !current)}
+            aria-expanded={open}
+            aria-label={open ? "Collapse player details" : "Expand player details"}
+          >
+            <IoChevronDown aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -784,6 +791,7 @@ export default function AdminWaiversPage() {
   const [playerDateFrom, setPlayerDateFrom] = useState("");
   const [playerDateTo, setPlayerDateTo] = useState("");
   const [playerGameStatusFilter, setPlayerGameStatusFilter] = useState("ready");
+  const [playerVisitTypeFilter, setPlayerVisitTypeFilter] = useState("walkins");
   const [playerSort, setPlayerSort] = useState("newest");
   const [playerPageSize, setPlayerPageSize] = useState(25);
   const [playerPage, setPlayerPage] = useState(1);
@@ -995,12 +1003,14 @@ export default function AdminWaiversPage() {
   );
   const playerEmailGroups = useMemo(
     () => playerEmailGroupsUnfiltered.filter((group) => {
+      if (playerVisitTypeFilter === "party" && !group.partyId) return false;
+      if (playerVisitTypeFilter === "walkins" && group.partyId) return false;
       if (playerGameStatusFilter === "ready") return playerNeedsThankYouEmail(group);
       if (playerGameStatusFilter === "ended") return playerReadyForThankYou(group);
       if (playerGameStatusFilter === "not-started") return !group.playerStartTime && !group.playerEndTime;
       return true;
     }),
-    [playerEmailGroupsUnfiltered, playerGameStatusFilter],
+    [playerEmailGroupsUnfiltered, playerGameStatusFilter, playerVisitTypeFilter],
   );
   const allPlayerEmailGroups = useMemo(
     () => buildPlayerEmailGroups(players, playerSort),
@@ -1054,7 +1064,7 @@ export default function AdminWaiversPage() {
 
   useEffect(() => {
     setPlayerPage(1);
-  }, [playerDateFrom, playerDateTo, playerGameStatusFilter, playerPageSize, playerQuery, playerSort]);
+  }, [playerDateFrom, playerDateTo, playerGameStatusFilter, playerPageSize, playerQuery, playerSort, playerVisitTypeFilter]);
 
   function clearFilters() {
     setQuery("");
@@ -1068,6 +1078,7 @@ export default function AdminWaiversPage() {
     setPlayerDateFrom("");
     setPlayerDateTo("");
     setPlayerGameStatusFilter("ready");
+    setPlayerVisitTypeFilter("walkins");
   }
 
   function exportWaiverRows(exportRows, label) {
@@ -1547,8 +1558,26 @@ export default function AdminWaiversPage() {
                     <h2>Visited Customers - Thank You Emails</h2>
                     <p>
                       Showing {firstVisiblePlayer}-{lastVisiblePlayer} of {playerEmailGroups.length}
-                      {playerEmailGroups.length === completedSessionGroups.length ? " completed visit groups" : ` filtered groups from ${completedSessionGroups.length} completed visits`}
+                      {playerVisitTypeFilter === "party" ? ` party visit groups from ${partyVisitGroups.length} completed party visits` : ` walk-in groups from ${noPartyVisitGroups.length} completed walk-in visits`}
                     </p>
+                  </div>
+                  <div className="player-visit-tabs" aria-label="Visit type">
+                    <button
+                      type="button"
+                      className={playerVisitTypeFilter === "walkins" ? "is-active" : ""}
+                      onClick={() => setPlayerVisitTypeFilter("walkins")}
+                    >
+                      Walk-ins
+                      <span>{noPartyVisitGroups.length}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={playerVisitTypeFilter === "party" ? "is-active" : ""}
+                      onClick={() => setPlayerVisitTypeFilter("party")}
+                    >
+                      Party Visits
+                      <span>{partyVisitGroups.length}</span>
+                    </button>
                   </div>
                   <div className="waiver-data-filters player-data-filters">
                     <label>
