@@ -142,6 +142,7 @@ async function readLocalRedirects() {
 
 const nextConfig = {
   output: "standalone",
+  staticPageGenerationTimeout: 180,
   // ← removed eslint block
   async redirects() {
     const sheetRedirects = await fetchSheetRedirects();
