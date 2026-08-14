@@ -333,6 +333,25 @@
   font-weight: 900;
 }
 
+.player-session-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-left: 8px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 0.72rem;
+  font-weight: 900;
+  vertical-align: middle;
+}
+
+.player-session-status.is-complete {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
 .waiver-data-pagination {
   display: flex;
   align-items: center;

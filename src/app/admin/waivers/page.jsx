@@ -648,8 +648,8 @@ function PlayerCard({ group, onThankYouEmail }) {
           <em>{group.partyDate ? `Party date ${formatDate(group.partyDate)}` : "Party ID"}</em>
         </span>
         <span>
-          <strong>{group.wristbandTranDate ? formatDateTime(group.wristbandTranDate) : "No wristband"}</strong>
-          <em>{group.playerEndTime ? "Already played" : "Latest wristband"}</em>
+          <strong>{group.playerEndTime ? formatDateTime(group.playerEndTime) : "No session end time"}</strong>
+          <em>{group.playerEndTime ? "Session end time - Already played" : "Session end time"}</em>
         </span>
       </button>
 
@@ -670,7 +670,12 @@ function PlayerCard({ group, onThankYouEmail }) {
               </div>
               <div>
                 <dt>Session end time</dt>
-                <dd>{formatDateTime(group.playerEndTime)}</dd>
+                <dd>
+                  {formatDateTime(group.playerEndTime)}
+                  <span className={group.playerEndTime ? "player-session-status is-complete" : "player-session-status"}>
+                    {playerPlayedStatus(group)}
+                  </span>
+                </dd>
               </div>
               <div>
                 <dt>Wristband transaction date</dt>
@@ -1512,7 +1517,7 @@ export default function AdminWaiversPage() {
                 <strong>{repeatVisitors}</strong>
               </article>
               <article>
-                <span>Session Complete — Email Not Delivered</span>
+                <span>Session Complete - Send Email</span>
                 <strong>{playerEmailStats.pending}</strong>
               </article>
               <article>
