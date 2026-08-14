@@ -78,11 +78,121 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const limit = Math.min(Number(searchParams.get("limit")) || 500, 1000);
   const locationId = Number(searchParams.get("locationId") || 2);
+  const followUpMode = searchParams.get("mode") === "followup";
 
-  await ensureRewardsTablesOnce();
+  if (!followUpMode) {
+    await ensureRewardsTablesOnce();
+  }
 
   const result = await query(
+    followUpMode
+      ? `
+      WITH recent_players AS (
+        SELECT
+          p."PlayerID",
+          p."FirstName",
+          p."LastName",
+          p."DateOfBirth",
+          p.email,
+          p."DateSigned",
+          p."SigneeID",
+          p."LocationID",
+          p."createdAt",
+          p."updatedAt"
+        FROM public."Players" p
+        WHERE p."LocationID" = $2
+        ORDER BY p."createdAt" DESC NULLS LAST, p."PlayerID" DESC
+        LIMIT $1
+      ),
+      waiver_party_people AS (
+        SELECT
+          lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) AS email,
+          coalesce(w.visit->>'partyId', '') AS party_id,
+          coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
+          CASE
+            WHEN coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') ~ '^\\d{4}-\\d{2}-\\d{2}$'
+              THEN coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '')::date
+            ELSE NULL
+          END AS party_visit_date,
+          w.submitted_at
+        FROM waivers w
+        WHERE coalesce(w.visit->>'partyId', '') <> ''
+          AND lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) IS NOT NULL
+      ),
+      latest_wristband AS (
+        SELECT DISTINCT ON (wt."PlayerID")
+          wt."PlayerID" AS player_id,
+          wt."wristbandCode" AS wristband_code,
+          wt."WristbandTranDate" AS wristband_tran_date,
+          wt."playerStartTime" AS player_start_time,
+          wt."playerEndTime" AS player_end_time,
+          wt."wristbandStatusFlag" AS wristband_status_flag
+        FROM public."WristbandTrans" wt
+        INNER JOIN recent_players rp ON rp."PlayerID" = wt."PlayerID"
+        WHERE wt."LocationID" = $2
+        ORDER BY wt."PlayerID", coalesce(wt."updatedAt", wt."createdAt", wt."WristbandTranDate") DESC NULLS LAST, wt."WristbandTranID" DESC
+      )
+      SELECT
+        p."PlayerID",
+        p."FirstName",
+        p."LastName",
+        p."DateOfBirth",
+        p.email,
+        waiver_party_details.party_id,
+        waiver_party_details.party_date,
+        latest_wristband.wristband_code,
+        latest_wristband.wristband_tran_date,
+        latest_wristband.player_start_time,
+        latest_wristband.player_end_time,
+        latest_wristband.wristband_status_flag,
+        p."DateSigned",
+        p."SigneeID",
+        p."LocationID",
+        p."createdAt",
+        p."updatedAt",
+        l."Name" AS "locationName",
+        0::integer AS lifetime_points,
+        0::integer AS repeat_visits,
+        0::integer AS score_events,
+        null::timestamptz AS last_score_at,
+        null::integer AS current_level,
+        0::integer AS current_threshold,
+        ''::text AS current_reward_name,
+        ''::text AS current_reward_type,
+        null::integer AS next_level,
+        0::integer AS next_threshold,
+        ''::text AS next_reward_name,
+        ''::text AS next_reward_type,
+        0::integer AS available_rewards,
+        0::integer AS redeemed_rewards
+      FROM recent_players p
+      LEFT JOIN public."Locations" l ON l."LocationID" = p."LocationID"
+      LEFT JOIN latest_wristband ON latest_wristband.player_id = p."PlayerID"
+      LEFT JOIN LATERAL (
+        SELECT
+          wpp.party_id,
+          wpp.party_date
+        FROM waiver_party_people wpp
+        WHERE wpp.email = lower(coalesce(p.email, ''))
+          AND (
+            wpp.party_visit_date IS NULL
+            OR wpp.party_visit_date = (
+              coalesce(
+                latest_wristband.player_end_time,
+                latest_wristband.player_start_time,
+                latest_wristband.wristband_tran_date,
+                p."createdAt"
+              ) AT TIME ZONE 'America/Toronto'
+            )::date
+          )
+        ORDER BY
+          CASE WHEN wpp.party_visit_date IS NULL THEN 1 ELSE 0 END,
+          wpp.submitted_at DESC NULLS LAST
+        LIMIT 1
+      ) waiver_party_details ON true
+      ORDER BY coalesce(latest_wristband.player_end_time, latest_wristband.player_start_time, latest_wristband.wristband_tran_date, p."createdAt") DESC NULLS LAST, p."PlayerID" DESC
     `
+      : `
       WITH recent_players AS (
         SELECT
           p."PlayerID",
@@ -134,40 +244,18 @@ export async function GET(req) {
       ),
       waiver_party_people AS (
         SELECT
-          email,
-          party_id,
-          party_date,
+          lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) AS email,
+          coalesce(w.visit->>'partyId', '') AS party_id,
+          coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
           CASE
-            WHEN party_date ~ '^\\d{4}-\\d{2}-\\d{2}$' THEN party_date::date
+            WHEN coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') ~ '^\\d{4}-\\d{2}-\\d{2}$'
+              THEN coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '')::date
             ELSE NULL
           END AS party_visit_date,
-          submitted_at
-        FROM (
-          SELECT
-            lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) AS email,
-            coalesce(w.visit->>'partyId', '') AS party_id,
-            coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
-            w.submitted_at
-          FROM waivers w
-          WHERE coalesce(w.visit->>'partyId', '') <> ''
-
-          UNION ALL
-
-          SELECT
-            lower(nullif(trim(coalesce(member->>'email', w.primary_participant->>'email', '')), '')) AS email,
-            coalesce(w.visit->>'partyId', '') AS party_id,
-            coalesce(w.visit->>'partyDate', w.visit->>'visitDate', '') AS party_date,
-            w.submitted_at
-          FROM waivers w
-          CROSS JOIN LATERAL jsonb_array_elements(
-            CASE
-              WHEN jsonb_typeof(w.family_members) = 'array' THEN w.family_members
-              ELSE '[]'::jsonb
-            END
-          ) member
-          WHERE coalesce(w.visit->>'partyId', '') <> ''
-        ) waiver_people
-        WHERE email IS NOT NULL AND email <> ''
+          w.submitted_at
+        FROM waivers w
+        WHERE coalesce(w.visit->>'partyId', '') <> ''
+          AND lower(nullif(trim(coalesce(w.primary_participant->>'email', '')), '')) IS NOT NULL
       ),
       latest_wristband AS (
         SELECT DISTINCT ON (wt."PlayerID")

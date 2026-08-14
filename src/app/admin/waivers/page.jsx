@@ -836,7 +836,7 @@ export default function AdminWaiversPage() {
       setPlayersError("");
 
       try {
-        const response = await fetch("/api/admin/players?locationId=2&limit=1000", { cache: "no-store" });
+        const response = await fetch("/api/admin/players?locationId=2&limit=1000&mode=followup", { cache: "no-store" });
         const data = await response.json();
 
         if (!response.ok) {

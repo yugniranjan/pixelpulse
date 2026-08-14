@@ -204,8 +204,7 @@ export async function listPostgresWaivers(limit = 300, { includeSignature = fals
       source,
       user_agent,
       submitted_at,
-      updated_at,
-      raw
+      updated_at
     `;
   const result = await query(
     `select ${columns} from waivers order by submitted_at desc nulls last limit $1`,
