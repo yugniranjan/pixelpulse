@@ -264,6 +264,72 @@
   grid-template-columns: minmax(220px, 1.15fr) minmax(280px, 1.35fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(190px, 1fr);
 }
 
+.player-visit-card {
+  border-color: #d0d5dd;
+}
+
+.player-visit-card.is-ready {
+  border-color: #f79009;
+  box-shadow: 0 0 0 3px rgba(247, 144, 9, 0.12);
+}
+
+.player-visit-card__summary {
+  display: grid;
+  grid-template-columns: minmax(250px, 1.35fr) minmax(190px, 0.9fr) minmax(150px, 0.7fr) minmax(180px, 0.85fr) minmax(190px, auto);
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.player-visit-card__summary > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.player-visit-card__summary span,
+.player-visit-card__summary em {
+  color: #667085;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.player-visit-card__summary strong,
+.player-visit-card__summary h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 0.98rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.player-visit-card__customer p {
+  margin: 0;
+  color: #667085;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.player-visit-card__actions {
+  justify-items: stretch;
+}
+
+.player-visit-card__actions button {
+  width: 100%;
+}
+
+.player-visit-card__toggle {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #344054;
+  font-weight: 900;
+}
+
 .player-email-status strong {
   display: inline-flex;
   gap: 6px;
@@ -1113,6 +1179,10 @@ details.waiver-admin-card .waiver-admin-card__summary::-webkit-details-marker {
   }
 
   .waiver-data-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .player-visit-card__summary {
     grid-template-columns: 1fr;
   }
 
