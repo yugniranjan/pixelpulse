@@ -99,16 +99,23 @@ function playerThankYouState(player = {}) {
 }
 
 function playerSortDate(player = {}) {
-  return player.lastScoreAt || player.createdAt || player.dateSigned || "";
+  return player.playerEndTime || player.playerStartTime || player.wristbandTranDate || player.lastScoreAt || player.createdAt || player.dateSigned || "";
 }
 
 function playerPlayedStatus(player = {}) {
-  if (!player.playerEndTime) return "Not completed";
-  return new Date(player.playerEndTime).getTime() <= Date.now() ? "Already played" : "In progress";
+  if (!player.playerEndTime) {
+    return player.playerStartTime || player.wristbandTranDate ? "Currently playing" : "Not started";
+  }
+  return new Date(player.playerEndTime).getTime() <= Date.now() ? "Already played" : "Currently playing";
 }
 
 function playerReadyForThankYou(player = {}) {
   return player.playerEndTime && new Date(player.playerEndTime).getTime() <= Date.now();
+}
+
+function playerCurrentlyPlaying(player = {}) {
+  if (player.playerEndTime) return new Date(player.playerEndTime).getTime() > Date.now();
+  return Boolean(player.playerStartTime || player.wristbandTranDate);
 }
 
 function playerVisitDate(player = {}) {
@@ -790,7 +797,7 @@ export default function AdminWaiversPage() {
   const [playerQuery, setPlayerQuery] = useState("");
   const [playerDateFrom, setPlayerDateFrom] = useState("");
   const [playerDateTo, setPlayerDateTo] = useState("");
-  const [playerGameStatusFilter, setPlayerGameStatusFilter] = useState("ready");
+  const [playerGameStatusFilter, setPlayerGameStatusFilter] = useState("all");
   const [playerVisitTypeFilter, setPlayerVisitTypeFilter] = useState("walkins");
   const [playerSort, setPlayerSort] = useState("newest");
   const [playerPageSize, setPlayerPageSize] = useState(25);
@@ -1007,6 +1014,7 @@ export default function AdminWaiversPage() {
       if (playerVisitTypeFilter === "walkins" && group.partyId) return false;
       if (playerGameStatusFilter === "ready") return playerNeedsThankYouEmail(group);
       if (playerGameStatusFilter === "ended") return playerReadyForThankYou(group);
+      if (playerGameStatusFilter === "playing") return playerCurrentlyPlaying(group);
       if (playerGameStatusFilter === "not-started") return !group.playerStartTime && !group.playerEndTime;
       return true;
     }),
@@ -1025,6 +1033,10 @@ export default function AdminWaiversPage() {
   const lastVisiblePlayer = Math.min(playerPageEnd, playerEmailGroups.length);
   const completedSessionGroups = useMemo(
     () => allPlayerEmailGroups.filter((group) => playerReadyForThankYou(group)),
+    [allPlayerEmailGroups],
+  );
+  const activeSessionGroups = useMemo(
+    () => allPlayerEmailGroups.filter((group) => playerCurrentlyPlaying(group)),
     [allPlayerEmailGroups],
   );
   const partyVisitGroups = useMemo(
@@ -1077,7 +1089,7 @@ export default function AdminWaiversPage() {
     setPlayerQuery("");
     setPlayerDateFrom("");
     setPlayerDateTo("");
-    setPlayerGameStatusFilter("ready");
+    setPlayerGameStatusFilter("all");
     setPlayerVisitTypeFilter("walkins");
   }
 
@@ -1523,6 +1535,10 @@ export default function AdminWaiversPage() {
                 <strong>{completedSessionGroups.length}</strong>
               </article>
               <article>
+                <span>Currently Playing</span>
+                <strong>{activeSessionGroups.length}</strong>
+              </article>
+              <article>
                 <span>Ready To Send</span>
                 <strong>{playerEmailStats.pending}</strong>
               </article>
@@ -1599,9 +1615,10 @@ export default function AdminWaiversPage() {
                     <label>
                       <span>Visit Status</span>
                       <select value={playerGameStatusFilter} onChange={(event) => setPlayerGameStatusFilter(event.target.value)}>
-                        <option value="ready">Ready to send</option>
-                        <option value="ended">Completed visits</option>
                         <option value="all">All player records</option>
+                        <option value="ready">Ready to send</option>
+                        <option value="playing">Currently playing</option>
+                        <option value="ended">Completed visits</option>
                         <option value="not-started">Not started</option>
                       </select>
                     </label>
