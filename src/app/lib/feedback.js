@@ -116,6 +116,9 @@ function normalizeRow(row = {}) {
     giftCardId: row.gift_card_id || row.giftCardId || "",
     giftCardCode: row.gift_card_code || row.giftCardCode || "",
     giftCardSentAt: iso(row.gift_card_sent_at || row.giftCardSentAt),
+    giftCardStatus: row.gift_card_status || row.giftCardStatus || "",
+    giftCardRedeemedAt: iso(row.gift_card_redeemed_at || row.giftCardRedeemedAt),
+    giftCardRedeemedBy: row.gift_card_redeemed_by || row.giftCardRedeemedBy || "",
     createdAt: iso(row.created_at || row.createdAt),
   };
 }
@@ -265,10 +268,15 @@ export async function listFeedbackSubmissions({ q = "", source = "", minRating =
   values.push(maxLimit);
   const result = await query(
     `
-      select *
+      select
+        feedback_submissions.*,
+        gift_cards.status as gift_card_status,
+        gift_cards.redeemed_at as gift_card_redeemed_at,
+        gift_cards.redeemed_by as gift_card_redeemed_by
       from feedback_submissions
+      left join gift_cards on gift_cards.code = feedback_submissions.gift_card_code
       ${where.length ? `where ${where.join(" and ")}` : ""}
-      order by created_at desc
+      order by feedback_submissions.created_at desc
       limit $${values.length}
     `,
     values,

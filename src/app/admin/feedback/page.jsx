@@ -122,6 +122,8 @@ export default function AdminFeedbackPage() {
   const [source, setSource] = useState("");
   const [minRating, setMinRating] = useState("");
   const [issuingId, setIssuingId] = useState("");
+  const [redeemingCode, setRedeemingCode] = useState("");
+  const [redeemForm, setRedeemForm] = useState({ code: "", redeemedBy: "front desk" });
   const [deletingId, setDeletingId] = useState("");
   const [giftEmailDraft, setGiftEmailDraft] = useState(null);
   const [giftEmailError, setGiftEmailError] = useState("");
@@ -220,6 +222,61 @@ export default function AdminFeedbackPage() {
       setGiftEmailError("Unable to issue gift card.");
     } finally {
       setIssuingId("");
+    }
+  }
+
+  async function redeemGiftCard(code = redeemForm.code) {
+    const normalizedCode = String(code || "").trim().toUpperCase();
+    if (!normalizedCode) {
+      setError("Enter a redemption code.");
+      return;
+    }
+
+    setRedeemingCode(normalizedCode);
+    setError("");
+    setStatus("");
+
+    try {
+      const response = await fetch("/api/admin/feedback", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "redeem-gift-card",
+          code: normalizedCode,
+          redeemedBy: redeemForm.redeemedBy || "front desk",
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to redeem code.");
+        if (data.giftCard) {
+          setFeedback((current) =>
+            current.map((row) => (row.giftCardCode === data.giftCard.code ? {
+              ...row,
+              giftCardStatus: data.giftCard.status,
+              giftCardRedeemedAt: data.giftCard.redeemedAt,
+              giftCardRedeemedBy: data.giftCard.redeemedBy,
+            } : row)),
+          );
+        }
+        return;
+      }
+
+      setFeedback((current) =>
+        current.map((row) => (row.giftCardCode === data.giftCard.code ? {
+          ...row,
+          giftCardStatus: data.giftCard.status,
+          giftCardRedeemedAt: data.giftCard.redeemedAt,
+          giftCardRedeemedBy: data.giftCard.redeemedBy,
+        } : row)),
+      );
+      setRedeemForm((current) => ({ ...current, code: "" }));
+      setStatus(`${data.giftCard.code} redeemed successfully. It cannot be used again.`);
+    } catch (redeemError) {
+      setError("Unable to redeem code.");
+    } finally {
+      setRedeemingCode("");
     }
   }
 
@@ -459,6 +516,38 @@ export default function AdminFeedbackPage() {
         </section>
 
         <section className="feedback-admin__panel">
+          <form
+            className="feedback-admin__redeem"
+            onSubmit={(event) => {
+              event.preventDefault();
+              redeemGiftCard();
+            }}
+          >
+            <div>
+              <h2>Redeem Feedback Play Pass</h2>
+              <p>Redeem a feedback reward code once. Redeemed codes cannot be used again.</p>
+            </div>
+            <label>
+              <span>Redemption Code</span>
+              <input
+                value={redeemForm.code}
+                onChange={(event) => setRedeemForm((current) => ({ ...current, code: event.target.value }))}
+                placeholder="PPP-60-FB-XXXXXX"
+              />
+            </label>
+            <label>
+              <span>Redeemed By</span>
+              <input
+                value={redeemForm.redeemedBy}
+                onChange={(event) => setRedeemForm((current) => ({ ...current, redeemedBy: event.target.value }))}
+                placeholder="front desk"
+              />
+            </label>
+            <button type="submit" disabled={Boolean(redeemingCode) || !redeemForm.code.trim()}>
+              {redeemingCode ? "Redeeming..." : "Redeem Code"}
+            </button>
+          </form>
+
           <div className="feedback-admin__filters">
             <label>
               <span>Search</span>
@@ -507,7 +596,24 @@ export default function AdminFeedbackPage() {
                 </div>
                 <div className="feedback-admin__summary-actions">
                   {item.giftCardCode && item.giftCardSentAt ? (
-                    <span className="feedback-admin__gift-status">Gift sent: {item.giftCardCode}</span>
+                    <>
+                      <span className="feedback-admin__gift-status">Gift sent: {item.giftCardCode}</span>
+                      {item.giftCardRedeemedAt ? (
+                        <span className="feedback-admin__redeemed-status">Redeemed: {formatDate(item.giftCardRedeemedAt)}</span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="feedback-admin__redeem-button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            redeemGiftCard(item.giftCardCode);
+                          }}
+                          disabled={redeemingCode === item.giftCardCode}
+                        >
+                          {redeemingCode === item.giftCardCode ? "Redeeming..." : "Redeem"}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <button
                       type="button"
@@ -543,6 +649,7 @@ export default function AdminFeedbackPage() {
                   <span className="feedback-admin__tag">Submitted: {formatDate(item.createdAt)}</span>
                   <span className="feedback-admin__tag">Visit: {item.visitDate || "Not provided"}</span>
                   <span className="feedback-admin__tag">Gift card: {item.giftCardCode || "Not sent"}</span>
+                  {item.giftCardRedeemedAt ? <span className="feedback-admin__tag">Redeemed: {formatDate(item.giftCardRedeemedAt)}</span> : null}
                   {item.partyId ? <span className="feedback-admin__tag">Party ID: {item.partyId}</span> : null}
                   <span className="feedback-admin__tag">Recommend: {sentenceValue(item.recommend) || "Not provided"}</span>
                   <span className="feedback-admin__tag">Return: {sentenceValue(item.returnVisit) || "Not provided"}</span>

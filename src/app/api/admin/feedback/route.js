@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteFeedbackSubmission, hasFeedbackStore, issueFeedbackGiftCard, listFeedbackSubmissions, markFeedbackGiftCardSent } from "@/lib/feedback";
+import { redeemGiftCard } from "@/lib/giftCards";
 import { isEmail, mailerConfigured, sendBrandedEmail } from "@/lib/mailer";
 
 export const dynamic = "force-dynamic";
@@ -156,8 +157,25 @@ export async function PATCH(request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  if (body.action !== "issue-gift-card") {
+  if (!["issue-gift-card", "redeem-gift-card"].includes(body.action)) {
     return NextResponse.json({ error: "Unsupported feedback action." }, { status: 400 });
+  }
+
+  if (body.action === "redeem-gift-card") {
+    const result = await redeemGiftCard({
+      code: body.code,
+      redeemedBy: body.redeemedBy || "feedback-admin",
+    });
+
+    if (result.notFound) return NextResponse.json({ error: result.error }, { status: 404 });
+    if (result.alreadyRedeemed || result.error) {
+      return NextResponse.json(
+        { error: result.error || "This code cannot be redeemed.", giftCard: result.giftCard },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json({ giftCard: result.giftCard });
   }
 
   const requestedSubject = String(body.emailSubject || "").trim();

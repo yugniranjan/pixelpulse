@@ -154,6 +154,70 @@
   padding: 18px;
 }
 
+.feedback-admin__redeem {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.35fr) minmax(190px, 0.8fr) minmax(160px, 0.7fr) auto;
+  gap: 12px;
+  align-items: end;
+  border: 1px solid #d8e6b8;
+  border-radius: 12px;
+  padding: 14px;
+  background: #f7fbea;
+}
+
+.feedback-admin__redeem h2,
+.feedback-admin__redeem p {
+  margin: 0;
+}
+
+.feedback-admin__redeem h2 {
+  color: #101828;
+  font-size: 1rem;
+}
+
+.feedback-admin__redeem p {
+  margin-top: 4px;
+  color: #667085;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.feedback-admin__redeem label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.feedback-admin__redeem input {
+  min-height: 42px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #101828;
+  font: inherit;
+  text-transform: none;
+}
+
+.feedback-admin__redeem button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 16px;
+  background: #101828;
+  color: #ffffff;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.feedback-admin__redeem button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .feedback-admin__filters {
   display: grid;
   grid-template-columns: minmax(220px, 1.5fr) minmax(180px, 0.9fr) minmax(150px, 0.65fr) auto;
@@ -353,6 +417,18 @@
   cursor: pointer;
 }
 
+.feedback-admin__redeem-button {
+  min-height: 34px;
+  border: 1px solid #101828;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: #101828;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
 .feedback-admin__delete-button {
   min-height: 34px;
   border: 1px solid #fda29b;
@@ -366,6 +442,7 @@
 }
 
 .feedback-admin__gift-button:disabled,
+.feedback-admin__redeem-button:disabled,
 .feedback-admin__delete-button:disabled {
   cursor: not-allowed;
   opacity: 0.65;
@@ -377,6 +454,16 @@
   padding: 7px 10px;
   background: #f0fdf4;
   color: #067647;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.feedback-admin__redeemed-status {
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #f2f4f7;
+  color: #344054;
   font-size: 0.78rem;
   font-weight: 900;
 }
@@ -548,6 +635,7 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .feedback-admin__redeem,
   .feedback-admin__filters {
     grid-template-columns: 1fr;
   }
