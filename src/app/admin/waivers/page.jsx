@@ -1039,6 +1039,13 @@ export default function AdminWaiversPage() {
     () => allPlayerEmailGroups.filter((group) => playerCurrentlyPlaying(group)),
     [allPlayerEmailGroups],
   );
+  const activeSessionPlayerCount = useMemo(
+    () => activeSessionGroups.reduce(
+      (total, group) => total + group.players.filter((player) => playerCurrentlyPlaying(player)).length,
+      0,
+    ),
+    [activeSessionGroups],
+  );
   const partyVisitGroups = useMemo(
     () => completedSessionGroups.filter((group) => group.partyId),
     [completedSessionGroups],
@@ -1536,7 +1543,7 @@ export default function AdminWaiversPage() {
               </article>
               <article>
                 <span>Currently Playing</span>
-                <strong>{activeSessionGroups.length}</strong>
+                <strong>{activeSessionPlayerCount}</strong>
               </article>
               <article>
                 <span>Ready To Send</span>
