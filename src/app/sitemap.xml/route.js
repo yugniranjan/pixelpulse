@@ -10,6 +10,7 @@ export async function GET() {
   const locationName = (LOCATION_NAME || "vaughan").toLowerCase();
   dynamicPaths.add(canonicalUrl());
   dynamicPaths.add(canonicalUrl("/blogs"));
+  dynamicPaths.add(canonicalUrl("/booking"));
 
   const getLocationPath = (location = "") => {
     const normalizedLocation = location.trim().toLowerCase();

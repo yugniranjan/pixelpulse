@@ -22,6 +22,10 @@ export const metadata = {
   alternates: {
     canonical: canonicalUrl("/booking"),
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 async function getBookingConfig() {

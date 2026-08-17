@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+const CANONICAL_HOST = "pixelpulseplay.ca";
+const DEFAULT_LOCATION_SLUG = "vaughan";
 const PUBLIC_FILES = ["/favicon.ico", "/robots.txt"];
 const SUMMER_PLAY_PASS_HOSTS = new Set([
   "summer.pixelpulseplay.ca",
@@ -34,6 +36,14 @@ const LEGACY_LOCATION_PREFIXES = new Set([
   "st-catharines",
   "windsor",
 ]);
+const LEGACY_SLUG_REDIRECTS = new Map([
+  ["/attractions/sea-shells", "/attractions/seashells"],
+  ["/attractions/pizza-dash", "/attractions/pizza-delivery"],
+  ["/attractions/shooting-challenge", "/attractions/shoot-it-out"],
+  ["/attractions/t-rex-course", "/attractions/trex-heist"],
+  ["/groups-events/facility-rental", "/private-party"],
+  ["/group-events/facility-rental", "/private-party"],
+]);
 
 function isAssetPath(pathname) {
   return (
@@ -57,9 +67,20 @@ function normalizeLegacyPath(pathname) {
     return "/";
   }
 
-  const segments = pathname.split("/").filter(Boolean);
+  let normalizedPathname = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  const directRedirect = LEGACY_SLUG_REDIRECTS.get(normalizedPathname);
+  if (directRedirect) {
+    return directRedirect;
+  }
+
+  const segments = normalizedPathname.split("/").filter(Boolean);
   if (!segments.length) {
     return null;
+  }
+
+  if (segments[0] === DEFAULT_LOCATION_SLUG) {
+    const rest = segments.slice(1);
+    return normalizeLegacyPath(rest.length ? `/${rest.join("/")}` : "/") || "/";
   }
 
   const blogIndex = segments.indexOf("blogs");
@@ -69,7 +90,8 @@ function normalizeLegacyPath(pathname) {
   }
 
   if (segments[0] === "groups-events") {
-    return `/group-events${segments.length > 1 ? `/${segments.slice(1).join("/")}` : ""}`;
+    const groupPath = `/group-events${segments.length > 1 ? `/${segments.slice(1).join("/")}` : ""}`;
+    return normalizeLegacyPath(groupPath) || groupPath;
   }
 
   if (segments[0] === "group-events" && segments[1] === "private-party") {
@@ -86,6 +108,10 @@ function normalizeLegacyPath(pathname) {
     return rest.length ? `/${rest.join("/")}` : "/";
   }
 
+  if (normalizedPathname !== pathname) {
+    return normalizedPathname;
+  }
+
   return null;
 }
 
@@ -100,13 +126,21 @@ export function middleware(request) {
   )
     .split(":")[0]
     .toLowerCase();
+  const forwardedProto = (
+    request.headers.get("x-forwarded-proto") ||
+    request.nextUrl.protocol.replace(":", "") ||
+    ""
+  ).toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
   const isInternalAppPath = pathname.startsWith("/admin") || pathname.startsWith("/api");
 
-  if (requestHostname === "www.pixelpulseplay.ca") {
+  if (
+    requestHostname === "www.pixelpulseplay.ca" ||
+    (requestHostname === CANONICAL_HOST && forwardedProto === "http")
+  ) {
     const url = request.nextUrl.clone();
     url.protocol = "https";
-    url.hostname = "pixelpulseplay.ca";
+    url.hostname = CANONICAL_HOST;
     url.port = "";
     return NextResponse.redirect(url, 308);
   }
@@ -172,12 +206,6 @@ export function middleware(request) {
   }
 
   if (REWARDS_HOSTS.has(requestHostname)) {
-    const forwardedProto = (
-      request.headers.get("x-forwarded-proto") ||
-      request.nextUrl.protocol.replace(":", "") ||
-      ""
-    ).toLowerCase();
-
     if (
       requestHostname === "www.rewards.pixelpulseplay.ca" ||
       forwardedProto === "http"
