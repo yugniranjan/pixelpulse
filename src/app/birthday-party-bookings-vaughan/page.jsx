@@ -16,6 +16,26 @@ const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play
 const phoneUrl = "tel:+19057602922";
 const pageUrl = "https://birthdays.pixelpulseplay.ca";
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
+const birthdayHeroVideoJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: "Pixel Pulse Play Birthday Party Experience",
+  description:
+    "Preview a Pixel Pulse Play birthday party with interactive challenge rooms, hosted gameplay, and high-energy indoor fun for kids and teens.",
+  thumbnailUrl: [ogImage],
+  uploadDate: "2026-08-01T09:00:00-04:00",
+  contentUrl: `${pageUrl}${heroVideo}`,
+  embedUrl: pageUrl,
+  publisher: {
+    "@type": "Organization",
+    name: "Pixel Pulse Play",
+    url: "https://pixelpulseplay.ca",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
+    },
+  },
+};
 
 export const revalidate = 900;
 
@@ -311,6 +331,10 @@ export default async function BirthdayPartyBookingsVaughanPage() {
 
   return (
     <main className="ppp-bday-booking-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(birthdayHeroVideoJsonLd) }}
+      />
       <nav className="ppp-bday-booking-nav" aria-label="Birthday party page navigation">
         <a className="ppp-bday-booking-logo" href="https://pixelpulseplay.ca">
           <Image src="/assets/images/logoD.png" alt="Pixel Pulse Play" width={188} height={70} priority />

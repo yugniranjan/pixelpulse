@@ -21,7 +21,7 @@ import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
 import VrTeaserModal from "./components/model/VrTeaserModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
-import { safeImageUrl } from "@/lib/seo";
+import { DEFAULT_SEO_IMAGE, canonicalUrl, safeImageUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +43,28 @@ const SITE_DATA_SHEET_NAMES = [
   "location",
   "cta",
 ];
+const HOMEPAGE_URL = canonicalUrl();
+const HOMEPAGE_GAMEPLAY_VIDEO_URL = canonicalUrl("/assets/videos/pixel-pulse-experience.mp4");
+const homepageGameplayVideoJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: "Pixel Pulse Play Gameplay Experience",
+  description:
+    "See how Pixel Pulse Play challenge rooms work with wristband activation, interactive games, live scoring, and replayable family fun.",
+  thumbnailUrl: [DEFAULT_SEO_IMAGE],
+  uploadDate: "2026-08-01T09:00:00-04:00",
+  contentUrl: HOMEPAGE_GAMEPLAY_VIDEO_URL,
+  embedUrl: HOMEPAGE_URL,
+  publisher: {
+    "@type": "Organization",
+    name: "Pixel Pulse Play",
+    url: HOMEPAGE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: DEFAULT_SEO_IMAGE,
+    },
+  },
+};
 
 function looksLikeRenderableImage(url = "") {
   if (!url) return false;
@@ -957,6 +979,10 @@ const Home = async () => {
 
   return (
     <main className="ppp-home">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageGameplayVideoJsonLd) }}
+      />
       <PromotionModal
         promotionPopup={promotionPopup}
         delayMs={5000}

@@ -1,24 +1,47 @@
 import "../styles/how-to-play.css";
-import { canonicalUrl } from "@/lib/seo";
+import { DEFAULT_SEO_IMAGE, canonicalUrl } from "@/lib/seo";
 
 const videoUrl = "/assets/videos/pixel-pulse-experience.mp4";
+const pageUrl = canonicalUrl("/how-to-play");
+const videoContentUrl = canonicalUrl(videoUrl);
 
 export const metadata = {
   title: "How to Play | Pixel Pulse Play Vaughan",
   description:
     "Watch the Pixel Pulse Play how-to video and learn what to expect before your visit, birthday party, or group challenge in Vaughan.",
   alternates: {
-    canonical: canonicalUrl("/how-to-play"),
+    canonical: pageUrl,
   },
   openGraph: {
     title: "How to Play | Pixel Pulse Play Vaughan",
     description:
       "Watch the quick Pixel Pulse Play guide before your visit so every player knows how the challenge rooms work.",
-    url: canonicalUrl("/how-to-play"),
+    url: pageUrl,
     type: "website",
   },
   robots: {
     index: true,
+  },
+};
+
+const videoJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: "How to Play at Pixel Pulse Play",
+  description:
+    "Watch how Pixel Pulse Play wristbands, challenge rooms, scoring, and gameplay work before your Vaughan visit.",
+  thumbnailUrl: [DEFAULT_SEO_IMAGE],
+  uploadDate: "2026-08-01T09:00:00-04:00",
+  contentUrl: videoContentUrl,
+  embedUrl: pageUrl,
+  publisher: {
+    "@type": "Organization",
+    name: "Pixel Pulse Play",
+    url: canonicalUrl(),
+    logo: {
+      "@type": "ImageObject",
+      url: DEFAULT_SEO_IMAGE,
+    },
   },
 };
 
@@ -44,6 +67,10 @@ const steps = [
 export default function HowToPlayPage() {
   return (
     <main className="ppp-how-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+      />
       <section className="ppp-how-hero">
         <div className="ppp-how-shell">
           <div className="ppp-how-copy">
