@@ -10,4 +10,4 @@ async function copyIfExists(source, destination) {
 
 await copyIfExists(".next/static", ".next/standalone/.next/static");
 await copyIfExists("public", ".next/standalone/public");
-await mkdir(".next/standalone/.next/cache", { recursive: true });
+await mkdir(".next/standalone/.next/cache/fetch-cache", { recursive: true });
