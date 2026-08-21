@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "node scripts/start-app-engine.mjs",
     "lint": "next lint",
-    "db:migrate:firestore": "node scripts/migrate-firestore-to-postgres.mjs"
+    "db:migrate:firestore": "node scripts/migrate-firestore-to-postgres.mjs",
+    "postbuild": "node scripts/prepare-standalone.mjs"
   },
   "dependencies": {
     "@editorjs/code": "^2.9.3",
