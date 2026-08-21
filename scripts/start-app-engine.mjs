@@ -1,4 +1,5 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { spawn } from "node:child_process";
 
 function parseEnvironmentYaml(contents) {
   return Object.fromEntries(
@@ -39,4 +40,20 @@ async function loadAppEnvironment() {
 }
 
 await loadAppEnvironment();
-await import("../.next/standalone/server.js");
+
+const nextStart = spawn("node", ["node_modules/next/dist/bin/next", "start"], {
+  env: process.env,
+  stdio: "inherit",
+});
+
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => {
+    nextStart.kill(signal);
+  });
+}
+
+const exitCode = await new Promise((resolve) => {
+  nextStart.on("exit", (code) => resolve(code ?? 0));
+});
+
+process.exit(exitCode);
