@@ -517,6 +517,11 @@
   flex: 0 0 auto;
 }
 
+.ppp-waiver-checks label > span {
+  display: grid;
+  gap: 0.45rem;
+}
+
 .ppp-waiver-signature {
   position: relative;
   box-sizing: border-box;

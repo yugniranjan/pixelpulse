@@ -71,6 +71,16 @@ const EMPTY_CHECKS = {
   final: false,
 };
 
+const REQUIRED_TERM_CHECKS = [
+  "risk",
+  "liability",
+  "rules",
+  "medical",
+  "guardian",
+  "privacy",
+  "final",
+];
+
 const DEFAULT_COPY = {
   legalIntro:
     "<strong>Read carefully before signing.</strong> Pixel Pulse Play operates next-generation interactive physical gaming attractions in Vaughan, Ontario including Laser Maze, Edge Climb, Hexa Quest, Shoot It Out, T-Rex Heist, Tile Hunt, Maze Gate, Soccer Challenge, and more.",
@@ -571,6 +581,16 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     setChecks((current) => ({ ...current, [name]: !current[name] }));
   }
 
+  function toggleRequiredTerms() {
+    setChecks((current) => {
+      const nextValue = !REQUIRED_TERM_CHECKS.every((key) => current[key]);
+      return REQUIRED_TERM_CHECKS.reduce(
+        (nextChecks, key) => ({ ...nextChecks, [key]: nextValue }),
+        { ...current },
+      );
+    });
+  }
+
   function resetWaiverForm() {
     setPrimary({ ...EMPTY_PRIMARY, ...initialPrimary });
     setFamilyMembers([]);
@@ -830,19 +850,24 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           <h2>{configuredText(waiverContent, "termsSectionTitle")}</h2>
         </div>
         <div className="ppp-waiver-checks">
-          {[
-            ["risk", configuredText(waiverContent, "riskAcknowledgement")],
-            ["liability", configuredText(waiverContent, "liabilityAcknowledgement")],
-            ["rules", configuredText(waiverContent, "rulesAcknowledgement")],
-            ["medical", configuredText(waiverContent, "medicalAcknowledgement")],
-            ["guardian", configuredText(waiverContent, "guardianAcknowledgement")],
-            ["privacy", configuredText(waiverContent, "privacyAcknowledgement")],
-          ].map(([key, label]) => (
-            <label className={checks[key] ? "is-checked" : ""} key={key}>
-              <input required type="checkbox" checked={checks[key]} onChange={() => toggleCheck(key)} />
-              <span>{label}</span>
-            </label>
-          ))}
+          <label className={REQUIRED_TERM_CHECKS.every((key) => checks[key]) ? "is-checked" : ""}>
+            <input
+              required
+              type="checkbox"
+              checked={REQUIRED_TERM_CHECKS.every((key) => checks[key])}
+              onChange={toggleRequiredTerms}
+            />
+            <span>
+              <strong>Accept all</strong>
+              <span>{configuredText(waiverContent, "riskAcknowledgement")}</span>
+              <span>{configuredText(waiverContent, "liabilityAcknowledgement")}</span>
+              <span>{configuredText(waiverContent, "rulesAcknowledgement")}</span>
+              <span>{configuredText(waiverContent, "medicalAcknowledgement")}</span>
+              <span>{configuredText(waiverContent, "guardianAcknowledgement")}</span>
+              <span>{configuredText(waiverContent, "privacyAcknowledgement")}</span>
+              <HtmlText html={configuredText(waiverContent, "finalAcknowledgement")} />
+            </span>
+          </label>
           {showPhotoConsent ? <label className={checks.photo ? "is-checked" : ""}>
             <input type="checkbox" checked={checks.photo} onChange={() => toggleCheck("photo")} />
             <HtmlText html={configuredText(waiverContent, "photoAcknowledgement")} />
@@ -883,15 +908,6 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           <DatePartsField label={configuredText(waiverContent, "signDateLabel")} value={visit.signDate} yearOptions={visitYears} onChange={(value) => updateVisit("signDate", value)} />
         </div>
       </section>
-
-      <div className="ppp-waiver-final">
-        <label className={checks.final ? "is-checked" : ""}>
-          <input required type="checkbox" checked={checks.final} onChange={() => toggleCheck("final")} />
-          <span>
-            <HtmlText html={configuredText(waiverContent, "finalAcknowledgement")} />
-          </span>
-        </label>
-      </div>
 
       <div className="ppp-waiver-submit">
         {error ? <p className="ppp-waiver-error">{error}</p> : null}
