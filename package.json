@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/start-app-engine.mjs",
     "lint": "next lint",
     "db:migrate:firestore": "node scripts/migrate-firestore-to-postgres.mjs"
   },
@@ -23,6 +23,7 @@
     "@editorjs/marker": "^1.4.0",
     "@editorjs/quote": "^2.7.6",
     "@editorjs/table": "^2.4.5",
+    "@google-cloud/secret-manager": "^7.0.0",
     "@google-cloud/storage": "^7.18.0",
     "@next/third-parties": "^16.2.4",
     "axios": "^1.10.0",

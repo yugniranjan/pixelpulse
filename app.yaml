@@ -13,6 +13,8 @@ handlers:
   - url: /.*
     script: auto
 
+env_variables:
+  APP_ENV_SECRET_NAME: pixelpulse-app-env
+
 includes:
-  - app.env.yaml
   - app.build.env.yaml
