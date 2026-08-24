@@ -1,6 +1,7 @@
 import Image from "next/image";
 import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
+import { FaArrowRight, FaGamepad, FaLock, FaPeopleGroup, FaStar } from "react-icons/fa6";
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
@@ -9,6 +10,9 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
 const heroVideo = "/assets/videos/pixelgame.mp4";
+const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
+const partyRoomImage =
+  "https://storage.googleapis.com/pixel-pulse-play/web/Birthday%20party%20room.jpg";
 const localFloorImage = "/assets/images/floorchallenge.webp";
 const localShootingImage = "/assets/images/shootinggame.webp";
 const LOCATION_SLUG = "vaughan";
@@ -139,6 +143,33 @@ const partyFeatures = [
   "Food and add-ons available",
   "Easy online booking",
   "Great for kids, tweens, and teens",
+];
+
+const partyRoomFeatures = [
+  {
+    icon: FaLock,
+    title: "One Party at a Time",
+    lead: "One celebration. One dedicated party experience.",
+    text: "Enjoy your party without another celebration running alongside yours.",
+  },
+  {
+    icon: FaPeopleGroup,
+    title: "Real Family Time",
+    lead: "The fun isn't just for the kids.",
+    text: "Parents can jump in, play, compete, and make memories together.",
+  },
+  {
+    icon: FaGamepad,
+    title: "No Party Overlap",
+    lead: "Your celebration gets its own moment.",
+    text: "No shared party tables. No overlapping party schedules. Less crowding, more celebrating.",
+  },
+  {
+    icon: FaStar,
+    title: "More Than a Party",
+    lead: "Play. Challenge. Celebrate.",
+    text: "Take on immersive challenge rooms, enjoy the arcade, then bring everyone together in your dedicated party room.",
+  },
 ];
 
 // Mirrors the kids-birthday-parties "birthday_packages" config. Used as a
@@ -313,6 +344,77 @@ function getAttractions(menuData = []) {
     }));
 }
 
+function DedicatedPartyRoomSection() {
+  return (
+    <section className="ppp-bday-room" aria-labelledby="bday-room-title">
+      <div className="ppp-bday-booking-shell">
+        <div className="ppp-bday-room__intro">
+          <p>Dedicated party room</p>
+          <h2 id="bday-room-title">One Party. Zero Sharing.</h2>
+        </div>
+
+        <div className="ppp-bday-room__story">
+          <div className="ppp-bday-room__copy">
+            <p className="ppp-bday-room__subhead">
+              A dedicated room for your birthday crew, not a shared party area.
+            </p>
+            <p className="ppp-bday-room__body">
+              <strong>Celebrate in your own space.</strong>
+              Cake, food, gifts and those special birthday moments all come
+              together in your dedicated party room-giving your group a
+              comfortable place to celebrate between the action.
+            </p>
+          </div>
+
+          <div className="ppp-bday-room__video-shell">
+            <video
+              className="ppp-bday-room__video"
+              src={partyRoomVideo}
+              poster={partyRoomImage}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Pixel Pulse birthday party room video"
+            />
+            <div className="ppp-bday-room__video-badge">Party room preview</div>
+          </div>
+        </div>
+
+        <div className="ppp-bday-room__features">
+          {partyRoomFeatures.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <article className="ppp-bday-room__feature" key={feature.title}>
+                <span className="ppp-bday-room__feature-icon">
+                  <Icon aria-hidden="true" />
+                </span>
+                <h3>{feature.title}</h3>
+                <p className="ppp-bday-room__feature-lead">{feature.lead}</p>
+                <p>{feature.text}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="ppp-bday-room__cta-row">
+          <p>One room. One party. All yours, start to finish.</p>
+          <a
+            href="#birthday-party-form"
+            data-gtm-event="birthday_party_room_cta_click"
+            data-gtm-category="Birthday Parties"
+            data-gtm-label="Dedicated party room Book Now"
+          >
+            Book Now
+            <FaArrowRight aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default async function BirthdayPartyBookingsVaughanPage() {
   const [menuData, configData] = await Promise.all([
     getBirthdayMenuData(),
@@ -421,6 +523,8 @@ export default async function BirthdayPartyBookingsVaughanPage() {
           </div>
         </div>
       </section>
+
+      <DedicatedPartyRoomSection />
 
       <section className="ppp-bday-private-band" aria-labelledby="private-party-banner-title">
         <div className="ppp-bday-booking-shell">
