@@ -799,6 +799,288 @@
   box-shadow: 0 0 24px rgba(164, 207, 95, 0.28);
 }
 
+.ppp-party-room {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border: 1px solid rgba(164, 207, 95, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(164, 207, 95, 0.12), rgba(251, 174, 123, 0.08) 42%, rgba(17, 24, 39, 0.96)),
+    var(--ppp-card);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.28), 0 0 18px rgba(164, 207, 95, 0.08);
+}
+
+.ppp-party-room::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--ppp-brand-line);
+}
+
+.ppp-party-room::after {
+  content: "";
+  position: absolute;
+  inset: auto -12% -28% 34%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 45, 120, 0.18), transparent 62%);
+  pointer-events: none;
+}
+
+.ppp-party-room > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ppp-party-room__intro {
+  max-width: 100%;
+  margin-bottom: clamp(1rem, 2vw, 1.4rem);
+}
+
+.ppp-party-room__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.7rem;
+  color: var(--ppp-lime);
+  font-family: var(--font-body, "DM Sans", "Segoe UI", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.ppp-party-room__eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--ppp-brand-line);
+}
+
+.ppp-party-room__intro h2 {
+  max-width: 100%;
+  margin: 0;
+  color: var(--white-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.85rem, 3.2vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ppp-party-room__intro p:not(.ppp-party-room__eyebrow) {
+  max-width: 62ch;
+  margin: 0.9rem 0 0;
+  color: rgba(240, 246, 255, 0.78);
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+  line-height: 1.65;
+}
+
+.ppp-party-room__body-copy {
+  max-width: 62ch !important;
+  color: rgba(240, 246, 255, 0.72) !important;
+  font-size: 1rem !important;
+  line-height: 1.7 !important;
+}
+
+.ppp-party-room__body-copy strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 800;
+}
+
+.ppp-party-room__subhead {
+  max-width: 46ch !important;
+  margin-bottom: 1.35rem !important;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid var(--ppp-lime);
+  border-radius: 8px;
+  background: rgba(164, 207, 95, 0.1);
+  color: var(--white-color) !important;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.25rem, 2vw, 1.65rem) !important;
+  font-weight: 800;
+  line-height: 1.15 !important;
+  text-transform: uppercase;
+}
+
+.ppp-party-room__story-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  gap: clamp(1rem, 2vw, 1.4rem);
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ppp-party-room__copy {
+  min-width: 0;
+}
+
+.ppp-party-room__video-shell,
+.ppp-party-room__feature {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(5, 8, 16, 0.64);
+}
+
+.ppp-party-room__video-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  aspect-ratio: 16 / 9;
+}
+
+.ppp-party-room__video-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 52%, rgba(5, 8, 16, 0.58)),
+    linear-gradient(90deg, rgba(164, 207, 95, 0.12), transparent 32%, rgba(251, 174, 123, 0.1));
+  pointer-events: none;
+}
+
+.ppp-party-room__video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.ppp-party-room__video-badge {
+  position: absolute;
+  z-index: 1;
+  left: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(5, 8, 16, 0.76);
+  color: var(--white-color);
+  font-family: var(--font-body, "DM Sans", "Segoe UI", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+
+.ppp-party-room__note {
+  margin: 0;
+  color: rgba(240, 246, 255, 0.76);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.ppp-party-room__cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+  padding: 1rem;
+  border: 1px solid rgba(164, 207, 95, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 8, 16, 0.52);
+}
+
+.ppp-party-room__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: fit-content;
+  min-height: 52px;
+  margin: 0;
+  padding: 13px 24px;
+  border: 2px solid var(--ppp-lime);
+  border-radius: 8px;
+  background: var(--ppp-lime);
+  color: #050810;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.ppp-party-room__btn:hover {
+  border-color: var(--ppp-peach);
+  background: var(--ppp-peach);
+  color: #050810;
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(251, 174, 123, 0.26);
+}
+
+.ppp-party-room__features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ppp-party-room__feature {
+  min-width: 0;
+  padding: 1.05rem;
+}
+
+.ppp-party-room__feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 0.85rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(164, 207, 95, 0.2), rgba(251, 174, 123, 0.18));
+  color: var(--ppp-lime);
+}
+
+.ppp-party-room__feature-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ppp-party-room__feature h3 {
+  margin: 0;
+  color: var(--white-color);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+
+.ppp-party-room__feature p {
+  margin: 0.55rem 0 0;
+  color: rgba(240, 246, 255, 0.72);
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.ppp-party-room__feature-lead {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 800;
+}
+
 @media (max-width: 768px) {
   .ppp-party-hero {
     padding-top: 1.5rem;
@@ -855,6 +1137,43 @@
   .ppp-party-cta-band__inner,
   .ppp-party-mobile-card {
     border-radius: 8px;
+  }
+
+  .ppp-party-room {
+    padding: 1.2rem;
+  }
+
+  .ppp-party-room__intro h2 {
+    max-width: 100%;
+    font-size: clamp(1.55rem, 8vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1;
+    white-space: normal;
+  }
+
+  .ppp-party-room__subhead {
+    white-space: normal;
+  }
+
+  .ppp-party-room__story-grid,
+  .ppp-party-room__features {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-party-room__video-shell {
+    min-height: 260px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .ppp-party-room__btn {
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  .ppp-party-room__cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
   }
 }
 
