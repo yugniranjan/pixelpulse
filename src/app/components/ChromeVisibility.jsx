@@ -9,6 +9,7 @@ const STANDALONE_PATHS = new Set([
   "/feedback",
   "/how-to-play",
   "/level-up-rewards",
+  "/levelingup",
   "/private-party",
   "/squad",
   "/summer-play-pass",
