@@ -10,7 +10,7 @@
   --leveling-pink: #ff4f8b;
   position: relative;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
   height: 100vh;
   height: 100svh;
   overflow: hidden;
@@ -66,7 +66,7 @@
 .ppp-leveling-card {
   position: relative;
   width: min(100%, 940px);
-  padding: clamp(1.8rem, 4vw, 3.4rem);
+  padding: clamp(2.2rem, 4.4vw, 4rem);
   border: 1px solid rgba(248, 251, 243, 0.12);
   border-radius: 8px;
   background:
@@ -102,12 +102,31 @@
   filter: drop-shadow(0 0 18px rgba(164, 207, 95, 0.18));
 }
 
+.ppp-leveling-play-icon {
+  display: inline-grid;
+  width: clamp(3.6rem, 8vw, 4.8rem);
+  height: clamp(3.6rem, 8vw, 4.8rem);
+  margin: 0 auto 1.1rem;
+  place-items: center;
+  border: 1px solid rgba(164, 207, 95, 0.28);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(248, 251, 243, 0.22), transparent 26%),
+    linear-gradient(145deg, rgba(164, 207, 95, 0.2), rgba(41, 196, 178, 0.1));
+  color: var(--leveling-lime);
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  box-shadow:
+    0 0 28px rgba(164, 207, 95, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: ppp-leveling-float 2.6s ease-in-out infinite;
+}
+
 .ppp-leveling-eyebrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 34px;
-  margin: 0 0 1.45rem;
+  margin: 0 0 1.8rem;
   padding: 0.46rem 0.86rem;
   border: 1px solid rgba(41, 196, 178, 0.38);
   border-radius: 8px;
@@ -132,14 +151,15 @@
 }
 
 .ppp-leveling-title {
-  max-width: 680px;
+  max-width: none;
   margin: 0 auto;
   color: #ffffff;
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(3.5rem, 12vw, 7.25rem);
-  font-weight: 800;
+  font-size: clamp(2.15rem, 5vw, 3.8rem);
+  font-weight: 700;
   letter-spacing: 0;
-  line-height: 0.86;
+  line-height: 1;
+  white-space: nowrap;
   text-transform: uppercase;
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.42);
 }
@@ -155,7 +175,7 @@
   display: block;
   width: min(180px, 42vw);
   height: 4px;
-  margin: 1.15rem auto 0;
+  margin: 1.55rem auto 0;
   border-radius: 999px;
   background: var(--leveling-peach);
   box-shadow: 0 0 20px rgba(251, 174, 123, 0.22);
@@ -163,7 +183,7 @@
 
 .ppp-leveling-lede {
   max-width: 590px;
-  margin: 0.75rem auto 0;
+  margin: 1rem auto 0;
   color: rgba(248, 251, 243, 0.68);
   font-size: clamp(1rem, 1.8vw, 1.14rem);
   font-weight: 500;
@@ -171,7 +191,7 @@
 }
 
 .ppp-leveling-lede--strong {
-  margin-top: 1.75rem;
+  margin-top: 2.2rem;
   color: var(--leveling-lime);
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: clamp(1.5rem, 3vw, 2.15rem);
@@ -182,8 +202,8 @@
 
 .ppp-leveling-progress {
   width: min(100%, 440px);
-  margin: 2.15rem auto 0;
-  padding-top: 1.45rem;
+  margin: 2.6rem auto 0;
+  padding-top: 1.75rem;
   border-top: 1px solid rgba(248, 251, 243, 0.1);
   text-align: left;
 }
@@ -223,49 +243,6 @@
   animation: ppp-leveling-progress 3.6s ease-in-out infinite;
 }
 
-.ppp-leveling-marquee {
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-  border-top: 1px solid var(--leveling-line);
-  border-bottom: 1px solid var(--leveling-line);
-  background: rgba(9, 15, 20, 0.95);
-  white-space: nowrap;
-}
-
-.ppp-leveling-marquee__track {
-  display: inline-flex;
-  min-width: 200%;
-  animation: ppp-leveling-scroll 18s linear infinite;
-}
-
-.ppp-leveling-marquee__track span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 56px;
-  padding: 0 1.2rem;
-  color: rgba(248, 251, 243, 0.68);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.ppp-leveling-marquee__track span:nth-child(odd) {
-  color: var(--leveling-cyan);
-}
-
-.ppp-leveling-marquee__track span::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  margin-left: 1.2rem;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.78;
-}
-
 @keyframes ppp-leveling-blink {
   0%,
   100% {
@@ -303,19 +280,24 @@
   }
 }
 
-@keyframes ppp-leveling-scroll {
-  0% {
-    transform: translateX(0);
+@keyframes ppp-leveling-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg);
   }
 
-  100% {
-    transform: translateX(-50%);
+  50% {
+    transform: translateY(-7px) rotate(6deg);
   }
 }
 
 @media (max-width: 680px) {
   .ppp-leveling-card {
     padding: 1.35rem;
+  }
+
+  .ppp-leveling-title {
+    font-size: clamp(1.55rem, 7.8vw, 2.15rem);
   }
 
   .ppp-leveling-hero {

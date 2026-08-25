@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { FaRocket } from "react-icons/fa6";
 import "../styles/levelingup.css";
 
 const logo = "/assets/images/logoD.png";
@@ -23,20 +24,24 @@ export default function LevelingUpPage() {
         </a>
 
         <div className="ppp-leveling-card">
+          <div className="ppp-leveling-play-icon" aria-hidden="true">
+            <FaRocket />
+          </div>
+
           <p className="ppp-leveling-eyebrow">
             <span aria-hidden="true" />
-            System Update In Progress
+            Level-Up In Progress
           </p>
 
           <h1 className="ppp-leveling-title" id="leveling-title">
-            Leveling Up<span>!</span>
+            We&apos;re upgrading this game<span>!</span>
           </h1>
 
           <p className="ppp-leveling-lede ppp-leveling-lede--strong">
-            This game is getting a quick software upgrade to make your next challenge even better.
+            Your next challenge awaits &rarr;
           </p>
           <p className="ppp-leveling-lede">
-            Meanwhile, the action continues! Pick another challenge room and keep playing.
+            Try another room &amp; keep climbing the leaderboard.
           </p>
 
           <div className="ppp-leveling-progress" aria-label="Upgrade progress">
@@ -51,18 +56,6 @@ export default function LevelingUpPage() {
         </div>
       </section>
 
-      <section className="ppp-leveling-marquee" aria-label="Pixel Pulse actions">
-        <div className="ppp-leveling-marquee__track">
-          <span>Run</span>
-          <span>Think</span>
-          <span>Compete</span>
-          <span>Play Beyond Reality</span>
-          <span>Run</span>
-          <span>Think</span>
-          <span>Compete</span>
-          <span>Play Beyond Reality</span>
-        </div>
-      </section>
     </main>
   );
 }
