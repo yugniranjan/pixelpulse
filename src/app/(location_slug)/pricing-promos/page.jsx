@@ -15,7 +15,7 @@ import {
   generateMetadataLib,
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
-import { getCtaContent, hasConfiguredKey, resolveConfiguredValue } from "@/lib/ctaContent";
+import { getCtaContent, resolveConfiguredValue } from "@/lib/ctaContent";
 
 export async function generateMetadata({ params }) {
   await params;
@@ -225,60 +225,6 @@ const DEFAULT_PRICING_CARD_META = [
   },
 ];
 
-const DEFAULT_SUMMER_PLAY_PASS = {
-  sectionLabel: "Summer Play Pass",
-  sectionTitle: "Choose Your Summer Play Pass",
-  title: "Unlimited Summer. Unlimited Play.",
-  subtitle: "Beat the heat. Enter the challenge. All summer long at Pixel Pulse.",
-  bookingUrl: "https://pixelpulseplayzone.lilypadpos.app/public/onlineproductsales/sales2.php?ptid=15",
-  bookingText: "Buy Now",
-  cards: [
-    {
-      title: "SUMMER PLAY PASS - 60",
-      price: "$99",
-      features: [
-        "60 minutes play access",
-        "Valid for 5 visits (June-Aug)",
-        "Weekday + off-peak weekend access",
-      ],
-      note: "Effective price: ~$20 per visit vs $35 regular",
-    },
-    {
-      title: "SUMMER PLAY PASS - 90",
-      badge: "Most Popular",
-      price: "$149",
-      features: [
-        "90 minutes play access",
-        "Valid for 5 visits (June-Aug)",
-        "Priority booking slots",
-      ],
-      note: "Effective price: ~$30 per visit vs $44 regular",
-    },
-    {
-      title: "UNLIMITED SUMMER PASS",
-      badge: "Hero Offer",
-      price: "$199",
-      features: [
-        "60 mins play per day",
-        "Valid all summer (June-Aug)",
-        "Weekdays + limited weekend slots",
-        "10% off arcade credits",
-      ],
-      note: "",
-    },
-  ],
-  valueTitle: "Regular price = $34-$49 per visit",
-  valueText: "Save up to 40%",
-  addonsTitle: "Buy your pass and enjoy the summer challenge",
-  addons: [
-    "Terms and Condituons Apply",
-    "All passes are valid upto August 31st 2026.",
-  ],
-  termsTitle: "Terms",
-  terms: [],
-  cta: "Don't just play once. PLAY ALL SUMMER.",
-};
-
 function parseBoolean(value, fallback = true) {
   const normalizedValue = String(value ?? "").trim().toLowerCase();
   if (!normalizedValue) {
@@ -294,147 +240,6 @@ function parseBoolean(value, fallback = true) {
   }
 
   return fallback;
-}
-
-function splitConfigList(value = "") {
-  return String(value || "")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .split(/[\n|]/)
-    .map((item) => stripHtml(decodeHtmlEntities(item)).trim())
-    .filter(Boolean);
-}
-
-function normalizeBuyNowText(value = "") {
-  return String(value || "").trim().toLowerCase() === "book now" ? "Buy Now" : value;
-}
-
-function buildSummerPassNotice(addonsTitle = "", addons = []) {
-  const noticeItems = addons.filter(Boolean);
-  const firstItem = noticeItems[0] || "";
-  const firstItemIsTitle = /^buy your pass/i.test(firstItem);
-
-  return {
-    addonsTitle: addonsTitle || (firstItemIsTitle ? firstItem : DEFAULT_SUMMER_PLAY_PASS.addonsTitle),
-    addons: firstItemIsTitle ? noticeItems.slice(1) : noticeItems,
-  };
-}
-
-function parseSummerPassCards(configData = []) {
-  const jsonCards = getConfigValues(configData, "summerPlayPassCards")
-    .flatMap((value) => {
-      const parsed = parseJsonConfigValue(value);
-      if (Array.isArray(parsed)) return parsed;
-      if (parsed && typeof parsed === "object") return [parsed];
-      return [];
-    })
-    .map((item) => ({
-      title: item.title || item.name || "",
-      badge: item.badge || item.tag || "",
-      price: item.price || item.amount || "",
-      features: Array.isArray(item.features)
-        ? item.features.filter(Boolean)
-        : splitConfigList(item.features || item.details),
-      note: item.note || item.value || "",
-    }))
-    .filter((item) => item.title || item.price || item.features.length > 0);
-
-  const matrixCards = [
-    ...(parseConfigMatrix(configData, "summerPlayPassCard") || []),
-    ...(parseConfigMatrix(configData, "summerPassCard") || []),
-  ]
-    .map((row) => ({
-      title: row.value1 || "",
-      badge: row.value2 || "",
-      price: row.value3 || "",
-      features: splitConfigList(row.value4),
-      note: row.value5 || "",
-    }))
-    .filter((item) => item.title || item.price || item.features.length > 0);
-
-  return [...jsonCards, ...matrixCards];
-}
-
-function buildSummerPlayPassContent(configData = [], pageData = {}) {
-  const sources = [configData, pageData || {}];
-  const cards = parseSummerPassCards(configData);
-  const notice = buildSummerPassNotice(
-    resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassAddonsTitle", "summerPassAddonsTitle"],
-      fallback: "",
-    }),
-    splitConfigList(resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassAddons", "summerPassAddons"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.addons.join("|"),
-    })),
-  );
-
-  return {
-    sectionLabel: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassSectionLabel", "summerPassSectionLabel"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.sectionLabel,
-    }),
-    sectionTitle: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassSectionTitle", "summerPassSectionTitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.sectionTitle,
-    }),
-    title: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassTitle", "summerPassTitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.title,
-    }),
-    subtitle: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassSubtitle", "summerPassSubtitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.subtitle,
-    }),
-    cards: cards.length > 0 ? cards : DEFAULT_SUMMER_PLAY_PASS.cards,
-    bookingUrl: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassBookingUrl", "summerPassBookingUrl"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.bookingUrl,
-    }),
-    bookingText: normalizeBuyNowText(resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassBookingText", "summerPassBookingText"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.bookingText,
-    })),
-    valueTitle: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassValueTitle", "summerPassValueTitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.valueTitle,
-    }),
-    valueText: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassValueText", "summerPassValueText"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.valueText,
-    }),
-    addonsTitle: notice.addonsTitle,
-    addons: notice.addons,
-    termsTitle: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassTermsTitle", "summerPassTermsTitle"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.termsTitle,
-    }),
-    terms: splitConfigList(resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassTerms", "summerPassTerms"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.terms.join("|"),
-    })),
-    cta: resolveConfiguredValue({
-      sources,
-      keys: ["summerPlayPassCta", "summerPassCta"],
-      fallback: DEFAULT_SUMMER_PLAY_PASS.cta,
-    }),
-    show: parseBoolean(resolveConfiguredValue({
-      sources,
-      keys: ["showSummerPlayPass", "summerPlayPassShow"],
-      fallback: "true",
-    }), true),
-  };
 }
 
 function parsePricingCardDetails(value = "") {
@@ -639,7 +444,6 @@ const PricingPromosPage = async ({ params }) => {
   const helpfulDetailsHtml = normalizeListHtml(pageData?.section4 || "");
   const extraText = stripHtml(helpfulDetailsHtml);
   const hasPricingCards = pricingCards.length > 0;
-  const summerPlayPass = buildSummerPlayPassContent(configData, pageData || {});
   const visiblePromotions = (promotions.length > 0 ? promotions : allPromotions).filter((promo) =>
     parseBoolean(
       promo.showOnPricingPromos ??
@@ -845,79 +649,6 @@ const PricingPromosPage = async ({ params }) => {
                     </div>
                   )}
                 </div>
-              )}
-              {summerPlayPass.show && (
-                <article className="ppp-summer-pass-block" id="summer-play-pass">
-                  <div className="ppp-summer-pass-block__header">
-                    {summerPlayPass.sectionLabel && (
-                      <span className="ppp-summer-pass-block__label">
-                        {summerPlayPass.sectionLabel}
-                      </span>
-                    )}
-                    <SectionHeading className="section-heading-white">
-                      {summerPlayPass.sectionTitle}
-                    </SectionHeading>
-                    {(summerPlayPass.title || summerPlayPass.subtitle) && (
-                      <p className="ppp-summer-pass-block__subtitle">
-                        {[summerPlayPass.title, summerPlayPass.subtitle].filter(Boolean).join(" ")}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="ppp-summer-pass-grid">
-                    {summerPlayPass.cards.map((card, index) => (
-                      <article
-                        className={`ppp-summer-pass-card${card.badge ? " ppp-summer-pass-card--featured" : ""}`}
-                        key={`${card.title}-${index}`}
-                      >
-                        {card.badge && (
-                          <span className="ppp-summer-pass-card__badge">{card.badge}</span>
-                        )}
-                        <h3>{card.title}</h3>
-                        {card.price && <p className="ppp-summer-pass-card__price">{card.price}</p>}
-                        {card.features.length > 0 && (
-                          <ul className="ppp-summer-pass-card__features">
-                            {card.features.map((feature, featureIndex) => (
-                              <li key={`${card.title}-${feature}-${featureIndex}`}>
-                                {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {card.note && (
-                          <p className="ppp-summer-pass-card__note">{card.note}</p>
-                        )}
-                        {summerPlayPass.bookingUrl && (
-                          <a
-                            className="ppp-summer-pass-card__button"
-                            href={summerPlayPass.bookingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {summerPlayPass.bookingText}
-                          </a>
-                        )}
-                      </article>
-                    ))}
-                  </div>
-
-                  {summerPlayPass.terms.length > 0 && (
-                    <p className="ppp-summer-pass-terms">
-                      <strong>{summerPlayPass.termsTitle}:</strong> {summerPlayPass.terms.join(" | ")}
-                    </p>
-                  )}
-
-                  {summerPlayPass.cta && (
-                    <div className="ppp-summer-pass-cta">
-                      {summerPlayPass.cta}
-                    </div>
-                  )}
-                  {summerPlayPass.addons.length > 0 && (
-                    <p className="ppp-summer-pass-terms">
-                      {summerPlayPass.addons.join(" | ")}
-                    </p>
-                  )}
-                </article>
               )}
               {hasPromotions && (
                 <article className="ppp-promotions-block ppp-promos" id="deals-and-savings">
