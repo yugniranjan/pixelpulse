@@ -6,12 +6,13 @@ import {
   FaCircleCheck,
   FaGift,
   FaMedal,
+  FaMugHot,
   FaShirt,
   FaTicket,
-  FaWallet,
 } from "react-icons/fa6";
 import RewardLookupForm from "@/components/RewardLookupForm";
 import { lookupRewardPlayers } from "@/lib/rewardLookup";
+import { getRewardsSheetConfig } from "@/lib/rewardSheet";
 import "../styles/level-up-rewards.css";
 
 const logo = "/assets/images/logoD.png";
@@ -20,125 +21,117 @@ const floorImage = "/assets/images/floorchallenge.webp";
 const shootingImage = "/assets/images/shootinggame.webp";
 const rewardsSiteUrl = "https://rewards.pixelpulseplay.ca";
 
-const rewardLadder = [
+const defaultRewardLadder = [
   {
     level: "Level 1",
     threshold: "5,000 PulsePoints",
     reward: "10 Arcade Credits",
-    detail: "Immediate gratification that gives kids a reason to come back quickly.",
+    detail: "Load 10 arcade credits and keep the fun going.",
     icon: FaGift,
   },
   {
     level: "Level 2",
     threshold: "12,000 PulsePoints",
     reward: "20 Arcade Credits",
-    detail: "A quick second-visit reward that keeps early momentum high.",
+    detail: "Enjoy 20 arcade credits for even more games on your next visit.",
     icon: FaMedal,
   },
   {
     level: "Level 3",
     threshold: "20,000 PulsePoints",
-    reward: "Free Slushie or Snack",
-    detail: "A low-cost treat with strong kid appeal.",
+    reward: "Free Drink or Snack",
+    detail: "Choose a refreshing drink or a tasty snack.",
     icon: FaBottleWater,
   },
   {
     level: "Level 4",
     threshold: "35,000 PulsePoints",
     reward: "30 Bonus Minutes",
-    detail: "Weekday-only bonus time that drives repeat traffic.",
+    detail: "Enjoy 30 extra minutes of play on a weekday.",
     icon: FaTicket,
   },
   {
     level: "Level 5",
     threshold: "50,000 PulsePoints",
-    reward: "FREE VR Game 30 mins",
-    detail: "A high perceived-value reward that feels like a real milestone.",
-    icon: FaWallet,
+    reward: "Pixel Pulse Coffee Mug",
+    detail: "Take home your own Pixel Pulse coffee mug.",
+    icon: FaMugHot,
   },
   {
     level: "Level 6",
     threshold: "70,000 PulsePoints",
     reward: "Friend Pass",
-    detail: "Bring a friend for 30 minutes and turn loyalty into customer acquisition.",
+    detail: "Bring a friend and enjoy 30 minutes of play together.",
     icon: FaGift,
   },
   {
     level: "Level 7",
     threshold: "90,000 PulsePoints",
     reward: "Free Upgrade to 90-Min Pass",
-    detail: "Encourages upselling into longer sessions.",
+    detail: "Upgrade your visit to a 90-minute pass at no extra cost.",
     icon: FaShirt,
   },
   {
     level: "Level 8",
     threshold: "120,000 PulsePoints",
     reward: "FREE 60-Minute Pass",
-    detail: "A major milestone for loyal repeat players.",
+    detail: "Enjoy a full 60-minute play session on us.",
     icon: FaTicket,
   },
   {
     level: "Level 9",
     threshold: "160,000 PulsePoints",
     reward: "FREE 90-Minute Pass",
-    detail: "Highly desirable free play that keeps families aiming higher.",
+    detail: "Unlock a full 90-minute play session on us.",
     icon: FaTicket,
   },
   {
     level: "Level 10",
     threshold: "250,000 PulsePoints",
     reward: "Pixel Pulse VIP Member",
-    detail: "Aspirational status for the most loyal players.",
+    detail: "Reach VIP status and enjoy our best member perks.",
     icon: FaCakeCandles,
   },
 ];
 
-const earningWays = [
-  { label: "$1 spent", value: "100 PulsePoints" },
-  { label: "Game challenge", value: "Bonus Points" },
-  { label: "Birthday booking", value: "5,000 bonus points" },
-  { label: "Bring a friend", value: "2,500 bonus points" },
-  { label: "Weekday visits", value: "Double Points" },
-];
-
-const vipBenefits = [
+const defaultVipBenefits = [
   "Skip-the-line check-in",
   "10% off food and beverages",
-  "2x points on weekdays",
-  "Birthday bonus of 10,000 points",
+  "Weekday member offers",
+  "Birthday surprise reward",
   "Exclusive event invitations",
   "One free guest pass every quarter",
 ];
 
-const prizeWheelRewards = [
+const defaultPrizeWheelRewards = [
   "10 Arcade Credits",
-  "Slushie",
+  "Drink or Snack",
   "Candy",
   "Extra 15 Minutes",
   "Free Upgrade",
-  "Double Points Next Visit",
+  "Pixel Pulse Sticker",
   "Mystery Prize",
 ];
 
-const streakRewards = [
-  { visits: "2 visits in a month", reward: "1,500 Bonus Points" },
-  { visits: "3 visits in a month", reward: "3,000 Bonus Points" },
+const defaultStreakRewards = [
+  { visits: "2 visits in a month", reward: "Free Drink" },
+  { visits: "3 visits in a month", reward: "10 Arcade Credits" },
   { visits: "5 visits in a month", reward: "FREE 30 Minutes" },
   { visits: "8 visits in a month", reward: "FREE 60-Minute Pass" },
 ];
 
-const howSteps = [
+const defaultHowSteps = [
   {
     number: "01",
     title: "Book or play",
     text: "Explorer, All-Access, Booster, parties, and add-ons all feed the same player profile.",
-    accent: "$1 spent = 100 PulsePoints",
+    accent: "Every visit moves you forward",
   },
   {
     number: "02",
-    title: "Stack bonuses",
-    text: "Challenges, friends, birthdays, and weekday visits help players climb faster.",
-    accent: "Mon-Thu visits earn double",
+    title: "Build your streak",
+    text: "Friends, birthdays, and repeat visits help you unlock more rewards.",
+    accent: "Visit more, unlock more",
   },
   {
     number: "03",
@@ -148,7 +141,7 @@ const howSteps = [
   },
 ];
 
-const annualStatus = [
+const defaultAnnualStatus = [
   {
     tier: "Bronze",
     range: "0-100k points",
@@ -157,19 +150,19 @@ const annualStatus = [
   {
     tier: "Silver",
     range: "100k-250k points",
-    perks: ["10% bonus points"],
+    perks: ["Early access to member events"],
   },
   {
     tier: "Gold",
     range: "250k+ points",
-    perks: ["Double points weekdays", "Exclusive events", "Birthday free pass"],
+    perks: ["Weekday member offers", "Exclusive events", "Birthday free pass"],
   },
 ];
 
-const heroStats = [
-  { label: "Earn rate", value: "$1 = 100 pts" },
+const defaultHeroStats = [
+  { label: "Player access", value: "Email or phone" },
   { label: "Reward ladder", value: "10 levels" },
-  { label: "Weekdays", value: "Double points" },
+  { label: "Monthly streaks", value: "Extra rewards" },
 ];
 
 export const metadata = {
@@ -192,6 +185,38 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function LevelUpRewardsPage({ searchParams = {} }) {
+  const sheetConfig = await getRewardsSheetConfig();
+  const pageCopy = sheetConfig?.pageCopy || {};
+  const content = (key, field, fallback) => pageCopy[key]?.[field] || fallback;
+  const iconMap = {
+    birthday: FaCakeCandles,
+    drink: FaBottleWater,
+    gift: FaGift,
+    medal: FaMedal,
+    mug: FaMugHot,
+    shirt: FaShirt,
+    ticket: FaTicket,
+  };
+  const rewardLadder = sheetConfig?.rewardLadder?.length
+    ? sheetConfig.rewardLadder.map((reward) => ({
+        ...reward,
+        icon: iconMap[reward.icon] || FaGift,
+      }))
+    : defaultRewardLadder;
+  const vipBenefits = sheetConfig?.vipBenefits?.length
+    ? sheetConfig.vipBenefits
+    : defaultVipBenefits;
+  const prizeWheelRewards = sheetConfig?.prizeWheelRewards?.length
+    ? sheetConfig.prizeWheelRewards
+    : defaultPrizeWheelRewards;
+  const streakRewards = sheetConfig?.streakRewards?.length
+    ? sheetConfig.streakRewards
+    : defaultStreakRewards;
+  const howSteps = sheetConfig?.howSteps?.length ? sheetConfig.howSteps : defaultHowSteps;
+  const annualStatus = sheetConfig?.annualStatus?.length
+    ? sheetConfig.annualStatus
+    : defaultAnnualStatus;
+  const heroStats = sheetConfig?.heroStats?.length ? sheetConfig.heroStats : defaultHeroStats;
   const initialIdentifier = String(searchParams.lookup || "").trim();
   const initialSelectedPlayerId = /^\d+$/.test(String(searchParams.player || ""))
     ? Number(searchParams.player)
@@ -218,7 +243,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         </a>
         <div className="ppp-level-nav__links">
           <a href="#top">Dashboard</a>
-          <a href="#earn">Earn</a>
           <a href="#ladder">Rewards</a>
           <a href="#streaks">Streak</a>
           <a href="#vip">VIP</a>
@@ -231,13 +255,19 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         </div>
         <div className="ppp-level-hero__stage" aria-hidden="true" />
         <div className="ppp-level-hero__content">
-          <span className="ppp-level-kicker">Level Up Rewards App</span>
+          <span className="ppp-level-kicker">
+            {content("hero_kicker", "text", "Level Up Rewards App")}
+          </span>
           <h1>
-            Register for Pixel Pulse <span>Rewards.</span>
+            {content("hero_title", "title", "Your Pixel Pulse")} {" "}
+            <span>{content("hero_title", "value", "Rewards.")}</span>
           </h1>
           <p>
-            Join Level Up Rewards with your name, email, age, and optional phone number. Already
-            registered? Enter your email or phone to open your Level Up dashboard.
+            {content(
+              "hero_description",
+              "text",
+              "Already played at Pixel Pulse? Enter the email or phone number used for your visit to open your dashboard, check your points, and redeem unlocked rewards.",
+            )}
           </p>
           <div className="ppp-level-overview" aria-label="Example level progress">
             <div className="ppp-level-ring" aria-hidden="true">
@@ -301,11 +331,14 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
       <section className="ppp-level-section ppp-level-how" id="app">
         <div className="ppp-level-inner ppp-level-how__grid">
           <div className="ppp-level-section__intro">
-            <span>How it works</span>
-            <h2>PulsePoints turns every visit into progress.</h2>
+            <span>{content("how_eyebrow", "text", "How it works")}</span>
+            <h2>{content("how_title", "title", "PulsePoints turns every visit into progress.")}</h2>
             <p>
-              The program gives kids quick wins, encourages longer sessions, and creates an
-              aspirational VIP tier families can work toward all year.
+              {content(
+                "how_description",
+                "text",
+                "Earn PulsePoints every time you play, unlock rewards as you level up, and work your way toward VIP status all year long.",
+              )}
             </p>
           </div>
           <div className="ppp-level-app-card" aria-label="Sample rewards app dashboard">
@@ -340,34 +373,18 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         </div>
       </section>
 
-      <section className="ppp-level-section ppp-level-earn" id="earn">
-        <div className="ppp-level-inner ppp-level-section__header">
-          <span>How to Earn</span>
-          <h2>Play more. Earn more. Level up.</h2>
-          <p>
-            PulsePoints reward spend, gameplay, birthdays, referrals, and weekday visits so every
-            return trip can move a player closer to the next unlock.
-          </p>
-        </div>
-        <div className="ppp-level-inner ppp-level-earn__grid">
-          {earningWays.map((item) => (
-            <article key={item.label}>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="ppp-level-visual-band" aria-label="Pixel Pulse play experiences">
         <Image src={floorImage} alt="Interactive floor challenge at Pixel Pulse Play" width={520} height={360} />
         <Image src={shootingImage} alt="Target game at Pixel Pulse Play" width={520} height={360} />
         <div>
-          <span>Every score counts</span>
-          <strong>Keep earning points every time you play.</strong>
+          <span>{content("visual_eyebrow", "text", "Every visit counts")}</span>
+          <strong>{content("visual_title", "title", "Keep moving up every time you visit.")}</strong>
           <p>
-            Points, challenge bonuses, referrals, birthday bookings, and weekday double-points help
-            players move through the PulsePoints ladder faster.
+            {content(
+              "visual_description",
+              "text",
+              "Repeat visits, referrals, birthdays, and monthly streaks bring your next reward closer.",
+            )}
           </p>
         </div>
       </section>
@@ -375,10 +392,14 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
       <section className="ppp-level-section" id="ladder">
         <div className="ppp-level-inner">
           <div className="ppp-level-section__header">
-            <span>Reward Ladder</span>
-            <h2>From quick credits to Pixel Pulse VIP.</h2>
+            <span>{content("ladder_eyebrow", "text", "Reward Ladder")}</span>
+            <h2>{content("ladder_title", "title", "From quick credits to Pixel Pulse VIP.")}</h2>
             <p>
-              Move through 10 reward levels as your lifetime PulsePoints grow.
+              {content(
+                "ladder_description",
+                "text",
+                "Move through 10 reward levels as your lifetime PulsePoints grow.",
+              )}
             </p>
           </div>
           <div className="ppp-level-tier-layout">
@@ -404,9 +425,9 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
               })}
             </div>
             <aside className="ppp-level-signage-card" aria-label="Suggested rewards signage">
-              <span>Suggested Signage</span>
-              <h3>PulsePoints Rewards</h3>
-              <p>Earn points every time you play.</p>
+              <span>{content("signage_eyebrow", "text", "Suggested Signage")}</span>
+              <h3>{content("signage_title", "title", "PulsePoints Rewards")}</h3>
+              <p>{content("signage_description", "text", "Earn points every time you play.")}</p>
               <div>
                 {rewardLadder.filter((_, index) => [0, 2, 3, 7, 8, 9].includes(index)).map((item) => (
                   <strong key={item.level}>
@@ -423,8 +444,8 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
       <section className="ppp-level-section ppp-level-specials" id="vip">
         <div className="ppp-level-inner ppp-level-specials__grid">
           <article className="ppp-level-specials__panel">
-            <span>VIP Member Benefits</span>
-            <h2>250,000 points unlocks status.</h2>
+            <span>{content("vip_eyebrow", "text", "VIP Member Benefits")}</span>
+            <h2>{content("vip_title", "title", "Reach VIP at 250,000 points.")}</h2>
             <div className="ppp-level-specials__list">
               {vipBenefits.map((benefit) => (
                 <p key={benefit}>
@@ -435,12 +456,9 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             </div>
           </article>
           <article className="ppp-level-specials__panel">
-            <span>Surprise Rewards</span>
-            <h2>Spin the Prize Wheel.</h2>
-            <p>
-              Every level-up includes a surprise prize moment, because kids love not knowing exactly
-              what they might win next.
-            </p>
+            <span>{content("prize_eyebrow", "text", "Surprise Rewards")}</span>
+            <h2>{content("prize_title", "title", "Spin the Prize Wheel.")}</h2>
+            <p>{content("prize_description", "text", "Every level-up comes with a surprise spin. See what you win next.")}</p>
             <div className="ppp-level-prize-grid">
               {prizeWheelRewards.map((reward) => (
                 <strong key={reward}>{reward}</strong>
@@ -452,12 +470,9 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
 
       <section className="ppp-level-section ppp-level-streaks" id="streaks">
         <div className="ppp-level-inner ppp-level-section__header">
-          <span>Repeat Visit Accelerator</span>
-          <h2>Monthly streaks reward fast return visits.</h2>
-          <p>
-            Visit streak bonuses give families a clear reason to come back again this month instead
-            of waiting for a special occasion.
-          </p>
+          <span>{content("streak_eyebrow", "text", "Monthly Visit Streaks")}</span>
+          <h2>{content("streak_title", "title", "Visit more this month. Unlock extra rewards.")}</h2>
+          <p>{content("streak_description", "text", "Each visit moves your monthly streak forward and brings the next reward closer.")}</p>
         </div>
         <div className="ppp-level-inner ppp-level-streaks__grid">
           {streakRewards.map((item) => (
@@ -471,12 +486,9 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
 
       <section className="ppp-level-section ppp-level-annual" id="status">
         <div className="ppp-level-inner ppp-level-section__header">
-          <span>Annual Membership Status</span>
-          <h2>Give families a reason to keep earning.</h2>
-          <p>
-            Annual status keeps the program aspirational even after players redeem points for
-            rewards.
-          </p>
+          <span>{content("annual_eyebrow", "text", "Annual Membership Status")}</span>
+          <h2>{content("annual_title", "title", "Keep leveling up all year.")}</h2>
+          <p>{content("annual_description", "text", "Your annual status grows with your points and unlocks even more member perks.")}</p>
         </div>
         <div className="ppp-level-inner ppp-level-annual__grid">
           {annualStatus.map((item) => (
@@ -495,14 +507,11 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
 
       <section className="ppp-level-cta" id="join">
         <div>
-          <span>Ready to level up?</span>
-          <h2>Ask staff about Level Up Rewards on your next visit.</h2>
-          <p>
-            Create one consistent player profile, keep earning with every session, and watch your
-            next reward move closer each time you play.
-          </p>
+          <span>{content("cta_eyebrow", "text", "Ready to level up?")}</span>
+          <h2>{content("cta_title", "title", "Ask staff about Level Up Rewards on your next visit.")}</h2>
+          <p>{content("cta_description", "text", "Use the player app above to check your balance, level, unlocked rewards, and progress toward your next reward.")}</p>
           <a className="ppp-level-button ppp-level-button--primary" href="/contactus">
-            Contact Pixel Pulse <FaArrowRight aria-hidden="true" />
+            {content("cta_button", "text", "Contact Pixel Pulse")} <FaArrowRight aria-hidden="true" />
           </a>
         </div>
       </section>

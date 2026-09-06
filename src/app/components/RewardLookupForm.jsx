@@ -1,21 +1,34 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const TABS = [
   { id: "status", label: "Status" },
-  { id: "wallet", label: "Wallet" },
+  { id: "wallet", label: "Redeem" },
   { id: "rules", label: "Rules" },
 ];
 
 const RULES = [
-  "$1 spent earns 100 PulsePoints.",
-  "Game challenges, birthdays, referrals, and weekday visits can add bonus points.",
+  "Monthly visit streaks, birthdays, referrals, and special offers can unlock extra rewards.",
   "Redeeming a reward reduces your points.",
   "Unlocked rewards are confirmed by Pixel Pulse staff.",
 ];
 
 const VALID_TAB_IDS = new Set(TABS.map((tab) => tab.id));
+
+const REWARD_COSTS = {
+  1: 5_000,
+  2: 12_000,
+  3: 20_000,
+  4: 35_000,
+  5: 50_000,
+  6: 70_000,
+  7: 90_000,
+  8: 120_000,
+  9: 160_000,
+  10: 250_000,
+};
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(Number(value) || 0);
@@ -42,7 +55,19 @@ function getLevelNumber(level) {
 
 function getInitials(name = "") {
   const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
-  return (parts[0]?.[0] || "P") + (parts[1]?.[0] || "");
+  return ((parts[0]?.[0] || "P") + (parts[1]?.[0] || "")).toUpperCase();
+}
+
+function formatPlayerName(name = "") {
+  return String(name || "")
+    .trim()
+    .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+}
+
+function getRewardCost(reward) {
+  const providedCost = Number(reward?.costPoints || 0);
+  if (providedCost > 0) return providedCost;
+  return REWARD_COSTS[Number(reward?.levelNumber)] || 0;
 }
 
 function getProgress(player) {
@@ -75,8 +100,8 @@ function EmptyState({ searched }) {
       <strong>{searched ? "No profile found" : "Find your rewards"}</strong>
       <p>
         {searched
-          ? "Try the email or phone number connected to your Pixel Pulse rewards registration."
-          : "Register for Level Up Rewards, or enter your email or phone number to load your PulsePoints, level, and unlocked rewards."}
+          ? "Try the email or phone number used for your Pixel Pulse visit or waiver."
+          : "Enter the email or phone number used for your Pixel Pulse visit to load your points, level, and unlocked rewards."}
       </p>
     </div>
   );
@@ -123,7 +148,7 @@ function StatusPanel({ player }) {
   );
 }
 
-function WalletPanel({ player }) {
+function WalletPanel({ player, onRedeem, redeemingRewardId }) {
   const rewards = player.availableRewards || [];
 
   return (
@@ -133,15 +158,36 @@ function WalletPanel({ player }) {
           <span>Reward wallet</span>
           <strong>{rewards.length ? `${rewards.length} unlocked` : "No rewards yet"}</strong>
         </div>
-        <small>Show staff to redeem</small>
+        <small>Request here, then show staff</small>
       </div>
       {rewards.length ? (
         <div className="ppp-level-app__rewards">
           {rewards.map((reward) => (
-            <article key={reward.id}>
+            <article
+              key={reward.id}
+              className={reward.status === "requested" ? "is-requested" : ""}
+            >
               <span>Level {reward.levelNumber}</span>
               <strong>{reward.rewardName}</strong>
-              <small>{reward.expiresAt ? `Expires ${formatDate(reward.expiresAt)}` : "Ask staff for details"}</small>
+              <small>
+                {reward.expiresAt
+                  ? `Expires ${formatDate(reward.expiresAt)}`
+                  : "Valid for 6 months after redemption"}
+              </small>
+              {reward.status === "requested" ? (
+                <div className="ppp-level-app__redemption-ready">
+                  Ready for staff confirmation
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="ppp-level-app__redeem-button"
+                  disabled={Boolean(redeemingRewardId)}
+                  onClick={() => onRedeem(reward)}
+                >
+                  {redeemingRewardId === reward.id ? "Requesting" : "Redeem reward"}
+                </button>
+              )}
             </article>
           ))}
         </div>
@@ -187,25 +233,38 @@ export default function RewardLookupForm({
   const [activeTab, setActiveTab] = useState(safeInitialTab);
   const [searched, setSearched] = useState(initiallySearched);
   const [loading, setLoading] = useState(false);
-  const [registering, setRegistering] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [mode, setMode] = useState(safeInitialPlayers.length ? "lookup" : "register");
   const [error, setError] = useState(initialError);
   const [success, setSuccess] = useState("");
-  const [registration, setRegistration] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    age: "",
-  });
-  const [verificationEmail, setVerificationEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [redeemingRewardId, setRedeemingRewardId] = useState("");
+  const [redeemCandidate, setRedeemCandidate] = useState(null);
+  const [redeemDialogError, setRedeemDialogError] = useState("");
   const appRef = useRef(null);
+  const playerPickerRef = useRef(null);
 
   const selectedPlayer = useMemo(() => {
     if (!players.length) return null;
     return players.find((player) => player.playerId === selectedPlayerId) || players[0];
   }, [players, selectedPlayerId]);
+
+  useEffect(() => {
+    if (!redeemCandidate) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape" && !redeemingRewardId) {
+        setRedeemCandidate(null);
+        setRedeemDialogError("");
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [redeemCandidate, redeemingRewardId]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -246,95 +305,57 @@ export default function RewardLookupForm({
     }
   }
 
-  async function handleRegister(event) {
-    event.preventDefault();
-    setRegistering(true);
+  function handleRedeem(reward) {
+    setRedeemCandidate(reward);
+    setRedeemDialogError("");
+  }
+
+  async function confirmRedemption() {
+    const reward = redeemCandidate;
+    if (!reward) return;
+
+    setRedeemingRewardId(reward.id);
     setError("");
     setSuccess("");
+    setRedeemDialogError("");
 
     try {
-      const response = await fetch("/api/rewards/register", {
+      const response = await fetch("/api/rewards/redeem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registration),
+        body: JSON.stringify({
+          identifier: identifier.trim(),
+          playerId: selectedPlayer.playerId,
+          rewardId: reward.id,
+        }),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Unable to register for rewards.");
+        throw new Error(data.error || "Unable to request this redemption.");
       }
 
-      setIdentifier(registration.email);
-      setVerificationEmail(registration.email);
-      setVerificationCode("");
-      setMode(data.verificationRequired ? "verify" : "lookup");
-      setSuccess(
-        data.verificationRequired
-          ? data.verificationSent
-            ? "Registration saved. Check your email for the verification code."
-            : "Registration saved. Email verification is not configured right now, so staff can verify you in person."
-          : "You are already registered and verified.",
-      );
+      setPlayers((currentPlayers) => currentPlayers.map((player) => {
+        if (player.playerId !== selectedPlayer.playerId) return player;
+        if (data.player) return data.player;
 
-      const lookupResponse = await fetch("/api/rewards/lookup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: registration.email }),
-      });
-      const lookupData = await lookupResponse.json();
-      const nextPlayers = Array.isArray(lookupData.players) ? lookupData.players : [];
-      setPlayers(nextPlayers);
-      setSelectedPlayerId(nextPlayers[0]?.playerId || null);
-      setSearched(true);
-    } catch (registerError) {
-      setError(registerError.message || "Unable to register for rewards.");
+        return {
+          ...player,
+          lifetimePoints: data.reward?.remainingPoints ?? player.lifetimePoints,
+          availableRewards: player.availableRewards.map((item) => (
+            item.id === reward.id
+              ? { ...item, status: "requested", expiresAt: data.reward?.expiresAt || "" }
+              : item
+          )),
+        };
+      }));
+      setSuccess("Redemption requested. Show this screen to Pixel Pulse staff to confirm it.");
+      setRedeemCandidate(null);
+    } catch (requestError) {
+      setRedeemDialogError(requestError.message || "Unable to request this redemption.");
     } finally {
-      setRegistering(false);
+      setRedeemingRewardId("");
     }
-  }
-
-  async function handleVerify(event) {
-    event.preventDefault();
-    setVerifying(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await fetch("/api/rewards/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verificationEmail, code: verificationCode }),
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to verify this email.");
-      }
-
-      setSuccess("Email verified. Your Level Up dashboard is ready.");
-      setMode("lookup");
-      setIdentifier(data.member?.email || verificationEmail);
-
-      const lookupResponse = await fetch("/api/rewards/lookup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: data.member?.email || verificationEmail }),
-      });
-      const lookupData = await lookupResponse.json();
-      const nextPlayers = Array.isArray(lookupData.players) ? lookupData.players : [];
-      setPlayers(nextPlayers);
-      setSelectedPlayerId(nextPlayers[0]?.playerId || null);
-      setSearched(true);
-    } catch (verifyError) {
-      setError(verifyError.message || "Unable to verify this email.");
-    } finally {
-      setVerifying(false);
-    }
-  }
-
-  function updateRegistration(event) {
-    const { name, value } = event.target;
-    setRegistration((current) => ({ ...current, [name]: value }));
   }
 
   function getLookupHref({ playerId = selectedPlayer?.playerId, view = activeTab } = {}) {
@@ -353,8 +374,14 @@ export default function RewardLookupForm({
     window.history.replaceState(null, "", getLookupHref({ playerId, view }));
   }
 
+  const redemptionCost = getRewardCost(redeemCandidate);
+  const currentBalance = Number(selectedPlayer?.lifetimePoints || 0);
+  const remainingBalance = Math.max(0, currentBalance - redemptionCost);
+  const canAffordRedemption = redemptionCost > 0 && currentBalance >= redemptionCost;
+
   return (
-    <section
+    <>
+      <section
       ref={appRef}
       className={`ppp-level-app ${selectedPlayer ? "ppp-level-app--has-results" : "ppp-level-app--empty"}`}
       aria-label="Level Up Rewards app"
@@ -370,140 +397,54 @@ export default function RewardLookupForm({
             {getLevelLabel(selectedPlayer.currentLevel)}
           </small>
         ) : (
-          <small>Guest</small>
+          <small>Player lookup</small>
         )}
       </div>
 
-      <div className="ppp-level-app__mode-tabs" role="tablist" aria-label="Rewards access">
-        <button
-          type="button"
-          className={mode === "register" ? "is-active" : ""}
-          onClick={() => setMode("register")}
-        >
-          Register
-        </button>
-        <button
-          type="button"
-          className={mode === "lookup" ? "is-active" : ""}
-          onClick={() => setMode("lookup")}
-        >
-          I am registered
-        </button>
-      </div>
-
-      {mode === "register" ? (
-        <form className="ppp-level-app__register" onSubmit={handleRegister}>
-          <label>
-            <span>Name</span>
-            <input
-              name="fullName"
-              value={registration.fullName}
-              onChange={updateRegistration}
-              autoComplete="name"
-              required
-            />
-          </label>
-          <label>
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              value={registration.email}
-              onChange={updateRegistration}
-              autoComplete="email"
-              inputMode="email"
-              required
-            />
-          </label>
-          <label>
-            <span>Phone <em>optional</em></span>
-            <input
-              type="tel"
-              name="phone"
-              value={registration.phone}
-              onChange={updateRegistration}
-              autoComplete="tel"
-              inputMode="tel"
-            />
-          </label>
-          <label>
-            <span>Age</span>
-            <input
-              type="number"
-              name="age"
-              value={registration.age}
-              onChange={updateRegistration}
-              min="1"
-              max="120"
-              inputMode="numeric"
-              required
-            />
-          </label>
-          <button type="submit" disabled={registering}>
-            {registering ? "Registering" : "Register for rewards"}
+      <form className="ppp-level-app__search" method="get" onSubmit={handleSubmit}>
+        <label htmlFor="reward-lookup-input">Enter the email or phone used for your visit</label>
+        <div>
+          <input
+            id="reward-lookup-input"
+            name="lookup"
+            value={identifier}
+            onChange={(event) => setIdentifier(event.target.value)}
+            placeholder="Email or phone number"
+            autoComplete="email"
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Checking" : "Show my rewards"}
           </button>
-        </form>
-      ) : null}
-
-      {mode === "lookup" ? (
-        <form className="ppp-level-app__search" method="get" onSubmit={handleSubmit}>
-          <label htmlFor="reward-lookup-input">Already registered? Enter email or phone</label>
-          <div>
-            <input
-              id="reward-lookup-input"
-              name="lookup"
-              value={identifier}
-              onChange={(event) => setIdentifier(event.target.value)}
-              placeholder="Email or phone number"
-              autoComplete="email"
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? "Checking" : "Show dashboard"}
-            </button>
-          </div>
-        </form>
-      ) : null}
-
-      {mode === "verify" ? (
-        <form className="ppp-level-app__verify" onSubmit={handleVerify}>
-          <label>
-            <span>Email verification code</span>
-            <input
-              value={verificationCode}
-              onChange={(event) => setVerificationCode(event.target.value)}
-              placeholder="6-digit code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              required
-            />
-          </label>
-          <button type="submit" disabled={verifying}>
-            {verifying ? "Verifying" : "Verify email"}
-          </button>
-        </form>
-      ) : null}
+        </div>
+      </form>
 
       {error ? <p className="ppp-level-app__error">{error}</p> : null}
       {success ? <p className="ppp-level-app__success">{success}</p> : null}
 
       {players.length > 1 ? (
-        <div>
-          <div className="ppp-level-app__chips-label">Players on account</div>
-          <div className="ppp-level-app__players" aria-label="Select player">
-            {players.map((player) => (
-              <a
-                href={getLookupHref({ playerId: player.playerId, view: activeTab })}
-                key={player.playerId}
-                className={player.playerId === selectedPlayer?.playerId ? "is-active" : ""}
-                onClick={(event) => {
-                  event.preventDefault();
-                  setSelectedPlayerId(player.playerId);
-                }}
-              >
-                {player.fullName}
-              </a>
-            ))}
-          </div>
+        <div className="ppp-level-app__player-picker">
+          <span>Player on this account</span>
+          <details ref={playerPickerRef}>
+            <summary>{formatPlayerName(selectedPlayer?.fullName) || "Choose a player"}</summary>
+            <div className="ppp-level-app__player-options" role="listbox" aria-label="Choose a player">
+              {players.map((player) => (
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={player.playerId === selectedPlayer?.playerId}
+                  className={player.playerId === selectedPlayer?.playerId ? "is-active" : ""}
+                  key={player.playerId}
+                  onClick={() => {
+                    setSelectedPlayerId(player.playerId);
+                    syncLookupUrl({ playerId: player.playerId, view: activeTab });
+                    playerPickerRef.current?.removeAttribute("open");
+                  }}
+                >
+                  {formatPlayerName(player.fullName)}
+                </button>
+              ))}
+            </div>
+          </details>
         </div>
       ) : null}
 
@@ -516,19 +457,10 @@ export default function RewardLookupForm({
               </div>
               <div>
                 <span>Player</span>
-                <strong>{selectedPlayer.fullName}</strong>
+                <strong>{formatPlayerName(selectedPlayer.fullName)}</strong>
               </div>
             </div>
-            <small>#{selectedPlayer.playerId}</small>
           </div>
-          {selectedPlayer.isRewardsMember ? (
-            <p className="ppp-level-app__member-note">
-              {selectedPlayer.emailVerified
-                ? "Registered rewards member. Points will appear here after your first tracked play session."
-                : "Registered rewards member. Verify your email to keep this dashboard connected to you."}
-            </p>
-          ) : null}
-
           <div className="ppp-level-app__tabs" role="tablist" aria-label="Reward views">
             {TABS.map((tab) => (
               <button
@@ -550,13 +482,93 @@ export default function RewardLookupForm({
 
           <div className="ppp-level-app__view" key={activeTab}>
             {activeTab === "status" ? <StatusPanel player={selectedPlayer} /> : null}
-            {activeTab === "wallet" ? <WalletPanel player={selectedPlayer} /> : null}
+            {activeTab === "wallet" ? (
+              <WalletPanel
+                player={selectedPlayer}
+                onRedeem={handleRedeem}
+                redeemingRewardId={redeemingRewardId}
+              />
+            ) : null}
             {activeTab === "rules" ? <RulesPanel /> : null}
           </div>
         </>
       ) : (
         <EmptyState searched={searched} />
       )}
-    </section>
+      </section>
+      {redeemCandidate && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="ppp-redeem-modal__backdrop"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget && !redeemingRewardId) {
+                  setRedeemCandidate(null);
+                  setRedeemDialogError("");
+                }
+              }}
+            >
+              <div
+                className="ppp-redeem-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="ppp-redeem-modal-title"
+              >
+                <span className="ppp-redeem-modal__kicker">Confirm redemption</span>
+                <h2 id="ppp-redeem-modal-title">Redeem this reward?</h2>
+                <p>
+                  Continue only when a Pixel Pulse staff member is ready to confirm your reward.
+                </p>
+                <div className="ppp-redeem-modal__reward">
+                  <span>Level {redeemCandidate.levelNumber}</span>
+                  <strong>{redeemCandidate.rewardName}</strong>
+                  <small>Valid for six months from today</small>
+                </div>
+                <div className="ppp-redeem-modal__balance" aria-label="Redemption point balance">
+                  <div>
+                    <span>Points deducted</span>
+                    <strong>−{formatNumber(redemptionCost)}</strong>
+                  </div>
+                  <div>
+                    <span>Balance after</span>
+                    <strong>{formatNumber(remainingBalance)}</strong>
+                  </div>
+                </div>
+                {!canAffordRedemption ? (
+                  <p className="ppp-redeem-modal__error">
+                    You need {formatNumber(Math.max(0, redemptionCost - currentBalance))} more
+                    PulsePoints for this reward.
+                  </p>
+                ) : null}
+                {redeemDialogError ? (
+                  <p className="ppp-redeem-modal__error">{redeemDialogError}</p>
+                ) : null}
+                <div className="ppp-redeem-modal__actions">
+                  <button
+                    type="button"
+                    className="ppp-redeem-modal__cancel"
+                    disabled={Boolean(redeemingRewardId)}
+                    autoFocus
+                    onClick={() => {
+                      setRedeemCandidate(null);
+                      setRedeemDialogError("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="ppp-redeem-modal__confirm"
+                    disabled={Boolean(redeemingRewardId) || !canAffordRedemption}
+                    onClick={confirmRedemption}
+                  >
+                    {redeemingRewardId ? "Requesting" : "Confirm redemption"}
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }

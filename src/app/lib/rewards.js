@@ -1,12 +1,13 @@
 import { getPostgresPool, query } from "@/lib/postgres";
+import { getRewardsSheetConfig } from "@/lib/rewardSheet";
 import crypto from "crypto";
 
 const DEFAULT_LEVELS = [
   [1, 5_000, "10 Arcade Credits", "arcade_credits"],
   [2, 12_000, "20 Arcade Credits", "arcade_credits"],
-  [3, 20_000, "Free Slushie or Snack", "snack"],
+  [3, 20_000, "Free Drink or Snack", "snack"],
   [4, 35_000, "30 Bonus Minutes (Weekday Only)", "bonus_minutes"],
-  [5, 50_000, "FREE VR Game 30 mins", "vr_game"],
+  [5, 50_000, "Pixel Pulse Coffee Mug", "merchandise"],
   [6, 70_000, "Friend Pass (Bring a Friend for 30 mins)", "friend_pass"],
   [7, 90_000, "Free Upgrade to 90-Min Pass", "upgrade"],
   [8, 120_000, "FREE 60-Minute Pass", "play_pass"],
@@ -20,6 +21,7 @@ const DEFAULT_LEVELS = [
 }));
 
 let tablesReady = false;
+let tablesReadyAt = 0;
 
 export function hasPostgres() {
   return Boolean(getPostgresPool());
@@ -32,7 +34,8 @@ function iso(value) {
 }
 
 export async function ensureRewardsTables() {
-  if (tablesReady) return;
+  const refreshMs = Number(process.env.REWARDS_SHEET_CACHE_TTL_MS || 60_000);
+  if (tablesReady && Date.now() - tablesReadyAt < refreshMs) return;
 
   await query(`
     create table if not exists reward_levels (
@@ -146,7 +149,17 @@ export async function ensureRewardsTables() {
       on reward_email_verifications (member_id, created_at desc)
   `);
 
-  for (const level of DEFAULT_LEVELS) {
+  const sheetConfig = await getRewardsSheetConfig();
+  const configuredLevels = sheetConfig?.rewardLadder?.length
+    ? sheetConfig.rewardLadder.map((reward) => ({
+        levelNumber: reward.levelNumber,
+        thresholdPoints: reward.thresholdPoints,
+        rewardName: reward.reward,
+        rewardType: reward.rewardType || "reward",
+      }))
+    : DEFAULT_LEVELS;
+
+  for (const level of configuredLevels) {
     await query(
       `
         insert into reward_levels (level_number, threshold_points, reward_name, reward_type)
@@ -162,7 +175,45 @@ export async function ensureRewardsTables() {
     );
   }
 
+  if (sheetConfig?.rewardLadder?.length) {
+    await query(
+      `
+        update reward_levels
+        set active = false,
+            updated_at = now()
+        where level_number <> all($1::integer[])
+          and active = true
+      `,
+      [configuredLevels.map((level) => level.levelNumber)],
+    );
+  }
+
+  await query(`
+    update reward_redemptions rr
+    set reward_name = rl.reward_name,
+        updated_at = now()
+    from reward_levels rl
+    where rr.level_number = rl.level_number
+      and rr.status in ('available', 'requested')
+      and rr.reward_name is distinct from rl.reward_name
+  `);
+
+  await query(`
+    update reward_redemptions
+    set expires_at = case
+      when status = 'available' then null
+      when status = 'requested' then updated_at + interval '6 months'
+      else expires_at
+    end
+    where (status = 'available' and expires_at is not null)
+       or (
+         status = 'requested'
+         and (expires_at is null or expires_at < updated_at + interval '6 months')
+       )
+  `);
+
   tablesReady = true;
+  tablesReadyAt = Date.now();
 }
 
 function normalizePhone(value = "") {
@@ -348,6 +399,7 @@ function normalizeRedemption(row = {}) {
     playerId: Number(row.player_id),
     levelNumber: Number(row.level_number),
     rewardName: row.reward_name || "",
+    costPoints: Number(row.threshold_points || 0),
     status: row.status || "available",
     unlockedAt: iso(row.unlocked_at),
     redeemedAt: iso(row.redeemed_at),
@@ -417,14 +469,12 @@ export async function unlockRewardsForPlayers(playerIds = []) {
       insert into reward_redemptions (
         player_id,
         level_number,
-        reward_name,
-        expires_at
+        reward_name
       )
       select
         player_points.player_id::bigint,
         rl.level_number,
-        rl.reward_name,
-        now() + interval '90 days'
+        rl.reward_name
       from (
         select
           player_id,
@@ -650,7 +700,7 @@ export async function addRewardLedgerEntry({
 }
 
 export async function setRewardRedemptionStatus({ id, status, redeemedBy = "" }) {
-  if (!hasPostgres() || !id || !["available", "redeemed", "void"].includes(status)) {
+  if (!hasPostgres() || !id || !["available", "requested", "redeemed", "void"].includes(status)) {
     return null;
   }
 
@@ -658,10 +708,28 @@ export async function setRewardRedemptionStatus({ id, status, redeemedBy = "" })
 
   const result = await query(
     `
+      with current_redemption as materialized (
+        select status
+        from reward_redemptions
+        where id = $1
+      ),
+      refunded_points as (
+        delete from reward_point_ledger
+        where source_score_id = concat('reward-redemption:', $1)
+          and (select status from current_redemption) = 'requested'
+          and $2 in ('available', 'void')
+        returning id
+      )
       update reward_redemptions
       set status = $2,
           redeemed_at = case when $2 = 'redeemed' then now() else null end,
           redeemed_by = case when $2 = 'redeemed' then $3 else null end,
+          expires_at = case
+            when $2 = 'available' then null
+            when $2 = 'requested' then now() + interval '6 months'
+            when $2 = 'redeemed' then coalesce(expires_at, now() + interval '6 months')
+            else expires_at
+          end,
           updated_at = now()
       where id = $1
       returning *
@@ -670,6 +738,115 @@ export async function setRewardRedemptionStatus({ id, status, redeemedBy = "" })
   );
 
   return result.rows[0] ? normalizeRedemption(result.rows[0]) : null;
+}
+
+export async function requestRewardRedemption({ id, playerId }) {
+  const cleanPlayerId = Number(playerId);
+
+  if (!hasPostgres() || !id || !Number.isInteger(cleanPlayerId) || cleanPlayerId < 1) {
+    return null;
+  }
+
+  await ensureRewardsTables();
+
+  const client = await getPostgresPool().connect();
+
+  try {
+    await client.query("begin");
+
+    const targetResult = await client.query(
+      `
+        select rr.*, rl.threshold_points
+        from reward_redemptions rr
+        join reward_levels rl on rl.level_number = rr.level_number
+        where rr.id = $1
+          and rr.player_id = $2
+          and rr.status = 'available'
+        for update of rr
+      `,
+      [id, cleanPlayerId],
+    );
+    const target = targetResult.rows[0];
+
+    if (!target) {
+      await client.query("rollback");
+      return null;
+    }
+
+    const balanceResult = await client.query(
+      `
+        select (
+          select coalesce(sum(coalesce(ps."Points", 0)), 0)
+          from public."PlayerScores" ps
+          where ps."PlayerID" = $1
+        ) + (
+          select coalesce(sum(rpl.points_delta), 0)
+          from reward_point_ledger rpl
+          where rpl.player_id = $1
+            and coalesce(rpl.source_type, '') <> 'scoreboard'
+        ) as balance
+      `,
+      [cleanPlayerId],
+    );
+    const balance = Number(balanceResult.rows[0]?.balance || 0);
+    const costPoints = Number(target.threshold_points || 0);
+
+    if (costPoints < 1 || balance < costPoints) {
+      await client.query("rollback");
+      const error = new Error(
+        balance < costPoints
+          ? `You need ${costPoints - balance} more PulsePoints to redeem this reward.`
+          : "This reward does not have a valid point cost.",
+      );
+      error.status = 409;
+      throw error;
+    }
+
+    const updatedResult = await client.query(
+      `
+        update reward_redemptions
+        set status = 'requested',
+            expires_at = now() + interval '6 months',
+            updated_at = now()
+        where id = $1
+        returning *, $2::integer as threshold_points
+      `,
+      [id, costPoints],
+    );
+
+    await client.query(
+      `
+        insert into reward_point_ledger (
+          player_id,
+          source_score_id,
+          source_type,
+          points_delta,
+          reason,
+          earned_at,
+          raw
+        )
+        values ($1, $2, 'reward_redemption', $3, $4, now(), $5::jsonb)
+      `,
+      [
+        cleanPlayerId,
+        `reward-redemption:${id}`,
+        -costPoints,
+        `Redeemed: ${target.reward_name}`,
+        JSON.stringify({ redemptionId: id, levelNumber: Number(target.level_number) }),
+      ],
+    );
+
+    await client.query("commit");
+    return {
+      ...normalizeRedemption(updatedResult.rows[0]),
+      remainingPoints: balance - costPoints,
+    };
+  } catch (error) {
+    await client.query("rollback").catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function getRewardStats() {

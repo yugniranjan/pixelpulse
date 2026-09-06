@@ -4,6 +4,10 @@ import { ensureRewardsTables, unlockRewardsForPlayers } from "@/lib/rewards";
 const LOOKUP_CACHE_TTL_MS = Number(process.env.REWARD_LOOKUP_CACHE_TTL_MS || 60_000);
 const lookupCache = new Map();
 
+export function clearRewardLookupCache() {
+  lookupCache.clear();
+}
+
 function normalizePhone(value = "") {
   return String(value || "").replace(/\D/g, "");
 }
@@ -35,33 +39,9 @@ function normalizeReward(row = {}) {
     id: row.id,
     levelNumber: Number(row.level_number || 0),
     rewardName: row.reward_name || "",
+    costPoints: Number(row.threshold_points || 0),
     status: row.status || "available",
     expiresAt: iso(row.expires_at),
-  };
-}
-
-function normalizeMemberPlayer(row = {}) {
-  const memberId = Number(row.id || 0);
-  const fullName = row.full_name || `Rewards Member ${memberId}`;
-
-  return {
-    playerId: -memberId,
-    memberId,
-    fullName,
-    lifetimePoints: 0,
-    repeatVisits: 0,
-    scoreEvents: 0,
-    lastScoreAt: "",
-    currentLevel: null,
-    nextLevel: {
-      levelNumber: Number(row.next_level || 1),
-      thresholdPoints: Number(row.next_threshold || 5000),
-      rewardName: row.next_reward_name || "10 Arcade Credits",
-      rewardType: row.next_reward_type || "arcade_credits",
-    },
-    availableRewards: [],
-    emailVerified: Boolean(row.email_verified),
-    isRewardsMember: true,
   };
 }
 
@@ -301,11 +281,12 @@ export async function lookupRewardPlayers(identifierValue = "") {
 
     const rewards = await query(
       `
-        select *
-        from reward_redemptions
-        where player_id = any($1::bigint[])
-          and status = 'available'
-        order by level_number asc
+        select rr.*, rl.threshold_points
+        from reward_redemptions rr
+        join reward_levels rl on rl.level_number = rr.level_number
+        where rr.player_id = any($1::bigint[])
+          and rr.status in ('available', 'requested')
+        order by rr.level_number asc
       `,
       [playerIds],
     );
@@ -334,42 +315,6 @@ export async function lookupRewardPlayers(identifierValue = "") {
       availableRewards: rewardsByPlayer.get(playerId) || [],
     };
   });
-
-  const memberResult = await query(
-    `
-      select
-        rm.*,
-        next_level.level_number as next_level,
-        next_level.threshold_points as next_threshold,
-        next_level.reward_name as next_reward_name,
-        next_level.reward_type as next_reward_type
-      from reward_members rm
-      left join lateral (
-        select *
-        from reward_levels rl
-        where rl.active = true
-        order by rl.threshold_points asc
-        limit 1
-      ) next_level on true
-      where ($1 <> '' and lower(rm.email) = $1)
-        or ($2 <> '' and regexp_replace(coalesce(rm.phone, ''), '\\D', '', 'g') = $2)
-      order by rm.updated_at desc nulls last
-      limit 10
-    `,
-    [email.includes("@") ? email : "", phone],
-  );
-
-  const existingNames = new Set(players.map((player) => player.fullName.toLowerCase()));
-  const existingEmails = new Set(matchedPlayers.rows.map((player) => normalizeEmail(player.email)).filter(Boolean));
-
-  for (const member of memberResult.rows) {
-    const memberEmail = normalizeEmail(member.email);
-    const memberName = String(member.full_name || "").toLowerCase();
-    if ((memberEmail && existingEmails.has(memberEmail)) || (memberName && existingNames.has(memberName))) {
-      continue;
-    }
-    players.push(normalizeMemberPlayer(member));
-  }
 
   setCachedLookup(cacheKey, players);
   return players;
