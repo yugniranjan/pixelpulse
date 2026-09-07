@@ -491,17 +491,27 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
           <p>{content("annual_description", "text", "Your annual status grows with your points and unlocks even more member perks.")}</p>
         </div>
         <div className="ppp-level-inner ppp-level-annual__grid">
-          {annualStatus.map((item) => (
-            <article className="ppp-level-annual-card" key={item.tier}>
-              <span>{item.tier}</span>
-              <strong>{item.range}</strong>
-              <div>
-                {item.perks.map((perk) => (
-                  <p key={perk}>{perk}</p>
-                ))}
-              </div>
-            </article>
-          ))}
+          {annualStatus.map((item) => {
+            const tierClass = String(item.tier || "")
+              .trim()
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-");
+
+            return (
+              <article
+                className={`ppp-level-annual-card ppp-level-annual-card--${tierClass}`}
+                key={item.tier}
+              >
+                <span>{item.tier}</span>
+                <strong>{item.range}</strong>
+                <div>
+                  {item.perks.map((perk) => (
+                    <p key={perk}>{perk}</p>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
