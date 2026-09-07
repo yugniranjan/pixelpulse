@@ -2496,7 +2496,7 @@
   --level-lime: #c8f135;
   --level-cyan: #c8f135;
   --level-coral: #ff8a2a;
-  --level-gold: #c8f135;
+  --level-gold: #ffd15c;
   --level-action: #c8f135;
   --level-card: linear-gradient(180deg, #191f2c, #10141c);
   background:
@@ -3389,8 +3389,8 @@
 }
 
 .ppp-level-annual-card--gold {
-  --status-accent: var(--level-lime);
-  --status-glow: rgba(200, 241, 53, 0.14);
+  --status-accent: var(--level-gold);
+  --status-glow: rgba(255, 209, 92, 0.16);
 }
 
 .ppp-level-annual-card span {
