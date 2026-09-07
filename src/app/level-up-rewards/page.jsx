@@ -165,6 +165,11 @@ const defaultHeroStats = [
   { label: "Monthly streaks", value: "Extra rewards" },
 ];
 
+function getVisitCountLabel(value = "") {
+  const match = String(value).match(/\d+/);
+  return match ? match[0] : value;
+}
+
 export const metadata = {
   title: "Level Up Rewards | Pixel Pulse Play",
   description:
@@ -389,7 +394,7 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         </div>
       </section>
 
-      <section className="ppp-level-section" id="ladder">
+      <section className="ppp-level-section ppp-level-ladder-section" id="ladder">
         <div className="ppp-level-inner">
           <div className="ppp-level-section__header">
             <span>{content("ladder_eyebrow", "text", "Reward Ladder")}</span>
@@ -406,7 +411,11 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <div className="ppp-level-tier-list" role="list">
               {rewardLadder.map((item, index) => {
                 const Icon = item.icon;
-                const tierState = index === 9 ? "is-vip" : index >= 7 ? "is-major" : "";
+                const tierState = [
+                  index === 3 ? "is-current" : "",
+                  index > 3 ? "is-locked" : "",
+                  index === 9 ? "is-vip" : index >= 7 ? "is-major" : "",
+                ].filter(Boolean).join(" ");
 
                 return (
                   <article className={`ppp-level-tier-row ${tierState}`} key={item.level} role="listitem">
@@ -459,6 +468,20 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <span>{content("prize_eyebrow", "text", "Surprise Rewards")}</span>
             <h2>{content("prize_title", "title", "Spin the Prize Wheel.")}</h2>
             <p>{content("prize_description", "text", "Every level-up comes with a surprise spin. See what you win next.")}</p>
+            <div className="ppp-level-wheel" aria-hidden="true">
+              <svg viewBox="0 0 200 200">
+                <g transform="translate(100,100)">
+                  <circle r="95" fill="currentColor" />
+                  <path d="M0 0 L0 -95 A95 95 0 0 1 90.4 -29.4 Z" />
+                  <path d="M0 0 L90.4 -29.4 A95 95 0 0 1 55.9 76.7 Z" />
+                  <path d="M0 0 L55.9 76.7 A95 95 0 0 1 -55.9 76.7 Z" />
+                  <path d="M0 0 L-55.9 76.7 A95 95 0 0 1 -90.4 -29.4 Z" />
+                  <path d="M0 0 L-90.4 -29.4 A95 95 0 0 1 0 -95 Z" />
+                  <circle r="14" />
+                </g>
+                <path d="M100 4 L92 18 L108 18 Z" />
+              </svg>
+            </div>
             <div className="ppp-level-prize-grid">
               {prizeWheelRewards.map((reward) => (
                 <strong key={reward}>{reward}</strong>
@@ -469,26 +492,31 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
       </section>
 
       <section className="ppp-level-section ppp-level-streaks" id="streaks">
-        <div className="ppp-level-inner ppp-level-section__header">
-          <span>{content("streak_eyebrow", "text", "Monthly Visit Streaks")}</span>
-          <h2>{content("streak_title", "title", "Visit more this month. Unlock extra rewards.")}</h2>
-          <p>{content("streak_description", "text", "Each visit moves your monthly streak forward and brings the next reward closer.")}</p>
+        <div className="ppp-level-inner">
+          <div className="ppp-level-section__header">
+            <span>{content("streak_eyebrow", "text", "Monthly Visit Streaks")}</span>
+            <h2>{content("streak_title", "title", "Visit more this month. Unlock extra rewards.")}</h2>
+            <p>{content("streak_description", "text", "Each visit moves your monthly streak forward and brings the next reward closer.")}</p>
+          </div>
         </div>
         <div className="ppp-level-inner ppp-level-streaks__grid">
-          {streakRewards.map((item) => (
-            <article key={item.visits}>
-              <span>{item.visits}</span>
+          {streakRewards.map((item, index) => (
+            <article className={index < 2 ? "is-active" : ""} key={item.visits}>
+              <span>{getVisitCountLabel(item.visits)}</span>
               <strong>{item.reward}</strong>
+              <small>{item.visits}</small>
             </article>
           ))}
         </div>
       </section>
 
       <section className="ppp-level-section ppp-level-annual" id="status">
-        <div className="ppp-level-inner ppp-level-section__header">
-          <span>{content("annual_eyebrow", "text", "Annual Membership Status")}</span>
-          <h2>{content("annual_title", "title", "Keep leveling up all year.")}</h2>
-          <p>{content("annual_description", "text", "Your annual status grows with your points and unlocks even more member perks.")}</p>
+        <div className="ppp-level-inner">
+          <div className="ppp-level-section__header">
+            <span>{content("annual_eyebrow", "text", "Annual Membership Status")}</span>
+            <h2>{content("annual_title", "title", "Keep leveling up all year.")}</h2>
+            <p>{content("annual_description", "text", "Your annual status grows with your points and unlocks even more member perks.")}</p>
+          </div>
         </div>
         <div className="ppp-level-inner ppp-level-annual__grid">
           {annualStatus.map((item) => {

@@ -8,7 +8,7 @@
   --level-lime: #a4cf5f;
   --level-cyan: #29c4b2;
   --level-peach: #fbae7b;
-  --level-coral: #ff4f8b;
+  --level-coral: #ff8a2a;
   --level-gold: #ffd15c;
   --level-action: linear-gradient(135deg, var(--level-lime), var(--level-cyan));
   --level-warm-action: linear-gradient(135deg, var(--level-peach), var(--level-gold));
@@ -2480,5 +2480,1022 @@
   .ppp-level-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* Final rewards redesign override. Kept at EOF so older page rules cannot re-inflate the layout. */
+.ppp-level-page {
+  --level-gutter: 24px;
+  --level-bg: #07090f;
+  --level-bg-soft: #10141c;
+  --level-panel: #191f2c;
+  --level-panel-strong: #202736;
+  --level-line: #262e3d;
+  --level-ink: #f4f6f9;
+  --level-muted: #8b93a1;
+  --level-lime: #c8f135;
+  --level-cyan: #c8f135;
+  --level-coral: #ff8a2a;
+  --level-gold: #c8f135;
+  --level-action: #c8f135;
+  --level-card: linear-gradient(180deg, #191f2c, #10141c);
+  background:
+    radial-gradient(ellipse 900px 500px at 78% -6%, rgba(200, 241, 53, 0.1), transparent 60%),
+    radial-gradient(ellipse 720px 520px at 5% 18%, rgba(255, 138, 42, 0.1), transparent 58%),
+    #07090f;
+  color: var(--level-ink);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ppp-level-nav {
+  height: 64px;
+  padding: 0 max(24px, calc((100vw - 1140px) / 2));
+  border-bottom: 1px solid var(--level-line);
+  background: rgba(7, 9, 15, 0.88);
+  backdrop-filter: blur(10px);
+}
+
+.ppp-level-logo img {
+  width: 118px;
+  filter: none;
+}
+
+.ppp-level-nav__links {
+  gap: clamp(1rem, 3vw, 1.75rem);
+}
+
+.ppp-level-nav__links a {
+  color: var(--level-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ppp-level-nav__links a:hover {
+  color: var(--level-ink);
+}
+
+.ppp-level-hero {
+  grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
+  gap: clamp(2rem, 5vw, 3.5rem);
+  width: min(1140px, calc(100% - 48px));
+  padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+}
+
+.ppp-level-hero::before {
+  background:
+    radial-gradient(ellipse 900px 500px at 78% -10%, rgba(200, 241, 53, 0.1), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 5% 30%, rgba(255, 138, 42, 0.1), transparent 60%);
+}
+
+.ppp-level-hero::after,
+.ppp-level-hero__image,
+.ppp-level-hero__stage,
+.ppp-level-visual-band,
+.ppp-level-command-strip,
+.ppp-level-overview,
+.ppp-level-score-preview,
+.ppp-level-app-card,
+.ppp-level-signage-card {
+  display: none;
+}
+
+.ppp-level-hero__content {
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ppp-level-kicker,
+.ppp-level-section__header span,
+.ppp-level-section__intro span,
+.ppp-level-specials__panel > span,
+.ppp-level-signage__panel > span,
+.ppp-level-cta span {
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--level-coral);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.ppp-level-kicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--level-lime);
+}
+
+.ppp-level-hero h1 {
+  max-width: 560px;
+  margin: 1rem 0 1.2rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(2.15rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.02;
+  text-transform: none;
+}
+
+.ppp-level-hero h1 span {
+  color: var(--level-lime);
+}
+
+.ppp-level-hero p,
+.ppp-level-section__header p,
+.ppp-level-section__intro p,
+.ppp-level-cta p {
+  max-width: 520px;
+  color: var(--level-muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.ppp-level-actions {
+  margin-top: 1.8rem;
+  gap: 0.85rem;
+}
+
+.ppp-level-button,
+.ppp-level-app__search button,
+.ppp-level-app__register button,
+.ppp-level-app__verify button,
+.ppp-level-app__players a,
+.ppp-level-app__tabs a,
+.ppp-level-app__players button,
+.ppp-level-app__tabs button {
+  min-height: 42px;
+  border-radius: 999px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ppp-level-button {
+  padding: 0.65rem 1.15rem;
+}
+
+.ppp-level-button--primary,
+.ppp-level-app__search button,
+.ppp-level-app__register button,
+.ppp-level-app__verify button,
+.ppp-level-app__players button.is-active,
+.ppp-level-app__players a.is-active,
+.ppp-level-app__tabs a.is-active,
+.ppp-level-app__tabs button.is-active,
+.ppp-level-app__redeem-button,
+.ppp-redeem-modal__confirm {
+  color: #07090f;
+  background: var(--level-lime);
+  box-shadow: none;
+}
+
+.ppp-level-button--secondary {
+  border: 1px solid var(--level-line);
+  color: var(--level-ink);
+  background: transparent;
+}
+
+.ppp-level-hero__side {
+  align-self: center;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow: visible;
+  border: 1px solid var(--level-line);
+  border-radius: 20px;
+  background: var(--level-card);
+  box-shadow: none;
+}
+
+.ppp-level-hero__side::before {
+  content: "REWARDS DASHBOARD";
+  justify-self: end;
+  color: var(--level-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.ppp-level-app {
+  background: transparent;
+}
+
+.ppp-level-app__topbar span,
+.ppp-level-app__identity span,
+.ppp-level-app__wallet-head span,
+.ppp-level-app__hero-stat span,
+.ppp-level-app__stats span,
+.ppp-level-app__rewards span,
+.ppp-level-app__player-picker > span {
+  color: var(--level-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.ppp-level-app__topbar strong,
+.ppp-level-app__hero-stat strong,
+.ppp-level-app__identity strong,
+.ppp-level-app__wallet-head strong {
+  color: var(--level-ink);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.05;
+}
+
+.ppp-level-app__level-badge,
+.ppp-level-app__level-chip {
+  border-color: rgba(200, 241, 53, 0.35);
+  color: var(--level-lime);
+  background: rgba(200, 241, 53, 0.1);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.ppp-level-app__level-badge span,
+.ppp-level-app__level-chip span {
+  border: 0;
+  color: #07090f;
+  background: var(--level-lime);
+}
+
+.ppp-level-app__search input,
+.ppp-level-app__register input,
+.ppp-level-app__verify input,
+.ppp-level-app__player-picker summary,
+.ppp-level-app__stats div,
+.ppp-level-app__rewards article,
+.ppp-level-app__identity,
+.ppp-level-app__rules p,
+.ppp-redeem-modal,
+.ppp-redeem-modal__reward,
+.ppp-redeem-modal__balance div {
+  border-color: var(--level-line);
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-app__meter span,
+.ppp-level-pass__meter span,
+.ppp-level-app-card__progress span {
+  background: var(--level-lime);
+}
+
+.ppp-level-hero__side {
+  display: grid;
+  gap: 1.75rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-color: #293244;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #1a2130 0%, #121821 100%);
+}
+
+.ppp-level-hero__side::before {
+  align-self: start;
+  justify-self: end;
+  margin-bottom: -4.25rem;
+  color: #a8afbd;
+  font-size: clamp(0.72rem, 1.4vw, 0.95rem);
+  letter-spacing: 0.18em;
+}
+
+.ppp-level-app {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.ppp-level-app__topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.ppp-level-app__topbar span,
+.ppp-level-app__identity span,
+.ppp-level-app__wallet-head span,
+.ppp-level-app__hero-stat span,
+.ppp-level-app__stats span,
+.ppp-level-app__rewards span,
+.ppp-level-app__player-picker > span {
+  color: #a8afbd;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__topbar strong,
+.ppp-level-app__identity strong {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__level-badge,
+.ppp-level-app__level-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 54px;
+  padding: 0.45rem 1.25rem 0.45rem 0.45rem;
+  border: 1px solid rgba(200, 241, 53, 0.42);
+  border-radius: 999px;
+  color: var(--level-lime);
+  background: rgba(200, 241, 53, 0.08);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.2rem, 2.8vw, 1.8rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__level-badge span,
+.ppp-level-app__level-chip span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #07090f;
+  background: var(--level-lime);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.ppp-level-app__search {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ppp-level-app__search label {
+  color: #b8bec9;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.ppp-level-app__search > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+
+.ppp-level-app__search input {
+  min-height: 58px;
+  border: 1px solid #313b50;
+  border-radius: 14px;
+  color: #07090f;
+  background: #e9effc;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ppp-level-app__search button {
+  min-height: 58px;
+  padding: 0 1.55rem;
+  border-radius: 999px;
+  color: #07090f;
+  background: var(--level-lime);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.ppp-level-app__success {
+  margin: 0;
+  color: #a8afbd;
+  background: transparent;
+  font-size: 1.2rem;
+}
+
+.ppp-level-app__player-picker {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ppp-level-app__player-picker summary,
+.ppp-level-app__identity,
+.ppp-level-app__stats div,
+.ppp-level-app__rewards article,
+.ppp-level-app__rules p {
+  border: 1px solid #293244;
+  border-radius: 16px;
+  background: #111720;
+}
+
+.ppp-level-app__player-picker summary {
+  min-height: 64px;
+  padding: 0 1.1rem;
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.55rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__player-picker summary::after {
+  border-color: var(--level-lime);
+}
+
+.ppp-level-app__identity {
+  padding: 1.15rem;
+}
+
+.ppp-level-app__identity-main {
+  gap: 1rem;
+}
+
+.ppp-level-app__avatar {
+  width: 54px;
+  height: 54px;
+  border: 1px solid #23897e;
+  color: var(--level-lime);
+  background: rgba(35, 137, 126, 0.2);
+  font-size: 1.3rem;
+}
+
+.ppp-level-app__tabs {
+  gap: 0.65rem;
+}
+
+.ppp-level-app__tabs button {
+  min-height: 52px;
+  padding: 0 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  color: #c2c7cf;
+  background: #252c37;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.ppp-level-app__tabs button.is-active {
+  color: #07090f;
+  background: var(--level-lime);
+}
+
+.ppp-level-app__panel {
+  display: grid;
+  gap: 1.1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.ppp-level-app__hero-stat strong {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.ppp-level-app__meter {
+  height: 16px;
+  border-radius: 999px;
+  background: #303743;
+}
+
+.ppp-level-app__progress-copy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.ppp-level-app__progress-copy > span {
+  justify-self: end;
+  color: #a8afbd;
+  font-size: 1.1rem;
+}
+
+.ppp-level-app__stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.ppp-level-app__stats div {
+  min-height: 112px;
+  padding: 1.1rem;
+}
+
+.ppp-level-app__stats strong,
+.ppp-level-app__rewards strong,
+.ppp-level-app__wallet-head strong {
+  color: var(--level-ink);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  line-height: 1.05;
+}
+
+.ppp-level-section {
+  padding: clamp(5rem, 7vw, 6rem) 0;
+  border-top: 1px solid var(--level-line);
+  background: transparent;
+}
+
+.ppp-level-inner {
+  width: min(1140px, calc(100% - 48px));
+}
+
+.ppp-level-section__header,
+.ppp-level-section__intro {
+  display: block;
+  justify-items: start;
+  max-width: 760px;
+  margin-left: 0;
+  margin-right: auto;
+  margin-bottom: clamp(2.75rem, 5vw, 4rem);
+  text-align: left;
+}
+
+.ppp-level-section__header h2,
+.ppp-level-section__intro h2,
+.ppp-level-specials__panel h2,
+.ppp-level-signage__panel h2,
+.ppp-level-cta h2 {
+  color: var(--level-ink);
+  max-width: 100%;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(2rem, 3.8vw, 3.1rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-level-how .ppp-level-section__intro h2,
+.ppp-level-ladder-section .ppp-level-section__header h2 {
+  max-width: none;
+  white-space: nowrap;
+}
+
+.ppp-level-section__header p,
+.ppp-level-section__intro p {
+  max-width: 680px;
+  margin-top: 1.25rem;
+}
+
+.ppp-level-how__grid,
+.ppp-level-tier-layout {
+  display: block;
+}
+
+.ppp-level-steps {
+  position: relative;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 0;
+}
+
+.ppp-level-steps::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--level-line) 0 8px, transparent 8px 14px);
+}
+
+.ppp-level-step {
+  min-height: 0;
+  padding: 0 1.5rem 0 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ppp-level-step::after {
+  display: none;
+}
+
+.ppp-level-step__number {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--level-lime);
+  color: var(--level-lime);
+  background: var(--level-bg);
+  font-size: 1.05rem;
+}
+
+.ppp-level-step h3 {
+  margin: 1.2rem 0 0.5rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.ppp-level-step p {
+  color: var(--level-muted);
+  font-size: 0.9rem;
+}
+
+.ppp-level-step strong {
+  color: var(--level-lime);
+  font-size: 0.78rem;
+}
+
+.ppp-level-tier-list {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.15rem;
+  margin: 0 -0.25rem;
+  padding: 0.5rem 0.25rem 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+
+.ppp-level-tier-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ppp-level-tier-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--level-line);
+}
+
+.ppp-level-tier-row {
+  position: relative;
+  flex: 0 0 210px;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  min-height: 230px;
+  padding: 1.25rem;
+  scroll-snap-align: start;
+  border-color: var(--level-line);
+  border-radius: 16px;
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-tier-row.is-current {
+  border-color: var(--level-lime);
+  box-shadow: 0 0 0 1px var(--level-lime), 0 0 30px rgba(200, 241, 53, 0.15);
+}
+
+.ppp-level-tier-row.is-current::before {
+  content: "YOU ARE HERE";
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  color: #07090f;
+  background: var(--level-lime);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.ppp-level-tier-row.is-locked {
+  opacity: 0.58;
+}
+
+.ppp-level-tier-row.is-major,
+.ppp-level-tier-row.is-vip {
+  background: var(--level-bg-soft);
+  box-shadow: none;
+}
+
+.ppp-level-tier-row__badge {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  color: var(--level-muted);
+  background: transparent;
+}
+
+.ppp-level-tier-row__badge svg {
+  display: none;
+}
+
+.ppp-level-tier-row .ppp-level-tier-row__badge span,
+.ppp-level-tier-row span {
+  color: var(--level-muted);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 0.94rem;
+  letter-spacing: 0.04em;
+}
+
+.ppp-level-tier-row.is-current span,
+.ppp-level-tier-row.is-current .ppp-level-tier-row__badge span {
+  color: var(--level-lime);
+}
+
+.ppp-level-tier-row h3 {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1.08rem;
+  line-height: 1.22;
+}
+
+.ppp-level-tier-row p {
+  min-height: 52px;
+  font-size: 0.83rem;
+}
+
+.ppp-level-tier-row > strong {
+  grid-column: auto;
+  justify-self: start;
+  color: var(--level-ink);
+  font-size: 1.25rem;
+  text-align: left;
+}
+
+.ppp-level-tier-row > strong::after {
+  content: "PulsePoints";
+  display: block;
+  color: var(--level-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ppp-level-specials__grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.ppp-level-specials__panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ppp-level-specials__list {
+  margin-top: 1.5rem;
+}
+
+.ppp-level-specials__list p {
+  background: rgba(244, 246, 249, 0.055);
+}
+
+.ppp-level-specials__list svg {
+  color: var(--level-lime);
+}
+
+.ppp-level-wheel {
+  display: grid;
+  place-items: center;
+  margin-top: 1.5rem;
+  padding: 1.75rem;
+  border: 1px solid var(--level-line);
+  border-radius: 20px;
+  color: var(--level-panel);
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-wheel svg {
+  width: min(260px, 72vw);
+}
+
+.ppp-level-wheel path:nth-of-type(1) {
+  fill: var(--level-lime);
+}
+
+.ppp-level-wheel path:nth-of-type(2),
+.ppp-level-wheel path:nth-of-type(4) {
+  fill: var(--level-panel);
+  stroke: var(--level-line);
+}
+
+.ppp-level-wheel path:nth-of-type(3) {
+  fill: var(--level-coral);
+}
+
+.ppp-level-wheel path:nth-of-type(5) {
+  fill: #8fae24;
+}
+
+.ppp-level-wheel circle:last-child {
+  fill: var(--level-bg);
+  stroke: var(--level-lime);
+  stroke-width: 2;
+}
+
+.ppp-level-wheel > svg > path {
+  fill: var(--level-ink);
+}
+
+.ppp-level-prize-grid strong {
+  border-color: var(--level-line);
+  border-radius: 999px;
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-streaks__grid {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.ppp-level-streaks__grid::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background: var(--level-line);
+}
+
+.ppp-level-streaks__grid article {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ppp-level-streaks__grid article::before {
+  content: "";
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 0.85rem;
+  border: 2px solid var(--level-line);
+  border-radius: 50%;
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-streaks__grid article.is-active::before {
+  border-color: var(--level-coral);
+  background: var(--level-coral);
+}
+
+.ppp-level-streaks__grid span {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.45rem;
+  letter-spacing: 0;
+}
+
+.ppp-level-streaks__grid strong {
+  max-width: 110px;
+  margin: 0.15rem auto 0;
+  color: var(--level-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.ppp-level-streaks__grid small {
+  display: none;
+}
+
+.ppp-level-annual__grid {
+  gap: 1.25rem;
+}
+
+.ppp-level-annual-card {
+  min-height: 190px;
+  padding: 1.5rem;
+  border-color: var(--level-line);
+  border-radius: 16px;
+  background: var(--level-bg-soft);
+  box-shadow: none;
+}
+
+.ppp-level-annual-card--bronze {
+  --status-accent: #d8965a;
+  --status-glow: rgba(216, 150, 90, 0.14);
+}
+
+.ppp-level-annual-card--silver {
+  --status-accent: #c6ccd6;
+  --status-glow: rgba(198, 204, 214, 0.12);
+}
+
+.ppp-level-annual-card--gold {
+  --status-accent: var(--level-lime);
+  --status-glow: rgba(200, 241, 53, 0.14);
+}
+
+.ppp-level-annual-card span {
+  font-size: 1.5rem;
+}
+
+.ppp-level-annual-card strong {
+  color: var(--level-muted);
+  font-size: 0.86rem;
+}
+
+.ppp-level-annual-card p {
+  font-size: 0.86rem;
+}
+
+.ppp-level-cta {
+  border-top: 1px solid var(--level-line);
+  background: radial-gradient(ellipse 700px 300px at 50% 0%, rgba(200, 241, 53, 0.08), transparent 70%);
+}
+
+.ppp-level-cta div {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ppp-level-footer {
+  border-top: 1px solid var(--level-line);
+  background: #07090f;
+}
+
+@media (max-width: 920px) {
+  .ppp-level-hero,
+  .ppp-level-specials__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-hero__side {
+    align-self: stretch;
+  }
+
+  .ppp-level-steps {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ppp-level-steps::before {
+    display: none;
+  }
+
+  .ppp-level-annual__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .ppp-level-nav {
+    padding: 0 1rem;
+  }
+
+  .ppp-level-logo img {
+    width: 96px;
+  }
+
+  .ppp-level-hero {
+    width: calc(100% - 32px);
+    padding: 2.5rem 0 3.5rem;
+  }
+
+  .ppp-level-hero h1 {
+    font-size: clamp(2.15rem, 10vw, 2.75rem);
+  }
+
+  .ppp-level-how .ppp-level-section__intro h2,
+  .ppp-level-ladder-section .ppp-level-section__header h2 {
+    font-size: clamp(1.3rem, 5.8vw, 1.65rem);
+  }
+
+  .ppp-level-inner {
+    width: calc(100% - 32px);
+  }
+
+  .ppp-level-app__topbar,
+  .ppp-level-app__search > div,
+  .ppp-level-app__progress-copy,
+  .ppp-level-app__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ppp-level-hero__side::before,
+  .ppp-level-app__progress-copy > span {
+    justify-self: start;
+  }
+
+  .ppp-level-hero__side::before {
+    margin-bottom: -0.5rem;
+  }
+
+  .ppp-level-streaks__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem 1rem;
+  }
+
+  .ppp-level-streaks__grid::before {
+    display: none;
   }
 }
