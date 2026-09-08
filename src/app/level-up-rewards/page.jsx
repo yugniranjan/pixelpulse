@@ -11,6 +11,8 @@ import {
   FaTicket,
 } from "react-icons/fa6";
 import RewardLookupForm from "@/components/RewardLookupForm";
+import PrizeWheel from "@/components/PrizeWheel";
+import RewardLadderCarousel from "@/components/RewardLadderCarousel";
 import { lookupRewardPlayers } from "@/lib/rewardLookup";
 import { getRewardsSheetConfig } from "@/lib/rewardSheet";
 import "../styles/level-up-rewards.css";
@@ -408,31 +410,9 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             </p>
           </div>
           <div className="ppp-level-tier-layout">
-            <div className="ppp-level-tier-list" role="list">
-              {rewardLadder.map((item, index) => {
-                const Icon = item.icon;
-                const tierState = [
-                  index === 3 ? "is-current" : "",
-                  index > 3 ? "is-locked" : "",
-                  index === 9 ? "is-vip" : index >= 7 ? "is-major" : "",
-                ].filter(Boolean).join(" ");
-
-                return (
-                  <article className={`ppp-level-tier-row ${tierState}`} key={item.level} role="listitem">
-                    <div className="ppp-level-tier-row__badge">
-                      <span>{index + 1}</span>
-                      <Icon aria-hidden="true" />
-                    </div>
-                    <div>
-                      <span>{item.level}</span>
-                      <h3>{item.reward}</h3>
-                      <p>{item.detail}</p>
-                    </div>
-                    <strong>{item.threshold}</strong>
-                  </article>
-                );
-              })}
-            </div>
+            <RewardLadderCarousel
+              rewards={rewardLadder.map(({ icon, ...reward }) => reward)}
+            />
             <aside className="ppp-level-signage-card" aria-label="Suggested rewards signage">
               <span>{content("signage_eyebrow", "text", "Suggested Signage")}</span>
               <h3>{content("signage_title", "title", "PulsePoints Rewards")}</h3>
@@ -468,25 +448,7 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <span>{content("prize_eyebrow", "text", "Surprise Rewards")}</span>
             <h2>{content("prize_title", "title", "Spin the Prize Wheel.")}</h2>
             <p>{content("prize_description", "text", "Every level-up comes with a surprise spin. See what you win next.")}</p>
-            <div className="ppp-level-wheel" aria-hidden="true">
-              <svg viewBox="0 0 200 200">
-                <g transform="translate(100,100)">
-                  <circle r="95" fill="currentColor" />
-                  <path d="M0 0 L0 -95 A95 95 0 0 1 90.4 -29.4 Z" />
-                  <path d="M0 0 L90.4 -29.4 A95 95 0 0 1 55.9 76.7 Z" />
-                  <path d="M0 0 L55.9 76.7 A95 95 0 0 1 -55.9 76.7 Z" />
-                  <path d="M0 0 L-55.9 76.7 A95 95 0 0 1 -90.4 -29.4 Z" />
-                  <path d="M0 0 L-90.4 -29.4 A95 95 0 0 1 0 -95 Z" />
-                  <circle r="14" />
-                </g>
-                <path d="M100 4 L92 18 L108 18 Z" />
-              </svg>
-            </div>
-            <div className="ppp-level-prize-grid">
-              {prizeWheelRewards.map((reward) => (
-                <strong key={reward}>{reward}</strong>
-              ))}
-            </div>
+            <PrizeWheel prizes={prizeWheelRewards} />
           </article>
         </div>
       </section>
