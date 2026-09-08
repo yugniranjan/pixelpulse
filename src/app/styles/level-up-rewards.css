@@ -3400,19 +3400,23 @@
   padding: 1.75rem;
   border: 1px solid var(--level-line);
   border-radius: 20px;
-  background: var(--level-bg-soft);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(200, 241, 53, 0.12), transparent 46%),
+    var(--level-bg-soft);
 }
 
 .ppp-prize-wheel__pointer {
   position: absolute;
-  top: 0.95rem;
+  top: 0.78rem;
   left: 50%;
   z-index: 2;
   width: 0;
   height: 0;
-  border-right: 12px solid transparent;
-  border-left: 12px solid transparent;
-  border-top: 18px solid var(--level-ink);
+  border-right: 14px solid transparent;
+  border-left: 14px solid transparent;
+  border-top: 22px solid var(--level-coral);
+  filter: drop-shadow(0 0 10px rgba(255, 138, 42, 0.38));
   transform: translateX(-50%);
 }
 
@@ -3452,10 +3456,48 @@
   transform: translate(-50%, -50%);
 }
 
+.ppp-prize-wheel__stars {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.ppp-prize-wheel__stars span {
+  position: absolute;
+  top: var(--star-top);
+  left: var(--star-left);
+  width: var(--star-size);
+  height: var(--star-size);
+  background: var(--level-gold);
+  clip-path: polygon(50% 0, 61% 34%, 98% 34%, 68% 55%, 79% 90%, 50% 68%, 21% 90%, 32% 55%, 2% 34%, 39% 34%);
+  filter: drop-shadow(0 0 10px rgba(255, 209, 92, 0.7));
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+  animation: ppp-prize-star-pop 900ms ease-out var(--star-delay) forwards;
+}
+
+@keyframes ppp-prize-star-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+  }
+
+  34% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.25) rotate(22deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -92%) scale(0.75) rotate(80deg);
+  }
+}
+
 .ppp-prize-wheel__button {
   justify-self: center;
   min-height: 46px;
-  padding: 0 1.4rem;
+  padding: 0 1.6rem;
   border: 0;
   border-radius: 999px;
   color: #07090f;
@@ -3463,6 +3505,13 @@
   font-size: 0.95rem;
   font-weight: 900;
   cursor: pointer;
+  box-shadow: 0 10px 26px rgba(200, 241, 53, 0.16);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ppp-prize-wheel__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(200, 241, 53, 0.24);
 }
 
 .ppp-prize-wheel__button:disabled {
@@ -3471,12 +3520,96 @@
 }
 
 .ppp-prize-wheel__result {
-  min-height: 1.5rem;
+  position: relative;
+  display: grid;
+  justify-items: center;
+  min-height: 4.1rem;
   margin: 0;
   color: var(--level-ink);
-  font-size: 0.9rem;
-  font-weight: 800;
   text-align: center;
+}
+
+.ppp-prize-wheel__result p {
+  align-self: center;
+  margin: 0;
+  color: var(--level-muted);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.ppp-prize-wheel__result.has-prize {
+  width: min(360px, 100%);
+  justify-self: center;
+  align-content: center;
+  gap: 0.1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(255, 209, 92, 0.48);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 209, 92, 0.14), rgba(255, 138, 42, 0.08));
+  box-shadow: 0 14px 34px rgba(255, 209, 92, 0.12);
+}
+
+.ppp-prize-wheel__result small {
+  color: var(--level-gold);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ppp-prize-wheel__result strong {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(1.65rem, 4vw, 2.4rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-prize-wheel__result-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ppp-prize-wheel__result-stars i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: var(--level-gold);
+  clip-path: polygon(50% 0, 61% 34%, 98% 34%, 68% 55%, 79% 90%, 50% 68%, 21% 90%, 32% 55%, 2% 34%, 39% 34%);
+  animation: ppp-prize-result-star 1s ease-out infinite;
+}
+
+.ppp-prize-wheel__result-stars i:nth-child(1) {
+  top: 0.55rem;
+  left: 1.1rem;
+}
+
+.ppp-prize-wheel__result-stars i:nth-child(2) {
+  top: 0.75rem;
+  right: 1.2rem;
+  width: 12px;
+  height: 12px;
+  animation-delay: 180ms;
+}
+
+.ppp-prize-wheel__result-stars i:nth-child(3) {
+  right: 2.1rem;
+  bottom: 0.55rem;
+  animation-delay: 360ms;
+}
+
+@keyframes ppp-prize-result-star {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.72) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.18) rotate(28deg);
+  }
 }
 
 .ppp-level-prize-grid strong {
