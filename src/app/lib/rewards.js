@@ -20,6 +20,16 @@ const DEFAULT_LEVELS = [
   rewardType,
 }));
 
+const DEFAULT_PRIZE_WHEEL_REWARDS = [
+  "10 Arcade Credits",
+  "Drink or Snack",
+  "Candy",
+  "Extra 15 Minutes",
+  "Free Upgrade",
+  "Pixel Pulse Sticker",
+  "Mystery Prize",
+];
+
 let tablesReady = false;
 let tablesReadyAt = 0;
 
@@ -147,6 +157,14 @@ export async function ensureRewardsTables() {
   await query(`
     create index if not exists reward_email_verifications_member_idx
       on reward_email_verifications (member_id, created_at desc)
+  `);
+  await query(`
+    create table if not exists reward_prize_wheel_spins (
+      identifier_key text primary key,
+      prize text not null,
+      created_at timestamptz not null default now(),
+      raw jsonb not null default '{}'::jsonb
+    )
   `);
 
   const sheetConfig = await getRewardsSheetConfig();
@@ -381,6 +399,99 @@ export async function verifyRewardMemberEmail({ email = "", code = "" } = {}) {
   }
 
   return normalizeRewardMember(result.rows[0]);
+}
+
+function normalizePrizeSpinIdentifier(identifier = "") {
+  return String(identifier || "").trim().toLowerCase().replace(/\s+/g, "");
+}
+
+async function getConfiguredPrizeWheelRewards() {
+  const sheetConfig = await getRewardsSheetConfig();
+  const configuredPrizes = sheetConfig?.prizeWheelRewards?.length
+    ? sheetConfig.prizeWheelRewards
+    : DEFAULT_PRIZE_WHEEL_REWARDS;
+
+  return [...new Set(
+    configuredPrizes
+      .map((prize) => String(prize || "").trim())
+      .filter(Boolean),
+  )];
+}
+
+export async function getRewardPrizeWheelSpin(identifier = "") {
+  const identifierKey = normalizePrizeSpinIdentifier(identifier);
+  if (!identifierKey) return null;
+
+  await ensureRewardsTables();
+
+  const result = await query(
+    `
+      select identifier_key, prize, created_at
+      from reward_prize_wheel_spins
+      where identifier_key = $1
+      limit 1
+    `,
+    [identifierKey],
+  );
+
+  const row = result.rows[0];
+  if (!row) return null;
+
+  return {
+    identifierKey: row.identifier_key,
+    prize: row.prize || "",
+    spunAt: iso(row.created_at),
+  };
+}
+
+export async function requestRewardPrizeWheelSpin({ identifier = "" } = {}) {
+  const identifierKey = normalizePrizeSpinIdentifier(identifier);
+  const cleanPrizes = await getConfiguredPrizeWheelRewards();
+
+  if (!identifierKey) {
+    const error = new Error("Enter an email or phone number before spinning.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!cleanPrizes.length) {
+    const error = new Error("Prize wheel rewards are not configured.");
+    error.status = 400;
+    throw error;
+  }
+
+  await ensureRewardsTables();
+
+  const selectedPrize = cleanPrizes[crypto.randomInt(cleanPrizes.length)];
+  const result = await query(
+    `
+      insert into reward_prize_wheel_spins (identifier_key, prize, raw)
+      values ($1, $2, $3::jsonb)
+      on conflict (identifier_key) do nothing
+      returning identifier_key, prize, created_at
+    `,
+    [
+      identifierKey,
+      selectedPrize,
+      JSON.stringify({ availablePrizes: cleanPrizes }),
+    ],
+  );
+
+  const row = result.rows[0];
+  if (row) {
+    return {
+      alreadySpun: false,
+      identifierKey: row.identifier_key,
+      prize: row.prize || "",
+      spunAt: iso(row.created_at),
+    };
+  }
+
+  const existingSpin = await getRewardPrizeWheelSpin(identifierKey);
+  return {
+    ...existingSpin,
+    alreadySpun: true,
+  };
 }
 
 function normalizeLevel(row = {}) {

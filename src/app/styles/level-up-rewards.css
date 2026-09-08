@@ -2543,10 +2543,10 @@
 }
 
 .ppp-level-hero {
-  grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
-  gap: clamp(2rem, 5vw, 3.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 2.25rem);
   width: min(1140px, calc(100% - 48px));
-  padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+  padding: clamp(3.25rem, 6vw, 4.5rem) 0;
 }
 
 .ppp-level-hero::before {
@@ -2559,7 +2559,6 @@
 .ppp-level-hero__image,
 .ppp-level-hero__stage,
 .ppp-level-visual-band,
-.ppp-level-command-strip,
 .ppp-level-overview,
 .ppp-level-score-preview,
 .ppp-level-app-card,
@@ -2599,12 +2598,12 @@
 }
 
 .ppp-level-hero h1 {
-  max-width: 560px;
-  margin: 1rem 0 1.2rem;
-  font-family: Inter, system-ui, sans-serif;
-  font-size: clamp(2.15rem, 4vw, 3rem);
-  font-weight: 700;
-  line-height: 1.02;
+  max-width: 620px;
+  margin: 1rem 0 1.25rem;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(3rem, 4.9vw, 3.6rem);
+  font-weight: 800;
+  line-height: 0.98;
   text-transform: none;
 }
 
@@ -2616,7 +2615,7 @@
 .ppp-level-section__header p,
 .ppp-level-section__intro p,
 .ppp-level-cta p {
-  max-width: 520px;
+  max-width: 580px;
   color: var(--level-muted);
   font-size: 1rem;
   line-height: 1.55;
@@ -2627,8 +2626,43 @@
   gap: 0.85rem;
 }
 
+.ppp-level-command-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  width: min(580px, 100%);
+  margin-top: 1.8rem;
+  overflow: hidden;
+  border: 1px solid var(--level-line);
+  border-radius: 14px;
+  background: var(--level-line);
+}
+
+.ppp-level-command-strip div {
+  padding: 1rem 0.9rem;
+  background: var(--level-bg-soft);
+}
+
+.ppp-level-command-strip span {
+  color: var(--level-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ppp-level-command-strip strong {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--level-lime);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .ppp-level-button,
 .ppp-level-app__search button,
+.ppp-level-app__reset-button,
 .ppp-level-app__register button,
 .ppp-level-app__verify button,
 .ppp-level-app__players a,
@@ -2670,7 +2704,10 @@
 }
 
 .ppp-level-hero__side {
-  align-self: center;
+  align-self: start;
+  justify-self: start;
+  width: 100%;
+  max-width: 920px;
   padding: clamp(1rem, 2vw, 1.5rem);
   overflow: visible;
   border: 1px solid var(--level-line);
@@ -2752,25 +2789,26 @@
 
 .ppp-level-hero__side {
   display: grid;
-  gap: 1.75rem;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  gap: 1.2rem;
+  padding: clamp(1.25rem, 2.4vw, 2rem);
   border-color: #293244;
-  border-radius: 28px;
+  border-radius: 22px;
   background: linear-gradient(180deg, #1a2130 0%, #121821 100%);
 }
 
 .ppp-level-hero__side::before {
   align-self: start;
   justify-self: end;
-  margin-bottom: -4.25rem;
+  margin-bottom: -3.1rem;
   color: #a8afbd;
-  font-size: clamp(0.72rem, 1.4vw, 0.95rem);
-  letter-spacing: 0.18em;
+  font-size: clamp(0.64rem, 1.1vw, 0.78rem);
+  font-weight: 750;
+  letter-spacing: 0.14em;
 }
 
 .ppp-level-app {
   display: grid;
-  gap: 1.4rem;
+  gap: 1rem;
 }
 
 .ppp-level-app__topbar {
@@ -2792,9 +2830,9 @@
 .ppp-level-app__player-picker > span {
   color: #a8afbd;
   font-family: Inter, system-ui, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 900;
-  letter-spacing: 0.11em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -2802,9 +2840,9 @@
 .ppp-level-app__identity strong {
   color: var(--level-ink);
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 900;
-  line-height: 0.9;
+  font-size: clamp(1.55rem, 3.3vw, 2.05rem);
+  font-weight: 750;
+  line-height: 0.98;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -2813,16 +2851,16 @@
 .ppp-level-app__level-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.8rem;
-  min-height: 54px;
-  padding: 0.45rem 1.25rem 0.45rem 0.45rem;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0.35rem 1rem 0.35rem 0.35rem;
   border: 1px solid rgba(200, 241, 53, 0.42);
   border-radius: 999px;
   color: var(--level-lime);
   background: rgba(200, 241, 53, 0.08);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: clamp(1.2rem, 2.8vw, 1.8rem);
-  font-weight: 900;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+  font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -2831,13 +2869,13 @@
 .ppp-level-app__level-chip span {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   color: #07090f;
   background: var(--level-lime);
-  font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 1.45rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.9rem;
   font-weight: 900;
 }
 
@@ -2849,41 +2887,47 @@
 .ppp-level-app__search label {
   color: #b8bec9;
   font-family: Inter, system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 850;
+  font-size: 0.86rem;
+  font-weight: 750;
 }
 
 .ppp-level-app__search > div {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(320px, 1fr) auto auto;
   gap: 0.75rem;
 }
 
 .ppp-level-app__search input {
-  min-height: 58px;
+  min-height: 48px;
   border: 1px solid #313b50;
-  border-radius: 14px;
+  border-radius: 12px;
   color: #07090f;
   background: #e9effc;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 650;
 }
 
 .ppp-level-app__search button {
-  min-height: 58px;
-  padding: 0 1.55rem;
+  min-height: 48px;
+  padding: 0 1.25rem;
   border-radius: 999px;
   color: #07090f;
   background: var(--level-lime);
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.ppp-level-app__reset-button {
+  border: 1px solid #313b50;
+  color: #c2c7cf;
+  background: transparent;
 }
 
 .ppp-level-app__success {
   margin: 0;
   color: #a8afbd;
   background: transparent;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
 }
 
 .ppp-level-app__player-picker {
@@ -2902,12 +2946,12 @@
 }
 
 .ppp-level-app__player-picker summary {
-  min-height: 64px;
+  min-height: 52px;
   padding: 0 1.1rem;
   color: var(--level-ink);
   font-family: "Barlow Condensed", Impact, sans-serif;
-  font-size: 1.55rem;
-  font-weight: 900;
+  font-size: 1.2rem;
+  font-weight: 750;
   text-transform: uppercase;
 }
 
@@ -2916,20 +2960,20 @@
 }
 
 .ppp-level-app__identity {
-  padding: 1.15rem;
+  padding: 0.9rem;
 }
 
 .ppp-level-app__identity-main {
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .ppp-level-app__avatar {
-  width: 54px;
-  height: 54px;
+  width: 42px;
+  height: 42px;
   border: 1px solid #23897e;
   color: var(--level-lime);
   background: rgba(35, 137, 126, 0.2);
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 
 .ppp-level-app__tabs {
@@ -2937,14 +2981,14 @@
 }
 
 .ppp-level-app__tabs button {
-  min-height: 52px;
-  padding: 0 1.2rem;
+  min-height: 42px;
+  padding: 0 1rem;
   border: 0;
   border-radius: 999px;
   color: #c2c7cf;
   background: #252c37;
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .ppp-level-app__tabs button.is-active {
@@ -2958,6 +3002,47 @@
   padding: 0;
   border: 0;
   background: transparent;
+}
+
+.ppp-level-app__spin-card {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(300px, 1.2fr);
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #293244;
+  border-radius: 16px;
+  background: #111720;
+}
+
+.ppp-level-app__spin-card > div:first-child {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ppp-level-app__spin-card > div:first-child span {
+  color: #a8afbd;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__spin-card > div:first-child strong {
+  color: var(--level-ink);
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 750;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ppp-level-app__spin-card > div:first-child p {
+  margin: 0;
+  color: var(--level-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .ppp-level-app__hero-stat strong {
@@ -3364,8 +3449,13 @@
 }
 
 .ppp-level-specials__grid {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 620px);
+  justify-content: start;
+  gap: 0;
+}
+
+.ppp-level-specials {
+  padding: clamp(3rem, 5vw, 4rem) 0;
 }
 
 .ppp-level-specials__panel {
@@ -3376,10 +3466,13 @@
 }
 
 .ppp-level-specials__list {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
+  max-width: 620px;
 }
 
 .ppp-level-specials__list p {
+  min-height: 48px;
+  padding: 0.85rem 1rem;
   background: rgba(244, 246, 249, 0.055);
 }
 
@@ -3389,8 +3482,12 @@
 
 .ppp-prize-wheel {
   display: grid;
-  gap: 1rem;
+  gap: 0.8rem;
   margin-top: 1.5rem;
+}
+
+.ppp-level-app__spin-card .ppp-prize-wheel {
+  margin-top: 0;
 }
 
 .ppp-prize-wheel__stage {
@@ -3430,6 +3527,23 @@
   box-shadow: inset 0 0 0 1px rgba(244, 246, 249, 0.16);
   transform: rotate(var(--wheel-rotation));
   transition: transform 2.6s cubic-bezier(0.12, 0.72, 0.18, 1);
+}
+
+.ppp-level-app__spin-card .ppp-prize-wheel__stage {
+  padding: 1rem;
+}
+
+.ppp-level-app__spin-card .ppp-prize-wheel__disc {
+  width: min(150px, 42vw);
+}
+
+.ppp-level-app__spin-card .ppp-level-prize-grid {
+  margin-top: 0.2rem;
+}
+
+.ppp-level-app__spin-card .ppp-level-prize-grid strong {
+  font-size: 0.62rem;
+  padding: 0.32rem 0.55rem;
 }
 
 .ppp-prize-wheel__disc::before {
@@ -3547,6 +3661,14 @@
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(255, 209, 92, 0.14), rgba(255, 138, 42, 0.08));
   box-shadow: 0 14px 34px rgba(255, 209, 92, 0.12);
+}
+
+.ppp-prize-wheel__error {
+  margin: 0;
+  color: #ffb086;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .ppp-prize-wheel__result small {
@@ -3797,6 +3919,7 @@
   .ppp-level-app__topbar,
   .ppp-level-app__search > div,
   .ppp-level-app__progress-copy,
+  .ppp-level-app__spin-card,
   .ppp-level-app__stats {
     grid-template-columns: 1fr;
   }

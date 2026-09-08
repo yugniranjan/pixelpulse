@@ -3,7 +3,6 @@ import {
   FaArrowRight,
   FaBottleWater,
   FaCakeCandles,
-  FaCircleCheck,
   FaGift,
   FaMedal,
   FaMugHot,
@@ -11,7 +10,6 @@ import {
   FaTicket,
 } from "react-icons/fa6";
 import RewardLookupForm from "@/components/RewardLookupForm";
-import PrizeWheel from "@/components/PrizeWheel";
 import RewardLadderCarousel from "@/components/RewardLadderCarousel";
 import { lookupRewardPlayers } from "@/lib/rewardLookup";
 import { getRewardsSheetConfig } from "@/lib/rewardSheet";
@@ -96,15 +94,6 @@ const defaultRewardLadder = [
   },
 ];
 
-const defaultVipBenefits = [
-  "Skip-the-line check-in",
-  "10% off food and beverages",
-  "Weekday member offers",
-  "Birthday surprise reward",
-  "Exclusive event invitations",
-  "One free guest pass every quarter",
-];
-
 const defaultPrizeWheelRewards = [
   "10 Arcade Credits",
   "Drink or Snack",
@@ -161,12 +150,6 @@ const defaultAnnualStatus = [
   },
 ];
 
-const defaultHeroStats = [
-  { label: "Player access", value: "Email or phone" },
-  { label: "Reward ladder", value: "10 levels" },
-  { label: "Monthly streaks", value: "Extra rewards" },
-];
-
 function getVisitCountLabel(value = "") {
   const match = String(value).match(/\d+/);
   return match ? match[0] : value;
@@ -210,9 +193,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
         icon: iconMap[reward.icon] || FaGift,
       }))
     : defaultRewardLadder;
-  const vipBenefits = sheetConfig?.vipBenefits?.length
-    ? sheetConfig.vipBenefits
-    : defaultVipBenefits;
   const prizeWheelRewards = sheetConfig?.prizeWheelRewards?.length
     ? sheetConfig.prizeWheelRewards
     : defaultPrizeWheelRewards;
@@ -223,7 +203,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
   const annualStatus = sheetConfig?.annualStatus?.length
     ? sheetConfig.annualStatus
     : defaultAnnualStatus;
-  const heroStats = sheetConfig?.heroStats?.length ? sheetConfig.heroStats : defaultHeroStats;
   const initialIdentifier = String(searchParams.lookup || "").trim();
   const initialSelectedPlayerId = /^\d+$/.test(String(searchParams.player || ""))
     ? Number(searchParams.player)
@@ -252,7 +231,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
           <a href="#top">Dashboard</a>
           <a href="#ladder">Rewards</a>
           <a href="#streaks">Streak</a>
-          <a href="#vip">VIP</a>
         </div>
       </nav>
 
@@ -273,7 +251,7 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             {content(
               "hero_description",
               "text",
-              "Already played at Pixel Pulse? Enter the email or phone number used for your visit to open your dashboard, check your points, and redeem unlocked rewards.",
+              "Already played at Pixel Pulse? Look up your dashboard to check your points, spin your prize wheel, and see what's next.",
             )}
           </p>
           <div className="ppp-level-overview" aria-label="Example level progress">
@@ -306,14 +284,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <strong>250,000</strong>
             <small>Sample player dashboard</small>
           </div>
-          <div className="ppp-level-command-strip" aria-label="Rewards app highlights">
-            {heroStats.map((item) => (
-              <div key={item.label}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-              </div>
-            ))}
-          </div>
           <div className="ppp-level-actions">
             <a className="ppp-level-button ppp-level-button--primary" href="#ladder">
               See rewards <FaArrowRight aria-hidden="true" />
@@ -331,6 +301,7 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             initiallySearched={Boolean(initialIdentifier)}
             initialSelectedPlayerId={initialSelectedPlayerId}
             initialActiveTab={initialActiveTab}
+            prizeWheelRewards={prizeWheelRewards}
           />
         </div>
       </section>
@@ -427,29 +398,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
               </div>
             </aside>
           </div>
-        </div>
-      </section>
-
-      <section className="ppp-level-section ppp-level-specials" id="vip">
-        <div className="ppp-level-inner ppp-level-specials__grid">
-          <article className="ppp-level-specials__panel">
-            <span>{content("vip_eyebrow", "text", "VIP Member Benefits")}</span>
-            <h2>{content("vip_title", "title", "Reach VIP at 250,000 points.")}</h2>
-            <div className="ppp-level-specials__list">
-              {vipBenefits.map((benefit) => (
-                <p key={benefit}>
-                  <FaCircleCheck aria-hidden="true" />
-                  {benefit}
-                </p>
-              ))}
-            </div>
-          </article>
-          <article className="ppp-level-specials__panel">
-            <span>{content("prize_eyebrow", "text", "Surprise Rewards")}</span>
-            <h2>{content("prize_title", "title", "Spin the Prize Wheel.")}</h2>
-            <p>{content("prize_description", "text", "Every level-up comes with a surprise spin. See what you win next.")}</p>
-            <PrizeWheel prizes={prizeWheelRewards} />
-          </article>
         </div>
       </section>
 

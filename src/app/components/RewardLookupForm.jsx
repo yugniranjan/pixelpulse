@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import PrizeWheel from "@/components/PrizeWheel";
 
 const TABS = [
   { id: "status", label: "Status" },
@@ -148,6 +149,13 @@ function StatusPanel({ player }) {
   );
 }
 
+function normalizeSpinKey(identifier = "") {
+  return String(identifier || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
+
 function WalletPanel({ player, onRedeem, redeemingRewardId }) {
   const rewards = player.availableRewards || [];
 
@@ -220,6 +228,7 @@ export default function RewardLookupForm({
   initiallySearched = false,
   initialSelectedPlayerId = null,
   initialActiveTab = "status",
+  prizeWheelRewards = [],
 } = {}) {
   const safeInitialPlayers = Array.isArray(initialPlayers) ? initialPlayers : [];
   const safeInitialPlayerId =
@@ -374,10 +383,27 @@ export default function RewardLookupForm({
     window.history.replaceState(null, "", getLookupHref({ playerId, view }));
   }
 
+  function resetLookup() {
+    setIdentifier("");
+    setPlayers([]);
+    setSelectedPlayerId(null);
+    setActiveTab("status");
+    setSearched(false);
+    setLoading(false);
+    setError("");
+    setSuccess("");
+    setRedeemCandidate(null);
+    setRedeemDialogError("");
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }
+
   const redemptionCost = getRewardCost(redeemCandidate);
   const currentBalance = Number(selectedPlayer?.lifetimePoints || 0);
   const remainingBalance = Math.max(0, currentBalance - redemptionCost);
   const canAffordRedemption = redemptionCost > 0 && currentBalance >= redemptionCost;
+  const spinKey = normalizeSpinKey(identifier);
 
   return (
     <>
@@ -415,6 +441,16 @@ export default function RewardLookupForm({
           <button type="submit" disabled={loading}>
             {loading ? "Checking" : "Show my rewards"}
           </button>
+          {(identifier || selectedPlayer || error || success) ? (
+            <button
+              type="button"
+              className="ppp-level-app__reset-button"
+              onClick={resetLookup}
+              disabled={loading}
+            >
+              Reset
+            </button>
+          ) : null}
         </div>
       </form>
 
@@ -479,7 +515,6 @@ export default function RewardLookupForm({
               </button>
             ))}
           </div>
-
           <div className="ppp-level-app__view" key={activeTab}>
             {activeTab === "status" ? <StatusPanel player={selectedPlayer} /> : null}
             {activeTab === "wallet" ? (
@@ -490,6 +525,14 @@ export default function RewardLookupForm({
               />
             ) : null}
             {activeTab === "rules" ? <RulesPanel /> : null}
+          </div>
+          <div className="ppp-level-app__spin-card">
+            <div>
+              <span>Surprise spin</span>
+              <strong>Spin your prize wheel</strong>
+              <p>One spin is available for this email or phone lookup. Show the revealed prize to staff.</p>
+            </div>
+            <PrizeWheel prizes={prizeWheelRewards} spinKey={spinKey} oneSpinOnly />
           </div>
         </>
       ) : (
