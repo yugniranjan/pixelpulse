@@ -2499,6 +2499,12 @@
   --level-gold: #ffd15c;
   --level-action: #c8f135;
   --level-card: linear-gradient(180deg, #191f2c, #10141c);
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  min-height: 100dvh;
+  margin-left: -50vw;
+  overflow-x: hidden;
   background:
     radial-gradient(ellipse 900px 500px at 78% -6%, rgba(200, 241, 53, 0.1), transparent 60%),
     radial-gradient(ellipse 720px 520px at 5% 18%, rgba(255, 138, 42, 0.1), transparent 58%),
@@ -3176,15 +3182,6 @@
   background: var(--level-coral);
 }
 
-.ppp-reward-carousel__dots button.is-current {
-  width: 32px;
-}
-
-.ppp-reward-carousel__dots button.is-current::before {
-  width: 28px;
-  background: var(--level-lime);
-}
-
 .ppp-level-steps {
   position: relative;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3292,38 +3289,6 @@
   background: var(--level-bg-soft);
 }
 
-.ppp-level-tier-row.is-current {
-  border-color: var(--level-lime);
-  box-shadow: 0 0 0 1px var(--level-lime), 0 0 30px rgba(200, 241, 53, 0.15);
-}
-
-.ppp-level-tier-row.is-current::before {
-  content: "YOU ARE HERE";
-  position: absolute;
-  top: -10px;
-  right: 16px;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  color: #07090f;
-  background: var(--level-lime);
-  font-size: 0.62rem;
-  font-weight: 800;
-}
-
-.ppp-level-tier-row.is-locked {
-  opacity: 0.68;
-}
-
-.ppp-level-tier-row.is-unlocked {
-  border-color: rgba(200, 241, 53, 0.32);
-}
-
-.ppp-level-tier-row.is-major,
-.ppp-level-tier-row.is-vip {
-  background: var(--level-bg-soft);
-  box-shadow: none;
-}
-
 .ppp-level-tier-row__top {
   position: relative;
   z-index: 1;
@@ -3339,17 +3304,11 @@
   width: 42px;
   height: 42px;
   padding: 0;
-  border: 2px solid var(--level-line);
+  border: 2px solid var(--level-lime);
   border-radius: 50%;
-  color: var(--level-muted);
-  background: var(--level-bg);
-}
-
-.ppp-level-tier-row.is-unlocked .ppp-level-tier-row__badge,
-.ppp-level-tier-row.is-current .ppp-level-tier-row__badge {
-  border-color: var(--level-lime);
   color: #07090f;
   background: var(--level-lime);
+  box-shadow: 0 0 22px rgba(200, 241, 53, 0.16);
 }
 
 .ppp-level-tier-row__badge svg {
@@ -3358,7 +3317,7 @@
 
 .ppp-level-tier-row .ppp-level-tier-row__badge span,
 .ppp-level-tier-row span {
-  color: var(--level-muted);
+  color: var(--level-lime);
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: 0.94rem;
   letter-spacing: 0.04em;
@@ -3368,43 +3327,6 @@
   color: inherit;
   font-size: 1.25rem;
   letter-spacing: 0;
-}
-
-.ppp-level-tier-row.is-current span,
-.ppp-level-tier-row.is-current .ppp-level-tier-row__badge span {
-  color: var(--level-lime);
-}
-
-.ppp-level-tier-row.is-unlocked .ppp-level-tier-row__badge span,
-.ppp-level-tier-row.is-current .ppp-level-tier-row__badge span {
-  color: #07090f;
-}
-
-.ppp-level-tier-row__status {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  padding: 0.2rem 0.55rem;
-  border: 1px solid var(--level-line);
-  border-radius: 999px;
-  color: var(--level-muted);
-  font-family: Inter, system-ui, sans-serif;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.ppp-level-tier-row.is-unlocked .ppp-level-tier-row__status {
-  border-color: rgba(200, 241, 53, 0.28);
-  color: var(--level-lime);
-  background: rgba(200, 241, 53, 0.08);
-}
-
-.ppp-level-tier-row.is-current .ppp-level-tier-row__status {
-  border-color: var(--level-lime);
-  color: #07090f;
-  background: var(--level-lime);
 }
 
 .ppp-level-tier-row h3 {

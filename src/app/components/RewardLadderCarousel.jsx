@@ -2,33 +2,21 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const CURRENT_LEVEL_INDEX = 3;
-
-function getCardState(index) {
-  return {
-    isCurrent: index === CURRENT_LEVEL_INDEX,
-    isLocked: index > CURRENT_LEVEL_INDEX,
-    isMajor: index >= 7,
-    isVip: index === 9,
-  };
-}
-
 export default function RewardLadderCarousel({ rewards = [] }) {
   const listRef = useRef(null);
   const rewardItems = useMemo(() => rewards.filter((reward) => reward?.reward), [rewards]);
-  const startIndex = Math.min(CURRENT_LEVEL_INDEX, Math.max(0, rewardItems.length - 1));
-  const [activeIndex, setActiveIndex] = useState(startIndex);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const list = listRef.current;
-    const card = list?.children[startIndex];
+    const card = list?.children[0];
     if (!list || !card) return;
 
     window.requestAnimationFrame(() => {
       list.scrollLeft = Math.max(0, card.offsetLeft - list.offsetLeft);
-      setActiveIndex(startIndex);
+      setActiveIndex(0);
     });
-  }, [startIndex]);
+  }, []);
 
   function scrollToIndex(index) {
     const list = listRef.current;
@@ -73,13 +61,6 @@ export default function RewardLadderCarousel({ rewards = [] }) {
         <div className="ppp-reward-carousel__buttons">
           <button
             type="button"
-            aria-label="Show current reward level"
-            onClick={() => scrollToIndex(startIndex)}
-          >
-            Current
-          </button>
-          <button
-            type="button"
             aria-label="Previous reward level"
             disabled={activeIndex === 0}
             onClick={() => scrollToIndex(activeIndex - 1)}
@@ -100,21 +81,12 @@ export default function RewardLadderCarousel({ rewards = [] }) {
       <div className="ppp-reward-carousel__viewport">
         <div className="ppp-level-tier-list" role="list" ref={listRef} onScroll={handleScroll}>
           {rewardItems.map((item, index) => {
-            const { isCurrent, isLocked, isMajor, isVip } = getCardState(index);
-            const statusLabel = isCurrent ? "Current level" : isLocked ? "Locked" : "Unlocked";
-            const tierState = [
-              isCurrent ? "is-current" : "",
-              isLocked ? "is-locked" : "is-unlocked",
-              isVip ? "is-vip" : isMajor ? "is-major" : "",
-            ].filter(Boolean).join(" ");
-
             return (
-              <article className={`ppp-level-tier-row ${tierState}`} key={item.level || item.reward} role="listitem">
+              <article className="ppp-level-tier-row" key={item.level || item.reward} role="listitem">
                 <div className="ppp-level-tier-row__top">
                   <div className="ppp-level-tier-row__badge">
                     <span>{index + 1}</span>
                   </div>
-                  <strong className="ppp-level-tier-row__status">{statusLabel}</strong>
                 </div>
                 <div>
                   <span>{item.level}</span>
@@ -136,11 +108,8 @@ export default function RewardLadderCarousel({ rewards = [] }) {
           <button
             type="button"
             key={item.level || item.reward}
-            className={[
-              activeIndex === index ? "is-active" : "",
-              startIndex === index ? "is-current" : "",
-            ].filter(Boolean).join(" ")}
-            aria-label={`Show reward level ${index + 1}${startIndex === index ? ", current level" : ""}`}
+            className={activeIndex === index ? "is-active" : ""}
+            aria-label={`Show reward level ${index + 1}`}
             onClick={() => scrollToIndex(index)}
           />
         ))}

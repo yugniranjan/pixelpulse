@@ -29,11 +29,13 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  background: #0b0f14;
 }
 
 .ppp-site-content {
   flex: 1 0 auto;
   min-width: 0;
+  background: #0b0f14;
 }
 
 .aero_footer_section-bg {
