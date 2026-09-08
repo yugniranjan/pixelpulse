@@ -98,11 +98,11 @@ function getProgress(player) {
 function EmptyState({ searched }) {
   return (
     <div className="ppp-level-app__empty">
-      <strong>{searched ? "No profile found" : "Find your rewards"}</strong>
+      <strong>{searched ? "No profile found" : "Ready for lookup"}</strong>
       <p>
         {searched
           ? "Try the email or phone number used for your Pixel Pulse visit or waiver."
-          : "Enter the email or phone number used for your Pixel Pulse visit to load your points, level, and unlocked rewards."}
+          : "Your points, level, rewards, and prize spin will appear here after a match."}
       </p>
     </div>
   );
@@ -423,12 +423,12 @@ export default function RewardLookupForm({
             {getLevelLabel(selectedPlayer.currentLevel)}
           </small>
         ) : (
-          <small>Player lookup</small>
+          <small>Lookup</small>
         )}
       </div>
 
       <form className="ppp-level-app__search" method="get" onSubmit={handleSubmit}>
-        <label htmlFor="reward-lookup-input">Enter the email or phone used for your visit</label>
+        <label className="ppp-level-sr-only" htmlFor="reward-lookup-input">Email or phone used for your visit</label>
         <div>
           <input
             id="reward-lookup-input"

@@ -243,15 +243,20 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
           <span className="ppp-level-kicker">
             {content("hero_kicker", "text", "Level Up Rewards App")}
           </span>
-          <h1>
-            {content("hero_title", "title", "Your Pixel Pulse")} {" "}
-            <span>{content("hero_title", "value", "Rewards.")}</span>
-          </h1>
+          <div className="ppp-level-hero__heading-row">
+            <h1>
+              {content("hero_title", "title", "Your Pixel Pulse")} {" "}
+              <span>{content("hero_title", "value", "Rewards.")}</span>
+            </h1>
+            <a className="ppp-level-heading-link" href="#ladder">
+              View rewards <FaArrowRight aria-hidden="true" />
+            </a>
+          </div>
           <p>
             {content(
               "hero_description",
               "text",
-              "Already played at Pixel Pulse? Look up your dashboard to check your points, spin your prize wheel, and see what's next.",
+              "Use the email or phone from your visit to open your player dashboard, check points, redeem rewards, and claim your one-time prize spin.",
             )}
           </p>
           <div className="ppp-level-overview" aria-label="Example level progress">
@@ -283,14 +288,6 @@ export default async function LevelUpRewardsPage({ searchParams = {} }) {
             <span>Lifetime points</span>
             <strong>250,000</strong>
             <small>Sample player dashboard</small>
-          </div>
-          <div className="ppp-level-actions">
-            <a className="ppp-level-button ppp-level-button--primary" href="#ladder">
-              See rewards <FaArrowRight aria-hidden="true" />
-            </a>
-            <a className="ppp-level-button ppp-level-button--secondary" href="#app">
-              How rewards work
-            </a>
           </div>
         </div>
         <div className="ppp-level-hero__side">
