@@ -47,7 +47,7 @@ const ALLOWED_HOSTS = new Set([
   "www.pixelpulseplay.ca",
   "birthdays.pixelpulseplay.ca",
   "summer.pixelpulseplay.ca",
-  "parties.pixelpulseplay.ca",
+  "events.pixelpulseplay.ca",
   "squad.pixelpulseplay.ca",
   "rewards.pixelpulseplay.ca",
 ]);

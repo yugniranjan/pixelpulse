@@ -18,9 +18,9 @@ const REWARDS_HOSTS = new Set([
 const BIRTHDAY_HOSTS = new Set([
   "birthdays.pixelpulseplay.ca",
 ]);
-const LEGACY_PARTIES_HOSTS = new Set([
-  "parties.pixelpulseplay.ca",
-  "www.parties.pixelpulseplay.ca",
+const EVENTS_HOSTS = new Set([
+  "events.pixelpulseplay.ca",
+  "www.events.pixelpulseplay.ca",
 ]);
 const LOCATION_PREFIXES = new Set([
   "vaughan",
@@ -224,12 +224,23 @@ export function middleware(request) {
     }
   }
 
-  if (LEGACY_PARTIES_HOSTS.has(requestHostname)) {
-    const url = request.nextUrl.clone();
-    url.protocol = "https";
-    url.hostname = "birthdays.pixelpulseplay.ca";
-    url.port = "";
-    return NextResponse.redirect(url, 308);
+  if (EVENTS_HOSTS.has(requestHostname)) {
+    if (
+      requestHostname === "www.events.pixelpulseplay.ca" ||
+      forwardedProto === "http"
+    ) {
+      const url = new URL(
+        `${request.nextUrl.pathname}${request.nextUrl.search}`,
+        "https://events.pixelpulseplay.ca",
+      );
+      return NextResponse.redirect(url, 307);
+    }
+
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/private-party";
+      return NextResponse.rewrite(url);
+    }
   }
 
   if (BIRTHDAY_HOSTS.has(requestHostname)) {

@@ -1,12 +1,17 @@
 import Image from "next/image";
+import ExploreChallengesCarousel from "../components/home/ExploreChallengesCarousel";
 import "../styles/private-party.css";
-import { canonicalUrl } from "@/lib/seo";
+import { fetchMenuData } from "@/lib/sheets";
+import { LOCATION_NAME } from "@/lib/constant";
+import { canonicalUrl, safeImageUrl } from "@/lib/seo";
+import { getDataByParentId } from "@/utils/customFunctions";
 
 const logo = "/assets/images/logoD.png";
-const heroImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
-const arenaImage = "https://storage.googleapis.com/pixel-pulse-play/web/birthdaylandinghero.webp";
+const heroImage = "/assets/images/private-party-hero.webp";
+const heroVideo = "/assets/videos/birthday-party-room.mp4";
 const contactUrl = "/contactus";
 const phoneUrl = "tel:+19057602922";
+const siteDataGoogleSheetId = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 
 export const metadata = {
   title: "Private Party | Pixel Pulse Play Vaughan",
@@ -22,7 +27,7 @@ export const metadata = {
     url: canonicalUrl("/private-party"),
     images: [
       {
-        url: heroImage,
+        url: canonicalUrl(heroImage),
         width: 1200,
         height: 630,
         alt: "Private party at Pixel Pulse Play Vaughan",
@@ -35,7 +40,7 @@ export const metadata = {
     title: "Private Party | Pixel Pulse Play Vaughan",
     description:
       "Private parties, challenge rooms, live leaderboards, and dedicated hosts at Pixel Pulse Play Vaughan.",
-    images: [heroImage],
+    images: [canonicalUrl(heroImage)],
   },
   robots: {
     index: true,
@@ -43,17 +48,45 @@ export const metadata = {
 };
 
 const navLinks = [
-  { label: "Attractions", href: "/attractions" },
-  { label: "Birthday", href: "/kids-birthday-parties" },
-  { label: "Groups", href: "/group-events" },
-  { label: "Pricing", href: "/pricing-promos" },
+  { label: "Group Experiences", href: "#group-experiences" },
+  { label: "Challenge Rooms", href: "#rooms" },
 ];
 
-const heroStats = [
-  { value: "12+", label: "Challenge Rooms" },
-  { value: "10-100", label: "Guest Capacity" },
-  { value: "2hr", label: "Private Slots" },
-  { value: "Live", label: "Group Scores" },
+const groupBenefits = [
+  "Designed for groups of all sizes",
+  "Fully hosted and organized",
+  "Active and engaging",
+];
+
+const groupEvents = [
+  {
+    title: "Private Party",
+    body: "High-energy celebrations without the chaos, built around your group size, timing, and party flow.",
+    href: contactUrl,
+    image: "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png",
+    imageAlt: "Private party room setup at Pixel Pulse Play",
+  },
+  {
+    title: "Corporate Parties",
+    body: "Team-building, work socials, and staff nights with challenge rooms, simple booking, and real group energy.",
+    href: "/group-events/corporate-parties-events-groups",
+    image: "https://storage.googleapis.com/pixel-pulse-play/web/CorporateParty.png",
+    imageAlt: "Target challenge room for corporate group events",
+  },
+  {
+    title: "School / Groups",
+    body: "Structured trips for school groups, clubs, camps, and youth crews with hosted activities and clear timing.",
+    href: "/group-events/school-groups",
+    image: "https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.png",
+    imageAlt: "Interactive floor challenge for school and youth groups",
+  },
+  {
+    title: "Fund Raising",
+    body: "Give your community a reason to gather, play, and support a cause with an event people actually enjoy.",
+    href: "/group-events/fund-raising",
+    image: "https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.png",
+    imageAlt: "Arcade games for fundraising events",
+  },
 ];
 
 const steps = [
@@ -79,148 +112,295 @@ const steps = [
   },
 ];
 
-const attractions = [
-  ["Laser Maze", "Agility and timing"],
-  ["Hexa Quest", "Puzzle and reflex"],
-  ["Edge Climb", "Climb and balance"],
-  ["Shoot It Out", "Target action"],
-  ["Tile Hunt", "Speed and memory"],
-  ["T-Rex Heist", "Adventure mission"],
-  ["Soccer Challenge", "Sports accuracy"],
-  ["Basket Ball", "Arcade scoring"],
-  ["Maze Gate", "Movement puzzle"],
-  ["Pizza Delivery", "Reaction quest"],
-  ["Ball Toss", "Aim challenge"],
-  ["Seashells", "Search and score"],
+const fallbackAttractions = [
+  {
+    title: "Laser Maze",
+    body: "Duck, weave, and race the clock through a glowing obstacle path.",
+    meta: "Agility + Timing",
+    image: "/assets/images/vr-section-bg.webp",
+    imageAlt: "Laser maze challenge room",
+    href: "/attractions/laser-maze",
+  },
+  {
+    title: "Hexa Quest",
+    body: "Solve patterns, react fast, and keep your team moving.",
+    meta: "Puzzle + Reflex",
+    image: "/assets/images/floorchallenge.webp",
+    imageAlt: "Interactive floor challenge",
+    href: "/attractions/hexa-quest",
+  },
+  {
+    title: "Edge Climb",
+    body: "Balance, climb, and push for the cleanest run.",
+    meta: "Climb + Balance",
+    image: "/assets/images/birthday-party-room-hero.webp",
+    imageAlt: "Challenge room for climbing and movement",
+    href: "/attractions/edge-climb",
+  },
+  {
+    title: "Shoot It Out",
+    body: "Line up your aim and chase the highest score under pressure.",
+    meta: "Target Action",
+    image: "/assets/images/shootinggame.webp",
+    imageAlt: "Target shooting game",
+    href: "/attractions/shoot-it-out",
+  },
+  {
+    title: "Tile Hunt",
+    body: "Sprint, scan, and step through a fast memory challenge.",
+    meta: "Speed + Memory",
+    image: "/assets/images/floorchallenge.webp",
+    imageAlt: "Tile hunt floor game",
+    href: "/attractions/tile-hunt",
+  },
+  {
+    title: "T-Rex Heist",
+    body: "Work through a themed mission built for team energy.",
+    meta: "Adventure Mission",
+    image: "/assets/images/arcade.webp",
+    imageAlt: "Arcade challenge room",
+    href: "/attractions/trex-heist",
+  },
+  {
+    title: "Soccer Challenge",
+    body: "Test your accuracy and timing with a sporty scoring round.",
+    meta: "Sports Accuracy",
+    image: "/assets/images/floorchallenge.webp",
+    imageAlt: "Soccer challenge room",
+    href: "/attractions/soccer-challenge",
+  },
+  {
+    title: "Basket Ball",
+    body: "Stack points fast in a classic party-friendly scoring challenge.",
+    meta: "Arcade Scoring",
+    image: "/assets/images/arcade.webp",
+    imageAlt: "Basketball arcade challenge",
+    href: "/attractions/basket-ball",
+  },
+  {
+    title: "Maze Gate",
+    body: "Move smart, find the route, and beat the room together.",
+    meta: "Movement Puzzle",
+    image: "/assets/images/vr-section-bg.webp",
+    imageAlt: "Maze gate challenge",
+    href: "/attractions/maze-gate",
+  },
+  {
+    title: "Pizza Delivery",
+    body: "Keep up with a playful reaction quest made for quick laughs.",
+    meta: "Reaction Quest",
+    image: "/assets/images/arcade.webp",
+    imageAlt: "Pizza delivery game",
+    href: "/attractions/pizza-delivery",
+  },
+  {
+    title: "Ball Toss",
+    body: "Aim clean, throw steady, and compete for bragging rights.",
+    meta: "Aim Challenge",
+    image: "/assets/images/shootinggame.webp",
+    imageAlt: "Ball toss challenge",
+    href: "/attractions/ball-toss",
+  },
+  {
+    title: "Seashells",
+    body: "Search, score, and move through a lighter challenge room.",
+    meta: "Search + Score",
+    image: "/assets/images/floorchallenge.webp",
+    imageAlt: "Seashells challenge room",
+    href: "/attractions/seashells",
+  },
 ];
 
-const packages = [
-  {
-    name: "Pulse Party",
-    sub: "A focused party setup for smaller squads who want the Pixel Pulse experience.",
-    price: "$299",
-    note: "Starting from",
-    features: [
-      "Up to 15 guests",
-      "60-minute play session",
-      "Dedicated party area",
-      "Live leaderboard for your group",
-      "Party host on site",
-    ],
-    muted: ["Full arena buyout", "Custom tournament bracket"],
-  },
-  {
-    name: "Arena Takeover",
-    sub: "The full private-party energy with more time, more rooms, and more competition.",
-    price: "$599",
-    note: "Starting from",
-    badge: "Most Popular",
-    featured: true,
-    features: [
-      "Up to 40 guests",
-      "90-minute private session",
-      "Full arena access",
-      "Live tournament leaderboard",
-      "Dedicated party host",
-      "Food and drink options available",
-      "Custom bracket and scoring",
-    ],
-    muted: ["VIP lounge add-on"],
-  },
-  {
-    name: "Ultimate VIP",
-    sub: "A larger private event with more control, more support, and a fully custom flow.",
-    price: "$999",
-    note: "Starting from",
-    features: [
-      "Up to 100 guests",
-      "2-hour private session",
-      "Full arena exclusively yours",
-      "Custom branded leaderboard",
-      "Two dedicated hosts",
-      "Catering options",
-      "Tournament design",
-    ],
-    muted: [],
-  },
-];
+function googleSheetCsvUrl(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${siteDataGoogleSheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+function parseCsv(csv) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < csv.length; i += 1) {
+    const char = csv[i];
+    const nextChar = csv[i + 1];
+
+    if (char === "\"" && inQuotes && nextChar === "\"") {
+      value += "\"";
+      i += 1;
+    } else if (char === "\"") {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      row.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && nextChar === "\n") i += 1;
+      row.push(value);
+      rows.push(row);
+      row = [];
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+
+  if (value || row.length) {
+    row.push(value);
+    rows.push(row);
+  }
+
+  const [headers = [], ...dataRows] = rows.filter((csvRow) =>
+    csvRow.some((cell) => String(cell).trim()),
+  );
+
+  return dataRows.map((csvRow) =>
+    headers.reduce((acc, header, index) => {
+      acc[String(header).trim()] = csvRow[index] ?? "";
+      return acc;
+    }, {}),
+  );
+}
+
+async function fetchGameRows() {
+  const response = await fetch(googleSheetCsvUrl("games"), {
+    next: { revalidate: 900 },
+  });
+
+  if (!response.ok) return [];
+
+  return parseCsv(await response.text()).map((row) => {
+    const image = row.image || row.imageUrl || row.imageurl || row.image_url || row.smallimage || row.headerimage;
+
+    return {
+      id: String(row.id || ""),
+      name: String(row.name || ""),
+      tag: String(row.tag || ""),
+      bestFor: String(row.bestFor || ""),
+      image: image ? safeImageUrl(image) : "",
+      imageAlt: String(row.imageAlt || row.imagealt || row.image_alt || ""),
+      link: String(row.link || row.url || row.href || ""),
+    };
+  }).filter((row) => row.name || row.tag);
+}
+
+function looksLikeRenderableImage(url = "") {
+  if (!url) return false;
+  if (url.startsWith("/")) return true;
+
+  const normalized = url.split("?")[0].toLowerCase();
+  return [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".svg"].some((ext) =>
+    normalized.endsWith(ext),
+  );
+}
+
+function getPreferredImage(pageData) {
+  if (looksLikeRenderableImage(pageData?.smallimage)) return safeImageUrl(pageData.smallimage);
+  if (looksLikeRenderableImage(pageData?.headerimage)) return safeImageUrl(pageData.headerimage);
+  return safeImageUrl(pageData?.smallimage || pageData?.headerimage);
+}
+
+function normalizeAttractionKey(value = "") {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function findHomepageAttractionItem(game, attractionChildren = []) {
+  const gameKeys = [game?.id, game?.name]
+    .map(normalizeAttractionKey)
+    .filter(Boolean);
+
+  return (
+    attractionChildren.find((item) => {
+      const itemKeys = [item?.path, item?.pageid, item?.metatitle, item?.desc]
+        .map(normalizeAttractionKey)
+        .filter(Boolean);
+
+      return gameKeys.some((key) => itemKeys.includes(key));
+    }) || null
+  );
+}
+
+function formatHomepageAttractionTitle(title = "") {
+  return String(title || "").replace(
+    /\b(interactive|immersive)\b/gi,
+    (word) => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`,
+  );
+}
+
+async function getHomepageGames() {
+  try {
+    const [games, menuData] = await Promise.all([
+      fetchGameRows(),
+      fetchMenuData(LOCATION_NAME),
+    ]);
+    const attractionsData = Array.isArray(menuData)
+      ? getDataByParentId(menuData, "attractions") || []
+      : [];
+    const attractionChildren =
+      attractionsData?.[0]?.children?.filter((item) => item?.isactive == 1) || [];
+
+    const homepageGames = games.map((game) => {
+      const matchedAttraction = findHomepageAttractionItem(game, attractionChildren);
+      const attractionHref =
+        matchedAttraction?.parentid && matchedAttraction?.path
+          ? `/${matchedAttraction.parentid}/${matchedAttraction.path}`
+          : "";
+
+      return {
+        title: formatHomepageAttractionTitle(game.name || matchedAttraction?.desc || "Game Room"),
+        body: game.tag || matchedAttraction?.metatitle || "",
+        meta: game.bestFor || "",
+        image: game.image || getPreferredImage(matchedAttraction),
+        imageAlt: game.imageAlt || matchedAttraction?.iconalttextforhomepage || game.name || "Pixel Pulse game room",
+        href: game.link || attractionHref || "#",
+      };
+    });
+
+    return homepageGames.length ? homepageGames : fallbackAttractions;
+  } catch (error) {
+    console.error("private party games failed:", error);
+    return fallbackAttractions;
+  }
+}
 
 const reasons = [
   {
+    icon: "+",
     title: "Brain + Body Gameplay",
-    body: "Guests think, react, move, aim, climb, and chase scores across rooms that feel active from the first minute.",
+    body: "Guests think, react, move, aim, and climb across rooms built for real competition, not just screen time.",
   },
   {
+    icon: "▥",
     title: "Live Group Leaderboard",
-    body: "Your party gets real-time rankings so everyone can see who is climbing, falling, and staging a comeback.",
+    body: "Real-time rankings for your whole party or team, whether it is coworkers, friends, or a table of tweens.",
   },
   {
+    icon: "✓",
     title: "Zero Setup Stress",
-    body: "A dedicated host keeps the flow moving while you enjoy the party instead of managing every detail.",
+    body: "A dedicated host runs the flow so you can show up and enjoy it, whether you are hosting family or clients.",
   },
   {
+    icon: "↻",
     title: "Replay Value Built In",
-    body: "Different rooms, different scores, and rematch energy make the experience feel fresh for every guest.",
+    body: "Different rooms and rematch energy keep it fresh, from a first visit to an annual team tradition.",
   },
 ];
 
-const leaderboardRows = [
-  ["1", "Alex K.", "Laser Maze", "9,850", "0:45"],
-  ["2", "Jordan M.", "T-Rex Heist", "9,200", "1:02"],
-  ["3", "Sam R.", "Tile Hunt", "8,750", "0:58"],
-  ["4", "Taylor W.", "Soccer Challenge", "8,400", "0:50"],
-  ["5", "Morgan L.", "Shoot It Out", "8,100", "0:55"],
+const audienceChips = [
+  "Birthdays",
+  "Corporate Events",
+  "Team Nights",
+  "Adult Groups",
+  "Family Celebrations",
 ];
 
-const testimonials = [
-  {
-    quote:
-      "We booked for my son's birthday and the kids were locked into the leaderboard the whole time. Staff handled the flow and we actually got to enjoy it.",
-    name: "Sarah M.",
-    role: "Parent, Vaughan",
-  },
-  {
-    quote:
-      "Our team event had instant energy. Even the quiet people were competing, laughing, and checking scores between every room.",
-    name: "Aisha K.",
-    role: "Group organizer, Maple",
-  },
-  {
-    quote:
-      "It felt private, organized, and exciting without us needing to build the party from scratch. The kids are already asking for a rematch.",
-    name: "James T.",
-    role: "Parent, Woodbridge",
-  },
-];
+export default async function PrivatePartyPage() {
+  const attractions = await getHomepageGames();
 
-const faqs = [
-  {
-    q: "How far in advance should I book?",
-    a: "We recommend 2-3 weeks in advance, especially for weekend private-party slots. Earlier inquiries give us more room to match your preferred time.",
-  },
-  {
-    q: "What group sizes work best?",
-    a: "Private parties work well for groups of 10 or more, and larger events can be planned for up to 100 guests depending on the package and timing.",
-  },
-  {
-    q: "Can we bring cake or decorations?",
-    a: "Yes, you can bring a cake and simple decorations for your party area. Ask us about food, drink, and timing options when you inquire.",
-  },
-  {
-    q: "Can the leaderboard be customized?",
-    a: "Yes. Private parties can use a group leaderboard, and larger packages can include custom tournament-style scoring.",
-  },
-  {
-    q: "Are the challenges good for different ages?",
-    a: "Most rooms are designed for kids, teens, families, and adults. Our team helps guide guests toward age-appropriate challenges during the session.",
-  },
-  {
-    q: "Do guests need a waiver?",
-    a: "Yes, all participating guests need a signed waiver before play. Sending the waiver link before the event helps speed up check-in.",
-  },
-];
-
-export default function PrivatePartyPage() {
   return (
     <main className="ppp-private-page">
       <nav className="ppp-private-nav" aria-label="Private party landing navigation">
@@ -240,14 +420,17 @@ export default function PrivatePartyPage() {
       </nav>
 
       <section className="ppp-private-hero">
-        <Image
+        <video
           className="ppp-private-hero__image"
-          src={heroImage}
-          alt=""
-          fill
-          sizes="100vw"
-          priority
-        />
+          poster={heroImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
         <div className="ppp-private-hero__grid" />
         <div className="ppp-private-shell ppp-private-hero__layout">
           <div className="ppp-private-hero__copy">
@@ -264,31 +447,50 @@ export default function PrivatePartyPage() {
               <a className="ppp-private-btn ppp-private-btn--primary" href={contactUrl}>
                 Inquire About A Party
               </a>
-              <a className="ppp-private-btn ppp-private-btn--ghost" href="#packages">
-                View Packages
-              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="ppp-private-section ppp-private-section--panel" id="group-experiences">
+        <div className="ppp-private-shell ppp-private-group-intro">
+          <div>
+            <div className="ppp-private-section__header">
+              <p>Group Experiences</p>
+              <h2>
+                Bring Your Group. <span>We&apos;ll Handle The Energy.</span>
+              </h2>
+            </div>
+            <p className="ppp-private-muted">
+              From corporate teams to school trips, Pixel Pulse builds high-energy
+              experiences that are structured, supervised, and actually fun.
+            </p>
+            <div className="ppp-private-benefits" aria-label="Group event benefits">
+              {groupBenefits.map((benefit) => (
+                <span key={benefit}>{benefit}</span>
+              ))}
             </div>
           </div>
 
-          <aside className="ppp-private-hero-card" aria-label="Private party highlights">
-            <p>Why Groups Love Us</p>
-            <h2>Your Group. Your Rules.</h2>
-            <span>
-              Dedicated hosts, arena-style gameplay, and a leaderboard with your crew&apos;s
-              names on it.
-            </span>
-            <div className="ppp-private-stats">
-              {heroStats.map((stat) => (
-                <div key={stat.label}>
-                  <strong>{stat.value}</strong>
-                  <small>{stat.label}</small>
+          <div className="ppp-private-event-types">
+            <p className="ppp-private-event-types__eyebrow">What Are You Planning?</p>
+            {groupEvents.map((event) => (
+              <article key={event.title}>
+                <Image
+                  src={event.image}
+                  alt={event.imageAlt}
+                  width={180}
+                  height={128}
+                  sizes="(max-width: 760px) 100vw, 180px"
+                />
+                <div>
+                  <h3>{event.title}</h3>
+                  <p>{event.body}</p>
                 </div>
-              ))}
-            </div>
-            <a className="ppp-private-btn ppp-private-btn--primary" href={contactUrl}>
-              Check Availability
-            </a>
-          </aside>
+                <a href={event.href}>Plan This Event</a>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -296,7 +498,9 @@ export default function PrivatePartyPage() {
         <div className="ppp-private-shell">
           <div className="ppp-private-section__header">
             <p>The Process</p>
-            <h2>Booked. Played. Legendary.</h2>
+            <h2>
+              Booked. Played. <span>Legendary.</span>
+            </h2>
           </div>
           <div className="ppp-private-steps">
             {steps.map((step) => (
@@ -310,154 +514,49 @@ export default function PrivatePartyPage() {
         </div>
       </section>
 
-      <section className="ppp-private-section">
-        <div className="ppp-private-shell ppp-private-split">
+      <section className="ppp-private-section" id="rooms">
+        <div className="ppp-private-shell ppp-private-rooms">
           <div>
             <div className="ppp-private-section__header">
               <p>All Included</p>
-              <h2>12 Challenge Rooms. One Private Arena.</h2>
+              <h2>
+                13 Challenge Rooms. <span>One Private Arena.</span>
+              </h2>
             </div>
             <p className="ppp-private-muted">
               Every private party can tap into the full attraction lineup, from fast
               reflex games to team missions and score-chasing rooms.
             </p>
           </div>
-          <div className="ppp-private-attractions">
-            {attractions.map(([name, meta]) => (
-              <article key={name}>
-                <strong>{name}</strong>
-                <span>{meta}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-private-section ppp-private-section--panel" id="packages">
-        <div className="ppp-private-shell">
-          <div className="ppp-private-section__header ppp-private-section__header--center">
-            <p>Party Packages</p>
-            <h2>Pick Your Level Of Legendary.</h2>
-          </div>
-          <div className="ppp-private-packages">
-            {packages.map((pkg) => (
-              <article
-                className={`ppp-private-package${pkg.featured ? " ppp-private-package--featured" : ""}`}
-                key={pkg.name}
-              >
-                {pkg.badge ? <span className="ppp-private-package__badge">{pkg.badge}</span> : null}
-                <h3>{pkg.name}</h3>
-                <p>{pkg.sub}</p>
-                <div className="ppp-private-price">
-                  <span>{pkg.note}</span>
-                  <strong>{pkg.price}</strong>
-                  <small>/ event</small>
-                </div>
-                <ul>
-                  {pkg.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                  {pkg.muted.map((feature) => (
-                    <li className="is-muted" key={feature}>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  className={`ppp-private-package__cta${pkg.featured ? " is-solid" : ""}`}
-                  href={contactUrl}
-                >
-                  Inquire
-                </a>
-              </article>
-            ))}
-          </div>
-          <p className="ppp-private-note">
-            Prices are starting estimates. Final pricing depends on group size, date,
-            private access, and add-ons.
-          </p>
+          <ExploreChallengesCarousel games={attractions} />
         </div>
       </section>
 
       <section className="ppp-private-section">
         <div className="ppp-private-shell ppp-private-experience">
-          <div>
+          <div className="ppp-private-experience__content">
             <div className="ppp-private-section__header">
               <p>Why Pixel Pulse</p>
               <h2>
                 Not Just A Venue. <span>A Victory Lap.</span>
               </h2>
             </div>
+            <div className="ppp-private-audience" aria-label="Best for">
+              {audienceChips.map((chip) => (
+                <span key={chip}>{chip}</span>
+              ))}
+            </div>
             <div className="ppp-private-reasons">
               {reasons.map((reason) => (
                 <article key={reason.title}>
+                  <span className="ppp-private-reason-icon" aria-hidden="true">
+                    {reason.icon}
+                  </span>
                   <h3>{reason.title}</h3>
                   <p>{reason.body}</p>
                 </article>
               ))}
             </div>
-          </div>
-
-          <div className="ppp-private-leaderboard">
-            <Image
-              src={arenaImage}
-              alt=""
-              width={680}
-              height={420}
-              sizes="(max-width: 900px) 100vw, 44vw"
-            />
-            <div className="ppp-private-leaderboard__panel">
-              <div className="ppp-private-leaderboard__head">
-                <strong>Party Leaderboard</strong>
-                <span>Live</span>
-              </div>
-              {leaderboardRows.map(([rank, name, game, score, time]) => (
-                <div className="ppp-private-rank" key={`${rank}-${name}`}>
-                  <b>{rank}</b>
-                  <span>
-                    <strong>{name}</strong>
-                    <small>{game}</small>
-                  </span>
-                  <em>{score}</em>
-                  <small>{time}</small>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-private-section ppp-private-section--panel">
-        <div className="ppp-private-shell">
-          <div className="ppp-private-section__header ppp-private-section__header--center">
-            <p>Guest Reactions</p>
-            <h2>They Came For A Party. They Left With Bragging Rights.</h2>
-          </div>
-          <div className="ppp-private-testimonials">
-            {testimonials.map((item) => (
-              <article key={item.name}>
-                <p>&ldquo;{item.quote}&rdquo;</p>
-                <strong>{item.name}</strong>
-                <span>{item.role}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-private-section">
-        <div className="ppp-private-shell ppp-private-faq-wrap">
-          <div className="ppp-private-section__header">
-            <p>Questions</p>
-            <h2>Everything You Need To Know.</h2>
-          </div>
-          <div className="ppp-private-faq">
-            {faqs.map((item) => (
-              <details key={item.q}>
-                <summary>{item.q}</summary>
-                <p>{item.a}</p>
-              </details>
-            ))}
           </div>
         </div>
       </section>

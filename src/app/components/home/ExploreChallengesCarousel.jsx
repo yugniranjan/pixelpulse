@@ -13,6 +13,8 @@ export default function ExploreChallengesCarousel({ games = [] }) {
     if (!carousel) return undefined;
 
     let frame = 0;
+    carousel.scrollLeft = 0;
+
     const updateActiveDot = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
@@ -46,8 +48,13 @@ export default function ExploreChallengesCarousel({ games = [] }) {
     const slide = carousel?.querySelectorAll(".ppp-attractions__item")?.[index];
     if (!carousel || !slide) return;
 
+    const targetLeft =
+      slide.getBoundingClientRect().left -
+      carousel.getBoundingClientRect().left +
+      carousel.scrollLeft;
+
     carousel.scrollTo({
-      left: slide.offsetLeft - carousel.offsetLeft,
+      left: targetLeft,
       behavior: "smooth",
     });
     setActiveIndex(index);
