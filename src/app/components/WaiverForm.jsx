@@ -730,13 +730,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
         return;
       }
 
-      setEditingWaiverId(data.waiverId || editingWaiverId);
-      setToast(
-        `${configuredText(
-          waiverContent,
-          data.updated ? "updateSuccessPrefix" : "saveSuccessPrefix",
-        )} ${data.waiverId}`,
-      );
+      const successMessage = `${configuredText(
+        waiverContent,
+        data.updated ? "updateSuccessPrefix" : "saveSuccessPrefix",
+      )} ${data.waiverId}`;
+      resetWaiverForm();
+      setToast(successMessage);
     } catch (submitError) {
       setError(configuredText(waiverContent, "submitError"));
     } finally {
