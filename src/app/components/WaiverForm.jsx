@@ -124,7 +124,7 @@ const DEFAULT_COPY = {
   signDateLabel: "Date signed *",
   addAdultButton: "+ Add adult (18+)",
   addMinorButton: "+ Add minor (under 18)",
-  familySummaryLabel: "Party:",
+  familySummaryLabel: "Additional participants:",
   emptyFamilySummary: "No additional family members added yet.",
   memberTitle: "Member",
   removeMemberButton: "Remove",
