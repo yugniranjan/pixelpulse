@@ -384,7 +384,7 @@ export async function POST(req) {
     );
   }
 
-  if (visit.visitDate && isPastDate(visit.visitDate)) {
+  if (!updateWaiverId && visit.visitDate && isPastDate(visit.visitDate)) {
     return NextResponse.json(
       { error: "Visit date cannot be in the past." },
       { status: 400 },

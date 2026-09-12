@@ -702,7 +702,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       return;
     }
 
-    if (showVisitDateField && isPastDate(visit.visitDate)) {
+    if (!editingWaiverId && showVisitDateField && isPastDate(visit.visitDate)) {
       setError(configuredText(waiverContent, "pastVisitDateError"));
       return;
     }
