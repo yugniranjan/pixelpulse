@@ -42,16 +42,24 @@ function normalizePhone(value = "") {
 }
 
 function todayInToronto() {
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Toronto",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date());
+  }).formatToParts(new Date());
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+function dateNumber(value = "") {
+  const [year, month, day] = String(value || "").split("-").map(Number);
+  if (!year || !month || !day) return 0;
+  return year * 10000 + month * 100 + day;
 }
 
 function isPastDate(value = "") {
-  return Boolean(value && value < todayInToronto());
+  return Boolean(value && dateNumber(value) < dateNumber(todayInToronto()));
 }
 
 function fullLegalName(person = {}) {

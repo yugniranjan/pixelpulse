@@ -227,12 +227,24 @@ function memberLabel(type) {
 }
 
 function today() {
-  const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Toronto",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+function dateNumber(value = "") {
+  const [year, month, day] = String(value || "").split("-").map(Number);
+  if (!year || !month || !day) return 0;
+  return year * 10000 + month * 100 + day;
 }
 
 function isPastDate(value = "") {
-  return Boolean(value && value < today());
+  return Boolean(value && dateNumber(value) < dateNumber(today()));
 }
 
 function isBeforeToday(parts = {}) {
