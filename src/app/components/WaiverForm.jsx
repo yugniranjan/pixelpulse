@@ -133,12 +133,19 @@ const DEFAULT_COPY = {
   linkedPartyIdText: "with Party ID",
   resetButton: "Reset Form",
   submitButton: "Submit Waiver & Start Playing",
+  updateSubmitButton: "Update Waiver",
   submittingButton: "Saving Waiver...",
   submitFootnote: "Securely recorded · Vaughan, Ontario · pixelpulseplay.ca",
   signatureRequiredError: "Please draw your signature before submitting.",
   pastVisitDateError: "Visit date cannot be in the past.",
   submitError: "Unable to submit waiver. Please check your connection and try again.",
   saveSuccessPrefix: "Waiver saved. Confirmation:",
+  updateSuccessPrefix: "Waiver updated. Confirmation:",
+  loadExistingButton: "Load existing waiver",
+  loadingExistingButton: "Loading waiver...",
+  loadExistingHelp:
+    "Already submitted? Enter the same email or phone number, then load your waiver to make changes.",
+  loadExistingMissingError: "Enter the email or phone number used on the original waiver first.",
   riskAcknowledgement:
     "I understand Pixel Pulse Play attractions involve inherent and other risks, including slips, trips, falls, collisions, equipment contact, fast movement, climbing, jumping, running, aiming, sensory stimulation, and the acts or omissions of other participants. I voluntarily assume these risks for myself and all named participants.",
   liabilityAcknowledgement:
@@ -197,6 +204,21 @@ function createFamilyMember(type) {
     email: "",
     healthCondition: "Not Applicable",
     medicalNotes: "",
+  };
+}
+
+function createLoadedFamilyMember(member = {}, index = 0) {
+  const type = member.type === "minor" ? "minor" : "adult";
+  return {
+    id: member.id || `${type}-${Date.now()}-${index}`,
+    type,
+    firstName: member.firstName || "",
+    lastName: member.lastName || "",
+    dob: member.dob || "",
+    gender: member.gender || "",
+    email: member.email || "",
+    healthCondition: member.healthCondition || "Not Applicable",
+    medicalNotes: member.medicalNotes || "",
   };
 }
 
@@ -416,6 +438,9 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+  const [editingWaiverId, setEditingWaiverId] = useState("");
+  const [editingVerification, setEditingVerification] = useState(null);
   const [primary, setPrimary] = useState({ ...EMPTY_PRIMARY, ...initialPrimary });
   const [familyMembers, setFamilyMembers] = useState([]);
   const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
@@ -596,9 +621,63 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     setFamilyMembers([]);
     setVisit({ ...EMPTY_VISIT, ...initialVisit, signDate: today() });
     setChecks({ ...EMPTY_CHECKS });
+    setEditingWaiverId("");
+    setEditingVerification(null);
     setError("");
     setToast("");
     clearSignature();
+  }
+
+  async function loadExistingWaiver() {
+    setError("");
+    setToast("");
+
+    if (!primary.email && !primary.phone) {
+      setError(configuredText(waiverContent, "loadExistingMissingError"));
+      return;
+    }
+
+    setLoadingExisting(true);
+
+    try {
+      const params = new URLSearchParams();
+      if (primary.email) params.set("email", primary.email);
+      if (primary.phone) params.set("phone", primary.phone);
+      if (visit.partyId) params.set("partyId", visit.partyId);
+
+      const response = await fetch(`/api/waivers?${params.toString()}`, {
+        cache: "no-store",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || configuredText(waiverContent, "submitError"));
+        return;
+      }
+
+      const waiver = data.waiver || {};
+      setEditingWaiverId(waiver.id || "");
+      setEditingVerification(waiver.updateVerification || null);
+      setPrimary({ ...EMPTY_PRIMARY, ...(waiver.primary || {}) });
+      setFamilyMembers(
+        Array.isArray(waiver.familyMembers)
+          ? waiver.familyMembers.map(createLoadedFamilyMember)
+          : [],
+      );
+      setVisit({
+        ...EMPTY_VISIT,
+        ...initialVisit,
+        ...(waiver.visit || {}),
+        signDate: today(),
+      });
+      setChecks({ ...EMPTY_CHECKS, ...(waiver.checks || {}) });
+      clearSignature();
+      setToast("Waiver loaded. Review your details, sign again, and save changes.");
+    } catch (lookupError) {
+      setError(configuredText(waiverContent, "submitError"));
+    } finally {
+      setLoadingExisting(false);
+    }
   }
 
   async function handleSubmit(event) {
@@ -628,6 +707,8 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           visit,
           checks,
           signatureDataUrl: canvasRef.current?.toDataURL("image/png"),
+          updateWaiverId: editingWaiverId,
+          updateVerification: editingVerification,
         }),
       });
       const data = await response.json();
@@ -637,7 +718,13 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
         return;
       }
 
-      setToast(`${configuredText(waiverContent, "saveSuccessPrefix")} ${data.waiverId}`);
+      setEditingWaiverId(data.waiverId || editingWaiverId);
+      setToast(
+        `${configuredText(
+          waiverContent,
+          data.updated ? "updateSuccessPrefix" : "saveSuccessPrefix",
+        )} ${data.waiverId}`,
+      );
     } catch (submitError) {
       setError(configuredText(waiverContent, "submitError"));
     } finally {
@@ -691,6 +778,21 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
             <span>{configuredText(waiverContent, "phoneLabel")}</span>
             <input required type="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
           </label>
+          <div className="ppp-waiver-existing ppp-waiver-wide">
+            <div>
+              <strong>{editingWaiverId ? "Editing existing waiver" : "Need to make changes later?"}</strong>
+              <span>
+                {editingWaiverId
+                  ? "This form will update the loaded waiver after you sign again."
+                  : configuredText(waiverContent, "loadExistingHelp")}
+              </span>
+            </div>
+            <button type="button" onClick={loadExistingWaiver} disabled={loadingExisting || submitting}>
+              {loadingExisting
+                ? configuredText(waiverContent, "loadingExistingButton")
+                : configuredText(waiverContent, "loadExistingButton")}
+            </button>
+          </div>
           {showCityField ? (
             <label>
               <span>{configuredText(waiverContent, "cityLabel")}</span>
@@ -918,7 +1020,10 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           <button type="submit" disabled={submitting}>
             {submitting
               ? configuredText(waiverContent, "submittingButton")
-              : configuredText(waiverContent, "submitButton")}
+              : configuredText(
+                  waiverContent,
+                  editingWaiverId ? "updateSubmitButton" : "submitButton",
+                )}
           </button>
         </div>
         <p>{configuredText(waiverContent, "submitFootnote")}</p>

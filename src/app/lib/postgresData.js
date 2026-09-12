@@ -275,6 +275,25 @@ export async function listPostgresWaiversByEmail(email, limit = 50) {
   return result.rows.map(normalizeWaiverRow);
 }
 
+export async function listPostgresWaiversByPhone(phone, limit = 50) {
+  const normalizedPhone = String(phone || "").replace(/\D/g, "");
+  if (!normalizedPhone) return [];
+
+  const phoneExpr = "regexp_replace(coalesce(primary_participant->>'phone', raw->'primary'->>'phone', ''), '\\D', '', 'g')";
+  const result = await query(
+    `
+      select *
+      from waivers
+      where ${phoneExpr} = $1
+      order by submitted_at desc nulls last
+      limit $2
+    `,
+    [normalizedPhone, limit],
+  );
+
+  return result.rows.map(normalizeWaiverRow);
+}
+
 export async function createPostgresWaiver(doc) {
   const id = crypto.randomUUID();
   await query(
@@ -311,17 +330,31 @@ export async function updatePostgresWaiver(id, updateData) {
     `
       update waivers
       set primary_participant = $2::jsonb,
-          visit = $3::jsonb,
-          primary_name = $4,
-          updated_at = $5,
-          raw = raw || $6::jsonb
+          family_members = $3::jsonb,
+          visit = $4::jsonb,
+          checks = $5::jsonb,
+          attractions = $6::jsonb,
+          signature_data_url = $7,
+          participant_count = $8,
+          primary_name = $9,
+          source = $10,
+          user_agent = $11,
+          updated_at = $12,
+          raw = raw || $13::jsonb
       where id = $1
     `,
     [
       id,
       json(updateData.primary, {}),
+      json(updateData.familyMembers, []),
       json(updateData.visit, {}),
+      json(updateData.checks, {}),
+      json(updateData.attractions, []),
+      updateData.signatureDataUrl || "",
+      updateData.participantCount || 1,
       updateData.primaryName || "",
+      updateData.source || "",
+      updateData.userAgent || "",
       updateData.updatedAt || new Date(),
       json(updateData, {}),
     ],
