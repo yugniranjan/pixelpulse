@@ -8,6 +8,13 @@ import "../styles/admin-dashboard.css";
 
 const MODULES = [
   {
+    title: "Daily Checklist",
+    desc: "Opening, safety, bookings, guest experience, and close-out tasks.",
+    href: "/admin/daily-checklist",
+    action: "Open checklist",
+    accent: "#0f172a",
+  },
+  {
     title: "Party Bookings",
     desc: "Create & manage bookings, availability calendar, party links.",
     href: "/admin/bookings",

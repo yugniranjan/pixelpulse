@@ -1,0 +1,350 @@
+import { db } from "@/lib/firestore";
+import { getPostgresPool, query } from "@/lib/postgres";
+
+let tableReady;
+
+export const DAILY_CHECKLIST_RETENTION_DAYS = 15;
+
+export const DAILY_CHECKLIST_TEMPLATE = [
+  {
+    id: "opening",
+    title: "Opening Setup",
+    items: [
+      { id: "lights-sound", label: "Turn on arena lights, sound, TVs, and lobby screens." },
+      { id: "front-desk", label: "Open POS, booking calendar, waiver dashboard, and rewards dashboard." },
+      { id: "floors-clean", label: "Walk lobby, washrooms, party room, and arena floor for cleanliness." },
+      { id: "staff-huddle", label: "Review today's parties, staffing, promos, and assigned roles." },
+    ],
+  },
+  {
+    id: "safety",
+    title: "Safety And Game Rooms",
+    items: [
+      { id: "room-check", label: "Inspect all challenge rooms for hazards, loose props, sensors, and clear exits." },
+      { id: "wristbands", label: "Test wristbands, readers, check-in flow, and score tracking." },
+      { id: "games-online", label: "Confirm active games launch, score, and reset correctly." },
+      { id: "incident-kit", label: "Confirm first-aid kit, incident log, and cleaning supplies are ready." },
+    ],
+  },
+  {
+    id: "bookings",
+    title: "Bookings And Waivers",
+    items: [
+      { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
+      { id: "waiver-check", label: "Check incomplete waivers and send reminders where needed." },
+      { id: "party-room", label: "Prepare party room timing, tables, signage, and host notes." },
+      { id: "call-ahead", label: "Call or message any booking needing confirmation or missing details." },
+    ],
+  },
+  {
+    id: "guest-experience",
+    title: "Guest Experience",
+    items: [
+      { id: "rewards", label: "Check rewards, gift cards, prize wheel, and promo workflows." },
+      { id: "food-drink", label: "Restock drinks, snacks, cups, napkins, and front-counter essentials." },
+      { id: "signage", label: "Confirm pricing, event, waiver, and promo signage are visible." },
+      { id: "photo-moments", label: "Identify any party or group moments worth capturing with permission." },
+    ],
+  },
+  {
+    id: "closeout",
+    title: "Close-Out",
+    items: [
+      { id: "lost-found", label: "Check lost and found, party room, washrooms, and arena for belongings." },
+      { id: "sanitize", label: "Clean high-touch surfaces, counters, rooms, and shared equipment." },
+      { id: "cash-pos", label: "Reconcile POS, gift cards, refunds, and daily notes." },
+      { id: "handoff", label: "Log incidents, maintenance issues, follow-ups, and tomorrow's priorities." },
+    ],
+  },
+];
+
+function hasPostgres() {
+  return Boolean(getPostgresPool());
+}
+
+export function hasDailyChecklistStore() {
+  return hasPostgres() || Boolean(db);
+}
+
+async function ensureTable() {
+  if (!tableReady) {
+    tableReady = query(`
+      create table if not exists daily_checklists (
+        check_date text primary key,
+        items jsonb not null default '[]'::jsonb,
+        notes text not null default '',
+        completed_by text not null default '',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        raw jsonb not null default '{}'::jsonb
+      );
+      create index if not exists daily_checklists_updated_at_idx on daily_checklists (updated_at desc);
+    `).catch((error) => {
+      tableReady = undefined;
+      throw error;
+    });
+  }
+
+  return tableReady;
+}
+
+function cleanText(value = "") {
+  return String(value || "").trim();
+}
+
+function todayInToronto() {
+  return formatTorontoDate(new Date());
+}
+
+function formatTorontoDate(date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Toronto",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+function retentionCutoffDate(days = DAILY_CHECKLIST_RETENTION_DAYS) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return formatTorontoDate(date);
+}
+
+function validDate(value = "") {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
+}
+
+export function normalizeChecklistDate(value = "") {
+  const nextValue = cleanText(value);
+  return validDate(nextValue) ? nextValue : todayInToronto();
+}
+
+function iso(value) {
+  if (!value) return "";
+  if (typeof value.toDate === "function") return value.toDate().toISOString();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+function flatTemplateItems() {
+  return DAILY_CHECKLIST_TEMPLATE.flatMap((section) =>
+    section.items.map((item) => ({ ...item, sectionId: section.id })),
+  );
+}
+
+function normalizeSavedItems(items = []) {
+  const map = new Map();
+  if (!Array.isArray(items)) return map;
+
+  items.forEach((item) => {
+    const id = cleanText(item?.id);
+    if (!id) return;
+    map.set(id, {
+      id,
+      done: item.done === true,
+      note: cleanText(item.note),
+      completedAt: cleanText(item.completedAt),
+    });
+  });
+  return map;
+}
+
+function mergeItems(savedItems = []) {
+  const saved = normalizeSavedItems(savedItems);
+  return flatTemplateItems().map((item) => ({
+    id: item.id,
+    label: item.label,
+    sectionId: item.sectionId,
+    done: saved.get(item.id)?.done === true,
+    note: saved.get(item.id)?.note || "",
+    completedAt: saved.get(item.id)?.completedAt || "",
+  }));
+}
+
+function normalizeRow(row = {}) {
+  const raw = row.raw || {};
+  const items = row.items || raw.items || [];
+  return {
+    date: row.check_date || row.date || raw.date || todayInToronto(),
+    items: mergeItems(items),
+    notes: row.notes || raw.notes || "",
+    completedBy: row.completed_by || row.completedBy || raw.completedBy || "",
+    createdAt: iso(row.created_at || row.createdAt || raw.createdAt),
+    updatedAt: iso(row.updated_at || row.updatedAt || raw.updatedAt),
+  };
+}
+
+function templateChecklist(date) {
+  return normalizeRow({
+    check_date: normalizeChecklistDate(date),
+    items: [],
+    notes: "",
+    completed_by: "",
+  });
+}
+
+export async function getDailyChecklist(date = "") {
+  const checkDate = normalizeChecklistDate(date);
+
+  if (!hasDailyChecklistStore()) {
+    return templateChecklist(checkDate);
+  }
+
+  if (!hasPostgres()) {
+    const snapshot = await db.collection("dailyChecklists").doc(checkDate).get();
+    return snapshot.exists
+      ? normalizeRow({ date: checkDate, ...(snapshot.data() || {}) })
+      : templateChecklist(checkDate);
+  }
+
+  await ensureTable();
+  const result = await query("select * from daily_checklists where check_date = $1", [checkDate]);
+  return result.rows[0] ? normalizeRow(result.rows[0]) : templateChecklist(checkDate);
+}
+
+export async function listDailyChecklists(options = {}) {
+  const limit = Math.max(1, Math.min(Number(options.limit) || 10, 30));
+
+  if (!hasDailyChecklistStore()) {
+    return [];
+  }
+
+  if (!hasPostgres()) {
+    const snapshot = await db.collection("dailyChecklists").get();
+    return snapshot.docs
+      .map((doc) => normalizeRow({ date: doc.id, ...(doc.data() || {}) }))
+      .filter((item) => validDate(item.date))
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, limit);
+  }
+
+  await ensureTable();
+  const result = await query(
+    "select * from daily_checklists order by check_date desc limit $1",
+    [limit],
+  );
+  return result.rows.map((row) => normalizeRow(row));
+}
+
+export async function cleanupOldDailyChecklists(options = {}) {
+  const retentionDays = Number.isFinite(Number(options.retentionDays))
+    ? Number(options.retentionDays)
+    : DAILY_CHECKLIST_RETENTION_DAYS;
+  const cutoffDate = retentionCutoffDate(retentionDays);
+
+  if (!hasDailyChecklistStore()) {
+    return { cutoffDate, deleted: 0 };
+  }
+
+  if (!hasPostgres()) {
+    const snapshot = await db.collection("dailyChecklists").get();
+    let batch = db.batch();
+    let pending = 0;
+    let deleted = 0;
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data() || {};
+      const recordDate = cleanText(data.date || doc.id);
+
+      if (!validDate(recordDate) || recordDate >= cutoffDate) continue;
+
+      batch.delete(doc.ref);
+      pending += 1;
+      deleted += 1;
+
+      if (pending >= 450) {
+        await batch.commit();
+        batch = db.batch();
+        pending = 0;
+      }
+    }
+
+    if (pending > 0) {
+      await batch.commit();
+    }
+
+    return { cutoffDate, deleted };
+  }
+
+  await ensureTable();
+  const result = await query(
+    "delete from daily_checklists where check_date < $1",
+    [cutoffDate],
+  );
+  return { cutoffDate, deleted: result.rowCount || 0 };
+}
+
+export async function saveDailyChecklist(input = {}) {
+  const checkDate = normalizeChecklistDate(input.date);
+  const now = new Date();
+  const existing = await getDailyChecklist(checkDate);
+  const existingItems = normalizeSavedItems(existing.items);
+  const incomingItems = normalizeSavedItems(input.items);
+  const items = flatTemplateItems().map((templateItem) => {
+    const previous = existingItems.get(templateItem.id) || {};
+    const incoming = incomingItems.get(templateItem.id) || {};
+    const done = incoming.done === true;
+    return {
+      id: templateItem.id,
+      done,
+      note: incoming.note || "",
+      completedAt: done
+        ? incoming.completedAt || previous.completedAt || now.toISOString()
+        : "",
+    };
+  });
+  const doc = {
+    date: checkDate,
+    items,
+    notes: cleanText(input.notes),
+    completedBy: cleanText(input.completedBy),
+    updatedAt: now.toISOString(),
+  };
+
+  if (!hasDailyChecklistStore()) {
+    return normalizeRow(doc);
+  }
+
+  if (!hasPostgres()) {
+    const ref = db.collection("dailyChecklists").doc(checkDate);
+    const snapshot = await ref.get();
+    await ref.set(
+      {
+        ...doc,
+        createdAt: snapshot.exists ? snapshot.data()?.createdAt || now.toISOString() : now.toISOString(),
+      },
+      { merge: true },
+    );
+    return getDailyChecklist(checkDate);
+  }
+
+  await ensureTable();
+  await query(
+    `
+      insert into daily_checklists (check_date, items, notes, completed_by, created_at, updated_at, raw)
+      values ($1, $2::jsonb, $3, $4, $5, $5, $6::jsonb)
+      on conflict (check_date) do update set
+        items = excluded.items,
+        notes = excluded.notes,
+        completed_by = excluded.completed_by,
+        updated_at = excluded.updated_at,
+        raw = excluded.raw
+    `,
+    [
+      checkDate,
+      JSON.stringify(items),
+      doc.notes,
+      doc.completedBy,
+      now,
+      JSON.stringify(doc),
+    ],
+  );
+  return getDailyChecklist(checkDate);
+}
+
+export function checklistTemplate() {
+  return DAILY_CHECKLIST_TEMPLATE;
+}
