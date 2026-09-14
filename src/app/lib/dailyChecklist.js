@@ -189,12 +189,15 @@ function mergeItems(savedItems = []) {
 function normalizeRow(row = {}) {
   const raw = row.raw || {};
   const items = row.items || raw.items || [];
+  const legacyStaff = row.staff_name || row.staffName || raw.staffName || raw.completedBy || row.completed_by || "";
   return {
     date: row.check_date || row.date || raw.date || todayInToronto(),
     items: mergeItems(items),
     notes: row.notes || raw.notes || "",
     completedBy: row.completed_by || row.completedBy || raw.completedBy || "",
-    staffName: row.staff_name || row.staffName || raw.staffName || raw.completedBy || row.completed_by || "",
+    staffName: legacyStaff,
+    openingStaff: row.opening_staff || row.openingStaff || raw.openingStaff || legacyStaff,
+    closingStaff: row.closing_staff || row.closingStaff || raw.closingStaff || "",
     shiftStart: row.shift_start || row.shiftStart || raw.shiftStart || "",
     shiftEnd: row.shift_end || row.shiftEnd || raw.shiftEnd || "",
     createdAt: iso(row.created_at || row.createdAt || raw.createdAt),
@@ -308,6 +311,11 @@ export async function saveDailyChecklist(input = {}) {
   const existing = await getDailyChecklist(checkDate);
   const existingItems = normalizeSavedItems(existing.items);
   const incomingItems = normalizeSavedItems(input.items);
+  const hasOpeningStaff = Object.prototype.hasOwnProperty.call(input, "openingStaff");
+  const hasClosingStaff = Object.prototype.hasOwnProperty.call(input, "closingStaff");
+  const legacyStaff = cleanText(input.staffName || input.completedBy);
+  const openingStaff = hasOpeningStaff ? cleanText(input.openingStaff) : legacyStaff;
+  const closingStaff = hasClosingStaff ? cleanText(input.closingStaff) : "";
   const items = flatTemplateItems().map((templateItem) => {
     const previous = existingItems.get(templateItem.id) || {};
     const incoming = incomingItems.get(templateItem.id) || {};
@@ -325,8 +333,10 @@ export async function saveDailyChecklist(input = {}) {
     date: checkDate,
     items,
     notes: cleanText(input.notes),
-    completedBy: cleanText(input.staffName || input.completedBy),
-    staffName: cleanText(input.staffName || input.completedBy),
+    completedBy: closingStaff || openingStaff || legacyStaff,
+    staffName: openingStaff,
+    openingStaff,
+    closingStaff,
     shiftStart: cleanText(input.shiftStart),
     shiftEnd: cleanText(input.shiftEnd),
     updatedAt: now.toISOString(),

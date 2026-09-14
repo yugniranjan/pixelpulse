@@ -111,6 +111,8 @@ function emptyChecklist(date, template = FALLBACK_TEMPLATE) {
     notes: "",
     completedBy: "",
     staffName: "",
+    openingStaff: "",
+    closingStaff: "",
     shiftStart: "",
     shiftEnd: "",
   };
@@ -123,6 +125,8 @@ function mergeChecklist(checklist, template) {
     notes: checklist?.notes || "",
     completedBy: checklist?.completedBy || "",
     staffName: checklist?.staffName || checklist?.completedBy || "",
+    openingStaff: checklist?.openingStaff || checklist?.staffName || checklist?.completedBy || "",
+    closingStaff: checklist?.closingStaff || "",
     shiftStart: checklist?.shiftStart || "",
     shiftEnd: checklist?.shiftEnd || "",
     updatedAt: checklist?.updatedAt || "",
@@ -173,6 +177,7 @@ function sectionMode(sectionId = "") {
 
 export default function DailyChecklistPage() {
   const [date, setDate] = useState(todayToronto);
+  const [activeTab, setActiveTab] = useState("opening");
   const [template, setTemplate] = useState(FALLBACK_TEMPLATE);
   const [checklist, setChecklist] = useState(() => emptyChecklist(todayToronto(), FALLBACK_TEMPLATE));
   const [recent, setRecent] = useState([]);
@@ -248,6 +253,12 @@ export default function DailyChecklistPage() {
     };
   }, [checklist.items]);
 
+  const activeGroup = useMemo(() => (
+    activeTab === "closing"
+      ? { id: "closing", title: "Closing Checklist", desc: "Complete after the final session, before lock-up and handoff." }
+      : { id: "opening", title: "Opening Checklist", desc: "Complete before doors open and before the first guests arrive." }
+  ), [activeTab]);
+
   function updateItem(id, updates) {
     setChecklist((current) => ({
       ...current,
@@ -264,15 +275,18 @@ export default function DailyChecklistPage() {
     }));
   }
 
-  function setAll(done) {
+  function setAll(done, mode = "") {
     const now = new Date().toISOString();
     setChecklist((current) => ({
       ...current,
-      items: current.items.map((item) => ({
-        ...item,
-        done,
-        completedAt: done ? item.completedAt || now : "",
-      })),
+      items: current.items.map((item) => {
+        if (mode && sectionMode(item.sectionId) !== mode) return item;
+        return {
+          ...item,
+          done,
+          completedAt: done ? item.completedAt || now : "",
+        };
+      }),
     }));
   }
 
@@ -344,11 +358,19 @@ export default function DailyChecklistPage() {
             <input type="date" value={date} onChange={(event) => setDate(event.target.value || todayToronto())} />
           </label>
           <label>
-            <span>Staff name</span>
+            <span>Opening staff</span>
             <input
-              value={checklist.staffName}
-              onChange={(event) => setChecklist((current) => ({ ...current, staffName: event.target.value }))}
-              placeholder="Staff name"
+              value={checklist.openingStaff}
+              onChange={(event) => setChecklist((current) => ({ ...current, openingStaff: event.target.value }))}
+              placeholder="Optional if closing only"
+            />
+          </label>
+          <label>
+            <span>Closing staff</span>
+            <input
+              value={checklist.closingStaff}
+              onChange={(event) => setChecklist((current) => ({ ...current, closingStaff: event.target.value }))}
+              placeholder="Optional until close"
             />
           </label>
           <label>
@@ -383,59 +405,70 @@ export default function DailyChecklistPage() {
           <span>Closing {shiftStats.closing.percent}%</span>
         </div>
         <div className="daily-progress__actions">
-          <button type="button" onClick={() => setAll(true)}>Mark all done</button>
+          <button type="button" onClick={() => setAll(true, activeTab)}>Mark {activeTab} done</button>
           <button type="button" onClick={resetDay}>Reset day</button>
         </div>
       </section>
 
-      {[
-        { id: "opening", title: "Opening Checklist", desc: "Complete before doors open and before the first guests arrive." },
-        { id: "closing", title: "Closing Checklist", desc: "Complete after the final session, before lock-up and handoff." },
-      ].map((group) => (
-        <section className={`daily-checklist-group daily-checklist-group--${group.id}`} key={group.id}>
-          <div className="daily-checklist-group__head">
-            <div>
-              <span className="waiver-admin-kicker">{group.id === "opening" ? "Start of shift" : "End of shift"}</span>
-              <h2>{group.title}</h2>
-              <p>{group.desc}</p>
-            </div>
-            <strong>{shiftStats[group.id].complete}/{shiftStats[group.id].total}</strong>
+      <div className="daily-tabs" role="tablist" aria-label="Checklist type">
+        {["opening", "closing"].map((tab) => (
+          <button
+            aria-selected={activeTab === tab}
+            className={activeTab === tab ? "is-active" : ""}
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            role="tab"
+            type="button"
+          >
+            <span>{tab === "opening" ? "Opening" : "Closing"}</span>
+            <strong>{shiftStats[tab].complete}/{shiftStats[tab].total}</strong>
+          </button>
+        ))}
+      </div>
+
+      <section className={`daily-checklist-group daily-checklist-group--${activeGroup.id}`}>
+        <div className="daily-checklist-group__head">
+          <div>
+            <span className="waiver-admin-kicker">{activeGroup.id === "opening" ? "Start of shift" : "End of shift"}</span>
+            <h2>{activeGroup.title}</h2>
+            <p>{activeGroup.desc}</p>
           </div>
-          <div className="daily-grid">
-            {groupedSections[group.id].map((section) => {
-              const sectionItems = itemsBySection.get(section.id) || [];
-              const complete = sectionItems.filter((item) => item.done).length;
-              return (
-                <section className="daily-section" key={section.id}>
-                  <div className="daily-section__head">
-                    <h3>{section.title.replace(/^Opening - |^Closing - /, "")}</h3>
-                    <span>{complete}/{sectionItems.length}</span>
-                  </div>
-                  <div className="daily-tasks">
-                    {sectionItems.map((item) => (
-                      <article className={item.done ? "daily-task is-done" : "daily-task"} key={item.id}>
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={item.done}
-                            onChange={(event) => updateItem(item.id, { done: event.target.checked })}
-                          />
-                          <span>{item.label}</span>
-                        </label>
+          <strong>{shiftStats[activeGroup.id].complete}/{shiftStats[activeGroup.id].total}</strong>
+        </div>
+        <div className="daily-grid">
+          {groupedSections[activeGroup.id].map((section) => {
+            const sectionItems = itemsBySection.get(section.id) || [];
+            const complete = sectionItems.filter((item) => item.done).length;
+            return (
+              <section className="daily-section" key={section.id}>
+                <div className="daily-section__head">
+                  <h3>{section.title.replace(/^Opening - |^Closing - /, "")}</h3>
+                  <span>{complete}/{sectionItems.length}</span>
+                </div>
+                <div className="daily-tasks">
+                  {sectionItems.map((item) => (
+                    <article className={item.done ? "daily-task is-done" : "daily-task"} key={item.id}>
+                      <label>
                         <input
-                          value={item.note}
-                          onChange={(event) => updateItem(item.id, { note: event.target.value })}
-                          placeholder="Notes or action required"
+                          type="checkbox"
+                          checked={item.done}
+                          onChange={(event) => updateItem(item.id, { done: event.target.checked })}
                         />
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+                        <span>{item.label}</span>
+                      </label>
+                      <input
+                        value={item.note}
+                        onChange={(event) => updateItem(item.id, { note: event.target.value })}
+                        placeholder="Notes or action required"
+                      />
+                    </article>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </section>
 
       <section className="daily-closeout">
         <label>
@@ -496,7 +529,8 @@ export default function DailyChecklistPage() {
                     {record.notes ? <p>{record.notes}</p> : <p>No daily notes saved.</p>}
 
                     <div className="daily-history__meta">
-                      <span>Staff: {record.staffName || record.completedBy || "Not entered"}</span>
+                      <span>Opening: {record.openingStaff || record.staffName || record.completedBy || "Not entered"}</span>
+                      <span>Closing: {record.closingStaff || "Not entered"}</span>
                       <span>Shift: {record.shiftStart || "--:--"} - {record.shiftEnd || "--:--"}</span>
                       <span>Saved: {formatUpdated(record.updatedAt)}</span>
                     </div>

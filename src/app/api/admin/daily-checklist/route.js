@@ -56,6 +56,8 @@ export async function PUT(req) {
       notes: body.notes,
       completedBy: body.completedBy,
       staffName: body.staffName,
+      openingStaff: body.openingStaff,
+      closingStaff: body.closingStaff,
       shiftStart: body.shiftStart,
       shiftEnd: body.shiftEnd,
     });
