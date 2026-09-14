@@ -39,7 +39,7 @@ const FALLBACK_TEMPLATE = [
   },
   {
     id: "opening-bookings",
-    title: "Opening - Bookings",
+    title: "Opening - Booking And Communication",
     items: [
       { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
       { id: "birthday-party-supplies", label: "Prepare birthday party supplies: table cloths, cake knife, lighter, napkins, cutlery, plates, cups, and serving essentials." },
@@ -69,6 +69,15 @@ const FALLBACK_TEMPLATE = [
     ],
   },
   {
+    id: "closing-communication",
+    title: "Closing - Communication",
+    items: [
+      { id: "follow-up-calls", label: "Complete any required follow-up calls for parties, inquiries, missed calls, or guest concerns." },
+      { id: "email-communication", label: "Reply to pending customer emails and document any booking, waiver, or feedback follow-ups." },
+      { id: "thank-you-emails", label: "Send thank-you emails to completed parties or guests requiring post-visit communication." },
+    ],
+  },
+  {
     id: "closing-admin",
     title: "Closing - Admin",
     items: [
@@ -78,6 +87,11 @@ const FALLBACK_TEMPLATE = [
       { id: "handoff", label: "Log incidents, guest feedback, maintenance issues, and tomorrow's priorities." },
     ],
   },
+];
+
+const DAILY_TABS = [
+  { id: "opening", label: "Opening" },
+  { id: "closing", label: "Closing" },
 ];
 
 function todayToronto() {
@@ -98,6 +112,7 @@ function flattenTemplate(template = []) {
       sectionId: section.id,
       label: item.label,
       done: false,
+      status: "pending",
       note: "",
       completedAt: "",
     })),
@@ -133,6 +148,7 @@ function mergeChecklist(checklist, template) {
     items: flattenTemplate(template).map((item) => ({
       ...item,
       done: saved.get(item.id)?.done === true,
+      status: saved.get(item.id)?.status || (saved.get(item.id)?.done === true ? "complete" : "pending"),
       note: saved.get(item.id)?.note || "",
       completedAt: saved.get(item.id)?.completedAt || "",
     })),
@@ -151,6 +167,18 @@ function formatUpdated(value = "") {
   });
 }
 
+function formatShiftTime(value = "", fallback = "Pending") {
+  if (!value) return fallback;
+  const [hourValue, minuteValue] = value.split(":").map(Number);
+  if (!Number.isFinite(hourValue) || !Number.isFinite(minuteValue)) return value;
+  const date = new Date();
+  date.setHours(hourValue, minuteValue, 0, 0);
+  return date.toLocaleTimeString("en-CA", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 function formatChecklistDate(value = "") {
   const date = new Date(`${value}T12:00:00`);
   if (Number.isNaN(date.getTime())) return value || "Saved day";
@@ -163,10 +191,14 @@ function formatChecklistDate(value = "") {
 
 function checklistStats(items = []) {
   const total = items.length;
-  const complete = items.filter((item) => item.done).length;
+  const complete = items.filter((item) => item.status === "complete" || item.done).length;
+  const issues = items.filter((item) => item.status === "issue").length;
+  const na = items.filter((item) => item.status === "na").length;
   return {
     total,
     complete,
+    issues,
+    na,
     percent: total ? Math.round((complete / total) * 100) : 0,
   };
 }
@@ -223,10 +255,14 @@ export default function DailyChecklistPage() {
 
   const stats = useMemo(() => {
     const total = checklist.items.length;
-    const complete = checklist.items.filter((item) => item.done).length;
+    const complete = checklist.items.filter((item) => item.status === "complete" || item.done).length;
+    const issues = checklist.items.filter((item) => item.status === "issue").length;
+    const na = checklist.items.filter((item) => item.status === "na").length;
     return {
       total,
       complete,
+      issues,
+      na,
       percent: total ? Math.round((complete / total) * 100) : 0,
     };
   }, [checklist.items]);
@@ -259,6 +295,17 @@ export default function DailyChecklistPage() {
       : { id: "opening", title: "Opening Checklist", desc: "Complete before doors open and before the first guests arrive." }
   ), [activeTab]);
 
+  const activeSections = groupedSections[activeGroup.id] || [];
+  const activeStats = shiftStats[activeGroup.id];
+
+  const openingStatus = shiftStats.opening.complete
+    ? `${shiftStats.opening.percent}%`
+    : "Not started";
+  const closingStatus = shiftStats.closing.complete
+    ? `${shiftStats.closing.percent}%`
+    : "Not started";
+  const supervisorStatus = stats.percent === 100 && stats.issues === 0 ? "Ready" : "Pending";
+
   function updateItem(id, updates) {
     setChecklist((current) => ({
       ...current,
@@ -275,6 +322,11 @@ export default function DailyChecklistPage() {
     }));
   }
 
+  function updateItemStatus(id, status) {
+    const done = status === "complete";
+    updateItem(id, { status, done });
+  }
+
   function setAll(done, mode = "") {
     const now = new Date().toISOString();
     setChecklist((current) => ({
@@ -284,10 +336,17 @@ export default function DailyChecklistPage() {
         return {
           ...item,
           done,
+          status: done ? "complete" : "pending",
           completedAt: done ? item.completedAt || now : "",
         };
       }),
     }));
+  }
+
+  function switchTab(tab) {
+    if (tab === "opening" || tab === "closing") {
+      setActiveTab(tab);
+    }
   }
 
   function resetDay() {
@@ -338,67 +397,117 @@ export default function DailyChecklistPage() {
         </div>
       </div>
 
-      {loading ? <p className="daily-state">Loading checklist...</p> : null}
+      {loading ? (
+        <div className="daily-loading" aria-label="Loading checklist">
+          <span />
+          <span />
+          <span />
+        </div>
+      ) : null}
       {error ? <div className="waiver-admin-error"><p>{error}</p></div> : null}
       {notice ? <div className="daily-notice">{notice}</div> : null}
 
-      <section className="daily-shift-card">
-        <div className="daily-shift-card__head">
+      <section className="daily-ops-dashboard" aria-label="Daily operations dashboard">
+        <div className="daily-ops-shift">
           <div>
-            <span className="waiver-admin-kicker">Checklist date</span>
-            <h2>{formatChecklistDate(date)}</h2>
+            <span>Today</span>
+            <strong>{formatChecklistDate(date)}</strong>
+          </div>
+          <div>
+            <span>Opening staff</span>
+            <strong>{checklist.openingStaff || checklist.staffName || "Not assigned"}</strong>
+          </div>
+          <div>
+            <span>Closing staff</span>
+            <strong>{checklist.closingStaff || "Not assigned"}</strong>
+          </div>
+          <div>
+            <span>Opening time</span>
+            <strong>{formatShiftTime(checklist.shiftStart, "Pending")}</strong>
+          </div>
+          <div>
+            <span>Closing time</span>
+            <strong>{formatShiftTime(checklist.shiftEnd, "Pending")}</strong>
+          </div>
+          <div>
+            <span>Supervisor</span>
+            <strong>{checklist.completedBy || checklist.closingStaff || "Pending"}</strong>
           </div>
         </div>
-        <div className="daily-date-field">
-          <label>
-            <span>Date</span>
-            <input type="date" value={date} onChange={(event) => setDate(event.target.value || todayToronto())} />
-          </label>
-        </div>
-      </section>
 
-      <section className="daily-progress">
-        <div>
-          <strong>{stats.percent}%</strong>
-          <span>{stats.complete} of {stats.total} tasks complete</span>
-        </div>
-        <div className="daily-progress__bar" aria-label={`${stats.percent}% complete`}>
-          <i style={{ width: `${stats.percent}%` }} />
-        </div>
-        <div className="daily-progress__split">
-          <span>Opening {shiftStats.opening.percent}%</span>
-          <span>Closing {shiftStats.closing.percent}%</span>
-        </div>
-        <div className="daily-progress__actions">
-          <button type="button" onClick={() => setAll(true, activeTab)}>Mark {activeTab} done</button>
-          <button type="button" onClick={resetDay}>Reset day</button>
+        <div className="daily-ops-status-grid">
+          <button
+            className={`daily-ops-status daily-ops-status--action ${activeTab === "opening" ? "is-active" : ""}`}
+            onClick={() => switchTab("opening")}
+            type="button"
+          >
+            <span>Opening checklist</span>
+            <strong><i className={shiftStats.opening.complete ? "daily-dot daily-dot--green" : "daily-dot"} />{openingStatus}</strong>
+          </button>
+          <button
+            className={`daily-ops-status daily-ops-status--action ${activeTab === "closing" ? "is-active" : ""}`}
+            onClick={() => switchTab("closing")}
+            type="button"
+          >
+            <span>Closing checklist</span>
+            <strong><i className={shiftStats.closing.complete ? "daily-dot daily-dot--green" : "daily-dot"} />{closingStatus}</strong>
+          </button>
+          <article className="daily-ops-status">
+            <span>Issues reported</span>
+            <strong><i className={stats.issues ? "daily-dot daily-dot--amber" : "daily-dot daily-dot--green"} />{stats.issues} Open</strong>
+          </article>
+          <article className="daily-ops-status">
+            <span>Inventory alerts</span>
+            <strong><i className="daily-dot" />No alerts</strong>
+          </article>
+          <article className="daily-ops-status">
+            <span>Supervisor review</span>
+            <strong><i className={supervisorStatus === "Ready" ? "daily-dot daily-dot--green" : "daily-dot"} />{supervisorStatus}</strong>
+          </article>
         </div>
       </section>
 
       <div className="daily-tabs" role="tablist" aria-label="Checklist type">
-        {["opening", "closing"].map((tab) => (
+        {DAILY_TABS.map((tab) => (
           <button
-            aria-selected={activeTab === tab}
-            className={activeTab === tab ? "is-active" : ""}
-            key={tab}
-            onClick={() => setActiveTab(tab)}
+            aria-selected={activeTab === tab.id}
+            className={activeTab === tab.id ? "is-active" : ""}
+            key={tab.id}
+            onClick={() => switchTab(tab.id)}
+            aria-controls={`daily-${tab.id}-panel`}
+            id={`daily-${tab.id}-tab`}
             role="tab"
             type="button"
           >
-            <span>{tab === "opening" ? "Opening" : "Closing"}</span>
-            <strong>{shiftStats[tab].complete}/{shiftStats[tab].total}</strong>
+            <span>{tab.label}</span>
+            <strong>{shiftStats[tab.id].complete}/{shiftStats[tab.id].total}</strong>
           </button>
         ))}
       </div>
 
-      <section className={`daily-checklist-group daily-checklist-group--${activeGroup.id}`}>
+      <section
+        aria-labelledby={`daily-${activeGroup.id}-tab`}
+        className={`daily-checklist-group daily-checklist-group--${activeGroup.id}`}
+        id={`daily-${activeGroup.id}-panel`}
+        key={activeGroup.id}
+        role="tabpanel"
+      >
         <div className="daily-checklist-group__head">
           <div>
             <span className="waiver-admin-kicker">{activeGroup.id === "opening" ? "Start of shift" : "End of shift"}</span>
             <h2>{activeGroup.title}</h2>
             <p>{activeGroup.desc}</p>
           </div>
-          <strong>{shiftStats[activeGroup.id].complete}/{shiftStats[activeGroup.id].total}</strong>
+          <div className="daily-checklist-group__actions">
+            <div className="daily-checklist-progress-pill">
+              <span>{activeGroup.id === "opening" ? "Opening progress" : "Closing progress"}</span>
+              <strong>{activeStats.complete}/{activeStats.total}</strong>
+            </div>
+            <button type="button" onClick={() => setAll(true, activeTab)}>
+              Mark {activeGroup.id} complete
+            </button>
+            <button className="is-secondary" type="button" onClick={resetDay}>Reset today</button>
+          </div>
         </div>
         <div className="daily-tab-shift">
           {activeGroup.id === "opening" ? (
@@ -442,33 +551,58 @@ export default function DailyChecklistPage() {
           )}
         </div>
         <div className="daily-grid">
-          {groupedSections[activeGroup.id].map((section) => {
+          {activeSections.map((section) => {
             const sectionItems = itemsBySection.get(section.id) || [];
-            const complete = sectionItems.filter((item) => item.done).length;
+            const complete = sectionItems.filter((item) => item.status === "complete" || item.done).length;
+            const issues = sectionItems.filter((item) => item.status === "issue").length;
             return (
               <section className="daily-section" key={section.id}>
                 <div className="daily-section__head">
                   <h3>{section.title.replace(/^Opening - |^Closing - /, "")}</h3>
-                  <span>{complete}/{sectionItems.length}</span>
+                  <span>{complete}/{sectionItems.length}{issues ? ` · ${issues} issue${issues === 1 ? "" : "s"}` : ""}</span>
                 </div>
                 <div className="daily-tasks">
-                  {sectionItems.map((item) => (
-                    <article className={item.done ? "daily-task is-done" : "daily-task"} key={item.id}>
-                      <label>
+                  {sectionItems.map((item) => {
+                    const status = item.status || (item.done ? "complete" : "pending");
+                    return (
+                      <article className={`daily-task daily-task--${status}`} key={item.id}>
+                        <div className="daily-task__main">
+                          <div className="daily-task__copy">
+                            <span>{item.label}</span>
+                            {item.completedAt ? <small>Completed {formatUpdated(item.completedAt)}</small> : null}
+                          </div>
+                          <div className="daily-task__segmented" aria-label={`${item.label} status`}>
+                            <button
+                              className={status === "complete" ? "is-active" : ""}
+                              onClick={() => updateItemStatus(item.id, "complete")}
+                              type="button"
+                            >
+                              Complete
+                            </button>
+                            <button
+                              className={status === "issue" ? "is-active" : ""}
+                              onClick={() => updateItemStatus(item.id, "issue")}
+                              type="button"
+                            >
+                              Issue
+                            </button>
+                            <button
+                              className={status === "na" ? "is-active" : ""}
+                              onClick={() => updateItemStatus(item.id, "na")}
+                              type="button"
+                            >
+                              N/A
+                            </button>
+                          </div>
+                        </div>
                         <input
-                          type="checkbox"
-                          checked={item.done}
-                          onChange={(event) => updateItem(item.id, { done: event.target.checked })}
+                          value={item.note}
+                          onChange={(event) => updateItem(item.id, { note: event.target.value })}
+                          placeholder={status === "issue" ? "Describe the issue or action required" : "Optional note"}
                         />
-                        <span>{item.label}</span>
-                      </label>
-                      <input
-                        value={item.note}
-                        onChange={(event) => updateItem(item.id, { note: event.target.value })}
-                        placeholder="Notes or action required"
-                      />
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               </section>
             );

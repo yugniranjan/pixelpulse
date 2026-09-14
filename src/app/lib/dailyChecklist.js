@@ -39,7 +39,7 @@ export const DAILY_CHECKLIST_TEMPLATE = [
   },
   {
     id: "opening-bookings",
-    title: "Opening - Bookings",
+    title: "Opening - Booking And Communication",
     items: [
       { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
       { id: "birthday-party-supplies", label: "Prepare birthday party supplies: table cloths, cake knife, lighter, napkins, cutlery, plates, cups, and serving essentials." },
@@ -66,6 +66,15 @@ export const DAILY_CHECKLIST_TEMPLATE = [
       { id: "laser-room-glass-close", label: "Final glass clean for the laser room and guest viewing areas." },
       { id: "party-room-close", label: "Clear, sanitize, and reset party room tables, chairs, bins, and floors." },
       { id: "lost-found", label: "Check lost and found, party room, washrooms, and arena for belongings." },
+    ],
+  },
+  {
+    id: "closing-communication",
+    title: "Closing - Communication",
+    items: [
+      { id: "follow-up-calls", label: "Complete any required follow-up calls for parties, inquiries, missed calls, or guest concerns." },
+      { id: "email-communication", label: "Reply to pending customer emails and document any booking, waiver, or feedback follow-ups." },
+      { id: "thank-you-emails", label: "Send thank-you emails to completed parties or guests requiring post-visit communication." },
     ],
   },
   {
@@ -112,6 +121,12 @@ async function ensureTable() {
 
 function cleanText(value = "") {
   return String(value || "").trim();
+}
+
+function normalizeItemStatus(value = "", done = false) {
+  const status = cleanText(value).toLowerCase();
+  if (["complete", "issue", "na", "pending"].includes(status)) return status;
+  return done ? "complete" : "pending";
 }
 
 function todayInToronto() {
@@ -167,6 +182,7 @@ function normalizeSavedItems(items = []) {
     map.set(id, {
       id,
       done: item.done === true,
+      status: normalizeItemStatus(item.status, item.done === true),
       note: cleanText(item.note),
       completedAt: cleanText(item.completedAt),
     });
@@ -180,7 +196,8 @@ function mergeItems(savedItems = []) {
     id: item.id,
     label: item.label,
     sectionId: item.sectionId,
-    done: saved.get(item.id)?.done === true,
+    done: saved.get(item.id)?.status === "complete" || saved.get(item.id)?.done === true,
+    status: saved.get(item.id)?.status || "pending",
     note: saved.get(item.id)?.note || "",
     completedAt: saved.get(item.id)?.completedAt || "",
   }));
@@ -319,10 +336,12 @@ export async function saveDailyChecklist(input = {}) {
   const items = flatTemplateItems().map((templateItem) => {
     const previous = existingItems.get(templateItem.id) || {};
     const incoming = incomingItems.get(templateItem.id) || {};
-    const done = incoming.done === true;
+    const status = normalizeItemStatus(incoming.status, incoming.done === true);
+    const done = status === "complete";
     return {
       id: templateItem.id,
       done,
+      status,
       note: incoming.note || "",
       completedAt: done
         ? incoming.completedAt || previous.completedAt || now.toISOString()

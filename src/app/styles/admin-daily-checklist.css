@@ -26,7 +26,7 @@
 }
 
 .daily-save-row button,
-.daily-progress__actions button {
+.daily-checklist-group__actions button {
   min-height: 42px;
   border: 1px solid #0f172a;
   border-radius: 8px;
@@ -98,82 +98,154 @@
   background: #ffffff;
 }
 
+.daily-loading {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.7fr;
+  gap: 10px;
+  margin: 0 0 14px;
+  border: 1px solid #e7eaf1;
+  border-radius: 12px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.daily-loading span {
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #eef2f7, #f8fafc, #eef2f7);
+  background-size: 220% 100%;
+  animation: daily-loading-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes daily-loading-pulse {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
 .daily-notice {
   border: 1px solid rgba(164, 207, 95, 0.4);
   color: #3f6212;
   background: rgba(164, 207, 95, 0.14);
 }
 
-.daily-progress {
+.daily-ops-dashboard {
   display: grid;
-  grid-template-columns: minmax(160px, 0.3fr) minmax(240px, 1fr) auto auto;
   gap: 16px;
-  align-items: center;
   margin-bottom: 18px;
+}
+
+.daily-ops-shift,
+.daily-ops-status {
   border: 1px solid #e7eaf1;
-  border-radius: 16px;
-  padding: 18px 20px;
   background: #ffffff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
-}
-
-.daily-progress strong {
-  display: block;
   color: #0f172a;
-  font-size: 2rem;
-  line-height: 1;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
-.daily-progress span {
+.daily-ops-shift {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr 1.2fr 0.9fr 0.9fr 1fr;
+  gap: 16px;
+  border-radius: 18px;
+  padding: 24px 28px;
+}
+
+.daily-ops-shift div,
+.daily-ops-status {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.daily-ops-shift span,
+.daily-ops-status span {
   color: #64748b;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.daily-progress__bar {
-  height: 12px;
-  border-radius: 999px;
-  background: #e7eaf1;
-  overflow: hidden;
-}
-
-.daily-progress__bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #a4cf5f, #33e6df);
-  transition: width 180ms ease;
-}
-
-.daily-progress__actions {
-  display: flex;
-  gap: 8px;
-}
-
-.daily-progress__split {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.daily-progress__split span {
-  border-radius: 999px;
-  padding: 7px 10px;
-  background: #f8fafc;
-  color: #344054;
-  white-space: nowrap;
-}
-
-.daily-progress__actions button {
-  background: #ffffff;
+.daily-ops-shift strong {
+  min-width: 0;
   color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.daily-ops-status-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.daily-ops-status {
+  min-height: 120px;
+  justify-content: center;
+  border-radius: 18px;
+  padding: 20px 26px;
+  font: inherit;
+  text-align: left;
+}
+
+.daily-ops-status--action {
+  cursor: pointer;
+}
+
+.daily-ops-status--action:hover,
+.daily-ops-status--action.is-active {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.daily-ops-status--action.is-active {
+  box-shadow: inset 0 0 0 2px #0f172a, 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.daily-ops-status strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.daily-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #667085;
+  flex: 0 0 auto;
+}
+
+.daily-dot--green {
+  background: #c8f135;
+  box-shadow: 0 0 12px rgba(200, 241, 53, 0.5);
+}
+
+.daily-dot--amber {
+  background: #f0a93a;
+  box-shadow: 0 0 12px rgba(240, 169, 58, 0.5);
 }
 
 .daily-tabs {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 16px;
+  border: 1px solid #94a3b8;
+  border-radius: 14px;
+  padding: 6px;
+  background: #cbd5e1;
 }
 
 .daily-tabs button {
@@ -182,27 +254,34 @@
   justify-content: space-between;
   gap: 12px;
   min-height: 54px;
-  border: 1px solid #dce3ed;
-  border-radius: 12px;
+  border: 1px solid #94a3b8;
+  border-radius: 10px;
   padding: 12px 14px;
-  background: #ffffff;
-  color: #475569;
+  background: #d1d5db;
+  color: #0f172a;
   font: inherit;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  pointer-events: auto;
+  box-shadow: none;
+}
+
+.daily-tabs button:hover {
+  border-color: #64748b;
+  background: #e5e7eb;
 }
 
 .daily-tabs button.is-active {
   border-color: #0f172a;
   background: #0f172a;
   color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
 }
 
 .daily-tabs button strong {
   border-radius: 999px;
   padding: 5px 9px;
-  background: #eef2f7;
+  background: #ffffff;
   color: #475569;
   font-size: 0.78rem;
 }
@@ -249,12 +328,62 @@
   font-weight: 700;
 }
 
-.daily-checklist-group__head strong {
+.daily-checklist-group__head > strong {
   border-radius: 999px;
   padding: 8px 12px;
   background: #0f172a;
   color: #ffffff;
   font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.daily-checklist-group__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.daily-checklist-group__actions button {
+  min-height: 36px;
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.daily-checklist-group__actions button.is-secondary {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  color: #344054;
+}
+
+.daily-checklist-progress-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 6px 8px 6px 14px;
+  background: #ffffff;
+}
+
+.daily-checklist-progress-pill span {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.daily-checklist-progress-pill strong {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.86rem;
   white-space: nowrap;
 }
 
@@ -310,27 +439,77 @@
   background: #f8fafc;
 }
 
-.daily-task.is-done {
+.daily-task--complete {
   border-color: rgba(164, 207, 95, 0.45);
   background: rgba(164, 207, 95, 0.1);
 }
 
-.daily-task label {
+.daily-task--issue {
+  border-color: rgba(239, 68, 68, 0.34);
+  background: #fff7f7;
+}
+
+.daily-task--na {
+  background: #f1f5f9;
+}
+
+.daily-task__main {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr);
-  gap: 10px;
-  align-items: flex-start;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.daily-task__copy {
+  display: grid;
+  gap: 4px;
   color: #0f172a;
   font-size: 0.9rem;
   font-weight: 800;
   line-height: 1.42;
 }
 
-.daily-task input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  accent-color: #a4cf5f;
+.daily-task__copy small {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.daily-task__segmented {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(76px, 1fr));
+  gap: 6px;
+}
+
+.daily-task__segmented button {
+  min-height: 34px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #ffffff;
+  color: #475569;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.daily-task__segmented button.is-active {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.daily-task--complete .daily-task__segmented button:first-child.is-active {
+  border-color: #3f6212;
+  background: #a4cf5f;
+  color: #0f172a;
+}
+
+.daily-task--issue .daily-task__segmented button:nth-child(2).is-active {
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
 }
 
 .daily-task input:not([type="checkbox"]),
@@ -551,8 +730,9 @@
   .daily-header,
   .daily-date-field,
   .daily-tab-shift,
-  .daily-progress,
   .daily-grid,
+  .daily-ops-shift,
+  .daily-ops-status-grid,
   .daily-closeout {
     grid-template-columns: 1fr;
   }
@@ -575,25 +755,22 @@
 }
 
 @media (max-width: 560px) {
-  .daily-progress__actions {
-    flex-direction: column;
-  }
-
-  .daily-progress__split,
-  .daily-progress__actions {
-    width: 100%;
-  }
-
-  .daily-progress__actions button {
-    width: 100%;
-  }
-
   .daily-tabs {
     grid-template-columns: 1fr;
   }
 
+  .daily-checklist-group__actions,
+  .daily-checklist-group__actions button {
+    width: 100%;
+  }
+
   .daily-history__item summary,
-  .daily-history__sections {
+  .daily-history__sections,
+  .daily-task__main {
     grid-template-columns: 1fr;
+  }
+
+  .daily-task__segmented {
+    width: 100%;
   }
 }
