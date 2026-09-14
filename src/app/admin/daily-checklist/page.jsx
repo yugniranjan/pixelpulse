@@ -345,49 +345,14 @@ export default function DailyChecklistPage() {
       <section className="daily-shift-card">
         <div className="daily-shift-card__head">
           <div>
-            <span className="waiver-admin-kicker">Shift details</span>
-            <h2>Staff Sign-In</h2>
+            <span className="waiver-admin-kicker">Checklist date</span>
+            <h2>{formatChecklistDate(date)}</h2>
           </div>
-          <button type="button" onClick={saveChecklist} disabled={saving}>
-            {saving ? "Saving..." : "Save checklist"}
-          </button>
         </div>
-        <div className="daily-shift-fields">
+        <div className="daily-date-field">
           <label>
             <span>Date</span>
             <input type="date" value={date} onChange={(event) => setDate(event.target.value || todayToronto())} />
-          </label>
-          <label>
-            <span>Opening staff</span>
-            <input
-              value={checklist.openingStaff}
-              onChange={(event) => setChecklist((current) => ({ ...current, openingStaff: event.target.value }))}
-              placeholder="Optional if closing only"
-            />
-          </label>
-          <label>
-            <span>Closing staff</span>
-            <input
-              value={checklist.closingStaff}
-              onChange={(event) => setChecklist((current) => ({ ...current, closingStaff: event.target.value }))}
-              placeholder="Optional until close"
-            />
-          </label>
-          <label>
-            <span>Shift start</span>
-            <input
-              type="time"
-              value={checklist.shiftStart}
-              onChange={(event) => setChecklist((current) => ({ ...current, shiftStart: event.target.value }))}
-            />
-          </label>
-          <label>
-            <span>Shift end</span>
-            <input
-              type="time"
-              value={checklist.shiftEnd}
-              onChange={(event) => setChecklist((current) => ({ ...current, shiftEnd: event.target.value }))}
-            />
           </label>
         </div>
       </section>
@@ -435,6 +400,47 @@ export default function DailyChecklistPage() {
           </div>
           <strong>{shiftStats[activeGroup.id].complete}/{shiftStats[activeGroup.id].total}</strong>
         </div>
+        <div className="daily-tab-shift">
+          {activeGroup.id === "opening" ? (
+            <>
+              <label>
+                <span>Opening staff</span>
+                <input
+                  value={checklist.openingStaff}
+                  onChange={(event) => setChecklist((current) => ({ ...current, openingStaff: event.target.value }))}
+                  placeholder="Opening staff name"
+                />
+              </label>
+              <label>
+                <span>Opening time</span>
+                <input
+                  type="time"
+                  value={checklist.shiftStart}
+                  onChange={(event) => setChecklist((current) => ({ ...current, shiftStart: event.target.value }))}
+                />
+              </label>
+            </>
+          ) : (
+            <>
+              <label>
+                <span>Closing staff</span>
+                <input
+                  value={checklist.closingStaff}
+                  onChange={(event) => setChecklist((current) => ({ ...current, closingStaff: event.target.value }))}
+                  placeholder="Closing staff name"
+                />
+              </label>
+              <label>
+                <span>Closing time</span>
+                <input
+                  type="time"
+                  value={checklist.shiftEnd}
+                  onChange={(event) => setChecklist((current) => ({ ...current, shiftEnd: event.target.value }))}
+                />
+              </label>
+            </>
+          )}
+        </div>
         <div className="daily-grid">
           {groupedSections[activeGroup.id].map((section) => {
             const sectionItems = itemsBySection.get(section.id) || [];
@@ -479,7 +485,12 @@ export default function DailyChecklistPage() {
             placeholder="Incidents, maintenance, follow-ups, staffing notes..."
           />
         </label>
-        <p>Last saved: {formatUpdated(checklist.updatedAt)}</p>
+        <div className="daily-save-row">
+          <p>Last saved: {formatUpdated(checklist.updatedAt)}</p>
+          <button type="button" onClick={saveChecklist} disabled={saving}>
+            {saving ? "Saving..." : "Save checklist"}
+          </button>
+        </div>
       </section>
 
       <section className="daily-history">

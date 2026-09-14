@@ -25,7 +25,7 @@
   font-size: 1.18rem;
 }
 
-.daily-shift-card__head button,
+.daily-save-row button,
 .daily-progress__actions button {
   min-height: 42px;
   border: 1px solid #0f172a;
@@ -38,18 +38,32 @@
   cursor: pointer;
 }
 
-.daily-shift-card__head button:disabled {
+.daily-save-row button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.daily-shift-fields {
+.daily-date-field,
+.daily-tab-shift {
   display: grid;
-  grid-template-columns: minmax(150px, 0.75fr) repeat(2, minmax(180px, 1fr)) repeat(2, minmax(130px, 0.65fr));
   gap: 12px;
 }
 
-.daily-shift-fields label {
+.daily-date-field {
+  grid-template-columns: minmax(180px, 280px);
+}
+
+.daily-tab-shift {
+  grid-template-columns: minmax(220px, 1fr) minmax(150px, 0.45fr);
+  margin-bottom: 16px;
+  border: 1px solid #e7eaf1;
+  border-radius: 12px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.daily-date-field label,
+.daily-tab-shift label {
   display: grid;
   gap: 7px;
   color: #344054;
@@ -58,7 +72,8 @@
   text-transform: uppercase;
 }
 
-.daily-shift-fields input {
+.daily-date-field input,
+.daily-tab-shift input {
   width: 100%;
   box-sizing: border-box;
   min-height: 42px;
@@ -359,11 +374,17 @@
 }
 
 .daily-closeout p {
-  grid-column: 1 / -1;
   margin: 0;
   color: #64748b;
   font-size: 0.84rem;
   font-weight: 700;
+}
+
+.daily-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .daily-history {
@@ -528,7 +549,8 @@
 
 @media (max-width: 900px) {
   .daily-header,
-  .daily-shift-fields,
+  .daily-date-field,
+  .daily-tab-shift,
   .daily-progress,
   .daily-grid,
   .daily-closeout {
