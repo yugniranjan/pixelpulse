@@ -55,6 +55,9 @@ export async function PUT(req) {
       items: body.items,
       notes: body.notes,
       completedBy: body.completedBy,
+      staffName: body.staffName,
+      shiftStart: body.shiftStart,
+      shiftEnd: body.shiftEnd,
     });
     const recent = await listDailyChecklists({ limit: 10 });
 

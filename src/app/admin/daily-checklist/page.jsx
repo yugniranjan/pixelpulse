@@ -7,53 +7,75 @@ import "../../styles/admin-daily-checklist.css";
 
 const FALLBACK_TEMPLATE = [
   {
-    id: "opening",
-    title: "Opening Setup",
+    id: "opening-shift",
+    title: "Opening - Shift Setup",
     items: [
       { id: "lights-sound", label: "Turn on arena lights, sound, TVs, and lobby screens." },
       { id: "front-desk", label: "Open POS, booking calendar, waiver dashboard, and rewards dashboard." },
-      { id: "floors-clean", label: "Walk lobby, washrooms, party room, and arena floor for cleanliness." },
       { id: "staff-huddle", label: "Review today's parties, staffing, promos, and assigned roles." },
+      { id: "birthdays-prep", label: "Prepare birthday bookings, party room setup, signage, tableware, and host notes." },
     ],
   },
   {
-    id: "safety",
-    title: "Safety And Game Rooms",
+    id: "opening-rooms",
+    title: "Opening - Rooms And Safety",
     items: [
       { id: "room-check", label: "Inspect all challenge rooms for hazards, loose props, sensors, and clear exits." },
+      { id: "sensor-cleaning", label: "Clean and test room sensors, reader areas, buttons, and touch points." },
+      { id: "laser-room-glass", label: "Clean laser room glass so guests, staff, and cameras have a clear view." },
       { id: "wristbands", label: "Test wristbands, readers, check-in flow, and score tracking." },
-      { id: "games-online", label: "Confirm active games launch, score, and reset correctly." },
+    ],
+  },
+  {
+    id: "opening-cleaning",
+    title: "Opening - Guest Areas",
+    items: [
+      { id: "washrooms-opening", label: "Inspect, clean, and restock washrooms, including soap, paper products, bins, odours, and floors." },
+      { id: "room-fresheners", label: "Check room fresheners or deodorizing, and make sure lobby, party room, and game rooms smell fresh." },
+      { id: "lobby-glass", label: "Clean front glass, doors, counters, screens, and visible guest-facing surfaces." },
+      { id: "floors-clean", label: "Walk lobby, party room, and arena floor for cleanliness." },
+      { id: "food-drink", label: "Restock drinks, snacks, cups, napkins, and front-counter essentials." },
+    ],
+  },
+  {
+    id: "opening-bookings",
+    title: "Opening - Bookings",
+    items: [
+      { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
+      { id: "birthday-party-supplies", label: "Prepare birthday party supplies: table cloths, cake knife, lighter, napkins, cutlery, plates, cups, and serving essentials." },
+      { id: "waiver-check", label: "Check incomplete waivers and send reminders where needed." },
+      { id: "call-ahead", label: "Call or message any booking needing confirmation or missing details." },
       { id: "incident-kit", label: "Confirm first-aid kit, incident log, and cleaning supplies are ready." },
     ],
   },
   {
-    id: "bookings",
-    title: "Bookings And Waivers",
+    id: "closing-rooms",
+    title: "Closing - Rooms And Equipment",
     items: [
-      { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
-      { id: "waiver-check", label: "Check incomplete waivers and send reminders where needed." },
-      { id: "party-room", label: "Prepare party room timing, tables, signage, and host notes." },
-      { id: "call-ahead", label: "Call or message any booking needing confirmation or missing details." },
+      { id: "games-reset", label: "Reset all games and confirm rooms are powered down or ready for tomorrow." },
+      { id: "wristbands-returned", label: "Collect, count, clean, and charge wristbands and shared equipment." },
+      { id: "sensor-close", label: "Wipe sensors, buttons, props, and high-touch game surfaces." },
+      { id: "maintenance-log", label: "Log broken props, room issues, sensor faults, or maintenance follow-ups." },
     ],
   },
   {
-    id: "guest-experience",
-    title: "Guest Experience",
+    id: "closing-cleaning",
+    title: "Closing - Cleaning",
     items: [
-      { id: "rewards", label: "Check rewards, gift cards, prize wheel, and promo workflows." },
-      { id: "food-drink", label: "Restock drinks, snacks, cups, napkins, and front-counter essentials." },
-      { id: "signage", label: "Confirm pricing, event, waiver, and promo signage are visible." },
-      { id: "photo-moments", label: "Identify any party or group moments worth capturing with permission." },
-    ],
-  },
-  {
-    id: "closeout",
-    title: "Close-Out",
-    items: [
+      { id: "washrooms-closing", label: "Clean and restock washrooms before closing the building." },
+      { id: "laser-room-glass-close", label: "Final glass clean for the laser room and guest viewing areas." },
+      { id: "party-room-close", label: "Clear, sanitize, and reset party room tables, chairs, bins, and floors." },
       { id: "lost-found", label: "Check lost and found, party room, washrooms, and arena for belongings." },
-      { id: "sanitize", label: "Clean high-touch surfaces, counters, rooms, and shared equipment." },
+    ],
+  },
+  {
+    id: "closing-admin",
+    title: "Closing - Admin",
+    items: [
       { id: "cash-pos", label: "Reconcile POS, gift cards, refunds, and daily notes." },
-      { id: "handoff", label: "Log incidents, maintenance issues, follow-ups, and tomorrow's priorities." },
+      { id: "bookings-tomorrow", label: "Review tomorrow's bookings, staffing needs, birthdays, and special notes." },
+      { id: "doors-alarm", label: "Lock doors, set alarms, turn off screens, and secure staff areas." },
+      { id: "handoff", label: "Log incidents, guest feedback, maintenance issues, and tomorrow's priorities." },
     ],
   },
 ];
@@ -88,6 +110,9 @@ function emptyChecklist(date, template = FALLBACK_TEMPLATE) {
     items: flattenTemplate(template),
     notes: "",
     completedBy: "",
+    staffName: "",
+    shiftStart: "",
+    shiftEnd: "",
   };
 }
 
@@ -97,6 +122,9 @@ function mergeChecklist(checklist, template) {
     date: checklist?.date || todayToronto(),
     notes: checklist?.notes || "",
     completedBy: checklist?.completedBy || "",
+    staffName: checklist?.staffName || checklist?.completedBy || "",
+    shiftStart: checklist?.shiftStart || "",
+    shiftEnd: checklist?.shiftEnd || "",
     updatedAt: checklist?.updatedAt || "",
     items: flattenTemplate(template).map((item) => ({
       ...item,
@@ -137,6 +165,10 @@ function checklistStats(items = []) {
     complete,
     percent: total ? Math.round((complete / total) * 100) : 0,
   };
+}
+
+function sectionMode(sectionId = "") {
+  return sectionId.startsWith("closing") ? "closing" : "opening";
 }
 
 export default function DailyChecklistPage() {
@@ -200,6 +232,20 @@ export default function DailyChecklistPage() {
       map.set(item.sectionId, [...(map.get(item.sectionId) || []), item]);
     });
     return map;
+  }, [checklist.items]);
+
+  const groupedSections = useMemo(() => ({
+    opening: template.filter((section) => sectionMode(section.id) === "opening"),
+    closing: template.filter((section) => sectionMode(section.id) === "closing"),
+  }), [template]);
+
+  const shiftStats = useMemo(() => {
+    const openingItems = checklist.items.filter((item) => sectionMode(item.sectionId) === "opening");
+    const closingItems = checklist.items.filter((item) => sectionMode(item.sectionId) === "closing");
+    return {
+      opening: checklistStats(openingItems),
+      closing: checklistStats(closingItems),
+    };
   }, [checklist.items]);
 
   function updateItem(id, updates) {
@@ -274,22 +320,55 @@ export default function DailyChecklistPage() {
         <div>
           <span className="waiver-admin-kicker">Daily operations</span>
           <h1>Daily Checklist</h1>
-          <p>Open, run, and close the arena with one shared staff checklist.</p>
-        </div>
-        <div className="daily-header__controls">
-          <label>
-            <span>Date</span>
-            <input type="date" value={date} onChange={(event) => setDate(event.target.value || todayToronto())} />
-          </label>
-          <button type="button" onClick={saveChecklist} disabled={saving}>
-            {saving ? "Saving..." : "Save checklist"}
-          </button>
+          <p>Opening and closing checks for the arena, guest areas, equipment, and shift handoff.</p>
         </div>
       </div>
 
       {loading ? <p className="daily-state">Loading checklist...</p> : null}
       {error ? <div className="waiver-admin-error"><p>{error}</p></div> : null}
       {notice ? <div className="daily-notice">{notice}</div> : null}
+
+      <section className="daily-shift-card">
+        <div className="daily-shift-card__head">
+          <div>
+            <span className="waiver-admin-kicker">Shift details</span>
+            <h2>Staff Sign-In</h2>
+          </div>
+          <button type="button" onClick={saveChecklist} disabled={saving}>
+            {saving ? "Saving..." : "Save checklist"}
+          </button>
+        </div>
+        <div className="daily-shift-fields">
+          <label>
+            <span>Date</span>
+            <input type="date" value={date} onChange={(event) => setDate(event.target.value || todayToronto())} />
+          </label>
+          <label>
+            <span>Staff name</span>
+            <input
+              value={checklist.staffName}
+              onChange={(event) => setChecklist((current) => ({ ...current, staffName: event.target.value }))}
+              placeholder="Staff name"
+            />
+          </label>
+          <label>
+            <span>Shift start</span>
+            <input
+              type="time"
+              value={checklist.shiftStart}
+              onChange={(event) => setChecklist((current) => ({ ...current, shiftStart: event.target.value }))}
+            />
+          </label>
+          <label>
+            <span>Shift end</span>
+            <input
+              type="time"
+              value={checklist.shiftEnd}
+              onChange={(event) => setChecklist((current) => ({ ...current, shiftEnd: event.target.value }))}
+            />
+          </label>
+        </div>
+      </section>
 
       <section className="daily-progress">
         <div>
@@ -299,61 +378,72 @@ export default function DailyChecklistPage() {
         <div className="daily-progress__bar" aria-label={`${stats.percent}% complete`}>
           <i style={{ width: `${stats.percent}%` }} />
         </div>
+        <div className="daily-progress__split">
+          <span>Opening {shiftStats.opening.percent}%</span>
+          <span>Closing {shiftStats.closing.percent}%</span>
+        </div>
         <div className="daily-progress__actions">
           <button type="button" onClick={() => setAll(true)}>Mark all done</button>
           <button type="button" onClick={resetDay}>Reset day</button>
         </div>
       </section>
 
-      <div className="daily-grid">
-        {template.map((section) => {
-          const sectionItems = itemsBySection.get(section.id) || [];
-          const complete = sectionItems.filter((item) => item.done).length;
-          return (
-            <section className="daily-section" key={section.id}>
-              <div className="daily-section__head">
-                <h2>{section.title}</h2>
-                <span>{complete}/{sectionItems.length}</span>
-              </div>
-              <div className="daily-tasks">
-                {sectionItems.map((item) => (
-                  <article className={item.done ? "daily-task is-done" : "daily-task"} key={item.id}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={item.done}
-                        onChange={(event) => updateItem(item.id, { done: event.target.checked })}
-                      />
-                      <span>{item.label}</span>
-                    </label>
-                    <input
-                      value={item.note}
-                      onChange={(event) => updateItem(item.id, { note: event.target.value })}
-                      placeholder="Optional note"
-                    />
-                  </article>
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+      {[
+        { id: "opening", title: "Opening Checklist", desc: "Complete before doors open and before the first guests arrive." },
+        { id: "closing", title: "Closing Checklist", desc: "Complete after the final session, before lock-up and handoff." },
+      ].map((group) => (
+        <section className={`daily-checklist-group daily-checklist-group--${group.id}`} key={group.id}>
+          <div className="daily-checklist-group__head">
+            <div>
+              <span className="waiver-admin-kicker">{group.id === "opening" ? "Start of shift" : "End of shift"}</span>
+              <h2>{group.title}</h2>
+              <p>{group.desc}</p>
+            </div>
+            <strong>{shiftStats[group.id].complete}/{shiftStats[group.id].total}</strong>
+          </div>
+          <div className="daily-grid">
+            {groupedSections[group.id].map((section) => {
+              const sectionItems = itemsBySection.get(section.id) || [];
+              const complete = sectionItems.filter((item) => item.done).length;
+              return (
+                <section className="daily-section" key={section.id}>
+                  <div className="daily-section__head">
+                    <h3>{section.title.replace(/^Opening - |^Closing - /, "")}</h3>
+                    <span>{complete}/{sectionItems.length}</span>
+                  </div>
+                  <div className="daily-tasks">
+                    {sectionItems.map((item) => (
+                      <article className={item.done ? "daily-task is-done" : "daily-task"} key={item.id}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={item.done}
+                            onChange={(event) => updateItem(item.id, { done: event.target.checked })}
+                          />
+                          <span>{item.label}</span>
+                        </label>
+                        <input
+                          value={item.note}
+                          onChange={(event) => updateItem(item.id, { note: event.target.value })}
+                          placeholder="Notes or action required"
+                        />
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        </section>
+      ))}
 
       <section className="daily-closeout">
         <label>
-          <span>Daily notes</span>
+          <span>Critical issues / handover notes</span>
           <textarea
             value={checklist.notes}
             onChange={(event) => setChecklist((current) => ({ ...current, notes: event.target.value }))}
             placeholder="Incidents, maintenance, follow-ups, staffing notes..."
-          />
-        </label>
-        <label>
-          <span>Completed by</span>
-          <input
-            value={checklist.completedBy}
-            onChange={(event) => setChecklist((current) => ({ ...current, completedBy: event.target.value }))}
-            placeholder="Staff name"
           />
         </label>
         <p>Last saved: {formatUpdated(checklist.updatedAt)}</p>
@@ -406,7 +496,8 @@ export default function DailyChecklistPage() {
                     {record.notes ? <p>{record.notes}</p> : <p>No daily notes saved.</p>}
 
                     <div className="daily-history__meta">
-                      <span>Completed by: {record.completedBy || "Not entered"}</span>
+                      <span>Staff: {record.staffName || record.completedBy || "Not entered"}</span>
+                      <span>Shift: {record.shiftStart || "--:--"} - {record.shiftEnd || "--:--"}</span>
                       <span>Saved: {formatUpdated(record.updatedAt)}</span>
                     </div>
 

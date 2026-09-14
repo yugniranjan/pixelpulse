@@ -7,53 +7,75 @@ export const DAILY_CHECKLIST_RETENTION_DAYS = 15;
 
 export const DAILY_CHECKLIST_TEMPLATE = [
   {
-    id: "opening",
-    title: "Opening Setup",
+    id: "opening-shift",
+    title: "Opening - Shift Setup",
     items: [
       { id: "lights-sound", label: "Turn on arena lights, sound, TVs, and lobby screens." },
       { id: "front-desk", label: "Open POS, booking calendar, waiver dashboard, and rewards dashboard." },
-      { id: "floors-clean", label: "Walk lobby, washrooms, party room, and arena floor for cleanliness." },
       { id: "staff-huddle", label: "Review today's parties, staffing, promos, and assigned roles." },
+      { id: "birthdays-prep", label: "Prepare birthday bookings, party room setup, signage, tableware, and host notes." },
     ],
   },
   {
-    id: "safety",
-    title: "Safety And Game Rooms",
+    id: "opening-rooms",
+    title: "Opening - Rooms And Safety",
     items: [
       { id: "room-check", label: "Inspect all challenge rooms for hazards, loose props, sensors, and clear exits." },
+      { id: "sensor-cleaning", label: "Clean and test room sensors, reader areas, buttons, and touch points." },
+      { id: "laser-room-glass", label: "Clean laser room glass so guests, staff, and cameras have a clear view." },
       { id: "wristbands", label: "Test wristbands, readers, check-in flow, and score tracking." },
-      { id: "games-online", label: "Confirm active games launch, score, and reset correctly." },
+    ],
+  },
+  {
+    id: "opening-cleaning",
+    title: "Opening - Guest Areas",
+    items: [
+      { id: "washrooms-opening", label: "Inspect, clean, and restock washrooms, including soap, paper products, bins, odours, and floors." },
+      { id: "room-fresheners", label: "Check room fresheners or deodorizing, and make sure lobby, party room, and game rooms smell fresh." },
+      { id: "lobby-glass", label: "Clean front glass, doors, counters, screens, and visible guest-facing surfaces." },
+      { id: "floors-clean", label: "Walk lobby, party room, and arena floor for cleanliness." },
+      { id: "food-drink", label: "Restock drinks, snacks, cups, napkins, and front-counter essentials." },
+    ],
+  },
+  {
+    id: "opening-bookings",
+    title: "Opening - Bookings",
+    items: [
+      { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
+      { id: "birthday-party-supplies", label: "Prepare birthday party supplies: table cloths, cake knife, lighter, napkins, cutlery, plates, cups, and serving essentials." },
+      { id: "waiver-check", label: "Check incomplete waivers and send reminders where needed." },
+      { id: "call-ahead", label: "Call or message any booking needing confirmation or missing details." },
       { id: "incident-kit", label: "Confirm first-aid kit, incident log, and cleaning supplies are ready." },
     ],
   },
   {
-    id: "bookings",
-    title: "Bookings And Waivers",
+    id: "closing-rooms",
+    title: "Closing - Rooms And Equipment",
     items: [
-      { id: "todays-parties", label: "Review today's bookings, party IDs, guest counts, package, and timing." },
-      { id: "waiver-check", label: "Check incomplete waivers and send reminders where needed." },
-      { id: "party-room", label: "Prepare party room timing, tables, signage, and host notes." },
-      { id: "call-ahead", label: "Call or message any booking needing confirmation or missing details." },
+      { id: "games-reset", label: "Reset all games and confirm rooms are powered down or ready for tomorrow." },
+      { id: "wristbands-returned", label: "Collect, count, clean, and charge wristbands and shared equipment." },
+      { id: "sensor-close", label: "Wipe sensors, buttons, props, and high-touch game surfaces." },
+      { id: "maintenance-log", label: "Log broken props, room issues, sensor faults, or maintenance follow-ups." },
     ],
   },
   {
-    id: "guest-experience",
-    title: "Guest Experience",
+    id: "closing-cleaning",
+    title: "Closing - Cleaning",
     items: [
-      { id: "rewards", label: "Check rewards, gift cards, prize wheel, and promo workflows." },
-      { id: "food-drink", label: "Restock drinks, snacks, cups, napkins, and front-counter essentials." },
-      { id: "signage", label: "Confirm pricing, event, waiver, and promo signage are visible." },
-      { id: "photo-moments", label: "Identify any party or group moments worth capturing with permission." },
-    ],
-  },
-  {
-    id: "closeout",
-    title: "Close-Out",
-    items: [
+      { id: "washrooms-closing", label: "Clean and restock washrooms before closing the building." },
+      { id: "laser-room-glass-close", label: "Final glass clean for the laser room and guest viewing areas." },
+      { id: "party-room-close", label: "Clear, sanitize, and reset party room tables, chairs, bins, and floors." },
       { id: "lost-found", label: "Check lost and found, party room, washrooms, and arena for belongings." },
-      { id: "sanitize", label: "Clean high-touch surfaces, counters, rooms, and shared equipment." },
+    ],
+  },
+  {
+    id: "closing-admin",
+    title: "Closing - Admin",
+    items: [
       { id: "cash-pos", label: "Reconcile POS, gift cards, refunds, and daily notes." },
-      { id: "handoff", label: "Log incidents, maintenance issues, follow-ups, and tomorrow's priorities." },
+      { id: "bookings-tomorrow", label: "Review tomorrow's bookings, staffing needs, birthdays, and special notes." },
+      { id: "doors-alarm", label: "Lock doors, set alarms, turn off screens, and secure staff areas." },
+      { id: "handoff", label: "Log incidents, guest feedback, maintenance issues, and tomorrow's priorities." },
     ],
   },
 ];
@@ -172,6 +194,9 @@ function normalizeRow(row = {}) {
     items: mergeItems(items),
     notes: row.notes || raw.notes || "",
     completedBy: row.completed_by || row.completedBy || raw.completedBy || "",
+    staffName: row.staff_name || row.staffName || raw.staffName || raw.completedBy || row.completed_by || "",
+    shiftStart: row.shift_start || row.shiftStart || raw.shiftStart || "",
+    shiftEnd: row.shift_end || row.shiftEnd || raw.shiftEnd || "",
     createdAt: iso(row.created_at || row.createdAt || raw.createdAt),
     updatedAt: iso(row.updated_at || row.updatedAt || raw.updatedAt),
   };
@@ -300,7 +325,10 @@ export async function saveDailyChecklist(input = {}) {
     date: checkDate,
     items,
     notes: cleanText(input.notes),
-    completedBy: cleanText(input.completedBy),
+    completedBy: cleanText(input.staffName || input.completedBy),
+    staffName: cleanText(input.staffName || input.completedBy),
+    shiftStart: cleanText(input.shiftStart),
+    shiftEnd: cleanText(input.shiftEnd),
     updatedAt: now.toISOString(),
   };
 

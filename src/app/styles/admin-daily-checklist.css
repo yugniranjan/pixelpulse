@@ -2,18 +2,30 @@
   align-items: center;
 }
 
-.daily-header__controls {
+.daily-shift-card {
+  margin-bottom: 18px;
+  border: 1px solid #e7eaf1;
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.daily-shift-card__head {
   display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  min-width: min(100%, 440px);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.daily-header__controls label {
-  min-width: 180px;
+.daily-shift-card__head h2 {
+  margin: 4px 0 0;
+  color: #0f172a;
+  font-size: 1.18rem;
 }
 
-.daily-header__controls button,
+.daily-shift-card__head button,
 .daily-progress__actions button {
   min-height: 42px;
   border: 1px solid #0f172a;
@@ -26,9 +38,36 @@
   cursor: pointer;
 }
 
-.daily-header__controls button:disabled {
+.daily-shift-card__head button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.daily-shift-fields {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 1.4fr) minmax(140px, 0.7fr) minmax(140px, 0.7fr);
+  gap: 12px;
+}
+
+.daily-shift-fields label {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.daily-shift-fields input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 42px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #0f172a;
+  font: inherit;
+  text-transform: none;
 }
 
 .daily-state,
@@ -52,7 +91,7 @@
 
 .daily-progress {
   display: grid;
-  grid-template-columns: minmax(180px, 0.35fr) minmax(240px, 1fr) auto;
+  grid-template-columns: minmax(160px, 0.3fr) minmax(240px, 1fr) auto auto;
   gap: 16px;
   align-items: center;
   margin-bottom: 18px;
@@ -96,9 +135,69 @@
   gap: 8px;
 }
 
+.daily-progress__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.daily-progress__split span {
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #f8fafc;
+  color: #344054;
+  white-space: nowrap;
+}
+
 .daily-progress__actions button {
   background: #ffffff;
   color: #0f172a;
+}
+
+.daily-checklist-group {
+  margin-top: 18px;
+  border: 1px solid #dce3ed;
+  border-radius: 18px;
+  padding: 18px;
+  background: #f8fafc;
+}
+
+.daily-checklist-group--opening {
+  border-left: 5px solid #33e6df;
+}
+
+.daily-checklist-group--closing {
+  border-left: 5px solid #0f172a;
+}
+
+.daily-checklist-group__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.daily-checklist-group__head h2 {
+  margin: 5px 0 4px;
+  color: #0f172a;
+  font-size: 1.35rem;
+}
+
+.daily-checklist-group__head p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.daily-checklist-group__head strong {
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.88rem;
+  white-space: nowrap;
 }
 
 .daily-grid {
@@ -124,7 +223,7 @@
   margin-bottom: 14px;
 }
 
-.daily-section__head h2 {
+.daily-section__head h3 {
   margin: 0;
   color: #0f172a;
   font-size: 1.02rem;
@@ -196,7 +295,7 @@
 
 .daily-closeout {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   margin-top: 16px;
 }
@@ -386,15 +485,16 @@
 
 @media (max-width: 900px) {
   .daily-header,
-  .daily-header__controls,
+  .daily-shift-fields,
   .daily-progress,
   .daily-grid,
   .daily-closeout {
     grid-template-columns: 1fr;
   }
 
-  .daily-header__controls {
-    align-items: stretch;
+  .daily-shift-card__head,
+  .daily-checklist-group__head {
+    align-items: flex-start;
     flex-direction: column;
   }
 
@@ -412,6 +512,15 @@
 @media (max-width: 560px) {
   .daily-progress__actions {
     flex-direction: column;
+  }
+
+  .daily-progress__split,
+  .daily-progress__actions {
+    width: 100%;
+  }
+
+  .daily-progress__actions button {
+    width: 100%;
   }
 
   .daily-history__item summary,
