@@ -12,6 +12,36 @@ const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const CONTACT_PHONE = "+1 (905) 760-2922";
 const birthdayPackageNotice =
   "Birthday party packages include a hosted party experience and party room time, but they do not reserve the entire facility or play area for private use.";
+const PARTY_SLOT_STARTS = [
+  { label: "10:30 AM", minutes: 10 * 60 + 30 },
+  { label: "1:00 PM", minutes: 13 * 60 },
+  { label: "3:30 PM", minutes: 15 * 60 + 30 },
+  { label: "6:00 PM", minutes: 18 * 60 },
+];
+const BIRTHDAY_PACKAGE_OPTIONS = [
+  { name: "Pixel Punch", duration: 105 },
+  { name: "Pixel Ultra", duration: 120 },
+  { name: "Pixel Jumbo", duration: 150 },
+  { name: "Pulse Max", duration: 180 },
+];
+
+function formatMinutes(totalMinutes) {
+  const hours24 = Math.floor(totalMinutes / 60) % 24;
+  const minutes = totalMinutes % 60;
+  const suffix = hours24 >= 12 ? "PM" : "AM";
+  const hours12 = hours24 % 12 || 12;
+
+  return `${hours12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+}
+
+function getTimeSlotsForPackage(packageName) {
+  const selectedPackage = BIRTHDAY_PACKAGE_OPTIONS.find((option) => option.name === packageName);
+  if (!selectedPackage) return [];
+
+  return PARTY_SLOT_STARTS.map(
+    (slot) => `${slot.label} - ${formatMinutes(slot.minutes + selectedPackage.duration)}`,
+  );
+}
 
 function ContactForm() {
   const router = useRouter();
@@ -28,11 +58,14 @@ function ContactForm() {
     phone: "",
     date: "",
     time: "",
+    selectedPackage: "",
+    extraPlayTime: "",
     message: "",
     selectedEvent: "",
   });
   const isBirthdayInquiry = formData.selectedEvent === "BirthDay";
   const isPrivatePartyInquiry = formData.selectedEvent === "Private Party";
+  const birthdayTimeSlots = getTimeSlotsForPackage(formData.selectedPackage);
   useEffect(() => {
     const currentUrl = window.location.href;
     const pathSegments = new URL(currentUrl).pathname.split("/");
@@ -42,7 +75,16 @@ function ContactForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+      ...(name === "selectedEvent" && value !== "BirthDay"
+        ? { selectedPackage: "", time: "", extraPlayTime: "" }
+        : {}),
+      ...(name === "selectedPackage"
+        ? { time: "" }
+        : {}),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -179,19 +221,6 @@ function ContactForm() {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="time">Preferred Time</label>
-            <select
-              id="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-            >
-              <option value="">Select a time</option>
-              {generateTimeOptions()}
-            </select>
-          </div>
-
           <div className="form-group form-group--full">
             <label htmlFor="selectedEvent">Inquiry Type</label>
             <select
@@ -220,13 +249,79 @@ function ContactForm() {
             ) : null}
           </div>
 
+          {isBirthdayInquiry ? (
+            <div className="form-group form-group--full">
+              <label htmlFor="selectedPackage">Party Package</label>
+              <select
+                id="selectedPackage"
+                name="selectedPackage"
+                value={formData.selectedPackage}
+                onChange={handleChange}
+              >
+                <option value="">Select a package</option>
+                {BIRTHDAY_PACKAGE_OPTIONS.map((option) => (
+                  <option key={option.name} value={option.name}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          {isBirthdayInquiry ? (
+            <div className="form-group form-group--full">
+              <label htmlFor="time">Preferred Time</label>
+              <select
+                id="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                disabled={!formData.selectedPackage}
+              >
+                <option value="">
+                  {formData.selectedPackage ? "Select a time slot" : "Select a package first"}
+                </option>
+                {birthdayTimeSlots.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {slot}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          {isBirthdayInquiry ? (
+            <fieldset className="form-group form-group--full ppp-contact-form__choice-field">
+              <legend>Extra Play Time</legend>
+              <div className="ppp-contact-form__pill-group">
+                {["Yes", "No"].map((option) => (
+                  <label className="ppp-contact-form__pill-option" key={option}>
+                    <input
+                      type="radio"
+                      name="extraPlayTime"
+                      value={option}
+                      checked={formData.extraPlayTime === option}
+                      onChange={handleChange}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+
           <div className="form-group form-group--full">
-            <label htmlFor="message">Message</label>
+            <label htmlFor="message">{isBirthdayInquiry ? "Party Notes" : "Message"}</label>
             <textarea
               id="message"
               name="message"
               value={formData.message}
               onChange={handleChange}
+              placeholder={
+                isBirthdayInquiry
+                  ? "Any questions, special requests, or details you'd like us to know?"
+                  : undefined
+              }
               autoComplete="off"
               required
             />
@@ -252,39 +347,6 @@ function ContactForm() {
       </form>
     </div>
   );
-}
-
-function generateTimeOptions() {
-  const times = [];
-  let currentHour = 10;
-  let currentMinute = 0;
-
-  while (currentHour < 21 || (currentHour === 21 && currentMinute === 0)) {
-    const hourString = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
-    const minuteString = currentMinute === 0 ? "00" : `${currentMinute}`;
-    const timeString = `${hourString}:${minuteString}`;
-
-    const displayTime = new Date(
-      `1970-01-01T${timeString}:00`
-    ).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    times.push(
-      <option key={timeString} value={timeString}>
-        {displayTime}
-      </option>
-    );
-
-    currentMinute += 30;
-    if (currentMinute >= 60) {
-      currentMinute = 0;
-      currentHour += 1;
-    }
-  }
-
-  return times;
 }
 
 export default ContactForm;

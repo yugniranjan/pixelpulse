@@ -193,6 +193,7 @@ export async function POST(request) {
       phone,
       date,
       time,
+      extraPlayTime,
       message,
       selectedEvent,
       selectedPackage,
@@ -279,6 +280,7 @@ export async function POST(request) {
       `Preferred Date: ${date || "Not provided"}`,
       `Preferred Time: ${time || "Not provided"}`,
       `Party Package: ${selectedPackage || "Not provided"}`,
+      `Extra Play Time: ${extraPlayTime || "Not provided"}`,
       "",
       "Message:",
       message || "No message provided",
@@ -349,6 +351,7 @@ export async function POST(request) {
         <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
         <p><strong>Preferred Time:</strong> ${escapeHtml(time || "Not provided")}</p>
         <p><strong>Party Package:</strong> ${escapeHtml(selectedPackage || "Not provided")}</p>
+        <p><strong>Extra Play Time:</strong> ${escapeHtml(extraPlayTime || "Not provided")}</p>
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message || "No message provided")}</p>
       </div>

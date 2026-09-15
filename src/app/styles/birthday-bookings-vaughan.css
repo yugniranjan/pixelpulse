@@ -70,7 +70,7 @@
 }
 
 .ppp-bday-booking-shell {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1280px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -86,7 +86,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
-  width: min(1180px, calc(100% - 32px));
+  width: min(1280px, calc(100% - 32px));
   padding: 10px 12px 10px 16px;
   overflow: hidden;
   border: 1px solid rgba(188, 255, 107, 0.22);
@@ -266,8 +266,8 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.62fr);
-  gap: clamp(1.4rem, 3.4vw, 2.8rem);
+  grid-template-columns: minmax(0, 0.9fr) minmax(460px, 0.78fr);
+  gap: clamp(1.25rem, 2.7vw, 2.2rem);
   align-items: center;
 }
 
@@ -447,7 +447,7 @@
    --------------------------------------------------------- */
 .ppp-bday-booking-page .ppp-birthday-hero-form {
   gap: 14px;
-  padding: 20px;
+  padding: 22px;
   border: 1px solid rgba(247, 148, 79, 0.3);
   border-radius: 16px;
   background:
@@ -498,6 +498,33 @@
   text-transform: uppercase;
 }
 
+.ppp-bday-booking-page .ppp-birthday-hero-form__choice-field {
+  gap: 6px;
+  color: rgba(234, 242, 255, 0.72);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__pill-option span {
+  min-height: 40px;
+  border: 1px solid rgba(120, 150, 220, 0.24);
+  border-radius: 10px;
+  background: rgba(6, 10, 22, 0.6);
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__pill-option input:checked + span {
+  border-color: var(--lime, #bcff6b);
+  background: var(--lime, #bcff6b);
+  color: #06101d;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__pill-option input:focus-visible + span {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(188, 255, 107, 0.16), 0 0 22px rgba(188, 255, 107, 0.18);
+}
+
 .ppp-bday-booking-page .ppp-birthday-hero-form input,
 .ppp-bday-booking-page .ppp-birthday-hero-form select,
 .ppp-bday-booking-page .ppp-birthday-hero-form textarea {
@@ -527,7 +554,20 @@
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form textarea {
-  min-height: 56px;
+  min-height: 132px;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__notes small {
+  color: rgba(234, 242, 255, 0.68);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ppp-bday-booking-page .ppp-birthday-hero-form__notes small strong {
+  color: var(--lime, #bcff6b);
 }
 
 .ppp-bday-booking-page .ppp-birthday-hero-form__note {
@@ -1732,7 +1772,7 @@
 @media (max-width: 640px) {
   .ppp-bday-booking-shell,
   .ppp-bday-booking-nav {
-    width: min(100% - 22px, 1180px);
+    width: min(100% - 22px, 1280px);
   }
 
   .ppp-bday-booking-hero {
