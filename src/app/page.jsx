@@ -8,7 +8,6 @@ import MotionImage from "@/components/MotionImage";
 import BlogCard from "@/components/smallComponents/BlogCard";
 import {
   fetchsheetdata,
-  fetchsheetdataNoCache,
   fetchMenuData,
   fetchPageData,
   getWaiverLink,
@@ -23,7 +22,7 @@ import VrTeaserModal from "./components/model/VrTeaserModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
 import { DEFAULT_SEO_IMAGE, canonicalUrl, safeImageUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 const SITE_DATA_GOOGLE_SHEET_ID = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 const SITE_DATA_SHEET_NAMES = [
@@ -745,7 +744,7 @@ const Home = async () => {
       getWaiverLink(location_slug),
       fetchMenuData(location_slug),
       fetchPageData(location_slug, "home"),
-      fetchsheetdataNoCache("config", location_slug),
+      fetchsheetdata("config", location_slug),
       fetchGoogleSiteDataSheets().then(parseSiteDataSheets),
     ]);
   } catch (error) {
@@ -998,15 +997,19 @@ const Home = async () => {
       <section className="ppp-mini-cta">
         <div className="aero-max-container ppp-mini-cta__inner">
           {heroData.urgencyStrip && <p>{heroData.urgencyStrip}</p>}
-          {miniCtaText && miniCtaHref ? (
+          {miniCtaText && miniCtaHref && isMiniCtaExternal ? (
             <a
               href={miniCtaHref}
               className="ppp-btn ppp-btn--primary"
-              target={isMiniCtaExternal ? "_blank" : undefined}
-              rel={isMiniCtaExternal ? "noopener noreferrer" : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {miniCtaText}
             </a>
+          ) : miniCtaText && miniCtaHref ? (
+            <Link href={miniCtaHref} className="ppp-btn ppp-btn--primary" prefetch>
+              {miniCtaText}
+            </Link>
           ) : miniCtaText ? (
             <BookingButton title={miniCtaText} className="ppp-btn ppp-btn--primary" bookingType="party" />
           ) : null}
@@ -1143,15 +1146,19 @@ const Home = async () => {
       <section className="ppp-mini-cta">
         <div className="aero-max-container ppp-mini-cta__inner">
           {whyUsCta.text && <p>{whyUsCta.text}</p>}
-          {whyUsCta.button && whyUsCta.href ? (
+          {whyUsCta.button && whyUsCta.href && isWhyUsCtaExternal ? (
             <a
               href={whyUsCta.href}
               className="ppp-btn ppp-btn--primary"
-              target={isWhyUsCtaExternal ? "_blank" : undefined}
-              rel={isWhyUsCtaExternal ? "noopener noreferrer" : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {whyUsCta.button}
             </a>
+          ) : whyUsCta.button && whyUsCta.href ? (
+            <Link href={whyUsCta.href} className="ppp-btn ppp-btn--primary" prefetch>
+              {whyUsCta.button}
+            </Link>
           ) : whyUsCta.button ? (
             <BookingButton
               title={whyUsCta.button}
@@ -1455,15 +1462,19 @@ const Home = async () => {
             {siteData.location.walkIn && <p className="ppp-cta-band__sub">{siteData.location.walkIn}</p>}
             {siteData.location.finalStrip && <p className="ppp-cta-band__sub">{siteData.location.finalStrip}</p>}
             <div className="ppp-cta-band__actions">
-              {heroData.ctaPrimary && heroData.ctaPrimaryHref ? (
+              {heroData.ctaPrimary && heroData.ctaPrimaryHref && isHeroCtaPrimaryExternal ? (
                 <a
                   href={heroData.ctaPrimaryHref}
                   className="ppp-btn ppp-btn--primary"
-                  target={isHeroCtaPrimaryExternal ? "_blank" : undefined}
-                  rel={isHeroCtaPrimaryExternal ? "noopener noreferrer" : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {heroData.ctaPrimary}
                 </a>
+              ) : heroData.ctaPrimary && heroData.ctaPrimaryHref ? (
+                <Link href={heroData.ctaPrimaryHref} className="ppp-btn ppp-btn--primary" prefetch>
+                  {heroData.ctaPrimary}
+                </Link>
               ) : heroData.ctaPrimary ? (
                 <BookingButton title={heroData.ctaPrimary} className="ppp-btn ppp-btn--primary" bookingType="party" />
               ) : null}
