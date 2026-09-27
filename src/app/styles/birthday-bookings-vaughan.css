@@ -996,8 +996,7 @@
 }
 
 .ppp-bday-room__body strong {
-  display: block;
-  margin-bottom: 0.35rem;
+  display: inline;
   color: rgba(255, 255, 255, 0.92);
   font-weight: 800;
 }

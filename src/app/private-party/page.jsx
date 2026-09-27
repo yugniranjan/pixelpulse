@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ExploreChallengesCarousel from "../components/home/ExploreChallengesCarousel";
+import EventHero from "./EventHero";
 import "../styles/private-party.css";
 import { fetchMenuData } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
@@ -7,23 +8,22 @@ import { canonicalUrl, safeImageUrl } from "@/lib/seo";
 import { getDataByParentId } from "@/utils/customFunctions";
 
 const logo = "/assets/images/logoD.png";
-const heroImage = "/assets/images/private-party-hero.webp";
-const heroVideo = "/assets/videos/birthday-party-room.mp4";
+const heroImage = "/assets/images/events/corporate-party.webp";
 const contactUrl = "/contactus";
 const phoneUrl = "tel:+19057602922";
 const siteDataGoogleSheetId = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 
 export const metadata = {
-  title: "Private Party | Pixel Pulse Play Vaughan",
+  title: "Group Events & Parties | Pixel Pulse Play Vaughan",
   description:
-    "Plan a private party at Pixel Pulse Play Vaughan with interactive challenge rooms, live leaderboards, dedicated hosts, and group packages for birthdays, teams, families, and celebrations.",
+    "Plan Christmas parties, family gatherings, corporate parties, and fundraising events with interactive challenges and two dedicated party rooms at Pixel Pulse Play Vaughan.",
   alternates: {
     canonical: canonicalUrl("/private-party"),
   },
   openGraph: {
-    title: "Private Party | Pixel Pulse Play Vaughan",
+    title: "Group Events & Parties | Pixel Pulse Play Vaughan",
     description:
-      "Host a high-energy private party at Pixel Pulse Play with challenge rooms, arena-style gameplay, and a dedicated event flow for your group.",
+      "Host Christmas, family, corporate, and fundraising events with challenge rooms and dedicated party spaces at Pixel Pulse Play Vaughan.",
     url: canonicalUrl("/private-party"),
     images: [
       {
@@ -35,11 +35,11 @@ export const metadata = {
     ],
     type: "website",
   },
-  twitter: {
+    twitter: {
     card: "summary_large_image",
-    title: "Private Party | Pixel Pulse Play Vaughan",
+    title: "Group Events & Parties | Pixel Pulse Play Vaughan",
     description:
-      "Private parties, challenge rooms, live leaderboards, and dedicated hosts at Pixel Pulse Play Vaughan.",
+      "Christmas parties, family gatherings, corporate parties, and fundraising events at Pixel Pulse Play Vaughan.",
     images: [canonicalUrl(heroImage)],
   },
   robots: {
@@ -53,38 +53,38 @@ const navLinks = [
 ];
 
 const groupBenefits = [
-  "Designed for groups of all sizes",
-  "Fully hosted and organized",
-  "Active and engaging",
+  "Two dedicated party rooms",
+  "Hosted and organized",
+  "Active group experience",
 ];
 
 const groupEvents = [
   {
-    title: "Private Party",
-    body: "High-energy celebrations without the chaos, built around your group size, timing, and party flow.",
-    href: contactUrl,
-    image: "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.png",
-    imageAlt: "Private party room setup at Pixel Pulse Play",
+    title: "Christmas Parties",
+    body: "A festive group experience with challenge rooms, friendly competition, and space to celebrate together.",
+    href: "#event-inquiry",
+    image: "/assets/images/events/christmas-party.webp",
+    imageAlt: "Christmas party at Pixel Pulse Play",
+  },
+  {
+    title: "Family Gatherings",
+    body: "Bring generations together for active fun, shared memories, and a comfortable room of your own.",
+    href: "#event-inquiry",
+    image: "/assets/images/events/family-gathering.webp",
+    imageAlt: "Family gathering at Pixel Pulse Play",
   },
   {
     title: "Corporate Parties",
     body: "Team-building, work socials, and staff nights with challenge rooms, simple booking, and real group energy.",
-    href: "/group-events/corporate-parties-events-groups",
-    image: "https://storage.googleapis.com/pixel-pulse-play/web/CorporateParty.png",
+    href: "#event-inquiry",
+    image: "/assets/images/events/corporate-party.webp",
     imageAlt: "Target challenge room for corporate group events",
   },
   {
-    title: "School / Groups",
-    body: "Structured trips for school groups, clubs, camps, and youth crews with hosted activities and clear timing.",
-    href: "/group-events/school-groups",
-    image: "https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.png",
-    imageAlt: "Interactive floor challenge for school and youth groups",
-  },
-  {
-    title: "Fund Raising",
+    title: "Fundraising Events",
     body: "Give your community a reason to gather, play, and support a cause with an event people actually enjoy.",
-    href: "/group-events/fund-raising",
-    image: "https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.png",
+    href: "#event-inquiry",
+    image: "/assets/images/events/fundraising-event.webp",
     imageAlt: "Arcade games for fundraising events",
   },
 ];
@@ -391,11 +391,10 @@ const reasons = [
 ];
 
 const audienceChips = [
-  "Birthdays",
+  "Christmas Parties",
   "Corporate Events",
-  "Team Nights",
-  "Adult Groups",
-  "Family Celebrations",
+  "Fundraising Events",
+  "Family Gatherings",
 ];
 
 export default async function PrivatePartyPage() {
@@ -403,7 +402,7 @@ export default async function PrivatePartyPage() {
 
   return (
     <main className="ppp-private-page">
-      <nav className="ppp-private-nav" aria-label="Private party landing navigation">
+      <nav className="ppp-private-nav" aria-label="Group events navigation">
         <a className="ppp-private-logo" href="/">
           <Image src={logo} alt="Pixel Pulse Play" width={190} height={64} priority />
         </a>
@@ -419,38 +418,7 @@ export default async function PrivatePartyPage() {
         </div>
       </nav>
 
-      <section className="ppp-private-hero">
-        <video
-          className="ppp-private-hero__image"
-          poster={heroImage}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
-        <div className="ppp-private-hero__grid" />
-        <div className="ppp-private-shell ppp-private-hero__layout">
-          <div className="ppp-private-hero__copy">
-            <p className="ppp-private-kicker">Private Party | Vaughan</p>
-            <h1>
-              High-Energy <span>Celebrations</span> Without The Chaos.
-            </h1>
-            <p className="ppp-private-hero__text">
-              Rent the entire arena, or build a dedicated party experience for your group.
-              Pixel Pulse Play turns birthdays, team nights, family events, and friend
-              hangouts into a real challenge-room celebration.
-            </p>
-            <div className="ppp-private-actions">
-              <a className="ppp-private-btn ppp-private-btn--primary" href={contactUrl}>
-                Inquire About A Party
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div id="event-inquiry"><EventHero /></div>
 
       <section className="ppp-private-section ppp-private-section--panel" id="group-experiences">
         <div className="ppp-private-shell ppp-private-group-intro">
@@ -462,8 +430,8 @@ export default async function PrivatePartyPage() {
               </h2>
             </div>
             <p className="ppp-private-muted">
-              From corporate teams to school trips, Pixel Pulse builds high-energy
-              experiences that are structured, supervised, and actually fun.
+              From festive celebrations to company socials and community fundraisers,
+              Pixel Pulse makes group events structured, supervised, and genuinely fun.
             </p>
             <div className="ppp-private-benefits" aria-label="Group event benefits">
               {groupBenefits.map((benefit) => (
@@ -494,6 +462,19 @@ export default async function PrivatePartyPage() {
         </div>
       </section>
 
+      <section className="ppp-private-section ppp-private-two-rooms">
+        <div className="ppp-private-shell ppp-private-two-rooms__layout">
+          <div className="ppp-private-section__header">
+            <p>Two Dedicated Spaces</p>
+            <h2>More Ways To Gather. <span>Your Own Room.</span></h2>
+          </div>
+          <div className="ppp-private-two-rooms__copy">
+            <p>Pixel Party Lounge and Pulse Lounge give us more flexibility for group events without turning your celebration into a shared-room experience.</p>
+            <p>Your assigned lounge stays dedicated to your group during its reserved time, giving you a comfortable place for food, gifts, conversations, and breaks between the action.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="ppp-private-section ppp-private-section--panel">
         <div className="ppp-private-shell">
           <div className="ppp-private-section__header">
@@ -520,11 +501,11 @@ export default async function PrivatePartyPage() {
             <div className="ppp-private-section__header">
               <p>All Included</p>
               <h2>
-                13 Challenge Rooms. <span>One Private Arena.</span>
+                13 Challenge Rooms. <span>One Shared Adventure.</span>
               </h2>
             </div>
             <p className="ppp-private-muted">
-              Every private party can tap into the full attraction lineup, from fast
+              Every group event can tap into the attraction lineup, from fast
               reflex games to team missions and score-chasing rooms.
             </p>
           </div>
@@ -563,13 +544,13 @@ export default async function PrivatePartyPage() {
 
       <section className="ppp-private-final">
         <div className="ppp-private-shell">
-          <p>Book Your Private Party</p>
+          <p>Plan Your Group Event</p>
           <h2>
             Ready To Own The <span>Leaderboard?</span>
           </h2>
           <div className="ppp-private-actions ppp-private-actions--center">
             <a className="ppp-private-btn ppp-private-btn--primary" href={contactUrl}>
-              Inquire Now
+              Request Event Details
             </a>
             <a className="ppp-private-btn ppp-private-btn--ghost" href={phoneUrl}>
               Call +1 (905) 760-2922

@@ -358,9 +358,9 @@ function DedicatedPartyRoomSection() {
               No shared tables. No shared party room.
             </p>
             <p className="ppp-bday-room__body">
-              Cake, food, gifts and birthday moments all come together in <strong>your
-              group&apos;s dedicated party room</strong> — giving you a comfortable space
-              to celebrate, recharge and enjoy the day between the action.
+              Cake, food, gifts, and birthday moments all come together in <strong>your
+              group&apos;s dedicated party room</strong>, giving you a comfortable space to
+              celebrate, recharge, and enjoy the day between the action.
             </p>
           </div>
 
