@@ -297,21 +297,21 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
 const privateRoomFeatures = [
   {
     icon: FaLock,
-    title: "One Party at a Time",
-    lead: "One celebration. One dedicated party experience.",
-    text: "Enjoy your party without another celebration running alongside yours.",
+    title: "Dedicated Party Room",
+    lead: "No shared tables. No shared party room.",
+    text: "Your assigned room belongs to your group throughout your reserved party time.",
   },
   {
     icon: FaPeopleGroup,
-    title: "Real Family Time",
-    lead: "The fun isn't just for the kids.",
-    text: "Parents can jump in, play, compete, and make memories together.",
+    title: "Private Space for Your Group",
+    lead: "Cake. Food. Gifts. Birthday moments.",
+    text: "Bring everyone together in your own dedicated space between the games and celebrations.",
   },
   {
     icon: FaGamepad,
-    title: "No Party Overlap",
-    lead: "Your celebration gets its own moment.",
-    text: "No shared party tables. No overlapping party schedules. Less crowding, more celebrating.",
+    title: "Staggered Party Arrivals",
+    lead: "More availability without a shared-party-hall feel.",
+    text: "Separate room schedules help each party arrive, celebrate, and transition through the venue smoothly.",
   },
   {
     icon: FaStar,
@@ -328,21 +328,19 @@ function PrivatePartyRoomSection() {
 
   return (
     <section className="ppp-party-room" aria-labelledby="party-room-title">
-      <div className="ppp-party-room__intro">
-        <p className="ppp-party-room__eyebrow">Dedicated party room</p>
-        <h2 id="party-room-title">One Party. Zero Sharing.</h2>
-      </div>
-
       <div className="ppp-party-room__story-grid">
         <div className="ppp-party-room__copy">
+          <div className="ppp-party-room__intro">
+            <p className="ppp-party-room__eyebrow">Private party rooms</p>
+            <h2 id="party-room-title">Your Party. Your Room.</h2>
+          </div>
           <p className="ppp-party-room__subhead">
-            A dedicated room for your birthday crew, not a shared party area.
+            No shared tables. No shared party room.
           </p>
           <p className="ppp-party-room__body-copy">
-            <strong>Celebrate in your own space.</strong>
-            Cake, food, gifts and those special birthday moments all come
-            together in your dedicated party room-giving your group a
-            comfortable place to celebrate between the action.
+            Cake, food, gifts and birthday moments all come together in <strong>your
+            group&apos;s dedicated party room</strong> — giving you a comfortable space
+            to celebrate, recharge and enjoy the day between the action.
           </p>
         </div>
 
@@ -380,7 +378,7 @@ function PrivatePartyRoomSection() {
 
       <div className="ppp-party-room__cta-row">
         <p className="ppp-party-room__note">
-          One room. One party. All yours, start to finish.
+          More ways to celebrate. Your own space, every time.
         </p>
 
         {bookingHref && (
@@ -392,7 +390,7 @@ function PrivatePartyRoomSection() {
             rel={isBookingHrefExternal ? "noopener noreferrer" : undefined}
             data-gtm-event="birthday_party_room_cta_click"
             data-gtm-category="Birthday Parties"
-            data-gtm-label="Dedicated party room Book Now"
+            data-gtm-label="Private party rooms Book Now"
           >
             {bookingText}
             <FaArrowRight aria-hidden="true" />

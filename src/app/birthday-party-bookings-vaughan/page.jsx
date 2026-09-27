@@ -83,7 +83,7 @@ const navLinks = [
 const heroStats = [
   { value: "13+", label: "games" },
   { value: "Ages 7+", label: "kids and teens" },
-  { value: "Vaughan", label: "indoor venue" },
+  { value: "2", label: "dedicated party rooms" },
 ];
 
 const highlights = [
@@ -101,7 +101,7 @@ const highlights = [
   },
   {
     title: "Dedicated party rooms",
-    text: "Celebrate, eat, open gifts, and take photos together after the games.",
+    text: "Two dedicated lounges give each booked party its own space to eat, celebrate, open gifts, and take photos.",
   },
   {
     title: "Indoor summer fun",
@@ -137,38 +137,38 @@ const fallbackAttractions = [
 ];
 
 const partyFeatures = [
-  "Dedicated party rooms",
+  "Two dedicated party lounges",
   "Guided gameplay rotations",
   "Music and high-energy atmosphere",
   "Food and add-ons available",
-  "Easy online booking",
+  "Online booking and inquiry options",
   "Great for kids, tweens, and teens",
 ];
 
 const partyRoomFeatures = [
   {
     icon: FaLock,
-    title: "One Party at a Time",
-    lead: "One celebration. One dedicated party experience.",
-    text: "Enjoy your party without another celebration running alongside yours.",
+    title: "Dedicated Party Room",
+    lead: "No shared tables. No shared party room.",
+    text: "Your assigned room belongs to your group throughout your reserved party time.",
   },
   {
     icon: FaPeopleGroup,
-    title: "Real Family Time",
-    lead: "The fun isn't just for the kids.",
-    text: "Parents can jump in, play, compete, and make memories together.",
+    title: "Private Space for Your Group",
+    lead: "Cake. Food. Gifts. Birthday moments.",
+    text: "Bring everyone together in your own dedicated space between the games and celebrations.",
   },
   {
     icon: FaGamepad,
-    title: "No Party Overlap",
-    lead: "Your celebration gets its own moment.",
-    text: "No shared party tables. No overlapping party schedules. Less crowding, more celebrating.",
+    title: "Staggered Party Arrivals",
+    lead: "More availability without a shared-party-hall feel.",
+    text: "Separate room schedules help each party arrive, celebrate, and transition through the venue smoothly.",
   },
   {
     icon: FaStar,
     title: "More Than a Party",
     lead: "Play. Challenge. Celebrate.",
-    text: "Take on immersive challenge rooms, enjoy the arcade, then bring everyone together in your dedicated party room.",
+    text: "Take on immersive challenge rooms, enjoy the arcade, then bring everyone together in your assigned party lounge.",
   },
 ];
 
@@ -348,21 +348,19 @@ function DedicatedPartyRoomSection() {
   return (
     <section className="ppp-bday-room" aria-labelledby="bday-room-title">
       <div className="ppp-bday-booking-shell">
-        <div className="ppp-bday-room__intro">
-          <p>Dedicated party room</p>
-          <h2 id="bday-room-title">One Party. Zero Sharing.</h2>
-        </div>
-
         <div className="ppp-bday-room__story">
           <div className="ppp-bday-room__copy">
+            <div className="ppp-bday-room__intro">
+              <p>Private party rooms</p>
+              <h2 id="bday-room-title">Your Party. Your Room.</h2>
+            </div>
             <p className="ppp-bday-room__subhead">
-              A dedicated room for your birthday crew, not a shared party area.
+              No shared tables. No shared party room.
             </p>
             <p className="ppp-bday-room__body">
-              <strong>Celebrate in your own space.</strong>
-              Cake, food, gifts and those special birthday moments all come
-              together in your dedicated party room-giving your group a
-              comfortable place to celebrate between the action.
+              Cake, food, gifts and birthday moments all come together in <strong>your
+              group&apos;s dedicated party room</strong> — giving you a comfortable space
+              to celebrate, recharge and enjoy the day between the action.
             </p>
           </div>
 
@@ -376,9 +374,9 @@ function DedicatedPartyRoomSection() {
               loop
               playsInline
               preload="metadata"
-              aria-label="Pixel Pulse birthday party room video"
+              aria-label="Preview of a Pixel Pulse birthday party room"
             />
-            <div className="ppp-bday-room__video-badge">Party room preview</div>
+            <div className="ppp-bday-room__video-badge">Party lounge preview</div>
           </div>
         </div>
 
@@ -399,12 +397,12 @@ function DedicatedPartyRoomSection() {
         </div>
 
         <div className="ppp-bday-room__cta-row">
-          <p>One room. One party. All yours, start to finish.</p>
+          <p>More ways to celebrate. Your own space, every time.</p>
           <a
             href="#birthday-party-form"
             data-gtm-event="birthday_party_room_cta_click"
             data-gtm-category="Birthday Parties"
-            data-gtm-label="Dedicated party room Book Now"
+            data-gtm-label="Two dedicated party rooms Book Now"
           >
             Book Now
             <FaArrowRight aria-hidden="true" />
@@ -467,7 +465,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <p className="ppp-bday-kicker">Birthday parties in Vaughan</p>
             <h1>Birthday parties kids get <em>excited</em> about.</h1>
             <p>
-              Interactive challenge rooms for kids, tweens, and teens.
+              Interactive challenge rooms, hosted play, and two dedicated party lounges for kids, tweens, and teens.
             </p>
             <div className="ppp-bday-booking-actions">
               <a href="#packages">View party packages</a>
@@ -495,7 +493,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <p>Party packages</p>
             <h2>Pick the birthday <em>package</em> that fits your group.</h2>
             <span className="ppp-bday-package-note">
-              Birthday party packages include the listed party experience and room time. They do not reserve the entire facility or play area for private use.
+              Every package includes time in an assigned party lounge. Room assignment depends on the package and availability. A second party may use the other lounge, and packages do not reserve the entire facility or play area for private use.
             </span>
           </div>
           <div className="ppp-bday-package-grid">

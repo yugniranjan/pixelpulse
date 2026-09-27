@@ -963,7 +963,7 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
   gap: clamp(1rem, 2vw, 1.4rem);
-  align-items: center;
+  align-items: start;
   margin-bottom: 1rem;
 }
 
@@ -981,6 +981,7 @@
 
 .ppp-bday-room__subhead {
   max-width: 46ch !important;
+  margin-top: 0 !important;
   margin-bottom: 1.35rem !important;
   padding: 0.9rem 1rem;
   border-left: 4px solid var(--cyan);
@@ -1012,6 +1013,7 @@
 
 .ppp-bday-room__video-shell {
   position: relative;
+  align-self: start;
   overflow: hidden;
   min-height: 320px;
   aspect-ratio: 16 / 9;
