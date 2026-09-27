@@ -19,6 +19,8 @@ const STANDALONE_PATHS = new Set([
 const STANDALONE_HOSTS = new Set([
   "birthdays.pixelpulseplay.ca",
   "www.birthdays.pixelpulseplay.ca",
+  "events.pixelpulseplay.ca",
+  "www.events.pixelpulseplay.ca",
   "rewards.pixelpulseplay.ca",
   "www.rewards.pixelpulseplay.ca",
 ]);
