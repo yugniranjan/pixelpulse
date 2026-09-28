@@ -71,7 +71,7 @@ const groupEvents = [
     title: "Family Gathering",
     body: "Bring generations together for active fun, shared memories, and an experience everyone can join.",
     href: eventsUrl,
-    image: "/assets/images/events/family-gathering-2026-v3.webp",
+    image: "/assets/images/events/family-gathering-2026-v4.webp",
     imageAlt: "Family gathering at Pixel Pulse Play",
   },
   {
@@ -537,7 +537,7 @@ export default async function PrivatePartyPage() {
             Ready To Own The <span>Leaderboard?</span>
           </h2>
           <div className="ppp-private-actions ppp-private-actions--center">
-            <a className="ppp-private-btn ppp-private-btn--primary" href={contactUrl}>
+            <a className="ppp-private-btn ppp-private-btn--primary" href="#event-inquiry">
               Request Event Details
             </a>
             <a className="ppp-private-btn ppp-private-btn--ghost" href={phoneUrl}>

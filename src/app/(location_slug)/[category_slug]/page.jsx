@@ -490,26 +490,15 @@ const Category = async ({ params }) => {
                         )}
                       </>
                     )}
-                    {(ctaContent.groupsHeroPrimaryText || ctaContent.groupsHeroSecondaryText) && (
+                    {ctaContent.groupsHeroPrimaryText && (
                       <div className="ppp-groups-hero__actions">
-                        {ctaContent.groupsHeroPrimaryText && (
-                          <Link
-                            href={groupsHeroPrimaryHref}
-                            className="ppp-groups-hero__book-btn"
-                            prefetch
-                          >
-                            {ctaContent.groupsHeroPrimaryText}
-                          </Link>
-                        )}
-                        {ctaContent.groupsHeroSecondaryText && (
-                          <Link
-                            href={ctaContent.groupsHeroSecondaryHref || ctaContent.contactHref || "/contactus"}
-                            className="ppp-groups-hero__link"
-                            prefetch
-                          >
-                            {ctaContent.groupsHeroSecondaryText}
-                          </Link>
-                        )}
+                        <Link
+                          href={groupsHeroPrimaryHref}
+                          className="ppp-groups-hero__book-btn"
+                          prefetch
+                        >
+                          {ctaContent.groupsHeroPrimaryText}
+                        </Link>
                       </div>
                     )}
                   </div>
