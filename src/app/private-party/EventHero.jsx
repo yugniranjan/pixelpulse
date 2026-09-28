@@ -26,7 +26,7 @@ const slides = [
     title: "Corporate Party",
     headline: "Turn Team Time Into Game Time.",
     body: "Bring your crew together with hosted gameplay, friendly competition, and plenty of moments to laugh, connect, and compete.",
-    image: "/assets/images/events/corporate-party.webp",
+    image: "/assets/images/events/corporate-event-2026-v2.webp",
     alt: "Corporate group playing interactive challenges at Pixel Pulse Play",
   },
   {
