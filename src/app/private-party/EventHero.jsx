@@ -46,6 +46,7 @@ const initialForm = {
   selectedEvent: slides[0].title,
   groupSize: "",
   privateParty: "",
+  details: "",
 };
 
 export default function EventHero() {
@@ -94,6 +95,7 @@ export default function EventHero() {
           message: [
             `Estimated group size: ${formData.groupSize || "Not provided"}`,
             `Looking for a private party: ${formData.privateParty || "Not provided"}`,
+            `Additional details: ${formData.details || "Not provided"}`,
           ].join("\n"),
           subject: `${formData.fullName} - ${formData.selectedEvent} inquiry`,
         }),
@@ -160,6 +162,7 @@ export default function EventHero() {
               required
             >
               {slides.map((slide) => <option key={slide.title}>{slide.title}</option>)}
+              <option>Other</option>
             </select>
           </label>
           <div className="ppp-event-form__row">
@@ -204,6 +207,15 @@ export default function EventHero() {
               ))}
             </div>
           </fieldset>
+          <label>
+            Additional details
+            <textarea
+              rows="3"
+              placeholder="Tell us more about your event, occasion, or special requests."
+              value={formData.details}
+              onChange={(event) => setFormData({ ...formData, details: event.target.value })}
+            />
+          </label>
           {turnstileEnabled ? (
             <TurnstileWidget siteKey={siteKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} onError={() => setStatus("Verification could not load. Please refresh and try again.")} />
           ) : null}

@@ -244,17 +244,28 @@
 }
 
 .ppp-event-form input,
-.ppp-event-form select {
+.ppp-event-form select,
+.ppp-event-form textarea {
   width: 100%;
   min-width: 0;
-  height: 40px;
-  padding: 0 0.75rem;
   border: 1px solid var(--private-line);
   border-radius: 4px;
   background: #f7f9ff;
   color: #111827;
   font: 600 0.9rem var(--private-body);
   color-scheme: light;
+}
+
+.ppp-event-form input,
+.ppp-event-form select {
+  height: 40px;
+  padding: 0 0.75rem;
+}
+
+.ppp-event-form textarea {
+  min-height: 76px;
+  padding: 0.65rem 0.75rem;
+  resize: vertical;
 }
 
 .ppp-event-form__row {
