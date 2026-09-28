@@ -8,28 +8,29 @@ import TurnstileWidget from "../components/smallComponents/TurnstileWidget";
 
 const slides = [
   {
-    title: "Christmas Parties",
+    title: "Christmas Party",
     headline: "Make The Holiday Party The Main Event.",
-    body: "Bring your team, friends, or family together for festive challenges, shared laughs, and a dedicated room to celebrate between games.",
+    body: "Bring your team, friends, or family together for festive challenges, shared laughs, and a memorable celebration between games.",
     image: "/assets/images/events/christmas-party.webp",
     alt: "Christmas party playing interactive challenges at Pixel Pulse Play",
   },
   {
-    title: "Family Gatherings",
+    title: "Family Gathering",
     headline: "Every Generation Gets In The Game.",
-    body: "Turn family time into active, easy-to-join fun with challenges for different ages and your own room for food, gifts, and catching up.",
-    image: "/assets/images/events/family-gathering.webp",
+    body: "Turn family time into active, easy-to-join fun with challenges for different ages, shared laughs, and time to catch up.",
+    image: "/assets/images/events/family-gathering-2026-v3.webp",
     alt: "Multi-generation family gathering at Pixel Pulse Play",
+    preserveOrientation: true,
   },
   {
-    title: "Corporate Parties",
+    title: "Corporate Party",
     headline: "Trade The Boardroom For A Real Team Challenge.",
-    body: "Create a work social people want to attend, with hosted gameplay, friendly competition, and a dedicated space for your group.",
+    body: "Create a work social people want to attend, with hosted gameplay, friendly competition, and real team energy.",
     image: "/assets/images/events/corporate-party.webp",
     alt: "Corporate group playing interactive challenges at Pixel Pulse Play",
   },
   {
-    title: "Fundraising Events",
+    title: "Fundraising Event",
     headline: "Bring People Together For A Cause.",
     body: "Build energy around your fundraiser with an engaging group experience that gives supporters a memorable reason to show up.",
     image: "/assets/images/events/fundraising-event.webp",
@@ -113,7 +114,7 @@ export default function EventHero() {
         {slides.map((slide, index) => (
           <Image
             key={slide.image}
-            className={`ppp-private-hero__image${index === active ? " is-active" : ""}`}
+            className={`ppp-private-hero__image${index === active ? " is-active" : ""}${slide.preserveOrientation ? " is-original-orientation" : ""}`}
             src={slide.image}
             alt={index === active ? slide.alt : ""}
             fill
@@ -128,7 +129,6 @@ export default function EventHero() {
           <p className="ppp-private-kicker">{slides[active].title} | Vaughan</p>
           <h1>{slides[active].headline}</h1>
           <p className="ppp-private-hero__text">{slides[active].body}</p>
-          <p className="ppp-private-hero__rooms">Two dedicated party rooms. More availability. Your group&apos;s own space.</p>
           <div className="ppp-private-hero__controls" aria-label="Event carousel controls">
             <button type="button" onClick={() => showSlide(active - 1)} aria-label="Previous event">&#8592;</button>
             <div>

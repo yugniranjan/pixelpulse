@@ -10,20 +10,21 @@ import { getDataByParentId } from "@/utils/customFunctions";
 const logo = "/assets/images/logoD.png";
 const heroImage = "/assets/images/events/corporate-party.webp";
 const contactUrl = "/contactus";
+const eventsUrl = "https://events.pixelpulseplay.ca/";
 const phoneUrl = "tel:+19057602922";
 const siteDataGoogleSheetId = "1NEovNJVBVY4LyXWg3nHFh5-LekMt8GfL4y4eaNz7X1I";
 
 export const metadata = {
   title: "Group Events & Parties | Pixel Pulse Play Vaughan",
   description:
-    "Plan Christmas parties, family gatherings, corporate parties, and fundraising events with interactive challenges and two dedicated party rooms at Pixel Pulse Play Vaughan.",
+    "Plan a Christmas party, family gathering, corporate party, or fundraising event with interactive challenges at Pixel Pulse Play Vaughan.",
   alternates: {
     canonical: canonicalUrl("/private-party"),
   },
   openGraph: {
     title: "Group Events & Parties | Pixel Pulse Play Vaughan",
     description:
-      "Host Christmas, family, corporate, and fundraising events with challenge rooms and dedicated party spaces at Pixel Pulse Play Vaughan.",
+      "Host a Christmas party, family gathering, corporate party, or fundraising event with challenge rooms at Pixel Pulse Play Vaughan.",
     url: canonicalUrl("/private-party"),
     images: [
       {
@@ -39,7 +40,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Group Events & Parties | Pixel Pulse Play Vaughan",
     description:
-      "Christmas parties, family gatherings, corporate parties, and fundraising events at Pixel Pulse Play Vaughan.",
+      "Christmas party, family gathering, corporate party, and fundraising event experiences at Pixel Pulse Play Vaughan.",
     images: [canonicalUrl(heroImage)],
   },
   robots: {
@@ -53,37 +54,37 @@ const navLinks = [
 ];
 
 const groupBenefits = [
-  "Two dedicated party rooms",
+  "Flexible group planning",
   "Hosted and organized",
   "Active group experience",
 ];
 
 const groupEvents = [
   {
-    title: "Christmas Parties",
+    title: "Christmas Party",
     body: "A festive group experience with challenge rooms, friendly competition, and space to celebrate together.",
-    href: "#event-inquiry",
+    href: eventsUrl,
     image: "/assets/images/events/christmas-party.webp",
     imageAlt: "Christmas party at Pixel Pulse Play",
   },
   {
-    title: "Family Gatherings",
-    body: "Bring generations together for active fun, shared memories, and a comfortable room of your own.",
-    href: "#event-inquiry",
-    image: "/assets/images/events/family-gathering.webp",
+    title: "Family Gathering",
+    body: "Bring generations together for active fun, shared memories, and an experience everyone can join.",
+    href: eventsUrl,
+    image: "/assets/images/events/family-gathering-2026-v3.webp",
     imageAlt: "Family gathering at Pixel Pulse Play",
   },
   {
-    title: "Corporate Parties",
+    title: "Corporate Party",
     body: "Team-building, work socials, and staff nights with challenge rooms, simple booking, and real group energy.",
-    href: "#event-inquiry",
+    href: eventsUrl,
     image: "/assets/images/events/corporate-party.webp",
     imageAlt: "Target challenge room for corporate group events",
   },
   {
-    title: "Fundraising Events",
+    title: "Fundraising Event",
     body: "Give your community a reason to gather, play, and support a cause with an event people actually enjoy.",
-    href: "#event-inquiry",
+    href: eventsUrl,
     image: "/assets/images/events/fundraising-event.webp",
     imageAlt: "Arcade games for fundraising events",
   },
@@ -391,10 +392,10 @@ const reasons = [
 ];
 
 const audienceChips = [
-  "Christmas Parties",
-  "Corporate Events",
-  "Fundraising Events",
-  "Family Gatherings",
+  "Christmas Party",
+  "Corporate Party",
+  "Fundraising Event",
+  "Family Gathering",
 ];
 
 export default async function PrivatePartyPage() {
@@ -458,19 +459,6 @@ export default async function PrivatePartyPage() {
                 <a href={event.href}>Plan This Event</a>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="ppp-private-section ppp-private-two-rooms">
-        <div className="ppp-private-shell ppp-private-two-rooms__layout">
-          <div className="ppp-private-section__header">
-            <p>Two Dedicated Spaces</p>
-            <h2>More Ways To Gather. <span>Your Own Room.</span></h2>
-          </div>
-          <div className="ppp-private-two-rooms__copy">
-            <p>Pixel Party Lounge and Pulse Lounge give us more flexibility for group events without turning your celebration into a shared-room experience.</p>
-            <p>Your assigned lounge stays dedicated to your group during its reserved time, giving you a comfortable place for food, gifts, conversations, and breaks between the action.</p>
           </div>
         </div>
       </section>

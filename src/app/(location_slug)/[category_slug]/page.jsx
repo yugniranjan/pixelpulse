@@ -272,16 +272,9 @@ const Category = async ({ params }) => {
   };
   const ctaSources = [pageData || {}, configData];
   const contactHref = getConfiguredValue(ctaSources, ["cta_contact_href", "contactHref", "inquireHref"], "/contactus");
-  const groupsHeroPrimaryHref = getConfiguredValue(
-    ctaSources,
-    ["groupsHeroPrimaryHref", "groupHeroPrimaryHref"],
-    contactHref,
-  );
-  const groupsFinalCtaPrimaryHref = getConfiguredValue(
-    ctaSources,
-    ["groupsFinalCtaPrimaryHref", "groupFinalCtaPrimaryHref"],
-    contactHref,
-  );
+  const groupEventsHref = "https://events.pixelpulseplay.ca/";
+  const groupsHeroPrimaryHref = groupEventsHref;
+  const groupsFinalCtaPrimaryHref = groupEventsHref;
   const aboutReadMoreText = getConfiguredValue(
     ctaSources,
     ["aboutReadMoreText", "aboutCardReadMoreText"],
@@ -327,12 +320,6 @@ const Category = async ({ params }) => {
     ["groupsFinalCtaPrimaryText", "groupFinalCtaPrimaryText"],
     "Plan Your Event",
   );
-  const groupsFinalCtaSecondaryText = getConfiguredValue(
-    ctaSources,
-    ["groupsFinalCtaSecondaryText", "groupFinalCtaSecondaryText"],
-    "Talk To Us",
-  );
-
   const jsonLDschema = await generateSchema(
     pageData,
     '',
@@ -430,7 +417,7 @@ const Category = async ({ params }) => {
                           </Link>
                           <Link
                             href={`${category_slug}/${item?.path}`}
-                            prefetch
+                            prefetch={false}
                             className="ppp-attraction-card-modern__link"
                           >
                             Play This Room
@@ -575,8 +562,8 @@ const Category = async ({ params }) => {
                           </Link>
                           {ctaContent.exploreOptionText && (
                             <Link
-                              href={contactHref}
-                              prefetch={contactHref.startsWith("/")}
+                              href={groupEventsHref}
+                              prefetch={false}
                               className="ppp-group-card-modern__link"
                             >
                               {ctaContent.exploreOptionText}
@@ -604,13 +591,6 @@ const Category = async ({ params }) => {
                       prefetch
                     >
                       {groupsFinalCtaPrimaryText}
-                    </Link>
-                    <Link
-                      href={ctaContent.groupsFinalCtaSecondaryHref || contactHref}
-                      className="ppp-groups-final-cta__btn"
-                      prefetch={(ctaContent.groupsFinalCtaSecondaryHref || contactHref).startsWith("/")}
-                    >
-                      {groupsFinalCtaSecondaryText}
                     </Link>
                   </div>
                 </section>

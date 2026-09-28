@@ -1570,55 +1570,80 @@
 }
 
 /* ---------------------------------------------------------
-   SUMMER BANNER  (accent: lime)
+   FAQ
    --------------------------------------------------------- */
-.ppp-bday-booking-section--summer {
+.ppp-bday-booking-section--faq {
   --neon: var(--lime);
-  padding-block: clamp(2rem, 3.4vw, 3rem);
 }
 
-.ppp-bday-summer {
+.ppp-bday-faq {
+  max-width: 980px;
+}
+
+.ppp-bday-faq__list {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: clamp(1.2rem, 3vw, 2.4rem);
-  align-items: center;
-  padding: clamp(1.6rem, 3vw, 2.4rem);
-  border: 1px solid rgba(240, 234, 34, 0.28);
-  border-radius: 18px;
-  background:
-    radial-gradient(600px 300px at 80% 50%, rgba(240, 234, 34, 0.12), transparent 60%),
-    rgba(8, 12, 26, 0.7);
-  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(240, 234, 34, 0.04);
+  gap: 10px;
+  margin-top: clamp(1.6rem, 3vw, 2.5rem);
 }
 
-.ppp-bday-summer .ppp-bday-section-heading {
-  margin-bottom: 0;
+.ppp-bday-faq details {
+  overflow: hidden;
+  border: 1px solid rgba(188, 255, 107, 0.22);
+  border-radius: 8px;
+  background: rgba(8, 12, 26, 0.72);
 }
 
-.ppp-bday-summer a {
-  justify-self: end;
-  display: inline-flex;
+.ppp-bday-faq summary {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 56px;
-  padding: 0 28px;
-  border: 0;
-  border-radius: 12px;
-  background: linear-gradient(120deg, var(--lime), var(--cyan));
-  color: #050810;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 64px;
+  padding: 1rem 1.2rem;
+  color: #fff;
+  cursor: pointer;
   font-family: var(--display);
-  font-size: 1.08rem;
-  font-weight: 600;
-  letter-spacing: 0.005em;
-  text-decoration: none;
-  white-space: nowrap;
-  box-shadow: 0 0 28px rgba(240, 234, 34, 0.3);
-  transition: transform 160ms ease, box-shadow 200ms ease;
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+  font-weight: 700;
+  list-style: none;
 }
 
-.ppp-bday-summer a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 40px rgba(240, 234, 34, 0.5);
+.ppp-bday-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.ppp-bday-faq summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  color: var(--lime);
+  font-family: var(--body);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.ppp-bday-faq details[open] summary::after {
+  content: "-";
+}
+
+.ppp-bday-faq details > div {
+  padding: 0 1.2rem 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ppp-bday-faq details p {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.ppp-bday-faq details a {
+  display: inline-flex;
+  margin-top: 0.75rem;
+  color: var(--lime);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ---------------------------------------------------------
@@ -1742,8 +1767,7 @@
 
   .ppp-bday-booking-hero__layout,
   .ppp-bday-positioning,
-  .ppp-bday-party-layout,
-  .ppp-bday-summer {
+  .ppp-bday-party-layout {
     grid-template-columns: 1fr;
   }
 
@@ -1765,9 +1789,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .ppp-bday-summer a {
-    justify-self: start;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1806,8 +1827,7 @@
   .ppp-bday-final__actions,
   .ppp-bday-final__actions button,
   .ppp-bday-final__actions a,
-  .ppp-bday-room__cta-row a,
-  .ppp-bday-summer a {
+  .ppp-bday-room__cta-row a {
     width: 100%;
   }
 

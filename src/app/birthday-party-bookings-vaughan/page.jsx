@@ -218,6 +218,38 @@ const reviews = [
   "So much better than a regular trampoline park.",
 ];
 
+const birthdayFaqs = [
+  {
+    question: "What is included in a birthday package?",
+    answer: "Your selected package includes access to all 13 immersive challenge rooms for the listed play duration, pizza and beverages, a reserved party room with tablecloth, plates, cups and cutlery, and a dedicated party host. Arcade cards are available separately with a 10% discount.",
+  },
+  {
+    question: "How do children play the challenge rooms?",
+    answer: "Children play in their own groups and can try multiple games during their scheduled playtime. Each challenge room accommodates one group of up to five players at a time. Our team guides the children and manages rotation; if a room is occupied, the group can wait or move to another available room.",
+    link: { href: "https://www.pixelpulseplay.ca/how-to-play", label: "See how to play" },
+  },
+  {
+    question: "Is the whole facility private for our birthday?",
+    answer: "Birthday packages take place during regular operating hours and are not private facility rentals. Other parties and walk-in guests may be present, but unrelated groups are not mixed inside the challenge rooms. For private-party access, ask our team about a custom package.",
+  },
+  {
+    question: "Can we bring cake, snacks or drinks?",
+    answer: "Yes. Outside cake, dry snacks and non-alcoholic beverages are welcome. Coffee, slushies, extra drinks, water and snacks can also be purchased at the venue.",
+  },
+  {
+    question: "When should we arrive, and are waivers required?",
+    answer: "Please arrive 15 minutes before your reserved time for check-in. Every participant must have a completed waiver before playing.",
+  },
+  {
+    question: "What should participants wear?",
+    answer: "Comfortable clothing and closed-toe shoes are recommended so participants can move safely through the challenges.",
+  },
+  {
+    question: "What should we bring during winter?",
+    answer: "Please bring a clean, dry pair of closed-toe indoor shoes for each participant. Wet, snowy or salt-covered outdoor footwear should not be worn in the challenge rooms. Comfortable clothing that allows easy movement is recommended.",
+  },
+];
+
 // 8-bit pixel-art sprites that float through the hero. "1" = filled pixel.
 const SPRITE_HEART = [
   "0110110",
@@ -639,19 +671,26 @@ export default async function BirthdayPartyBookingsVaughanPage() {
         </div>
       </section>
 
-      <section className="ppp-bday-booking-section ppp-bday-booking-section--summer">
-        <div className="ppp-bday-booking-shell ppp-bday-summer">
-          <div className="ppp-bday-section-heading">
-            <p>Summer birthday positioning</p>
-            <h2>The ultimate <em>summer</em> birthday experience.</h2>
+      <section className="ppp-bday-booking-section ppp-bday-booking-section--faq" id="faq">
+        <div className="ppp-bday-booking-shell ppp-bday-faq">
+          <div className="ppp-bday-section-heading ppp-bday-section-heading--center">
+            <p>Birthday party FAQ</p>
+            <h2>Good to know <em>before the party.</em></h2>
             <p className="ppp-bday-section-copy">
-              Skip the same old birthday party this summer. Pixel Pulse delivers
-              air-conditioned indoor fun, active gameplay, immersive challenges, and
-              unforgettable memories without worrying about weather, heat, or boring
-              party halls.
+              Quick answers about what is included, how the games work, and how to prepare.
             </p>
           </div>
-          <a href="#birthday-party-form">Check available dates</a>
+          <div className="ppp-bday-faq__list">
+            {birthdayFaqs.map((faq, index) => (
+              <details key={faq.question} open={index === 0}>
+                <summary>{faq.question}</summary>
+                <div>
+                  <p>{faq.answer}</p>
+                  {faq.link ? <a href={faq.link.href}>{faq.link.label}</a> : null}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
