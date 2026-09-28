@@ -8,7 +8,7 @@ import { canonicalUrl, safeImageUrl } from "@/lib/seo";
 import { getDataByParentId } from "@/utils/customFunctions";
 
 const logo = "/assets/images/logoD.png";
-const heroImage = "/assets/images/events/corporate-event-2026-v2.webp";
+const heroImage = "/assets/images/events/corporate-event-2026-v3.webp";
 const contactUrl = "/contactus";
 const eventsUrl = "https://events.pixelpulseplay.ca/";
 const phoneUrl = "tel:+19057602922";
@@ -78,7 +78,7 @@ const groupEvents = [
     title: "Corporate Party",
     body: "Team-building, work socials, and staff nights with challenge rooms, simple booking, and real group energy.",
     href: eventsUrl,
-    image: "/assets/images/events/corporate-event-2026-v2.webp",
+    image: "/assets/images/events/corporate-event-2026-v3.webp",
     imageAlt: "Target challenge room for corporate group events",
   },
   {
