@@ -197,6 +197,9 @@ export async function POST(request) {
       message,
       selectedEvent,
       selectedPackage,
+      groupSize,
+      privateParty,
+      details,
       from,
       contactCompany,
       websiteUrl,
@@ -267,24 +270,40 @@ export async function POST(request) {
       );
     }
 
-    const safeSubject = `${visitorDisplayName} - ${BUSINESS_NAME} (Inquiry)`;
+    const isEventInquiry = includesText(from, "events");
+    const safeSubject = isEventInquiry
+      ? "Pixel Pulse Event Inquiry"
+      : `${visitorDisplayName} - ${BUSINESS_NAME} (Inquiry)`;
 
-    const text = [
-      `From Location: ${from || "Pixel Pulse Play"}`,
-      `Inquiry Type: ${selectedEvent || "Not provided"}`,
-      `Name: ${fullName || "Not provided"}`,
-      `Child Name: ${childDisplayName || "Not provided"}`,
-      `Year: ${childDisplayYear || "Not provided"}`,
-      `Email: ${email || "Not provided"}`,
-      `Phone: ${visitorPhone}`,
-      `Preferred Date: ${date || "Not provided"}`,
-      `Preferred Time: ${time || "Not provided"}`,
-      `Party Package: ${selectedPackage || "Not provided"}`,
-      `Extra Play Time: ${extraPlayTime || "Not provided"}`,
-      "",
-      "Message:",
-      message || "No message provided",
-    ].join("\n");
+    const text = isEventInquiry
+      ? [
+          `Event Type: ${selectedEvent || "Not provided"}`,
+          `Name: ${fullName || "Not provided"}`,
+          `Email: ${email || "Not provided"}`,
+          `Phone: ${visitorPhone}`,
+          `Preferred Date: ${date || "Not provided"}`,
+          `Estimated Group Size: ${groupSize || "Not provided"}`,
+          `Looking for a Private Party: ${privateParty || "Not provided"}`,
+          "",
+          "Additional Details:",
+          details || "Not provided",
+        ].join("\n")
+      : [
+          `From Location: ${from || "Pixel Pulse Play"}`,
+          `Inquiry Type: ${selectedEvent || "Not provided"}`,
+          `Name: ${fullName || "Not provided"}`,
+          `Child Name: ${childDisplayName || "Not provided"}`,
+          `Year: ${childDisplayYear || "Not provided"}`,
+          `Email: ${email || "Not provided"}`,
+          `Phone: ${visitorPhone}`,
+          `Preferred Date: ${date || "Not provided"}`,
+          `Preferred Time: ${time || "Not provided"}`,
+          `Party Package: ${selectedPackage || "Not provided"}`,
+          `Extra Play Time: ${extraPlayTime || "Not provided"}`,
+          "",
+          "Message:",
+          message || "No message provided",
+        ].join("\n");
 
     const safeName = escapeHtml(fullName || "there");
     const isBirthdayInquiry =
@@ -340,22 +359,36 @@ export async function POST(request) {
         `
       : "";
 
-    const html = `
-      <div>
-        <p><strong>Inquiry Type:</strong> ${escapeHtml(selectedEvent || "Not provided")}</p>
-        <p><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</p>
-        <p><strong>Child Name:</strong> ${escapeHtml(childDisplayName || "Not provided")}</p>
-        <p><strong>Year:</strong> ${escapeHtml(childDisplayYear || "Not provided")}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email || "Not provided")}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(visitorPhone)}</p>
-        <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
-        <p><strong>Preferred Time:</strong> ${escapeHtml(time || "Not provided")}</p>
-        <p><strong>Party Package:</strong> ${escapeHtml(selectedPackage || "Not provided")}</p>
-        <p><strong>Extra Play Time:</strong> ${escapeHtml(extraPlayTime || "Not provided")}</p>
-        <p><strong>Message:</strong></p>
-        <p>${escapeHtml(message || "No message provided")}</p>
-      </div>
-    `;
+    const html = isEventInquiry
+      ? `
+        <div>
+          <p><strong>Event Type:</strong> ${escapeHtml(selectedEvent || "Not provided")}</p>
+          <p><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email || "Not provided")}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(visitorPhone)}</p>
+          <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
+          <p><strong>Estimated Group Size:</strong> ${escapeHtml(groupSize || "Not provided")}</p>
+          <p><strong>Looking for a Private Party:</strong> ${escapeHtml(privateParty || "Not provided")}</p>
+          <p><strong>Additional Details:</strong></p>
+          <p style="white-space:pre-wrap">${escapeHtml(details || "Not provided")}</p>
+        </div>
+      `
+      : `
+        <div>
+          <p><strong>Inquiry Type:</strong> ${escapeHtml(selectedEvent || "Not provided")}</p>
+          <p><strong>Name:</strong> ${escapeHtml(fullName || "Not provided")}</p>
+          <p><strong>Child Name:</strong> ${escapeHtml(childDisplayName || "Not provided")}</p>
+          <p><strong>Year:</strong> ${escapeHtml(childDisplayYear || "Not provided")}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email || "Not provided")}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(visitorPhone)}</p>
+          <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
+          <p><strong>Preferred Time:</strong> ${escapeHtml(time || "Not provided")}</p>
+          <p><strong>Party Package:</strong> ${escapeHtml(selectedPackage || "Not provided")}</p>
+          <p><strong>Extra Play Time:</strong> ${escapeHtml(extraPlayTime || "Not provided")}</p>
+          <p><strong>Message:</strong></p>
+          <p style="white-space:pre-wrap">${escapeHtml(message || "No message provided")}</p>
+        </div>
+      `;
 
     await transporter.sendMail({
       from: {
