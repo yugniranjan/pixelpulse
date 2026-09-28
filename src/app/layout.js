@@ -273,6 +273,10 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
+      <head>
+        <link rel="dns-prefetch" href="//events.pixelpulseplay.ca" />
+        <link rel="preconnect" href="https://events.pixelpulseplay.ca" />
+      </head>
       <body suppressHydrationWarning>
         <TrackingVisibility>
           <>

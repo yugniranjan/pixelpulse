@@ -80,6 +80,7 @@ const groupEvents = [
     href: eventsUrl,
     image: "/assets/images/events/corporate-event-2026-v3.webp",
     imageAlt: "Target challenge room for corporate group events",
+    preserveOrientation: true,
   },
   {
     title: "Fundraising Event",
@@ -87,6 +88,7 @@ const groupEvents = [
     href: eventsUrl,
     image: "/assets/images/events/fundraising-event.webp",
     imageAlt: "Arcade games for fundraising events",
+    preserveOrientation: true,
   },
 ];
 
@@ -446,6 +448,7 @@ export default async function PrivatePartyPage() {
             {groupEvents.map((event) => (
               <article key={event.title}>
                 <Image
+                  className={event.preserveOrientation ? "is-original-orientation" : undefined}
                   src={event.image}
                   alt={event.imageAlt}
                   width={180}

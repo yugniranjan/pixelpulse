@@ -588,6 +588,10 @@
   border: 1px solid var(--private-line-soft);
 }
 
+.ppp-private-event-types article > img.is-original-orientation {
+  transform: none;
+}
+
 .ppp-private-event-types h3 {
   margin: 0 0 0.32rem;
   font-family: var(--private-display);

@@ -111,20 +111,26 @@ export default function EventHero() {
     }
   };
 
+  const nextSlideIndex = (active + 1) % slides.length;
+
   return (
     <section className="ppp-private-hero">
       <div className="ppp-private-hero__slides" aria-live="polite">
-        {slides.map((slide, index) => (
-          <Image
-            key={slide.image}
-            className={`ppp-private-hero__image${index === active ? " is-active" : ""}${slide.preserveOrientation ? " is-original-orientation" : ""}`}
-            src={slide.image}
-            alt={index === active ? slide.alt : ""}
-            fill
-            priority={index === 0}
-            sizes="100vw"
-          />
-        ))}
+        {slides.map((slide, index) => {
+          if (index !== active && index !== nextSlideIndex) return null;
+
+          return (
+            <Image
+              key={slide.image}
+              className={`ppp-private-hero__image${index === active ? " is-active" : ""}${slide.preserveOrientation ? " is-original-orientation" : ""}`}
+              src={slide.image}
+              alt={index === active ? slide.alt : ""}
+              fill
+              priority={index === 0}
+              sizes="100vw"
+            />
+          );
+        })}
       </div>
 
       <div className="ppp-private-shell ppp-private-hero__layout">
