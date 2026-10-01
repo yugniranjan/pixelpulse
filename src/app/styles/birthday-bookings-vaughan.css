@@ -141,6 +141,7 @@
 }
 
 .ppp-bday-booking-nav div a,
+.ppp-bday-nav-email,
 .ppp-bday-nav-phone {
   display: inline-flex;
   align-items: center;
@@ -148,6 +149,25 @@
   min-height: 40px;
   padding: 0 13px;
   border-radius: 10px;
+}
+
+.ppp-bday-nav-contact {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ppp-bday-nav-email {
+  border: 1px solid rgba(188, 255, 107, 0.3);
+  color: rgba(234, 242, 255, 0.86);
+}
+
+.ppp-bday-nav-email:hover {
+  border-color: rgba(188, 255, 107, 0.62);
+  background: rgba(188, 255, 107, 0.1);
+  color: #ffffff;
 }
 
 .ppp-bday-booking-nav div a:hover {
@@ -1761,6 +1781,11 @@
     display: none;
   }
 
+  .ppp-bday-nav-contact {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
   .ppp-bday-booking-hero {
     padding-top: 150px;
   }
@@ -1800,6 +1825,21 @@
   .ppp-bday-booking-hero {
     min-height: 0;
     padding-bottom: 44px;
+  }
+
+  .ppp-bday-nav-contact {
+    gap: 4px;
+  }
+
+  .ppp-bday-nav-email,
+  .ppp-bday-nav-phone {
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .ppp-bday-nav-phone {
+    display: none;
   }
 
   .ppp-bday-booking-hero::before {

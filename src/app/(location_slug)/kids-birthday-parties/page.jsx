@@ -21,6 +21,23 @@ import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "
 const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
 const partyRoomImage =
   "https://storage.googleapis.com/pixel-pulse-play/web/Birthday%20party%20room.jpg";
+const onlineBirthdayBookingUrl =
+  "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
+const birthdayInquiryPageUrl = "https://birthdays.pixelpulseplay.ca/";
+const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
+
+function getBirthdayPackageCta(packageName = "") {
+  const canBookOnline = onlineBirthdayPackages.has(
+    String(packageName).trim().toLowerCase(),
+  );
+
+  return canBookOnline
+    ? { href: onlineBirthdayBookingUrl, label: "Book Now" }
+    : {
+        href: `${birthdayInquiryPageUrl}?package=${encodeURIComponent(packageName)}#birthday-party-form`,
+        label: "Inquire",
+      };
+}
 
 function stripHtml(html = "") {
   return html
@@ -199,34 +216,65 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
                 ))}
               </tr>
             ))}
+            <tr className="ppp-party-table__cta-row">
+              <td className="ppp-party-feature">Booking</td>
+              {packages.map((plan) => {
+                const cta = getBirthdayPackageCta(plan.name);
+
+                return (
+                  <td className="ppp-party-value" key={plan.name}>
+                    <a
+                      className="ppp-party-package-cta"
+                      href={cta.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {cta.label}
+                    </a>
+                  </td>
+                );
+              })}
+            </tr>
           </tbody>
         </table>
       </div>
 
       <div className="ppp-party-mobile-cards">
-        {packages.map((plan, index) => (
-          <article
-            key={index}
-            className={`ppp-party-mobile-card${index === spotlightIndex ? " is-featured" : ""}`}
-          >
-            <div className="ppp-party-mobile-card__head">
-              <span className="ppp-party-mobile-card__eyebrow">
-                {index === spotlightIndex ? "Most Popular" : "Package"}
-              </span>
-              <h3>{plan.name}</h3>
-              <p>{plan["Package Price"]}</p>
-            </div>
+        {packages.map((plan, index) => {
+          const cta = getBirthdayPackageCta(plan.name);
 
-            <div className="ppp-party-mobile-card__body">
-              {features.slice(1).map((feature, featureIndex) => (
-                <div className="ppp-party-mobile-card__row" key={featureIndex}>
-                  <span className="ppp-party-mobile-card__label">{feature}</span>
-                  <span className="ppp-party-mobile-card__value">{plan[feature] || "-"}</span>
-                </div>
-              ))}
-            </div>
-          </article>
-        ))}
+          return (
+            <article
+              key={index}
+              className={`ppp-party-mobile-card${index === spotlightIndex ? " is-featured" : ""}`}
+            >
+              <div className="ppp-party-mobile-card__head">
+                <span className="ppp-party-mobile-card__eyebrow">
+                  {index === spotlightIndex ? "Most Popular" : "Package"}
+                </span>
+                <h3>{plan.name}</h3>
+                <p>{plan["Package Price"]}</p>
+              </div>
+
+              <div className="ppp-party-mobile-card__body">
+                {features.slice(1).map((feature, featureIndex) => (
+                  <div className="ppp-party-mobile-card__row" key={featureIndex}>
+                    <span className="ppp-party-mobile-card__label">{feature}</span>
+                    <span className="ppp-party-mobile-card__value">{plan[feature] || "-"}</span>
+                  </div>
+                ))}
+              </div>
+              <a
+                className="ppp-party-package-cta ppp-party-mobile-card__cta"
+                href={cta.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {cta.label}
+              </a>
+            </article>
+          );
+        })}
       </div>
 
       <PrivatePartyRoomSection />

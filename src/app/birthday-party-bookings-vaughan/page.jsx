@@ -19,7 +19,14 @@ const LOCATION_SLUG = "vaughan";
 const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 const phoneUrl = "tel:+19057602922";
 const pageUrl = "https://birthdays.pixelpulseplay.ca";
+const onlineBirthdayBookingUrl =
+  "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
+const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
+
+function isOnlineBirthdayPackage(packageName = "") {
+  return onlineBirthdayPackages.has(String(packageName).trim().toLowerCase());
+}
 const birthdayHeroVideoJsonLd = {
   "@context": "https://schema.org",
   "@type": "VideoObject",
@@ -478,9 +485,14 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             </a>
           ))}
         </div>
-        <a className="ppp-bday-nav-phone" href={phoneUrl}>
-          Call +1 (905) 760-2922
-        </a>
+        <span className="ppp-bday-nav-contact">
+          <a className="ppp-bday-nav-email" href="mailto:connect@pixelpulseplay.ca">
+            connect@pixelpulseplay.ca
+          </a>
+          <a className="ppp-bday-nav-phone" href={phoneUrl}>
+            Call +1 (905) 760-2922
+          </a>
+        </span>
       </nav>
 
       <section className="ppp-bday-booking-hero">
@@ -513,7 +525,6 @@ export default async function BirthdayPartyBookingsVaughanPage() {
           </div>
 
           <BirthdayHeroContactForm
-            urgency="Summer weekend spots fill quickly. Reserve your preferred party date today."
             packageOptions={packageList}
           />
         </div>
@@ -525,31 +536,42 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <p>Party packages</p>
             <h2>Pick the birthday <em>package</em> that fits your group.</h2>
             <span className="ppp-bday-package-note">
-              Every package includes time in an assigned party lounge. Room assignment depends on the package and availability. A second party may use the other lounge, and packages do not reserve the entire facility or play area for private use.
+              Pixel Punch and Pixel Ultra can be booked online. For Pixel Jumbo or Pulse Max, send us a party request so our team can confirm availability and details.
             </span>
           </div>
           <div className="ppp-bday-package-grid">
-            {packageList.map((pkg, index) => (
-              <article
-                key={pkg.name}
-                className={index === spotlightIndex ? "is-featured" : undefined}
-              >
-                <p>{index === spotlightIndex ? "Most Popular" : "Package"}</p>
-                <h3>{pkg.name}</h3>
-                <div className="ppp-bday-package-price">{pkg[PACKAGE_PRICE_KEY]}</div>
-                <ul>
-                  {packageFeatureKeys.map((key) => (
-                    <li key={key}>
-                      <span className="ppp-bday-package-key">{key}</span>
-                      <strong className="ppp-bday-package-val">{pkg[key] || "-"}</strong>
-                    </li>
-                  ))}
-                </ul>
-                <a className="ppp-bday-package-link" href="#birthday-party-form">
-                  Book this package
-                </a>
-              </article>
-            ))}
+            {packageList.map((pkg, index) => {
+              const canBookOnline = isOnlineBirthdayPackage(pkg.name);
+
+              return (
+                <article
+                  key={pkg.name}
+                  className={index === spotlightIndex ? "is-featured" : undefined}
+                >
+                  <p>{index === spotlightIndex ? "Most Popular" : "Package"}</p>
+                  <h3>{pkg.name}</h3>
+                  <div className="ppp-bday-package-price">{pkg[PACKAGE_PRICE_KEY]}</div>
+                  <ul>
+                    {packageFeatureKeys.map((key) => (
+                      <li key={key}>
+                        <span className="ppp-bday-package-key">{key}</span>
+                        <strong className="ppp-bday-package-val">{pkg[key] || "-"}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    className="ppp-bday-package-link"
+                    href={canBookOnline
+                      ? onlineBirthdayBookingUrl
+                      : `?package=${encodeURIComponent(pkg.name)}#birthday-party-form`}
+                    target={canBookOnline ? "_blank" : undefined}
+                    rel={canBookOnline ? "noopener noreferrer" : undefined}
+                  >
+                    {canBookOnline ? "Book online" : "Request this package"}
+                  </a>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

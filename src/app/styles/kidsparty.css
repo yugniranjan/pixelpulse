@@ -331,6 +331,35 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.ppp-party-table__cta-row td {
+  padding: 14px 10px 18px;
+}
+
+.ppp-party-package-cta {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: 1px solid var(--ppp-lime);
+  border-radius: 6px;
+  background: var(--ppp-lime);
+  color: #050810;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.ppp-party-package-cta:hover {
+  color: #050810;
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
 .ppp-party-mobile-cards {
   display: none;
 }
@@ -568,6 +597,11 @@
     color: var(--white-color);
     font-size: 0.96rem;
     line-height: 1.55;
+  }
+
+  .ppp-party-mobile-card__cta {
+    display: flex;
+    margin: 0.9rem 1rem 1rem;
   }
 
   .ppp-party-rules {
