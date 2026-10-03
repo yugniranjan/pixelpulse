@@ -18,13 +18,39 @@ import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
 import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
-const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
-const partyRoomImage =
-  "https://storage.googleapis.com/pixel-pulse-play/web/Birthday%20party%20room.jpg";
 const onlineBirthdayBookingUrl =
   "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
 const birthdayInquiryPageUrl = "https://birthdays.pixelpulseplay.ca/";
 const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
+const partyRoomAccessByPackage = {
+  "pixel punch": "45 minutes",
+  "pixel ultra": "45 minutes",
+  "pixel jumbo": "2.5 hours",
+  "pulse max": "3 hours",
+};
+
+function getPartyRoomAccess(packageName = "") {
+  return partyRoomAccessByPackage[String(packageName).trim().toLowerCase()] || "-";
+}
+
+function addPartyRoomAccessFeature(features = []) {
+  if (features.includes("Party Room Access")) return features;
+
+  const durationIndex = features.indexOf("Total Party Duration");
+  if (durationIndex < 0) return [...features, "Party Room Access"];
+
+  return [
+    ...features.slice(0, durationIndex + 1),
+    "Party Room Access",
+    ...features.slice(durationIndex + 1),
+  ];
+}
+
+function getPackageFeatureValue(plan, feature) {
+  return feature === "Party Room Access"
+    ? getPartyRoomAccess(plan.name)
+    : plan[feature] || "-";
+}
 
 function getBirthdayPackageCta(packageName = "") {
   const canBookOnline = onlineBirthdayPackages.has(
@@ -170,7 +196,9 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
   const isCtaSecondaryHrefExternal = /^https?:\/\//i.test(ctaSecondaryHref || "");
 
   const packages = parsedData.packages;
-  const features = Object.keys(packages[0]).filter((key) => key !== "name");
+  const features = addPartyRoomAccessFeature(
+    Object.keys(packages[0]).filter((key) => key !== "name"),
+  );
   const spotlightIndex = packages.length > 1 ? 1 : 0;
 
   return (
@@ -211,7 +239,7 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
                     className="ppp-party-value"
                     data-label={plan.name}
                   >
-                    {plan[feature] || "-"}
+                    {getPackageFeatureValue(plan, feature)}
                   </td>
                 ))}
               </tr>
@@ -260,7 +288,9 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
                 {features.slice(1).map((feature, featureIndex) => (
                   <div className="ppp-party-mobile-card__row" key={featureIndex}>
                     <span className="ppp-party-mobile-card__label">{feature}</span>
-                    <span className="ppp-party-mobile-card__value">{plan[feature] || "-"}</span>
+                    <span className="ppp-party-mobile-card__value">
+                      {getPackageFeatureValue(plan, feature)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -392,20 +422,6 @@ function PrivatePartyRoomSection() {
           </p>
         </div>
 
-        <div className="ppp-party-room__video-shell">
-          <video
-            className="ppp-party-room__video"
-            src={partyRoomVideo}
-            poster={partyRoomImage}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label="Pixel Pulse birthday party room video"
-          />
-          <div className="ppp-party-room__video-badge">Party room preview</div>
-        </div>
       </div>
 
       <div className="ppp-party-room__features">

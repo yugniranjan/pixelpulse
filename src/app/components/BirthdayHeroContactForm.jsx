@@ -13,8 +13,15 @@ const ONLINE_PACKAGE_DETAIL_KEYS = [
   "Number of Participants",
   "Game Time Included",
   "Total Party Duration",
+  "Party Room Access",
   "Refreshments",
 ];
+const PARTY_ROOM_ACCESS_BY_PACKAGE = {
+  "pixel punch": "45 minutes",
+  "pixel ultra": "45 minutes",
+  "pixel jumbo": "2.5 hours",
+  "pulse max": "3 hours",
+};
 
 const INITIAL_FORM = {
   fullName: "",
@@ -101,7 +108,9 @@ function PackageDetails({ packageDetails }) {
 
       <dl className="ppp-birthday-hero-form__package-details">
         {ONLINE_PACKAGE_DETAIL_KEYS.map((key) => {
-          const value = packageDetails[key];
+          const value = key === "Party Room Access"
+            ? PARTY_ROOM_ACCESS_BY_PACKAGE[packageDetails.name.trim().toLowerCase()]
+            : packageDetails[key];
           if (!value) return null;
 
           return (

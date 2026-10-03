@@ -981,7 +981,7 @@
 
 .ppp-bday-room__story {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  grid-template-columns: 1fr;
   gap: clamp(1rem, 2vw, 1.4rem);
   align-items: start;
   margin-bottom: 1rem;
@@ -989,6 +989,7 @@
 
 .ppp-bday-room__copy {
   min-width: 0;
+  max-width: 900px;
 }
 
 .ppp-bday-room__copy p {

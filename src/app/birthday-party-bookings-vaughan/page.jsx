@@ -10,9 +10,6 @@ import { getConfiguredValue } from "@/lib/ctaContent";
 
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
 const heroVideo = "/assets/videos/pixelgame.mp4";
-const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
-const partyRoomImage =
-  "https://storage.googleapis.com/pixel-pulse-play/web/Birthday%20party%20room.jpg";
 const localFloorImage = "/assets/images/floorchallenge.webp";
 const localShootingImage = "/assets/images/shootinggame.webp";
 const LOCATION_SLUG = "vaughan";
@@ -22,10 +19,33 @@ const pageUrl = "https://birthdays.pixelpulseplay.ca";
 const onlineBirthdayBookingUrl =
   "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
 const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
+const partyRoomAccessByPackage = {
+  "pixel punch": "45 minutes",
+  "pixel ultra": "45 minutes",
+  "pixel jumbo": "2.5 hours",
+  "pulse max": "3 hours",
+};
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
 
 function isOnlineBirthdayPackage(packageName = "") {
   return onlineBirthdayPackages.has(String(packageName).trim().toLowerCase());
+}
+
+function getPartyRoomAccess(packageName = "") {
+  return partyRoomAccessByPackage[String(packageName).trim().toLowerCase()] || "-";
+}
+
+function addPartyRoomAccessFeature(features = []) {
+  if (features.includes("Party Room Access")) return features;
+
+  const durationIndex = features.indexOf("Total Party Duration");
+  if (durationIndex < 0) return [...features, "Party Room Access"];
+
+  return [
+    ...features.slice(0, durationIndex + 1),
+    "Party Room Access",
+    ...features.slice(durationIndex + 1),
+  ];
 }
 const birthdayHeroVideoJsonLd = {
   "@context": "https://schema.org",
@@ -403,20 +423,6 @@ function DedicatedPartyRoomSection() {
             </p>
           </div>
 
-          <div className="ppp-bday-room__video-shell">
-            <video
-              className="ppp-bday-room__video"
-              src={partyRoomVideo}
-              poster={partyRoomImage}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-label="Preview of a Pixel Pulse birthday party room"
-            />
-            <div className="ppp-bday-room__video-badge">Party lounge preview</div>
-          </div>
         </div>
 
         <div className="ppp-bday-room__features">
@@ -462,9 +468,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
   const gameCards = attractions.length ? attractions : fallbackAttractions;
 
   const packageFeatureKeys = packageList.length
-    ? Object.keys(packageList[0]).filter(
+    ? addPartyRoomAccessFeature(Object.keys(packageList[0]).filter(
         (key) => key !== "name" && key !== PACKAGE_PRICE_KEY,
-      )
+      ))
     : [];
   const spotlightIndex = packageList.length > 1 ? 1 : 0;
 
@@ -555,7 +561,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
                     {packageFeatureKeys.map((key) => (
                       <li key={key}>
                         <span className="ppp-bday-package-key">{key}</span>
-                        <strong className="ppp-bday-package-val">{pkg[key] || "-"}</strong>
+                        <strong className="ppp-bday-package-val">
+                          {key === "Party Room Access" ? getPartyRoomAccess(pkg.name) : pkg[key] || "-"}
+                        </strong>
                       </li>
                     ))}
                   </ul>
