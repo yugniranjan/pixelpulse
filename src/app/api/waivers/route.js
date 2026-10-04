@@ -110,6 +110,10 @@ function hasRequiredParticipantFields(participant) {
   return Boolean(participant.firstName && participant.lastName && participant.dob);
 }
 
+function hasRequiredFamilyMemberFields(participant) {
+  return Boolean(participant.firstName || participant.lastName);
+}
+
 function samePhone(left = "", right = "") {
   const normalizedLeft = normalizePhone(left);
   const normalizedRight = normalizePhone(right);
@@ -176,12 +180,14 @@ async function getExistingWaiversByEmail(email, originalEmail = email) {
   if (!normalizedEmail) return [];
 
   if (hasPostgres()) {
+    let postgresWaivers = [];
     if (typeof listPostgresWaiversByEmail === "function") {
-      return listPostgresWaiversByEmail(normalizedEmail);
+      postgresWaivers = await listPostgresWaiversByEmail(normalizedEmail);
+    } else {
+      const waiver = await getPostgresWaiverByEmail(normalizedEmail);
+      postgresWaivers = waiver ? [waiver] : [];
     }
-
-    const waiver = await getPostgresWaiverByEmail(normalizedEmail);
-    return waiver ? [waiver] : [];
+    if (postgresWaivers.length || !db) return postgresWaivers;
   }
 
   if (!db) return [];
@@ -224,7 +230,8 @@ async function getExistingWaiversByPhone(phone) {
   if (!normalizedPhone) return [];
 
   if (hasPostgres()) {
-    return listPostgresWaiversByPhone(normalizedPhone);
+    const postgresWaivers = await listPostgresWaiversByPhone(normalizedPhone);
+    if (postgresWaivers.length || !db) return postgresWaivers;
   }
 
   if (!db) return [];
@@ -267,7 +274,8 @@ async function getWaiverById(id) {
   if (!waiverId) return null;
 
   if (hasPostgres()) {
-    return getPostgresWaiverById(waiverId);
+    const postgresWaiver = await getPostgresWaiverById(waiverId);
+    if (postgresWaiver || !db) return postgresWaiver;
   }
 
   if (!db) return null;
@@ -280,7 +288,11 @@ async function updateWaiverRecord(id, doc) {
   if (!waiverId) return false;
 
   if (hasPostgres()) {
-    return Boolean(await updatePostgresWaiver(waiverId, doc));
+    const postgresWaiver = await getPostgresWaiverById(waiverId);
+    if (postgresWaiver) {
+      return Boolean(await updatePostgresWaiver(waiverId, doc));
+    }
+    if (!db) return false;
   }
 
   if (!db) return false;
@@ -370,9 +382,9 @@ export async function POST(req) {
     );
   }
 
-  if (familyMembers.some((member) => !hasRequiredParticipantFields(member))) {
+  if (familyMembers.some((member) => !hasRequiredFamilyMemberFields(member))) {
     return NextResponse.json(
-      { error: "Every added family member needs a first name, last name, and date of birth." },
+      { error: "Every added family member needs a name." },
       { status: 400 },
     );
   }

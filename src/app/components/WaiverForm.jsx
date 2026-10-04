@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 
 const HEALTH_CONDITIONS = [
   "Not Applicable",
@@ -14,26 +15,6 @@ const HEALTH_CONDITIONS = [
   "Pregnancy",
   "Other",
 ];
-
-const MONTHS = [
-  ["01", "January"],
-  ["02", "February"],
-  ["03", "March"],
-  ["04", "April"],
-  ["05", "May"],
-  ["06", "June"],
-  ["07", "July"],
-  ["08", "August"],
-  ["09", "September"],
-  ["10", "October"],
-  ["11", "November"],
-  ["12", "December"],
-];
-
-const CURRENT_YEAR = new Date().getFullYear();
-const DOB_YEARS = Array.from({ length: CURRENT_YEAR - 1919 }, (_, index) =>
-  String(CURRENT_YEAR - index),
-);
 
 const EMPTY_PRIMARY = {
   firstName: "",
@@ -222,10 +203,6 @@ function createLoadedFamilyMember(member = {}, index = 0) {
   };
 }
 
-function memberLabel(type) {
-  return type === "adult" ? "Adult 18+" : "Minor under 18";
-}
-
 function today() {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Toronto",
@@ -247,207 +224,13 @@ function isPastDate(value = "") {
   return Boolean(value && dateNumber(value) < dateNumber(today()));
 }
 
-function isBeforeToday(parts = {}) {
-  return isCompleteDate(parts) && isPastDate(formatDob(parts));
-}
-
-function datePartsFromDate(date = new Date()) {
-  return {
-    year: String(date.getFullYear()),
-    month: String(date.getMonth() + 1).padStart(2, "0"),
-    day: String(date.getDate()).padStart(2, "0"),
-  };
-}
-
-function daysInMonth(year, month) {
-  if (!year || !month) return 31;
-  return new Date(Number(year), Number(month), 0).getDate();
-}
-
-function parseDob(value = "") {
-  const [year = "", month = "", day = ""] = String(value || "").split("-");
-  return { year, month, day };
-}
-
-function formatDob({ year, month, day }) {
-  if (!year || !month || !day) return "";
-  return `${year}-${month}-${day}`;
-}
-
-function formatReadableDate(value = "") {
-  const { year, month, day } = parseDob(value);
-  if (!year || !month || !day) return "";
-  const monthName = MONTHS.find(([monthValue]) => monthValue === month)?.[1] || month;
-  return `${monthName} ${Number(day)}, ${year}`;
-}
-
-function isCompleteDate({ year, month, day }) {
-  return Boolean(year && month && day);
-}
-
-function DobField({ label, value, onChange }) {
-  const [dob, setDob] = useState(() => parseDob(value));
-  const dayCount = daysInMonth(dob.year, dob.month);
-  const days = Array.from({ length: dayCount }, (_, index) =>
-    String(index + 1).padStart(2, "0"),
-  );
-
-  useEffect(() => {
-    setDob(parseDob(value));
-  }, [value]);
-
-  function updateDob(field, nextValue) {
-    const nextDob = { ...dob, [field]: nextValue };
-    const nextDayCount = daysInMonth(nextDob.year, nextDob.month);
-
-    if (nextDob.day && Number(nextDob.day) > nextDayCount) {
-      nextDob.day = String(nextDayCount).padStart(2, "0");
-    }
-
-    setDob(nextDob);
-    onChange(isCompleteDate(nextDob) ? formatDob(nextDob) : "");
-  }
-
-  const selectedDate = isCompleteDate(dob) ? formatReadableDate(formatDob(dob)) : "";
-
-  return (
-    <label>
-      <span>{label}</span>
-      <div className="ppp-waiver-dob-row">
-        <select required aria-label={`${label} month`} value={dob.month} onChange={(event) => updateDob("month", event.target.value)}>
-          <option value="">Month</option>
-          {MONTHS.map(([value, name]) => <option value={value} key={value}>{name}</option>)}
-        </select>
-        <select required aria-label={`${label} day`} value={dob.day} onChange={(event) => updateDob("day", event.target.value)}>
-          <option value="">Day</option>
-          {days.map((day) => <option value={day} key={day}>{Number(day)}</option>)}
-        </select>
-        <select required aria-label={`${label} year`} value={dob.year} onChange={(event) => updateDob("year", event.target.value)}>
-          <option value="">Year</option>
-          {DOB_YEARS.map((year) => <option value={year} key={year}>{year}</option>)}
-        </select>
-      </div>
-      {selectedDate ? (
-        <small className="ppp-waiver-date-summary" aria-live="polite">
-          Selected: <strong>{selectedDate}</strong>
-        </small>
-      ) : null}
-    </label>
-  );
-}
-
-function DatePartsField({ label, value, onChange, yearOptions = DOB_YEARS }) {
-  const [dateParts, setDateParts] = useState(() => parseDob(value));
-  const dayCount = daysInMonth(dateParts.year, dateParts.month);
-  const days = Array.from({ length: dayCount }, (_, index) =>
-    String(index + 1).padStart(2, "0"),
-  );
-  const todayParts = datePartsFromDate();
-
-  useEffect(() => {
-    const nextValue = isPastDate(value) ? today() : value;
-    setDateParts(parseDob(nextValue));
-    if (value && nextValue !== value) {
-      onChange(nextValue);
-    }
-  }, [value]);
-
-  function updateDate(field, nextValue) {
-    const nextDate = { ...dateParts, [field]: nextValue };
-    const nextDayCount = daysInMonth(nextDate.year, nextDate.month);
-
-    if (nextDate.day && Number(nextDate.day) > nextDayCount) {
-      nextDate.day = String(nextDayCount).padStart(2, "0");
-    }
-
-    const formattedDate = isCompleteDate(nextDate) ? formatDob(nextDate) : "";
-
-    if (formattedDate && isPastDate(formattedDate)) {
-      const todayParts = datePartsFromDate();
-      setDateParts(todayParts);
-      onChange(formatDob(todayParts));
-      return;
-    }
-
-    setDateParts(nextDate);
-    onChange(formattedDate);
-  }
-
-  function setToday() {
-    const nextDate = datePartsFromDate();
-    setDateParts(nextDate);
-    onChange(formatDob(nextDate));
-  }
-
-  function isMonthDisabled(month) {
-    return Boolean(
-      dateParts.year &&
-        dateParts.year === todayParts.year &&
-        Number(month) < Number(todayParts.month),
-    );
-  }
-
-  function isDayDisabled(day) {
-    return isBeforeToday({
-      year: dateParts.year,
-      month: dateParts.month,
-      day,
-    });
-  }
-
-  function isYearDisabled(year) {
-    return Number(year) < Number(todayParts.year);
-  }
-
-  const selectedDate = isCompleteDate(dateParts) ? formatReadableDate(formatDob(dateParts)) : "";
-
-  return (
-    <label>
-      <span>{label}</span>
-      <div className="ppp-waiver-dob-row ppp-waiver-date-row">
-        <button type="button" className="ppp-waiver-date-today" onClick={setToday}>
-          Use today
-        </button>
-        <select required aria-label={`${label} month`} value={dateParts.month} onChange={(event) => updateDate("month", event.target.value)}>
-          <option value="">Month</option>
-          {MONTHS.map(([value, name]) => (
-            <option value={value} key={value} disabled={isMonthDisabled(value)}>
-              {name}
-            </option>
-          ))}
-        </select>
-        <select required aria-label={`${label} day`} value={dateParts.day} onChange={(event) => updateDate("day", event.target.value)}>
-          <option value="">Day</option>
-          {days.map((day) => (
-            <option value={day} key={day} disabled={isDayDisabled(day)}>
-              {Number(day)}
-            </option>
-          ))}
-        </select>
-        <select required aria-label={`${label} year`} value={dateParts.year} onChange={(event) => updateDate("year", event.target.value)}>
-          <option value="">Year</option>
-          {yearOptions.map((year) => (
-            <option value={year} key={year} disabled={isYearDisabled(year)}>
-              {year}
-            </option>
-          ))}
-        </select>
-      </div>
-      {selectedDate ? (
-        <small className="ppp-waiver-date-summary" aria-live="polite">
-          Selected: <strong>{selectedDate}</strong>
-        </small>
-      ) : null}
-    </label>
-  );
-}
-
 export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, waiverContent = {} }) {
   const canvasRef = useRef(null);
   const boxRef = useRef(null);
   const drawingRef = useRef(false);
   const [hasSignature, setHasSignature] = useState(false);
   const [toast, setToast] = useState("");
+  const [completed, setCompleted] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loadingExisting, setLoadingExisting] = useState(false);
@@ -455,56 +238,25 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   const [editingVerification, setEditingVerification] = useState(null);
   const [primary, setPrimary] = useState({ ...EMPTY_PRIMARY, ...initialPrimary });
   const [familyMembers, setFamilyMembers] = useState([]);
-  const [visit, setVisit] = useState({ ...EMPTY_VISIT, ...initialVisit });
+  const [visit, setVisit] = useState({
+    ...EMPTY_VISIT,
+    ...initialVisit,
+    visitDate: initialVisit.visitDate || today(),
+  });
   const [checks, setChecks] = useState(EMPTY_CHECKS);
+  const [hasHealthDetails, setHasHealthDetails] = useState(false);
   const healthConditions = useMemo(
     () => configuredList(waiverContent, "healthConditions", HEALTH_CONDITIONS),
     [waiverContent],
   );
-  const genderOptions = useMemo(
-    () =>
-      configuredList(waiverContent, "genderOptions", [
-        "Prefer not to say",
-        "Male",
-        "Female",
-        "Non-binary",
-        "Other",
-      ]),
-    [waiverContent],
-  );
   const showFamilyMembers = configuredBoolean(waiverContent, "showFamilyMembers", true);
-  const showGenderField = configuredBoolean(waiverContent, "showGenderField", true);
-  const showCityField = configuredBoolean(
-    waiverContent,
-    "showCityField",
-    configuredBoolean(waiverContent, "showCity", true),
-  );
   const showMedicalFields = configuredBoolean(waiverContent, "showMedicalFields", true);
-  const showPartyFields = configuredBoolean(waiverContent, "showPartyFields", true);
   const showVisitDateField = configuredBoolean(
     waiverContent,
     "showVisitDateField",
     configuredBoolean(waiverContent, "showVisitDate", true),
   );
-  const showVisitTimeField = configuredBoolean(
-    waiverContent,
-    "showVisitTimeField",
-    configuredBoolean(
-      waiverContent,
-      "showVisitTime",
-      configuredBoolean(waiverContent, "showPartyTimeField", true),
-    ),
-  );
   const showPhotoConsent = configuredBoolean(waiverContent, "showPhotoConsent", true);
-
-  const namedFamily = useMemo(
-    () => familyMembers.filter((member) => member.firstName || member.lastName),
-    [familyMembers],
-  );
-  const visitYears = useMemo(
-    () => Array.from({ length: 3 }, (_, index) => String(CURRENT_YEAR + index)),
-    [],
-  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -514,21 +266,25 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     function resizeCanvas() {
       const rect = box.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;
-      canvas.width = rect.width * ratio;
-      canvas.height = rect.height * ratio;
+      const nextWidth = Math.round(rect.width * ratio);
+      const nextHeight = Math.round(rect.height * ratio);
+
+      if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+        canvas.width = nextWidth;
+        canvas.height = nextHeight;
+      }
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
       const context = canvas.getContext("2d");
-      context.scale(ratio, ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.lineWidth = 2;
       context.lineCap = "round";
       context.lineJoin = "round";
-      context.strokeStyle = "#0f172a";
+      context.strokeStyle = getComputedStyle(box).color;
     }
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-    return () => window.removeEventListener("resize", resizeCanvas);
+    const frame = window.requestAnimationFrame(resizeCanvas);
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -548,19 +304,30 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     initialVisit.visitTime,
   ]);
 
+  useEffect(() => {
+    if (!completed) return undefined;
+
+    const resetTimer = window.setTimeout(() => {
+      setToast("");
+      setCompleted(false);
+    }, 10000);
+
+    return () => window.clearTimeout(resetTimer);
+  }, [completed]);
+
   function pointFromEvent(event) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const source = event.touches?.[0] || event;
     return {
-      x: source.clientX - rect.left,
-      y: source.clientY - rect.top,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
     };
   }
 
   function startSignature(event) {
     event.preventDefault();
     const canvas = canvasRef.current;
+    canvas.setPointerCapture?.(event.pointerId);
     const context = canvas.getContext("2d");
     const point = pointFromEvent(event);
     drawingRef.current = true;
@@ -579,12 +346,19 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     setHasSignature(true);
   }
 
-  function endSignature() {
+  function endSignature(event) {
     drawingRef.current = false;
+    if (event?.pointerId != null && event.currentTarget?.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   }
 
   function clearSignature() {
     const canvas = canvasRef.current;
+    if (!canvas) {
+      setHasSignature(false);
+      return;
+    }
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
@@ -604,6 +378,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
         member.id === id ? { ...member, [field]: value } : member,
       ),
     );
+  }
+
+  function updateFamilyMemberName(id, value) {
+    const parts = value.trimStart().split(/\s+/);
+    updateFamilyMember(id, "firstName", parts.shift() || "");
+    updateFamilyMember(id, "lastName", parts.join(" "));
   }
 
   function addFamilyMember(type) {
@@ -631,12 +411,19 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   function resetWaiverForm() {
     setPrimary({ ...EMPTY_PRIMARY, ...initialPrimary });
     setFamilyMembers([]);
-    setVisit({ ...EMPTY_VISIT, ...initialVisit, signDate: today() });
+    setVisit({
+      ...EMPTY_VISIT,
+      ...initialVisit,
+      visitDate: initialVisit.visitDate || today(),
+      signDate: today(),
+    });
     setChecks({ ...EMPTY_CHECKS });
+    setHasHealthDetails(false);
     setEditingWaiverId("");
     setEditingVerification(null);
     setError("");
     setToast("");
+    setCompleted(false);
     clearSignature();
   }
 
@@ -670,7 +457,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       const waiver = data.waiver || {};
       setEditingWaiverId(waiver.id || "");
       setEditingVerification(waiver.updateVerification || null);
-      setPrimary({ ...EMPTY_PRIMARY, ...(waiver.primary || {}) });
+      const loadedPrimary = { ...EMPTY_PRIMARY, ...(waiver.primary || {}) };
+      setPrimary(loadedPrimary);
+      setHasHealthDetails(Boolean(
+        loadedPrimary.medicalNotes ||
+          (loadedPrimary.healthCondition && loadedPrimary.healthCondition !== "Not Applicable"),
+      ));
       setFamilyMembers(
         Array.isArray(waiver.familyMembers)
           ? waiver.familyMembers.map(createLoadedFamilyMember)
@@ -716,7 +508,11 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
         body: JSON.stringify({
           primary,
           familyMembers,
-          visit,
+          visit: {
+            ...visit,
+            printName: visit.printName || [primary.firstName, primary.lastName].filter(Boolean).join(" "),
+            signDate: visit.signDate || today(),
+          },
           checks,
           signatureDataUrl: canvasRef.current?.toDataURL("image/png"),
           updateWaiverId: editingWaiverId,
@@ -736,6 +532,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       )} ${data.waiverId}`;
       resetWaiverForm();
       setToast(successMessage);
+      setCompleted(true);
     } catch (submitError) {
       setError(configuredText(waiverContent, "submitError"));
     } finally {
@@ -743,225 +540,170 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
     }
   }
 
+  if (completed) {
+    return (
+      <div className="ppp-waiver-done">
+        <h1>You&apos;re all set</h1>
+        <p>Show your name at the front desk and start playing.</p>
+        {toast ? <small>{toast}</small> : null}
+        <p className="ppp-waiver-done__reset-note">A blank waiver will appear automatically in 10 seconds.</p>
+        <button type="button" onClick={resetWaiverForm}>Sign another waiver</button>
+      </div>
+    );
+  }
+
   return (
     <form
       className="ppp-waiver-form"
       onSubmit={handleSubmit}
     >
-      <div className="ppp-waiver-legal">
-        <p>
-          <HtmlText html={configuredText(waiverContent, "legalIntro")} />
-        </p>
-        <p>
-          <HtmlText html={configuredText(waiverContent, "legalRelease")} />
-        </p>
+      <div className="ppp-waiver-heading">
+        <div className="ppp-waiver-heading__title">
+          <Image
+            src="/assets/images/logo.png"
+            alt="Pixel Pulse Play"
+            width={48}
+            height={48}
+            priority
+          />
+          <h1>Sign your waiver</h1>
+        </div>
+        <p>One signature covers your whole group. Takes about two minutes.</p>
       </div>
 
       <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>01</span>
-          <h2>{configuredText(waiverContent, "primarySectionTitle")}</h2>
-        </div>
+        <h2>You</h2>
         <div className="ppp-waiver-field-grid">
+          <div className="ppp-waiver-field-grid__wide">
+            <label>
+              <span>{configuredText(waiverContent, "emailLabel")}</span>
+              <input required type="email" autoComplete="email" value={primary.email} onChange={(event) => updatePrimary("email", event.target.value)} />
+            </label>
+            <div className="ppp-waiver-returning">
+              <span>Already signed before?</span>
+              <button type="button" onClick={loadExistingWaiver} disabled={loadingExisting || submitting}>
+                {loadingExisting ? "Finding waiver..." : "Find my waiver"}
+              </button>
+            </div>
+          </div>
           <label>
             <span>{configuredText(waiverContent, "firstNameLabel")}</span>
-            <input required autoComplete="off" value={primary.firstName} onChange={(event) => updatePrimary("firstName", event.target.value)} />
+            <input required autoComplete="given-name" value={primary.firstName} onChange={(event) => updatePrimary("firstName", event.target.value)} />
           </label>
           <label>
             <span>{configuredText(waiverContent, "lastNameLabel")}</span>
-            <input required autoComplete="off" value={primary.lastName} onChange={(event) => updatePrimary("lastName", event.target.value)} />
-          </label>
-          <DobField label={configuredText(waiverContent, "dobLabel")} value={primary.dob} onChange={(value) => updatePrimary("dob", value)} />
-          {showGenderField ? (
-            <label>
-              <span>{configuredText(waiverContent, "genderLabel")}</span>
-              <select value={primary.gender} onChange={(event) => updatePrimary("gender", event.target.value)}>
-                <option value="">{genderOptions[0] || "Prefer not to say"}</option>
-                {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
-              </select>
-            </label>
-          ) : null}
-          <label>
-            <span>{configuredText(waiverContent, "emailLabel")}</span>
-            <input required type="email" value={primary.email} onChange={(event) => updatePrimary("email", event.target.value)} />
+            <input required autoComplete="family-name" value={primary.lastName} onChange={(event) => updatePrimary("lastName", event.target.value)} />
           </label>
           <label>
             <span>{configuredText(waiverContent, "phoneLabel")}</span>
-            <input required type="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
+            <input required type="tel" autoComplete="tel" inputMode="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
           </label>
-          <div className="ppp-waiver-existing ppp-waiver-wide">
-            <div>
-              <strong>{editingWaiverId ? "Editing existing waiver" : "Need to make changes later?"}</strong>
-              <span>
-                {editingWaiverId
-                  ? "This form will update the loaded waiver after you sign again."
-                  : configuredText(waiverContent, "loadExistingHelp")}
-              </span>
-            </div>
-            <button type="button" onClick={loadExistingWaiver} disabled={loadingExisting || submitting}>
-              {loadingExisting
-                ? configuredText(waiverContent, "loadingExistingButton")
-                : configuredText(waiverContent, "loadExistingButton")}
-            </button>
-          </div>
-          {showCityField ? (
-            <label>
-              <span>{configuredText(waiverContent, "cityLabel")}</span>
-              <input required value={primary.city} onChange={(event) => updatePrimary("city", event.target.value)} />
-            </label>
-          ) : null}
-          {showMedicalFields ? <div className="ppp-waiver-wide ppp-waiver-medical-row">
-            <label>
-              <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
-              <select value={primary.healthCondition} onChange={(event) => updatePrimary("healthCondition", event.target.value)}>
-                {healthConditions.map((condition) => <option key={condition}>{condition}</option>)}
-              </select>
-            </label>
-            <label>
-              <span>{configuredText(waiverContent, "medicalNotesLabel")}</span>
-              <textarea value={primary.medicalNotes} onChange={(event) => updatePrimary("medicalNotes", event.target.value)} />
-            </label>
-          </div> : null}
+          <label>
+            <span>{configuredText(waiverContent, "dobLabel")}</span>
+            <input required type="date" autoComplete="bday" value={primary.dob} max={today()} onChange={(event) => updatePrimary("dob", event.target.value)} />
+          </label>
         </div>
       </section>
 
       {showFamilyMembers ? <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>02</span>
-          <h2>{configuredText(waiverContent, "familySectionTitle")}</h2>
-        </div>
-        <p className="ppp-waiver-section-note">
-          {configuredText(waiverContent, "familySectionNote")}
-        </p>
-
-        <div className="ppp-waiver-family-list">
+        <h2>Who else is playing?</h2>
+        <ul className="ppp-waiver-people">
           {familyMembers.map((member, index) => (
-            <article className={`ppp-waiver-family-card ppp-waiver-family-card--${member.type}`} key={member.id}>
-              <div className="ppp-waiver-family-card__head">
-                <strong>{configuredText(waiverContent, "memberTitle")} {index + 1}</strong>
-                <div>
-                  <span>{memberLabel(member.type)}</span>
-                  <button type="button" onClick={() => removeFamilyMember(member.id)}>
-                    {configuredText(waiverContent, "removeMemberButton")}
-                  </button>
-                </div>
-              </div>
-              <div className="ppp-waiver-field-grid">
-                <label>
-                  <span>{configuredText(waiverContent, "firstNameLabel")}</span>
-                  <input required value={member.firstName} onChange={(event) => updateFamilyMember(member.id, "firstName", event.target.value)} />
-                </label>
-                <label>
-                  <span>{configuredText(waiverContent, "lastNameLabel")}</span>
-                  <input required value={member.lastName} onChange={(event) => updateFamilyMember(member.id, "lastName", event.target.value)} />
-                </label>
-                <DobField label={configuredText(waiverContent, "dobLabel")} value={member.dob} onChange={(value) => updateFamilyMember(member.id, "dob", value)} />
-                {showGenderField ? (
-                  <label>
-                    <span>{configuredText(waiverContent, "genderLabel")}</span>
-                    <select value={member.gender} onChange={(event) => updateFamilyMember(member.id, "gender", event.target.value)}>
-                      <option value="">{genderOptions[0] || "Prefer not to say"}</option>
-                      {genderOptions.slice(1).map((option) => <option key={option}>{option}</option>)}
-                    </select>
-                  </label>
-                ) : null}
-                {member.type === "adult" && (
-                  <label className="ppp-waiver-wide">
-                    <span>{configuredText(waiverContent, "memberEmailLabel")}</span>
-                    <input type="email" value={member.email} onChange={(event) => updateFamilyMember(member.id, "email", event.target.value)} />
-                  </label>
-                )}
-                {showMedicalFields ? <div className="ppp-waiver-wide ppp-waiver-medical-row">
-                  <label>
-                    <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
-                    <select value={member.healthCondition} onChange={(event) => updateFamilyMember(member.id, "healthCondition", event.target.value)}>
-                      {healthConditions.map((condition) => <option key={condition}>{condition}</option>)}
-                    </select>
-                  </label>
-                  <label>
-                    <span>{configuredText(waiverContent, "medicalNotesLabel")}</span>
-                    <textarea value={member.medicalNotes} onChange={(event) => updateFamilyMember(member.id, "medicalNotes", event.target.value)} />
-                  </label>
-                </div> : null}
-              </div>
-            </article>
+            <li key={member.id}>
+              <input
+                required
+                aria-label={`Person ${index + 1} full name`}
+                placeholder="Full name"
+                value={[member.firstName, member.lastName].filter(Boolean).join(" ")}
+                onChange={(event) => updateFamilyMemberName(member.id, event.target.value)}
+              />
+              <select
+                aria-label={`Person ${index + 1} age group`}
+                value={member.type}
+                onChange={(event) => updateFamilyMember(member.id, "type", event.target.value)}
+              >
+                <option value="adult">Adult (18+)</option>
+                <option value="minor">Minor (under 18)</option>
+              </select>
+              <button type="button" aria-label={`Remove person ${index + 1}`} onClick={() => removeFamilyMember(member.id)}>
+                ×
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <div className="ppp-waiver-add-row">
-          <button type="button" className="ppp-waiver-add-row__adult" onClick={() => addFamilyMember("adult")}>
-            {configuredText(waiverContent, "addAdultButton")}
+          <button type="button" onClick={() => addFamilyMember("adult")}>
+            + Add a person
           </button>
-          <button type="button" className="ppp-waiver-add-row__minor" onClick={() => addFamilyMember("minor")}>
-            {configuredText(waiverContent, "addMinorButton")}
-          </button>
-        </div>
-
-        <div className="ppp-waiver-family-summary" aria-live="polite">
-          {namedFamily.length > 0 ? (
-            <>
-              <small>{configuredText(waiverContent, "familySummaryLabel")}</small>
-              {namedFamily.map((member) => (
-                <span key={member.id}>
-                  {[member.firstName, member.lastName].filter(Boolean).join(" ")}
-                  <em>{memberLabel(member.type)}</em>
-                </span>
-              ))}
-            </>
-          ) : (
-            <small>{configuredText(waiverContent, "emptyFamilySummary")}</small>
-          )}
         </div>
       </section> : null}
 
       <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>03</span>
-          <h2>{configuredText(waiverContent, "visitSectionTitle")}</h2>
-        </div>
-        {visit.partyId || visit.partyName ? (
-          <p className="ppp-waiver-section-note ppp-waiver-party-note">
-            {configuredText(waiverContent, "linkedPartyPrefix")}{" "}
-            {visit.partyName ? <strong>{visit.partyName}</strong> : configuredText(waiverContent, "linkedPartyFallback")}
-            {visit.partyId ? <> {configuredText(waiverContent, "linkedPartyIdText")} <strong>{visit.partyId}</strong></> : null}.
-            {showVisitDateField && visit.visitDate ? <> Visit date: <strong>{visit.visitDate}</strong>.</> : null}
-            {showVisitTimeField && visit.visitTime ? <> Party time: <strong>{visit.visitTime}</strong>.</> : null}
-          </p>
-        ) : null}
-        <div className="ppp-waiver-field-grid">
-          <input type="hidden" name="partyId" value={visit.partyId} />
-          <input type="hidden" name="partyName" value={visit.partyName} />
-          <input type="hidden" name="passType" value={visit.passType} />
-          <input type="hidden" name="visitTime" value={visit.visitTime} />
-          {showPartyFields ? (
-            <>
-              <label>
-                <span>{configuredText(waiverContent, "partyIdLabel")}</span>
-                <input value={visit.partyId} onChange={(event) => updateVisit("partyId", event.target.value)} placeholder={configuredText(waiverContent, "partyIdPlaceholder")} />
-              </label>
-              <label>
-                <span>{configuredText(waiverContent, "partyNameLabel")}</span>
-                <input value={visit.partyName} onChange={(event) => updateVisit("partyName", event.target.value)} placeholder={configuredText(waiverContent, "partyNamePlaceholder")} />
-              </label>
-            </>
-          ) : null}
-          {showVisitDateField ? (
-            <DatePartsField label={configuredText(waiverContent, "visitDateLabel")} value={visit.visitDate} yearOptions={visitYears} onChange={(value) => updateVisit("visitDate", value)} />
-          ) : null}
-          {showVisitTimeField ? (
-            <label>
-              <span>{configuredText(waiverContent, "visitTimeLabel")}</span>
-              <input type="time" value={visit.visitTime} onChange={(event) => updateVisit("visitTime", event.target.value)} />
+        <h2>Health</h2>
+        {showMedicalFields ? (
+          <div className="ppp-waiver-health-disclosure">
+            <label className="ppp-waiver-inline-check">
+              <input
+                type="checkbox"
+                checked={hasHealthDetails}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setHasHealthDetails(checked);
+                  if (checked && primary.healthCondition === "Not Applicable") {
+                    updatePrimary(
+                      "healthCondition",
+                      healthConditions.find((condition) => condition !== "Not Applicable") || "Other",
+                    );
+                  } else if (!checked) {
+                    updatePrimary("healthCondition", "Not Applicable");
+                    updatePrimary("medicalNotes", "");
+                  }
+                }}
+              />
+              <span>Someone in our group has a condition staff should know about</span>
             </label>
-          ) : null}
-        </div>
+            {hasHealthDetails ? (
+              <div className="ppp-waiver-health-fields">
+                <label>
+                  <span>{configuredText(waiverContent, "healthConditionLabel")}</span>
+                  <select value={primary.healthCondition} onChange={(event) => updatePrimary("healthCondition", event.target.value)}>
+                    {healthConditions.filter((condition) => condition !== "Not Applicable").map((condition) => <option key={condition}>{condition}</option>)}
+                  </select>
+                </label>
+                <label>
+                  <span>Who, and anything staff should do</span>
+                  <textarea rows="3" value={primary.medicalNotes} onChange={(event) => updatePrimary("medicalNotes", event.target.value)} />
+                </label>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>04</span>
-          <h2>{configuredText(waiverContent, "termsSectionTitle")}</h2>
-        </div>
+        <h2>Agreement</h2>
+        <ul className="ppp-waiver-terms-summary">
+          <li>Active play has real risks, like falls and collisions. We take them on for everyone listed.</li>
+          <li>We release Pixel Pulse Play from claims, including ordinary negligence, as far as Ontario law allows.</li>
+          <li>We follow staff instructions and posted rules, and stop if unwell.</li>
+          <li>Staff may call emergency help, and we cover costs insurance doesn&apos;t.</li>
+          <li>I&apos;m 18+ and the parent or guardian of every minor listed.</li>
+        </ul>
+        <details className="ppp-waiver-terms-details">
+          <summary>Read the full legal terms</summary>
+          <div>
+            <p><HtmlText html={configuredText(waiverContent, "legalIntro")} /></p>
+            <p><HtmlText html={configuredText(waiverContent, "legalRelease")} /></p>
+            <p>{configuredText(waiverContent, "riskAcknowledgement")}</p>
+            <p>{configuredText(waiverContent, "liabilityAcknowledgement")}</p>
+            <p>{configuredText(waiverContent, "rulesAcknowledgement")}</p>
+            <p>{configuredText(waiverContent, "medicalAcknowledgement")}</p>
+            <p>{configuredText(waiverContent, "guardianAcknowledgement")}</p>
+            <p>{configuredText(waiverContent, "privacyAcknowledgement")}</p>
+            <p><HtmlText html={configuredText(waiverContent, "finalAcknowledgement")} /></p>
+          </div>
+        </details>
         <div className="ppp-waiver-checks">
           <label className={REQUIRED_TERM_CHECKS.every((key) => checks[key]) ? "is-checked" : ""}>
             <input
@@ -971,14 +713,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
               onChange={toggleRequiredTerms}
             />
             <span>
-              <strong>Accept all</strong>
-              <span>{configuredText(waiverContent, "riskAcknowledgement")}</span>
-              <span>{configuredText(waiverContent, "liabilityAcknowledgement")}</span>
-              <span>{configuredText(waiverContent, "rulesAcknowledgement")}</span>
-              <span>{configuredText(waiverContent, "medicalAcknowledgement")}</span>
-              <span>{configuredText(waiverContent, "guardianAcknowledgement")}</span>
-              <span>{configuredText(waiverContent, "privacyAcknowledgement")}</span>
-              <HtmlText html={configuredText(waiverContent, "finalAcknowledgement")} />
+              <strong>I have read and agree to the terms for myself and everyone listed.</strong>
             </span>
           </label>
           {showPhotoConsent ? <label className={checks.photo ? "is-checked" : ""}>
@@ -989,55 +724,64 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       </section>
 
       <section className="ppp-waiver-section">
-        <div className="ppp-waiver-section-head">
-          <span>05</span>
-          <h2>{configuredText(waiverContent, "signatureSectionTitle")}</h2>
-        </div>
+        <h2>Sign</h2>
         <div className="ppp-waiver-field-grid ppp-waiver-field-grid--full">
-          <label>
+          <div className="ppp-waiver-signature-field">
             <span>{configuredText(waiverContent, "signatureLabel")}</span>
             <div className="ppp-waiver-signature" ref={boxRef}>
               <canvas
                 ref={canvasRef}
-                onMouseDown={startSignature}
-                onMouseMove={drawSignature}
-                onMouseUp={endSignature}
-                onMouseLeave={endSignature}
-                onTouchStart={startSignature}
-                onTouchMove={drawSignature}
-                onTouchEnd={endSignature}
+                onPointerDown={startSignature}
+                onPointerMove={drawSignature}
+                onPointerUp={endSignature}
+                onPointerCancel={endSignature}
               />
               {!hasSignature && <em>{configuredText(waiverContent, "signaturePlaceholder")}</em>}
+              <button type="button" className="ppp-waiver-signature-clear" onClick={clearSignature}>
+                {configuredText(waiverContent, "clearSignatureButton")}
+              </button>
             </div>
-          </label>
+          </div>
           <div className="ppp-waiver-signature-foot">
             <span>{configuredText(waiverContent, "signatureHelp")}</span>
-            <button type="button" onClick={clearSignature}>{configuredText(waiverContent, "clearSignatureButton")}</button>
           </div>
           <label>
-            <span>{configuredText(waiverContent, "printNameLabel")}</span>
-            <input required value={visit.printName} onChange={(event) => updateVisit("printName", event.target.value)} />
+            <span>Full legal name</span>
+            <input required autoComplete="name" value={visit.printName} onChange={(event) => updateVisit("printName", event.target.value)} />
           </label>
-          <DatePartsField label={configuredText(waiverContent, "signDateLabel")} value={visit.signDate} yearOptions={visitYears} onChange={(value) => updateVisit("signDate", value)} />
+          <div className="ppp-waiver-field-grid">
+            <label>
+              <span>Signed on</span>
+              <input readOnly value={visit.signDate || today()} />
+            </label>
+            {showVisitDateField ? (
+              <label>
+                <span>{configuredText(waiverContent, "visitDateLabel")}</span>
+                <input required type="date" value={visit.visitDate} min={today()} onChange={(event) => updateVisit("visitDate", event.target.value)} />
+              </label>
+            ) : null}
+          </div>
+          <input type="hidden" name="partyId" value={visit.partyId} />
+          <input type="hidden" name="partyName" value={visit.partyName} />
+          <input type="hidden" name="passType" value={visit.passType} />
+          <input type="hidden" name="visitTime" value={visit.visitTime} />
         </div>
       </section>
 
       <div className="ppp-waiver-submit">
         {error ? <p className="ppp-waiver-error">{error}</p> : null}
         <div className="ppp-waiver-submit-actions">
-          <button type="button" className="ppp-waiver-reset" onClick={resetWaiverForm} disabled={submitting}>
-            {configuredText(waiverContent, "resetButton")}
-          </button>
+          <small>
+            {familyMembers.length === 0
+              ? "Just you"
+              : `${familyMembers.length + 1} people covered`}
+          </small>
           <button type="submit" disabled={submitting}>
             {submitting
               ? configuredText(waiverContent, "submittingButton")
-              : configuredText(
-                  waiverContent,
-                  editingWaiverId ? "updateSubmitButton" : "submitButton",
-                )}
+              : editingWaiverId ? "Update waiver" : "Sign and play"}
           </button>
         </div>
-        <p>{configuredText(waiverContent, "submitFootnote")}</p>
       </div>
 
       {toast && <div className="ppp-waiver-toast">{toast}</div>}

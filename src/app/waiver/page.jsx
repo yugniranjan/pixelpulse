@@ -2,8 +2,6 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import "../styles/waiver.css";
-import Image from "next/image";
-import SectionHeading from "@/components/home/SectionHeading";
 import WaiverForm from "@/components/WaiverForm";
 import { db } from "@/lib/firestore";
 import { fetchsheetdataNoCache } from "@/lib/sheets";
@@ -87,26 +85,7 @@ export default async function WaiverPage({ searchParams }) {
 
   return (
     <main className="ppp-waiver-page">
-      <section className="aero-max-container ppp-waiver-layout">
-        <div className="ppp-waiver-section-intro">
-          <Image
-            src="/assets/images/logo.png"
-            alt="Pixel Pulse Play"
-            width={96}
-            height={96}
-            priority
-            className="ppp-waiver-heading-logo"
-          />
-          <SectionHeading mainHeading={true}>
-            {waiverContent.waiverHeroTitle || "Pixel Pulse"}{" "}
-            <span>{waiverContent.waiverHeroTitleAccent || "Waiver"}</span>
-          </SectionHeading>
-          <p>
-            {waiverContent.waiverHeroText ||
-              "Add every player before you arrive, including adults and minors. This Vaughan waiver experience is designed for Pixel Pulse Play families, parties, and groups."}
-          </p>
-        </div>
-
+      <section className="ppp-waiver-layout">
         <WaiverForm
           initialPrimary={initialPrimary}
           initialVisit={initialVisit}

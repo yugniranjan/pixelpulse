@@ -1,764 +1,381 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500&display=swap");
+
 .ppp-waiver-page {
-  --void: #ffffff;
-  --panel: #ffffff;
-  --panel-2: #f7f9fc;
-  --rim: #cbd5e1;
-  --rim-2: #94a3b8;
-  --brand-lime: #14532d;
-  --brand-peach: #0f172a;
-  --brand-pink: #7f1d1d;
-  --text: #0f172a;
-  --text-dim: #334155;
-  --text-ghost: #64748b;
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+  --bg: #0a1020;
+  --panel: #111a30;
+  --line: #24304f;
+  --text: #e8edf8;
+  --mute: #8d9ab8;
+  --cyan: #27d7ee;
+  --amber: #ffb631;
+  --ink: #06101c;
   min-height: 100vh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
   color: var(--text);
-  background: #ffffff;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 400 16px/1.55 Inter, system-ui, sans-serif;
 }
 
-.ppp-waiver-page::before,
-.ppp-waiver-page::after {
-  display: none;
-}
+.ppp-waiver-page *,
+.ppp-waiver-page *::before,
+.ppp-waiver-page *::after { box-sizing: border-box; }
 
 .ppp-waiver-layout {
-  position: relative;
-  width: min(980px, calc(100% - 32px));
-  display: grid;
-  gap: 1.5rem;
+  display: block;
+  width: calc(100% - 40px) !important;
+  max-width: 560px !important;
   margin: 0 auto;
-  padding: 0 0 4rem;
-}
-
-.ppp-waiver-section-intro {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 2.5rem 0 0.35rem;
-  text-align: center;
-}
-
-.ppp-waiver-heading-logo {
-  width: 72px;
-  height: auto;
-  margin: 0 auto 0.85rem;
-}
-
-.ppp-waiver-section-intro h1,
-.ppp-waiver-section-intro h2 {
-  color: #0f172a;
-  font-family: inherit;
-  font-size: clamp(2rem, 4vw, 3rem) !important;
-  letter-spacing: 0;
-  text-transform: none;
-  text-shadow: none;
-  filter: none;
-  user-select: auto;
-}
-
-.ppp-waiver-section-intro h1 span,
-.ppp-waiver-section-intro h2 span {
-  color: #0f172a;
-}
-
-.ppp-waiver-section-intro p {
-  color: var(--text-dim);
-  line-height: 1.7;
+  padding: 40px 0 120px;
 }
 
 .ppp-waiver-form {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  gap: 1.5rem;
+  display: block;
   width: 100%;
-  border: 1px solid #d6dee9;
-  border-radius: 12px;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  background: #ffffff;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
+  max-width: 560px;
 }
 
-.ppp-waiver-form::before {
-  display: none;
+.ppp-waiver-heading h1,
+.ppp-waiver-section h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: Rajdhani, sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
 }
 
-.ppp-waiver-legal {
-  border: 1px solid #b6c2cf;
-  border-left: 4px solid #0f172a;
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  background: #f8fafc;
-  color: var(--text-dim);
-  font-size: 0.88rem;
-  line-height: 1.75;
+.ppp-waiver-heading h1 { font-size: 44px; letter-spacing: 0.01em; }
+.ppp-waiver-heading__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-.ppp-waiver-legal strong {
-  color: #0f172a;
+.ppp-waiver-heading__title img {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
-.ppp-waiver-legal p + p {
-  margin-top: 0.7rem;
+.ppp-waiver-heading p { margin: 10px 0 0; color: var(--mute); }
+.ppp-waiver-heading button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--cyan);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .ppp-waiver-section {
-  position: relative;
-  display: grid;
-  gap: 1.2rem;
+  display: block;
   width: 100%;
-  padding: clamp(1rem, 2vw, 1.35rem);
-  border: 1px solid #d6dee9;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
-  overflow: hidden;
-}
-
-.ppp-waiver-section::before {
-  display: none;
-}
-
-.ppp-waiver-section-head {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: calc(clamp(1rem, 2vw, 1.35rem) * -1) calc(clamp(1rem, 2vw, 1.35rem) * -1) 0;
-  padding: 0.82rem clamp(1rem, 2vw, 1.35rem);
-  border-bottom: 1px solid #d6dee9;
-  background: #f8fafc;
-  box-shadow: none;
-}
-
-.ppp-waiver-section-head::after {
-  display: none;
-}
-
-.ppp-waiver-section-head span {
-  min-width: 2.5rem;
-  padding: 0.25rem 0.62rem;
-  border: 1px solid #0f172a;
-  border-radius: 4px;
-  background: #0f172a;
-  color: #ffffff;
-  box-shadow: none;
-  font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-align: center;
-}
-
-.ppp-waiver-section-head h2 {
+  max-width: 560px;
   margin: 0;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
+  padding: 28px 0;
+  border: 0;
+  border-top: 1px dashed var(--line);
+  background: transparent;
 }
 
-.ppp-waiver-section-note {
-  margin: 0;
-  color: var(--text-dim);
-  font-size: 0.92rem;
-  line-height: 1.65;
-}
+.ppp-waiver-section:first-of-type { margin-top: 28px; }
+.ppp-waiver-section h2 { margin-bottom: 14px; font-size: 24px; }
 
 .ppp-waiver-field-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem 1.25rem;
-  align-items: start;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
-.ppp-waiver-field-grid--full {
-  grid-template-columns: 1fr;
-  min-width: 0;
+.ppp-waiver-field-grid__wide { grid-column: 1 / -1; }
+
+.ppp-waiver-returning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  color: var(--mute);
+  font-size: 14px;
 }
 
-.ppp-waiver-wide {
-  grid-column: 1 / -1;
+.ppp-waiver-returning button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--cyan);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
+
+.ppp-waiver-returning button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.ppp-waiver-field-grid--full { grid-template-columns: 1fr; }
 
 .ppp-waiver-field-grid label,
-.ppp-waiver-family-card label {
-  display: grid;
-  gap: 0.38rem;
-  min-width: 0;
-  max-width: 100%;
-}
+.ppp-waiver-health-fields label { display: block; min-width: 0; margin: 0; }
 
 .ppp-waiver-field-grid label > span,
-.ppp-waiver-label {
-  color: #0f172a;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
+.ppp-waiver-signature-field > span,
+.ppp-waiver-health-fields label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--mute);
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .ppp-waiver-field-grid input,
 .ppp-waiver-field-grid select,
-.ppp-waiver-field-grid textarea {
-  box-sizing: border-box;
+.ppp-waiver-field-grid textarea,
+.ppp-waiver-health-fields input,
+.ppp-waiver-health-fields select,
+.ppp-waiver-health-fields textarea,
+.ppp-waiver-people input,
+.ppp-waiver-people select {
   width: 100%;
-  min-height: 52px;
-  border: 1px solid var(--rim);
-  border-radius: 6px;
-  padding: 0.85rem 0.95rem;
-  background: #ffffff;
-  color: #0f172a;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--panel);
+  color: var(--text);
   font: inherit;
-  outline: none;
-  touch-action: manipulation;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.ppp-waiver-field-grid input::placeholder,
-.ppp-waiver-field-grid textarea::placeholder {
-  color: #64748b;
-}
-
-.ppp-waiver-field-grid select {
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.ppp-waiver-field-grid textarea {
-  min-height: 76px;
-  resize: vertical;
 }
 
 .ppp-waiver-field-grid input:focus,
 .ppp-waiver-field-grid select:focus,
-.ppp-waiver-field-grid textarea:focus {
-  border-color: var(--brand-lime);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
-}
+.ppp-waiver-field-grid textarea:focus,
+.ppp-waiver-health-fields input:focus,
+.ppp-waiver-health-fields select:focus,
+.ppp-waiver-health-fields textarea:focus,
+.ppp-waiver-people input:focus,
+.ppp-waiver-people select:focus,
+.ppp-waiver-form button:focus-visible,
+.ppp-waiver-form summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
-.ppp-waiver-existing {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.34);
-  border-radius: 8px;
-  padding: 0.9rem;
-  background: rgba(15, 23, 42, 0.04);
-}
-
-.ppp-waiver-existing div {
+.ppp-waiver-people { list-style: none; margin: 0 0 12px; padding: 0; }
+.ppp-waiver-people li {
   display: grid;
-  gap: 0.2rem;
+  grid-template-columns: 1fr 150px auto;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.ppp-waiver-existing strong {
-  color: #0f172a;
-  font-size: 0.95rem;
-}
-
-.ppp-waiver-existing span {
-  color: #475569;
-  font-size: 0.86rem;
-  line-height: 1.45;
-}
-
-.ppp-waiver-existing button {
-  flex: 0 0 auto;
+.ppp-waiver-people button {
   border: 0;
-  border-radius: 999px;
-  padding: 0.72rem 1rem;
-  background: #0f172a;
-  color: #fff;
+  padding: 10px;
+  background: transparent;
+  color: var(--mute);
   font: inherit;
-  font-size: 0.86rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.ppp-waiver-existing button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.ppp-waiver-dob-row {
-  display: grid;
-  grid-template-columns: 1.35fr 0.85fr 1fr;
-  gap: 0.65rem;
-  min-width: 0;
-}
-
-.ppp-waiver-dob-row select {
-  min-width: 0;
-}
-
-.ppp-waiver-date-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
-}
-
-.ppp-waiver-date-today {
-  grid-column: 1 / -1;
-  justify-self: stretch;
-  min-height: 52px;
-  border: 1px solid #64748b;
-  border-radius: 6px;
-  padding: 0.85rem 1rem;
-  background: #ffffff;
-  color: #0f172a;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-  cursor: pointer;
-  touch-action: manipulation;
-  white-space: nowrap;
-}
-
-.ppp-waiver-date-today:hover {
-  border-color: #0f172a;
-  background: #f1f5f9;
-}
-
-.ppp-waiver-date-summary {
-  display: block;
-  min-height: 1.25rem;
-  color: var(--text-dim);
-  font-size: 0.84rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-.ppp-waiver-date-summary strong {
-  color: #0f172a;
-  font-weight: 800;
-}
-
-.ppp-waiver-medical-row {
-  display: grid;
-  grid-template-columns: minmax(180px, 0.85fr) minmax(240px, 1.15fr);
-  gap: 0.75rem;
-}
-
-.ppp-waiver-family-list {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.ppp-waiver-family-card {
-  overflow: hidden;
-  border: 1px solid var(--rim);
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
-}
-
-.ppp-waiver-family-card__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--rim);
-  background: var(--panel-2);
-}
-
-.ppp-waiver-family-card--adult .ppp-waiver-family-card__head {
-  border-left: 4px solid #14532d;
-}
-
-.ppp-waiver-family-card--minor .ppp-waiver-family-card__head {
-  border-left: 4px solid #7f1d1d;
-}
-
-.ppp-waiver-family-card__head strong {
-  color: var(--text);
-  font-family: inherit;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.ppp-waiver-family-card__head div {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.ppp-waiver-family-card__head span {
-  border: 1px solid #94a3b8;
-  border-radius: 4px;
-  padding: 0.18rem 0.6rem;
-  color: #0f172a;
-  background: #ffffff;
-  font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.ppp-waiver-family-card--minor .ppp-waiver-family-card__head span {
-  border-color: #94a3b8;
-  color: #0f172a;
-  background: #ffffff;
-}
-
-.ppp-waiver-family-card__head button,
-.ppp-waiver-signature-foot button {
-  border: 1px solid var(--rim);
-  border-radius: 4px;
-  padding: 0.28rem 0.75rem;
-  background: #ffffff;
-  color: #334155;
-  font-family: inherit;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-  cursor: pointer;
-}
-
-.ppp-waiver-family-card__head button:hover,
-.ppp-waiver-signature-foot button:hover {
-  border-color: #7f1d1d;
-  color: #7f1d1d;
-  background: #fff1f2;
-}
-
-.ppp-waiver-family-card .ppp-waiver-field-grid {
-  padding: 1rem;
-}
-
-.ppp-waiver-add-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.ppp-waiver-add-row button,
-.ppp-waiver-chips button {
+  font-size: 1.25rem;
   cursor: pointer;
 }
 
 .ppp-waiver-add-row button {
-  border-radius: 6px;
-  padding: 0.58rem 1.15rem;
-  background: #ffffff;
-  font-family: inherit;
-  font-size: 0.86rem;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-transform: none;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
 }
 
-.ppp-waiver-add-row__adult {
-  border: 1px solid #14532d;
-  color: #14532d;
-}
+.ppp-waiver-add-row button:hover { border-color: var(--cyan); color: var(--cyan); }
+.ppp-waiver-health-disclosure,
+.ppp-waiver-health-fields { display: grid; gap: 14px; }
 
-.ppp-waiver-add-row__minor {
-  border: 1px solid #7f1d1d;
-  color: #7f1d1d;
-}
-
-.ppp-waiver-family-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.42rem;
-  align-items: center;
-}
-
-.ppp-waiver-family-summary small,
-.ppp-waiver-family-summary em {
-  color: var(--text-ghost);
-  font-style: normal;
-}
-
-.ppp-waiver-family-summary small {
-  font-family: inherit;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.ppp-waiver-family-summary span {
-  display: inline-flex;
-  gap: 0.45rem;
-  align-items: center;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 0.22rem 0.75rem;
-  background: var(--panel-2);
-  color: var(--brand-peach);
-  font-family: inherit;
-  font-weight: 800;
-}
-
-.ppp-waiver-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.45rem;
-}
-
-.ppp-waiver-chips button {
-  border: 1px solid var(--rim);
-  border-radius: 5px;
-  padding: 0.32rem 0.68rem;
-  background: #ffffff;
-  color: var(--text-dim);
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.ppp-waiver-chips button.is-selected {
-  border-color: #0f172a;
-  color: #ffffff;
-  background: #0f172a;
-  box-shadow: none;
-}
-
-.ppp-waiver-checks {
-  display: grid;
-  gap: 0.65rem;
-}
-
-.ppp-waiver-checks label,
-.ppp-waiver-final label {
+.ppp-waiver-inline-check,
+.ppp-waiver-checks label {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  border: 1px solid var(--rim);
-  border-radius: 8px;
-  padding: 1rem 1.1rem;
-  background: #ffffff;
-  color: var(--text-dim);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.ppp-waiver-checks label.is-checked,
-.ppp-waiver-final label.is-checked {
-  border-color: #14532d;
-  background: #f0fdf4;
+  gap: 12px;
+  margin: 0 0 14px;
   color: var(--text);
+  font-size: 15px;
 }
 
-.ppp-waiver-checks input,
-.ppp-waiver-final input {
-  width: 17px;
-  height: 17px;
-  margin-top: 3px;
-  accent-color: var(--brand-lime);
-  flex: 0 0 auto;
+.ppp-waiver-inline-check input,
+.ppp-waiver-checks input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--cyan);
 }
 
-.ppp-waiver-checks label > span {
+.ppp-waiver-terms-summary { margin: 0 0 14px; padding-left: 20px; color: var(--text); }
+.ppp-waiver-terms-summary li { margin-bottom: 6px; }
+.ppp-waiver-terms-details { margin: 0 0 18px; color: var(--mute); font-size: 14px; }
+.ppp-waiver-terms-details summary { color: var(--cyan); cursor: pointer; }
+.ppp-waiver-terms-details div {
   display: grid;
-  gap: 0.45rem;
+  gap: 10px;
+  max-height: 320px;
+  margin-top: 10px;
+  overflow-y: auto;
 }
+.ppp-waiver-terms-details p { margin: 0; }
 
 .ppp-waiver-signature {
   position: relative;
-  box-sizing: border-box;
   width: 100%;
-  max-width: 100%;
-  height: 136px;
-  border: 1px dashed var(--rim-2);
-  border-radius: 6px;
-  background: #ffffff;
-  cursor: crosshair;
+  max-width: 560px;
+  height: 150px;
   overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
 }
 
 .ppp-waiver-signature canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
-  max-width: 100%;
   touch-action: none;
+  user-select: none;
+  cursor: crosshair;
 }
-
 .ppp-waiver-signature em {
   position: absolute;
+  z-index: 2;
   inset: 0;
   display: grid;
   place-items: center;
-  color: var(--text-ghost);
-  font-family: inherit;
+  color: var(--mute);
+  font-size: 14px;
   font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
   pointer-events: none;
 }
 
-.ppp-waiver-signature-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  color: var(--text-ghost);
-  font-size: 0.76rem;
+.ppp-waiver-signature-clear {
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  right: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--mute);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.ppp-waiver-final {
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 1.15rem;
-  background: #f8fafc;
-}
-
+.ppp-waiver-signature-foot { display: none; }
 .ppp-waiver-submit {
-  display: grid;
-  justify-items: center;
-  gap: 0.8rem;
-  text-align: center;
+  position: fixed;
+  z-index: 40;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: var(--bg);
 }
 
 .ppp-waiver-submit-actions {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.85rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f8fafc;
-  box-shadow: none;
+  max-width: 560px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
+.ppp-waiver-submit-actions small { color: var(--mute); }
 .ppp-waiver-submit button {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #0f172a;
+  border: 0;
   border-radius: 8px;
-  padding: 1rem 2.5rem;
-  background: #0f172a;
-  color: #ffffff;
-  text-shadow: none;
-  box-shadow: none;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
+  padding: 13px 22px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 700 20px Rajdhani, sans-serif;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.ppp-waiver-submit .ppp-waiver-reset {
-  border-color: #64748b;
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: none;
-}
-
-.ppp-waiver-submit .ppp-waiver-reset:hover {
-  border-color: #0f172a;
-  color: #0f172a;
-  background: #f1f5f9;
-}
-
-.ppp-waiver-submit button:disabled {
-  cursor: not-allowed;
-  opacity: 0.68;
-}
-
-.ppp-waiver-submit a {
-  color: #0f172a;
-  font-family: inherit;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.ppp-waiver-submit p {
-  margin: 0;
-  color: var(--text-ghost);
-  font-size: 0.78rem;
-}
-
-.ppp-waiver-error {
-  margin: 0;
-  border: 1px solid #7f1d1d;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  background: #fef2f2;
-  color: #7f1d1d;
-  font-weight: 800;
-}
-
+.ppp-waiver-submit button:hover { filter: brightness(1.08); }
+.ppp-waiver-submit button:disabled { cursor: wait; opacity: 0.65; }
+.ppp-waiver-error { max-width: 560px; margin: 0 auto 8px; color: #ffb4b4; font-size: 14px; text-align: center; }
 .ppp-waiver-toast {
-  position: sticky;
-  bottom: 1rem;
-  z-index: 2;
-  justify-self: center;
-  border: 1px solid #14532d;
+  position: fixed;
+  z-index: 50;
+  right: 20px;
+  bottom: 82px;
+  border: 1px solid var(--cyan);
   border-radius: 8px;
-  padding: 0.85rem 1.35rem;
-  background: #f0fdf4;
-  color: #14532d;
-  backdrop-filter: none;
-  font-family: inherit;
-  font-weight: 800;
-  letter-spacing: 0;
+  padding: 12px 16px;
+  background: var(--panel);
+  color: var(--text);
 }
 
-@media (max-width: 640px) {
-  .ppp-waiver-layout {
-    width: min(100% - 24px, 860px);
-  }
+.ppp-waiver-done {
+  padding: 60px 0;
+  text-align: center;
+}
 
-  .ppp-waiver-field-grid {
-    grid-template-columns: 1fr;
-  }
+.ppp-waiver-done h1 {
+  margin: 0;
+  color: var(--text);
+  font: 700 44px/1.05 Rajdhani, sans-serif;
+}
 
-  .ppp-waiver-dob-row {
-    grid-template-columns: 1fr;
-  }
+.ppp-waiver-done p {
+  margin: 10px 0 0;
+  color: var(--mute);
+}
 
-  .ppp-waiver-date-row {
-    grid-template-columns: 1fr;
-  }
+.ppp-waiver-done small {
+  display: block;
+  margin-top: 18px;
+  color: var(--cyan);
+}
 
-  .ppp-waiver-wide {
-    grid-column: auto;
-  }
+.ppp-waiver-done__reset-note {
+  margin: 18px 0 10px;
+  color: var(--mute);
+  font-size: 14px;
+}
 
-  .ppp-waiver-existing {
-    align-items: stretch;
-    flex-direction: column;
-  }
+.ppp-waiver-done button {
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 18px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 700 18px Rajdhani, sans-serif;
+  cursor: pointer;
+}
 
-  .ppp-waiver-existing button {
-    width: 100%;
+@media (prefers-color-scheme: light) {
+  .ppp-waiver-page {
+    --bg: #f4f7fc;
+    --panel: #ffffff;
+    --line: #d5deee;
+    --text: #0d1830;
+    --mute: #5a6785;
+    --cyan: #067f93;
+    --amber: #b36b00;
+    --ink: #ffffff;
   }
+}
 
-  .ppp-waiver-medical-row {
-    grid-template-columns: 1fr;
-  }
-
-  .ppp-waiver-family-card__head,
-  .ppp-waiver-signature-foot {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .ppp-waiver-submit button {
-    width: 100%;
-    padding-inline: 1rem;
-  }
-
-  .ppp-waiver-submit-actions {
-    flex-direction: column-reverse;
-  }
+@media (max-width: 480px) {
+  .ppp-waiver-heading h1 { font-size: 38px; }
+  .ppp-waiver-heading__title img { width: 42px; height: 42px; }
+  .ppp-waiver-field-grid { grid-template-columns: 1fr; }
+  .ppp-waiver-people li { grid-template-columns: 1fr 1fr auto; }
+  .ppp-waiver-people li input { grid-column: 1 / -1; }
 }
