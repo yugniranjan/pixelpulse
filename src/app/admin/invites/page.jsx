@@ -528,8 +528,22 @@ export default function AdminInvitesPage() {
                 <button type="button" onClick={() => copyText(result.smsText)}>Copy</button>
               </div>
               <div>
-                <span>Confirmation Email Text</span>
-                <textarea readOnly value={result.confirmationEmailText || ""} />
+                <span>Confirmation Email Text <small>Editable</small></span>
+                <textarea
+                  className="invite-admin-confirmation-editor"
+                  value={result.confirmationEmailText || ""}
+                  onChange={(event) => {
+                    setResult((current) => ({
+                      ...current,
+                      confirmationEmailText: event.target.value,
+                    }));
+                    setEmailStatus("");
+                  }}
+                  placeholder="Review the confirmation email and add any customer-specific details before sending."
+                />
+                <small className="invite-admin-output__help">
+                  Review the generated details and add notes, reminders, or special instructions before sending.
+                </small>
                 <button type="button" onClick={() => copyText(result.confirmationEmailText || "")}>Copy</button>
               </div>
               <div>

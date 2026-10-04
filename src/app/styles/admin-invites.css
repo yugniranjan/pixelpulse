@@ -78,6 +78,17 @@
   resize: vertical;
 }
 
+.invite-admin-output .invite-admin-confirmation-editor {
+  min-height: 320px;
+}
+
+.invite-admin-output__help {
+  color: #667085;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 .invite-admin-field--review {
   grid-column: 1 / -1;
 }

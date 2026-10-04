@@ -324,7 +324,7 @@ function renderConfirmationHtml({ emailText, partyId }) {
                   ${detailRows.map((row) => `
                     <tr>
                       <td style="padding:9px 10px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;font-weight:700;width:38%;">${escapeHtml(row.label)}</td>
-                      <td style="padding:9px 10px;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;">${escapeHtml(row.value || "As confirmed")}</td>
+                      <td style="padding:9px 10px;border-top:1px solid #e5e7eb;color:#111827;font-size:14px;">${escapeHtml(row.value)}</td>
                     </tr>
                   `).join("")}
                 </tbody>
