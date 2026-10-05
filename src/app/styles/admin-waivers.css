@@ -179,6 +179,10 @@
   text-transform: uppercase;
 }
 
+.waiver-data-filters.waiver-date-filters {
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+}
+
 .waiver-data-filters input:not([type="checkbox"]),
 .waiver-data-filters select {
   width: 100%;

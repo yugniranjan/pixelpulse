@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import { listFeedbackEmailStatuses } from "@/lib/feedback";
+import { isWaiverDate, waiverMatchesDateRange } from "@/lib/waiverDates";
 import {
   deletePostgresWaiver,
   getPostgresWaiverById,
@@ -116,6 +117,12 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id")?.trim();
   const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 300, 1), 1000);
+  const from = cleanText(searchParams.get("from"));
+  const to = cleanText(searchParams.get("to"));
+  const dateType = searchParams.get("dateType") || "signed";
+  if (!id && ((from && !isWaiverDate(from)) || (to && !isWaiverDate(to)) || (from && to && from > to) || !["signed", "visit"].includes(dateType))) {
+    return NextResponse.json({ error: "Select a valid date range with From on or before To." }, { status: 400 });
+  }
 
   if (hasPostgres()) {
     if (id) {
@@ -128,7 +135,7 @@ export async function GET(req) {
         : NextResponse.json({ error: "Waiver not found." }, { status: 404 });
     }
 
-    const waivers = await listPostgresWaivers(limit, { includeSignature: false });
+    const waivers = await listPostgresWaivers(limit, { includeSignature: false, from, to, dateType });
     const partyEnriched = await enrichPostgresPartyDetails(waivers);
     return NextResponse.json({ waivers: await enrichFeedbackDetails(partyEnriched) });
   }
@@ -154,7 +161,7 @@ export async function GET(req) {
     return NextResponse.json({ waiver: enriched });
   }
 
-  const snapshot = await db
+  const waiverQuery = db
     .collection("waivers")
     .select(
       "primary",
@@ -170,11 +177,21 @@ export async function GET(req) {
       "submittedAt",
       "updatedAt",
     )
-    .orderBy("submittedAt", "desc")
-    .limit(limit)
-    .get();
+    .orderBy("submittedAt", "desc");
 
-  const waivers = snapshot.docs.map((doc) => serializeWaiver(doc, { includeSignature: false }));
+  const waivers = [];
+  let cursor;
+  do {
+    const batchQuery = cursor ? waiverQuery.startAfter(cursor) : waiverQuery;
+    const snapshot = await batchQuery.limit(limit).get();
+    for (const doc of snapshot.docs) {
+      const waiver = serializeWaiver(doc, { includeSignature: false });
+      if (waiverMatchesDateRange(waiver, { from, to, dateType })) waivers.push(waiver);
+      if (waivers.length === limit) break;
+    }
+    if ((!from && !to) || snapshot.docs.length < limit) break;
+    cursor = snapshot.docs.at(-1);
+  } while (waivers.length < limit);
 
   return NextResponse.json({
     waivers: await enrichFeedbackDetails(await enrichFirestorePartyDetails(waivers)),

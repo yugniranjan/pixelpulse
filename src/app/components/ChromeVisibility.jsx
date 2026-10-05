@@ -11,6 +11,7 @@ const STANDALONE_PATHS = new Set([
   "/level-up-rewards",
   "/levelingup",
   "/private-party",
+  "/party-dashboard",
   "/squad",
   "/summer-play-pass",
   "/waiver",

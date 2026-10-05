@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import AdminShell from "@/components/AdminShell";
+import { signedWaiverDate, waiverMatchesDateRange } from "@/lib/waiverDates";
 import "../../styles/admin-waivers.css";
 import "../../styles/admin-player-info.css";
 
@@ -301,7 +302,7 @@ function localDateString(date = new Date()) {
 function effectiveWaiverDate(waiver = {}) {
   const visitDate = waiver.visit?.visitDate;
   if (/^\d{4}-\d{2}-\d{2}$/.test(visitDate || "")) return visitDate;
-  return waiver.submittedAt ? String(waiver.submittedAt).slice(0, 10) : "";
+  return signedWaiverDate(waiver.submittedAt);
 }
 
 function waiverParticipantCount(waiver = {}) {
@@ -780,6 +781,7 @@ export default function AdminWaiversPage() {
   const [query, setQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [dateType, setDateType] = useState("signed");
   const [partyFilter, setPartyFilter] = useState("all");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
@@ -804,13 +806,25 @@ export default function AdminWaiversPage() {
   const [playerPage, setPlayerPage] = useState(1);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function loadWaivers() {
       setLoading(true);
       setError("");
+      setWaivers([]);
+
+      if (dateFrom && dateTo && dateFrom > dateTo) {
+        setError("Select a date range with From on or before To.");
+        setLoading(false);
+        return;
+      }
 
       try {
-        const response = await fetch("/api/admin/waivers?limit=300", { cache: "no-store" });
+        const params = new URLSearchParams({ limit: dateFrom || dateTo ? "1000" : "300", dateType });
+        if (dateFrom) params.set("from", dateFrom);
+        if (dateTo) params.set("to", dateTo);
+        const response = await fetch(`/api/admin/waivers?${params}`, { cache: "no-store", signal: controller.signal });
         const data = await response.json();
+        if (controller.signal.aborted) return;
 
         if (!response.ok) {
           setError(data.error || "Unable to load waivers.");
@@ -819,14 +833,15 @@ export default function AdminWaiversPage() {
 
         setWaivers(data.waivers || []);
       } catch (loadError) {
-        setError("Unable to load waivers.");
+        if (!controller.signal.aborted) setError("Unable to load waivers.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     loadWaivers();
-  }, []);
+    return () => controller.abort();
+  }, [dateFrom, dateTo, dateType]);
 
   useEffect(() => {
     if (activeTab !== "players" || players.length || playersLoading) return;
@@ -871,14 +886,12 @@ export default function AdminWaiversPage() {
         .filter(Boolean)
         .some((value) => normalizeSearchValue(value).includes(needle));
 
-      const waiverDate = effectiveWaiverDate(waiver);
-      const matchesFrom = !dateFrom || waiverDate >= dateFrom;
-      const matchesTo = !dateTo || waiverDate <= dateTo;
+      const matchesDate = waiverMatchesDateRange(waiver, { from: dateFrom, to: dateTo, dateType });
       const matchesParty = partyMatchesFilter(waiver, partyFilter);
 
-      return matchesSearch && matchesFrom && matchesTo && matchesParty;
+      return matchesSearch && matchesDate && matchesParty;
     });
-  }, [dateFrom, dateTo, partyFilter, query, waivers]);
+  }, [dateFrom, dateTo, dateType, partyFilter, query, waivers]);
   const searchSuggestions = useMemo(() => {
     const values = new Set();
 
@@ -961,7 +974,7 @@ export default function AdminWaiversPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [dateFrom, dateTo, pageSize, partyFilter, query]);
+  }, [dateFrom, dateTo, dateType, pageSize, partyFilter, query]);
 
   const filteredPlayers = useMemo(() => {
     const needle = playerQuery.trim().toLowerCase();
@@ -1089,6 +1102,7 @@ export default function AdminWaiversPage() {
     setQuery("");
     setDateFrom("");
     setDateTo("");
+    setDateType("signed");
     setPartyFilter("all");
   }
 
@@ -1440,7 +1454,7 @@ export default function AdminWaiversPage() {
                       {filteredWaivers.length === waivers.length ? " loaded records" : ` filtered records from ${waivers.length} loaded`}
                     </p>
                   </div>
-                  <div className="waiver-data-filters">
+                  <div className="waiver-data-filters waiver-date-filters">
                     <label>
                       <span>Search</span>
                       <input
@@ -1456,12 +1470,19 @@ export default function AdminWaiversPage() {
                       </datalist>
                     </label>
                     <label>
+                      <span>Date type</span>
+                      <select value={dateType} onChange={(event) => setDateType(event.target.value)}>
+                        <option value="signed">Signed date</option>
+                        <option value="visit">Visit date</option>
+                      </select>
+                    </label>
+                    <label>
                       <span>From</span>
-                      <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
+                      <input type="date" value={dateFrom} max={dateTo || undefined} onChange={(event) => setDateFrom(event.target.value)} />
                     </label>
                     <label>
                       <span>To</span>
-                      <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
+                      <input type="date" value={dateTo} min={dateFrom || undefined} onChange={(event) => setDateTo(event.target.value)} />
                     </label>
                     <label>
                       <span>Party ID</span>

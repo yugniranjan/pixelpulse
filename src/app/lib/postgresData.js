@@ -189,7 +189,7 @@ export async function getPostgresAdminByEmail(email) {
   };
 }
 
-export async function listPostgresWaivers(limit = 300, { includeSignature = false } = {}) {
+export async function listPostgresWaivers(limit = 300, { includeSignature = false, from = "", to = "", dateType = "signed" } = {}) {
   const columns = includeSignature
     ? "*"
     : `
@@ -206,9 +206,24 @@ export async function listPostgresWaivers(limit = 300, { includeSignature = fals
       submitted_at,
       updated_at
     `;
+  const signedDate = "to_char(submitted_at at time zone 'America/Toronto', 'YYYY-MM-DD')";
+  const dateExpression = dateType === "visit"
+    ? `case when coalesce(visit->>'visitDate', '') ~ '^\\d{4}-\\d{2}-\\d{2}$' then visit->>'visitDate' else ${signedDate} end`
+    : signedDate;
+  const params = [limit];
+  const conditions = [];
+  if (from) {
+    params.push(from);
+    conditions.push(`${dateExpression} >= $${params.length}`);
+  }
+  if (to) {
+    params.push(to);
+    conditions.push(`${dateExpression} <= $${params.length}`);
+  }
+  const where = conditions.length ? `where ${conditions.join(" and ")}` : "";
   const result = await query(
-    `select ${columns} from waivers order by submitted_at desc nulls last limit $1`,
-    [limit],
+    `select ${columns} from waivers ${where} order by submitted_at desc nulls last limit $1`,
+    params,
   );
   return result.rows.map((row) => normalizeWaiverRow(row, { includeSignature }));
 }
