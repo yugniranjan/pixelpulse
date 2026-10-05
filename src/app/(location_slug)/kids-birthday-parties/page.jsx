@@ -18,10 +18,7 @@ import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
 import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
-const onlineBirthdayBookingUrl =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
 const birthdayInquiryPageUrl = "https://birthdays.pixelpulseplay.ca/";
-const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
 const partyRoomAccessByPackage = {
   "pixel punch": "45 minutes",
   "pixel ultra": "45 minutes",
@@ -53,16 +50,10 @@ function getPackageFeatureValue(plan, feature) {
 }
 
 function getBirthdayPackageCta(packageName = "") {
-  const canBookOnline = onlineBirthdayPackages.has(
-    String(packageName).trim().toLowerCase(),
-  );
-
-  return canBookOnline
-    ? { href: onlineBirthdayBookingUrl, label: "Book Now" }
-    : {
-        href: `${birthdayInquiryPageUrl}?package=${encodeURIComponent(packageName)}#birthday-party-form`,
-        label: "Inquire",
-      };
+  return {
+    href: `${birthdayInquiryPageUrl}?package=${encodeURIComponent(packageName)}#birthday-party-form`,
+    label: "Inquire",
+  };
 }
 
 function stripHtml(html = "") {
