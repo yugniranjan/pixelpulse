@@ -6,6 +6,8 @@ import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
+const ONLINE_BOOKING_URL = "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
+const ONLINE_PACKAGE_NAMES = new Set(["pixel punch", "pixel ultra"]);
 const ONLINE_PACKAGE_DETAIL_KEYS = [
   "Number of Participants",
   "Game Time Included",
@@ -137,7 +139,8 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   const selectedPackageDetails = packageChoices.find(
     (option) => option.name === formData.selectedPackage,
   );
-  const isInquiryPackageSelected = Boolean(selectedPackageDetails);
+  const isOnlinePackageSelected = Boolean(selectedPackageDetails) && ONLINE_PACKAGE_NAMES.has(formData.selectedPackage.trim().toLowerCase());
+  const isInquiryPackageSelected = Boolean(selectedPackageDetails && !isOnlinePackageSelected);
   const partyTimeSlots = selectedPackageDetails
     ? getTimeSlotsForPackage(selectedPackageDetails)
     : [];
@@ -229,7 +232,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       <div className="ppp-birthday-hero-form__head">
         <p>Plan the party</p>
         <h2>
-          {isInquiryPackageSelected
+          {isOnlinePackageSelected ? "Book your party online" : isInquiryPackageSelected
             ? "Request a birthday callback"
             : "Choose your package"}
         </h2>
@@ -261,7 +264,13 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
           </fieldset>
         ) : null}
 
-        {isInquiryPackageSelected ? (
+        {isOnlinePackageSelected ? (
+          <div className="ppp-birthday-hero-form__online ppp-birthday-hero-form__wide">
+            <PackageDetails packageDetails={selectedPackageDetails} />
+            <a href={ONLINE_BOOKING_URL} target="_blank" rel="noopener noreferrer">Continue to online booking</a>
+            <small className="ppp-birthday-hero-form__additional-person">* Additional person: $25 plus HST</small>
+          </div>
+        ) : isInquiryPackageSelected ? (
           <>
             <div className="ppp-birthday-hero-form__online ppp-birthday-hero-form__wide">
               <PackageDetails packageDetails={selectedPackageDetails} />
@@ -428,11 +437,11 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         </button>
       ) : null}
 
-      <p aria-live="polite">
+      {!isOnlinePackageSelected ? <p aria-live="polite">
         {status || (isInquiryPackageSelected
           ? "We will follow up with birthday package availability."
           : "Select a package to continue.")}
-      </p>
+      </p> : null}
 
       {urgency && isInquiryPackageSelected ? (
         <p className="ppp-birthday-urgency">{urgency}</p>

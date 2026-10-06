@@ -81,6 +81,30 @@ test("confirmation details omit blank values and retain zero or completed fields
   assert.equal(groupUtilities.confirmationDetail("Notes", " Bring team shirts "), "Notes: Bring team shirts");
 });
 
+test("Punch and Ultra use online booking while Jumbo and Max retain inquiry", async () => {
+  for (const selectedPackage of ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"]) {
+    const BirthdayForm = await component("../src/app/components/BirthdayHeroContactForm.jsx", {
+      react: {
+        ...React,
+        useState: (value) => [value && typeof value === "object" && "selectedPackage" in value ? { ...value, selectedPackage } : value, () => {}],
+        useEffect: () => {},
+      },
+      "next/navigation": { useRouter: () => ({}), useSearchParams: () => new URLSearchParams() },
+      "@/lib/useTurnstileSiteKey": { useTurnstileSiteKey: () => ({}) },
+      "./smallComponents/TurnstileWidget": { default: () => null },
+    });
+    const html = renderToStaticMarkup(React.createElement(BirthdayForm, { packageOptions: [selectedPackage] }));
+    if (["Pixel Punch", "Pixel Ultra"].includes(selectedPackage)) {
+      assert.match(html, /lilypadpos\.app\/public\/onlinebooking\/step1\.php\?ptid=21/);
+      assert.match(html, /Continue to online booking/);
+      assert.doesNotMatch(html, /Send Birthday Request|Select a package to continue/);
+    } else {
+      assert.match(html, /Send Birthday Request/);
+      assert.doesNotMatch(html, /lilypadpos\.app/);
+    }
+  }
+});
+
 test("group waiver links preload their event and Group ID", async () => {
   let formProps;
   const WaiverPage = await component("../src/app/waiver/page.jsx", {
