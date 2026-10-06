@@ -6,6 +6,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as groupUtilities from "../src/app/lib/groupInvites.js";
 import * as ctaUtilities from "../src/app/lib/ctaContent.js";
+import * as trackingScope from "../src/app/lib/trackingScope.js";
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
@@ -86,8 +87,11 @@ test("GTM uses the config sheet and renders once in head and first in body even 
   const gtm = await component("../src/app/components/GoogleTagManager.jsx");
   for (const configuredId of ["GTM-53N567VP", "GTM-TEST123", "invalid<script>"]) {
     const blank = () => null;
+    let requestPath = "/";
     const RootLayout = await component("../src/app/layout.js", {
       "./components/GoogleTagManager": gtm,
+      "next/headers": { headers: () => new Headers({ [trackingScope.TRACKING_PATH_HEADER]: requestPath }) },
+      "@/lib/trackingScope": trackingScope,
       "./components/TrackingVisibility": blank,
       "./components/TrackingPageViews": blank,
       "./components/ChromeVisibility": blank,
@@ -112,6 +116,41 @@ test("GTM uses the config sheet and renders once in head and first in body even 
     assert.match(html, new RegExp(`ns.html\\?id=${expectedId}`));
     assert.equal((html.match(/id="google-tag-manager"/g) || []).length, 1);
     assert.doesNotMatch(html, /GTM-LOCATION|invalid<script>/);
+    for (const path of ["/admin/login", "/waiver", "/waiver-data", "/invite/team-event"]) {
+      requestPath = path;
+      const privateHtml = renderToStaticMarkup(await RootLayout({ children: React.createElement("main", null, "Private page") }));
+      assert.doesNotMatch(privateHtml, /google-tag-manager|googletagmanager\.com|ns\.html/);
+    }
+  }
+});
+
+test("tracking scope excludes sensitive routes and malformed or absent paths", () => {
+  for (const path of ["/admin", "/admin/waivers", "/waiver", "/waiver/123", "/waiver-data", "/invite/team-event", "/api/admin", "/concessions-tv", "/%61dmin/login", undefined, "%"]) {
+    assert.equal(trackingScope.isPublicTrackingPath(path), false, String(path));
+  }
+  for (const path of ["/", "/birthday-party-bookings-vaughan", "/birthday-party-landing", "/kids-birthday-parties", "/contactus"]) {
+    assert.equal(trackingScope.isPublicTrackingPath(path), true, path);
+  }
+});
+
+test("middleware overwrites spoofed tracking paths and preserves public subdomain rewrites", async () => {
+  const middleware = await component("../src/middleware.js", {
+    "./app/lib/trackingScope": trackingScope,
+    "next/server": { NextResponse: {
+      next: (options) => ({ type: "next", ...options }),
+      rewrite: (url, options) => ({ type: "rewrite", url, ...options }),
+      redirect: (url) => ({ type: "redirect", url }),
+    } },
+  });
+  for (const [host, path] of [["birthdays.pixelpulseplay.ca", "/"], ["pixelpulseplay.ca", "/admin/login"]]) {
+    const url = new URL(`https://${host}${path}`);
+    url.clone = () => new URL(url);
+    const result = middleware.middleware({ nextUrl: url, url: url.href, headers: new Headers({ host, [trackingScope.TRACKING_PATH_HEADER]: "/spoofed" }), cookies: { get: () => undefined } });
+    assert.equal(result.request.headers.get(trackingScope.TRACKING_PATH_HEADER), path);
+    if (host.startsWith("birthdays")) {
+      assert.equal(result.type, "rewrite");
+      assert.equal(result.url.pathname, "/birthday-party-bookings-vaughan");
+    }
   }
 });
 

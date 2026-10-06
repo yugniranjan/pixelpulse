@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { TRACKING_PATH_HEADER } from "./app/lib/trackingScope";
 
 const CANONICAL_HOST = "pixelpulseplay.ca";
 const DEFAULT_LOCATION_SLUG = "vaughan";
@@ -117,6 +118,9 @@ function normalizeLegacyPath(pathname) {
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(TRACKING_PATH_HEADER, pathname);
+  const requestOptions = { request: { headers: requestHeaders } };
   const { hostname } = request.nextUrl;
   const requestHostname = (
     request.headers.get("x-forwarded-host") ||
@@ -170,7 +174,7 @@ export function middleware(request) {
 
   // 🚫 Skip Next internals & public files
   if (isAssetPath(pathname)) {
-    return NextResponse.next();
+    return NextResponse.next(requestOptions);
   }
 
   if (SUMMER_PLAY_PASS_HOSTS.has(requestHostname)) {
@@ -185,7 +189,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/summer-play-pass";
-      return NextResponse.rewrite(url);
+      return NextResponse.rewrite(url, requestOptions);
     }
   }
 
@@ -201,7 +205,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/squad";
-      return NextResponse.rewrite(url);
+      return NextResponse.rewrite(url, requestOptions);
     }
   }
 
@@ -220,7 +224,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/level-up-rewards";
-      return NextResponse.rewrite(url);
+      return NextResponse.rewrite(url, requestOptions);
     }
   }
 
@@ -239,7 +243,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/private-party";
-      return NextResponse.rewrite(url);
+      return NextResponse.rewrite(url, requestOptions);
     }
   }
 
@@ -247,7 +251,7 @@ export function middleware(request) {
     if (pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/birthday-party-bookings-vaughan";
-      return NextResponse.rewrite(url);
+      return NextResponse.rewrite(url, requestOptions);
     }
   }
 
@@ -270,14 +274,14 @@ export function middleware(request) {
 
   // ✅ Allow auth APIs
   if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+    return NextResponse.next(requestOptions);
   }
 
   // 🔁 Logged-in admin should not see login page
   if (pathname === "/admin/login") {
     return token
       ? NextResponse.redirect(new URL("/admin/waivers", request.url))
-      : NextResponse.next();
+      : NextResponse.next(requestOptions);
   }
 
   // 🔐 Protect admin pages
@@ -295,7 +299,7 @@ export function middleware(request) {
     );
   }
 
-  return NextResponse.next();
+  return NextResponse.next(requestOptions);
 }
 
 export const config = {

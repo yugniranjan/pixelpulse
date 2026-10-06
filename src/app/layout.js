@@ -1,5 +1,6 @@
 import "./globals.css";
 import Script from "next/script";
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
@@ -15,6 +16,7 @@ import { LOCATION_NAME } from "./lib/constant";
 import { getConfiguredValue, getRowValue, normalizeValue } from "./lib/ctaContent";
 import Breadcrumbs from "./components/Breadcrumb";
 import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
+import { TRACKING_PATH_HEADER, isPublicTrackingPath } from "@/lib/trackingScope";
 
 export const revalidate = 900;
 
@@ -202,6 +204,7 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
+  const trackingAllowed = isPublicTrackingPath(headers().get(TRACKING_PATH_HEADER));
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
@@ -228,12 +231,12 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <GoogleTagManagerHead gtmId={gtmId} />
+        {trackingAllowed ? <GoogleTagManagerHead gtmId={gtmId} /> : null}
         <link rel="dns-prefetch" href="//events.pixelpulseplay.ca" />
         <link rel="preconnect" href="https://events.pixelpulseplay.ca" />
       </head>
       <body suppressHydrationWarning>
-        <GoogleTagManagerNoScript gtmId={gtmId} />
+        {trackingAllowed ? <GoogleTagManagerNoScript gtmId={gtmId} /> : null}
         <TrackingVisibility>
           <>
             <HeadTrackingScripts
