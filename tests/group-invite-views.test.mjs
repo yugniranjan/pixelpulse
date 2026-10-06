@@ -5,6 +5,7 @@ import { test } from "node:test";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as groupUtilities from "../src/app/lib/groupInvites.js";
+import * as ctaUtilities from "../src/app/lib/ctaContent.js";
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
@@ -24,7 +25,7 @@ async function component(path, overrides = {}) {
     return overrides[name] || require(name);
   };
   new Function("require", "module", "exports", code)(resolve, module, module.exports);
-  return module.exports.default;
+  return module.exports.default || module.exports;
 }
 
 test("group admin fields use Group ID and adult/organizer terms while birthdays retain their fields", async () => {
@@ -79,6 +80,39 @@ test("confirmation details omit blank values and retain zero or completed fields
   assert.equal(groupUtilities.confirmationDetail("Extras", "  "), null);
   assert.equal(groupUtilities.confirmationDetail("Extras", 0), "Extras: 0");
   assert.equal(groupUtilities.confirmationDetail("Notes", " Bring team shirts "), "Notes: Bring team shirts");
+});
+
+test("GTM uses the config sheet and renders once in head and first in body even when other tracking is excluded", async () => {
+  const gtm = await component("../src/app/components/GoogleTagManager.jsx");
+  for (const configuredId of ["GTM-53N567VP", "GTM-TEST123", "invalid<script>"]) {
+    const blank = () => null;
+    const RootLayout = await component("../src/app/layout.js", {
+      "./components/GoogleTagManager": gtm,
+      "./components/TrackingVisibility": blank,
+      "./components/TrackingPageViews": blank,
+      "./components/ChromeVisibility": blank,
+      "./components/Header": blank,
+      "./components/Footer": blank,
+      "./components/FloatingWaiverButton": blank,
+      "./components/Breadcrumb": blank,
+      "./loading": blank,
+      sonner: { Toaster: blank },
+      "./lib/sheets": {
+        fetchMenuData: async () => [],
+        fetchsheetdata: async (name) => name === "config" ? [{ key: "gtm_id", value: configuredId }] : [{ gtm_id: "GTM-LOCATION" }],
+      },
+      "./lib/constant": { LOCATION_NAME: "vaughan" },
+      "./lib/ctaContent": ctaUtilities,
+      "@/lib/seo": { canonicalUrl: () => "https://pixelpulseplay.ca", getCanonicalSiteUrl: () => "https://pixelpulseplay.ca" },
+    });
+    const html = renderToStaticMarkup(await RootLayout({ children: React.createElement("main", null, "Page") }));
+    const expectedId = gtm.cleanGtmId(configuredId) || gtm.DEFAULT_GTM_ID;
+    assert.match(html, /<head><script id="google-tag-manager">/);
+    assert.match(html, /<body><noscript><iframe/);
+    assert.match(html, new RegExp(`ns.html\\?id=${expectedId}`));
+    assert.equal((html.match(/id="google-tag-manager"/g) || []).length, 1);
+    assert.doesNotMatch(html, /GTM-LOCATION|invalid<script>/);
+  }
 });
 
 test("Punch and Ultra use online booking while Jumbo and Max retain inquiry", async () => {

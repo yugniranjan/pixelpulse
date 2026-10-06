@@ -8,6 +8,7 @@ import ChromeVisibility from "./components/ChromeVisibility";
 import FloatingWaiverButton from "./components/FloatingWaiverButton";
 import TrackingPageViews from "./components/TrackingPageViews";
 import TrackingVisibility from "./components/TrackingVisibility";
+import { GoogleTagManagerHead, GoogleTagManagerNoScript, GTM_KEYS, DEFAULT_GTM_ID, cleanGtmId } from "./components/GoogleTagManager";
 import { fetchMenuData, fetchsheetdata } from "./lib/sheets";
 import { Toaster } from "sonner";
 import { LOCATION_NAME } from "./lib/constant";
@@ -17,15 +18,6 @@ import { canonicalUrl, getCanonicalSiteUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 
-const DEFAULT_GTM_ID = "GTM-53N567VP";
-const GTM_KEYS = [
-  "gtm_id",
-  "gtmId",
-  "gtm",
-  "googleTagManagerId",
-  "googleTagManager",
-  "googleTagManagerContainerId",
-];
 const GOOGLE_TAG_KEYS = [
   "googleTagId",
   "googleTagIds",
@@ -42,11 +34,6 @@ const META_PIXEL_KEYS = [
   "fbPixelId",
   "pixelId",
 ];
-function cleanGtmId(value = "") {
-  const id = String(value || "").trim().toUpperCase();
-  return /^GTM-[A-Z0-9]+$/.test(id) ? id : "";
-}
-
 function cleanGoogleTagId(value = "") {
   const id = String(value || "").trim().toUpperCase();
   return /^[A-Z]{1,3}-[A-Z0-9]+$/.test(id) && !id.startsWith("GTM-")
@@ -76,36 +63,17 @@ function getGoogleTagIds(sources = []) {
     .filter(Boolean);
 }
 
-function HeadTrackingScripts({ gtmId = "", googleTagIds = [], metaPixelId = "" }) {
-  const cleanGtm = cleanGtmId(gtmId);
+function HeadTrackingScripts({ googleTagIds = [], metaPixelId = "" }) {
   const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
   const cleanGoogleTags = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
   const primaryGoogleTag = cleanGoogleTags[0];
 
-  if (!cleanGtm && cleanGoogleTags.length === 0 && !cleanMetaPixel) {
+  if (cleanGoogleTags.length === 0 && !cleanMetaPixel) {
     return null;
   }
 
   return (
     <>
-      {cleanGtm ? (
-        <>
-          <Script
-            id="google-tag-manager"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${cleanGtm}');
-              `,
-            }}
-          />
-        </>
-      ) : null}
-
       {primaryGoogleTag ? (
         <>
           <Script
@@ -156,27 +124,15 @@ function HeadTrackingScripts({ gtmId = "", googleTagIds = [], metaPixelId = "" }
   );
 }
 
-function BodyTrackingNoScripts({ gtmId = "", metaPixelId = "" }) {
-  const cleanGtm = cleanGtmId(gtmId);
+function BodyTrackingNoScripts({ metaPixelId = "" }) {
   const cleanMetaPixel = cleanMetaPixelId(metaPixelId);
 
-  if (!cleanGtm && !cleanMetaPixel) {
+  if (!cleanMetaPixel) {
     return null;
   }
 
   return (
     <>
-      {cleanGtm ? (
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${cleanGtm}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-            title="Google Tag Manager"
-          />
-        </noscript>
-      ) : null}
       {cleanMetaPixel ? (
         <noscript>
           <img
@@ -263,9 +219,7 @@ export default async function RootLayout({ children }) {
   }
   const trackingRow = findTrackingRow(sheetdata) || {};
   const trackingSources = [trackingRow, configdata];
-  const gtmId =
-    cleanGtmId(getConfiguredValue(trackingSources, GTM_KEYS, "")) ||
-    DEFAULT_GTM_ID;
+  const gtmId = cleanGtmId(getConfiguredValue([configdata, trackingRow], GTM_KEYS, "")) || DEFAULT_GTM_ID;
   const googleTagIds = getGoogleTagIds(trackingSources);
   const metaPixelId = cleanMetaPixelId(
     getConfiguredValue(trackingSources, META_PIXEL_KEYS, ""),
@@ -274,19 +228,19 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <GoogleTagManagerHead gtmId={gtmId} />
         <link rel="dns-prefetch" href="//events.pixelpulseplay.ca" />
         <link rel="preconnect" href="https://events.pixelpulseplay.ca" />
       </head>
       <body suppressHydrationWarning>
+        <GoogleTagManagerNoScript gtmId={gtmId} />
         <TrackingVisibility>
           <>
             <HeadTrackingScripts
-              gtmId={gtmId}
               googleTagIds={googleTagIds}
               metaPixelId={metaPixelId}
             />
             <BodyTrackingNoScripts
-              gtmId={gtmId}
               metaPixelId={metaPixelId}
             />
             <Suspense fallback={null}>

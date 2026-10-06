@@ -147,44 +147,16 @@ function getConfiguredTagIds(rows = [], keys = []) {
     .filter(Boolean);
 }
 
-function LandingGoogleTags({ gtmId = "", googleTagIds = [] }) {
-  const cleanGtmId = cleanGoogleTagId(gtmId);
+function LandingGoogleTags({ googleTagIds = [] }) {
   const tagIds = googleTagIds.map(cleanGoogleTagId).filter(Boolean);
   const primaryGoogleTagId = tagIds[0] || "";
 
-  if (!cleanGtmId && !tagIds.length) {
+  if (!tagIds.length) {
     return null;
   }
 
   return (
     <>
-      {cleanGtmId ? (
-        <>
-          <Script
-            id="birthday-landing-google-tag-manager"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${cleanGtmId}');
-              `,
-            }}
-          />
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${cleanGtmId}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-              title="Google Tag Manager"
-            />
-          </noscript>
-        </>
-      ) : null}
-
       {primaryGoogleTagId ? (
         <>
           <Script
@@ -362,11 +334,6 @@ export default async function BirthdayPartyLandingPage() {
     ["birthdayLandingFinalButtonText", "partyLandingFinalAnchorText", "partyLandingFinalButtonText"],
     "",
   );
-  const landingGtmId = getConfiguredValue(
-    landingData,
-    ["birthdayLandingGtmId", "birthdayLandingGoogleTagManagerId", "birthdayLandingGoogleTagManager"],
-    "",
-  );
   const landingGoogleTagIds = getConfiguredTagIds(
     landingData,
     ["birthdayLandingGoogleTagId", "birthdayLandingGoogleTagIds", "birthdayLandingGtagId", "birthdayLandingGtagIds"],
@@ -375,7 +342,7 @@ export default async function BirthdayPartyLandingPage() {
 
   return (
     <>
-      <LandingGoogleTags gtmId={landingGtmId} googleTagIds={landingGoogleTagIds} />
+      <LandingGoogleTags googleTagIds={landingGoogleTagIds} />
       <main className="ppp-birthday-landing">
       <section
         className="ppp-birthday-hero"
