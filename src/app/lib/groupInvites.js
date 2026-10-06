@@ -14,6 +14,15 @@ export function inviteKind(invite = {}) {
   return legacyGroup ? "group" : "birthday";
 }
 
+export function confirmationDetail(label, value) {
+  const text = String(value ?? "").trim();
+  return text ? `${label}: ${text}` : null;
+}
+
+export function omitUnfilledConfirmationDetails(text = "") {
+  return text.split(/\r?\n/).filter((line) => !/^(?:Party Package|Package|Play Duration|Number of Children Included|Participants Included|Party Room Access|Room Access|Food & Add-ons|Additional Extras|Special Notes):\s*(?:As confirmed(?: in your booking)?|None specified)?\s*$/i.test(line.trim())).join("\n");
+}
+
 export function buildGroupConfirmationText(invite = {}) {
   return [
     `Dear ${invite.rsvpName || "Group Organizer"},`,
@@ -25,13 +34,13 @@ export function buildGroupConfirmationText(invite = {}) {
     `Group ID: ${invite.groupId || invite.partyId}`,
     `Event Date: ${invite.date}`,
     `Event Time: ${invite.time}`,
-    `Package: ${invite.partyPackage || "As confirmed in your booking"}`,
-    `Play Duration: ${invite.playDuration || "As confirmed in your booking"}`,
-    `Participants Included: ${invite.childrenIncluded || "As confirmed in your booking"}`,
-    `Room Access: ${invite.partyRoomAccess || "As confirmed in your booking"}`,
-    `Food & Add-ons: ${invite.foodAddOns || "As confirmed in your booking"}`,
-    `Additional Extras: ${invite.additionalExtras || "None specified"}`,
-    `Special Notes: ${invite.specialNotes || "None specified"}`,
+    confirmationDetail("Package", invite.partyPackage),
+    confirmationDetail("Play Duration", invite.playDuration),
+    confirmationDetail("Participants Included", invite.childrenIncluded),
+    confirmationDetail("Room Access", invite.partyRoomAccess),
+    confirmationDetail("Food & Add-ons", invite.foodAddOns),
+    confirmationDetail("Additional Extras", invite.additionalExtras),
+    confirmationDetail("Special Notes", invite.specialNotes),
     `Venue: ${invite.venue || "Pixel Pulse Play"}`,
     `Address: ${invite.address}`,
     `Invite: ${invite.inviteUrl || ""}`,
@@ -60,5 +69,5 @@ export function buildGroupConfirmationText(invite = {}) {
     "",
     "Warm regards,",
     "The Pixel Pulse Team",
-  ].join("\n");
+  ].filter((line) => line !== null).join("\n");
 }

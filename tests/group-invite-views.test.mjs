@@ -62,6 +62,7 @@ test("guest group invite renders its name, Group ID, and waiver link without bir
     assert.match(html, /groupId=GROUP-101/);
     assert.match(html, /floorchallenge.webp/);
     assert.match(html, /ppp-group-invite-tiles/);
+    assert.match(html, /<header class="ppp-group-invite-header">/);
     assert.doesNotMatch(html, /Birthday|Party ID|balloon|&#x27;s/);
   }
 });
@@ -72,6 +73,12 @@ test("older group invites select the group layout while birthdays remain birthda
   assert.equal(groupUtilities.inviteKind({ eventType: "adult" }), "group");
   assert.equal(groupUtilities.inviteKind({ title: "Birthday Party" }), "birthday");
   assert.equal(groupUtilities.inviteKind({ inviteType: "birthday", title: "Group Event" }), "birthday");
+});
+
+test("confirmation details omit blank values and retain zero or completed fields", () => {
+  assert.equal(groupUtilities.confirmationDetail("Extras", "  "), null);
+  assert.equal(groupUtilities.confirmationDetail("Extras", 0), "Extras: 0");
+  assert.equal(groupUtilities.confirmationDetail("Notes", " Bring team shirts "), "Notes: Bring team shirts");
 });
 
 test("group waiver links preload their event and Group ID", async () => {

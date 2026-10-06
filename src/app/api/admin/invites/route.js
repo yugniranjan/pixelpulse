@@ -16,7 +16,7 @@ import {
 } from "@/lib/postgresData";
 import { fetchsheetdata } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
-import { GROUP_INVITE_DEFAULTS, inviteKind, buildGroupConfirmationText } from "@/lib/groupInvites";
+import { GROUP_INVITE_DEFAULTS, inviteKind, buildGroupConfirmationText, confirmationDetail } from "@/lib/groupInvites";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -170,7 +170,6 @@ function buildConfirmationEmailText(invite = {}) {
   if (inviteKind(invite) === "group") return buildGroupConfirmationText(invite);
   const hostName = invite.rsvpName || "Party Host";
   const childName = invite.childName || "the birthday child";
-  const partyPackage = invite.partyPackage || invite.titleSuffix || invite.title || "Birthday Party Package";
   const venue = invite.venue || "Pixel Pulse PlayZone";
   const address = invite.address || DEFAULT_ADDRESS;
   const website = invite.websiteLink || "https://www.pixelpulseplay.ca";
@@ -185,13 +184,13 @@ function buildConfirmationEmailText(invite = {}) {
     `Party ID: ${invite.partyId || "As confirmed"}`,
     `Party Date: ${invite.date || "As confirmed"}`,
     `Party Time: ${invite.time || "As confirmed"}`,
-    `Party Package: ${partyPackage}`,
-    `Play Duration: ${invite.playDuration || "As confirmed in your booking"}`,
-    `Number of Children Included: ${invite.childrenIncluded || "As confirmed in your booking"}`,
-    `Party Room Access: ${invite.partyRoomAccess || "As confirmed in your booking"}`,
-    `Food & Add-ons: ${invite.foodAddOns || ""}`,
-    `Additional Extras: ${invite.additionalExtras || ""}`,
-    `Special Notes: ${invite.specialNotes || ""}`,
+    confirmationDetail("Party Package", invite.partyPackage),
+    confirmationDetail("Play Duration", invite.playDuration),
+    confirmationDetail("Number of Children Included", invite.childrenIncluded),
+    confirmationDetail("Party Room Access", invite.partyRoomAccess),
+    confirmationDetail("Food & Add-ons", invite.foodAddOns),
+    confirmationDetail("Additional Extras", invite.additionalExtras),
+    confirmationDetail("Special Notes", invite.specialNotes),
     "",
     "Package Inclusions",
     "- Pizza is provided as per your selected package.",

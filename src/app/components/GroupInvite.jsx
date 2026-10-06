@@ -18,12 +18,12 @@ export default function GroupInvite({ invite }) {
 
   return (
     <main className="ppp-group-invite">
-      <div className="ppp-group-invite-brand">
+      <header className="ppp-group-invite-header"><div className="ppp-group-invite-brand">
         <a href="/" aria-label="Pixel Pulse Play home">
           <Image src="/assets/images/logo.png" alt="Pixel Pulse Play" width={168} height={60} priority />
         </a>
         <span>{isCorporate ? "Corporate & team events" : "Adult group events"}</span>
-      </div>
+      </div></header>
       <section className="ppp-group-invite-hero" aria-labelledby="group-invite-title">
         <Image src="/assets/images/floorchallenge.webp" alt="Glowing interactive floor tiles at Pixel Pulse Play" fill sizes="100vw" priority />
         <div className="ppp-group-invite-tiles" aria-hidden="true">

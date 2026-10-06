@@ -70,6 +70,7 @@ test("group creation persists its type, generates Group ID links, and seeds the 
   assert.equal(result.waiverUrl, "https://example.test/waiver?groupId=GROUP-101");
   assert.match(result.confirmationEmailText, /Group ID: GROUP-101/);
   assert.match(result.confirmationEmailText, /Participants Included: 20/);
+  assert.doesNotMatch(result.confirmationEmailText, /Play Duration:|Room Access:|Food & Add-ons:|Additional Extras:|Special Notes:/);
   assert.doesNotMatch(result.confirmationEmailText, /birthday|children|Party ID|pizza is provided/i);
   assert.equal(seeds.get("GROUP-101").inviteType, "group");
   assert.equal(invites.get(result.slug).inviteType, "group");
@@ -82,6 +83,7 @@ test("birthday and group lists stay separate; editing and deleting respect the m
   const birthdayResult = await (await api.POST(request("/api/admin/invites", birthday))).json();
   assert.match(birthdayResult.waiverUrl, /\?partyId=BIRTHDAY-1/);
   assert.match(birthdayResult.confirmationEmailText, /birthday/i);
+  assert.doesNotMatch(birthdayResult.confirmationEmailText, /Play Duration:|Party Room Access:|Food & Add-ons:|Additional Extras:|Special Notes:/);
   const groupList = await (await api.GET(request("/api/admin/invites?list=1&type=group", null, "GET"))).json();
   const birthdayList = await (await api.GET(request("/api/admin/invites?list=1", null, "GET"))).json();
   assert.equal(groupList.invites.length, 1);
@@ -117,15 +119,31 @@ test("group invite, waiver, and confirmation emails have Group ID wording withou
   for (const email of [
     { ...base, smsText: generated.smsText },
     { ...base, type: "waiver" },
-    { ...base, confirmationEmailText: generated.confirmationEmailText },
+    { ...base, confirmationEmailText: `${generated.confirmationEmailText}\nFood & Add-ons:   \nPlay Duration: As confirmed in your booking\nSpecial Notes: None specified\nAdditional Extras: Team shirts` },
   ]) assert.equal((await api.POST(request("/api/admin/invites/email", email))).status, 200);
   assert.equal(messages.length, 3);
+  const birthday = await (await invites.POST(request("/api/admin/invites", { ...group, inviteType: "birthday", partyId: "BIRTHDAY-EMAIL", childrenIncluded: "", partyPackage: "" }))).json();
+  assert.equal((await api.POST(request("/api/admin/invites/email", {
+    email: base.email, inviteUrl: birthday.inviteUrl, partyId: "BIRTHDAY-EMAIL",
+    confirmationEmailText: `${birthday.confirmationEmailText}\nFood & Add-ons: \nPlay Duration: As confirmed in your booking\nSpecial Notes: None specified\nAdditional Extras: Cake table`,
+  }))).status, 200);
+  const birthdayMail = messages[3];
+  assert.match(birthdayMail.html, /background:#000000/);
+  assert.match(birthdayMail.html, /<img[^>]+alt="Pixel Pulse Play"/);
+  assert.match(birthdayMail.html, /Your Birthday Party is Confirmed/);
+  assert.match(birthdayMail.text, /Party ID: BIRTHDAY-EMAIL/);
+  assert.match(birthdayMail.text, /Additional Extras: Cake table/);
+  assert.doesNotMatch(birthdayMail.text + birthdayMail.html, /Food & Add-ons:|Play Duration:|Special Notes:|Number of Children Included:|Party Room Access:|Party Package:/);
+  assert.doesNotMatch(birthdayMail.html, /Group ID|Your Group Event/);
   for (const mail of messages) {
+    if (mail === birthdayMail) continue;
     assert.match(mail.text, /Group ID: GROUP-101/);
     assert.doesNotMatch(mail.subject + mail.html + mail.text, /birthday|Party ID|Number of Children|Pizza is provided/i);
   }
   assert.match(messages[1].html, /groupId=GROUP-101/);
   assert.match(messages[2].subject, /Group Event is Confirmed/);
+  assert.doesNotMatch(messages[2].text + messages[2].html, /Food & Add-ons:|Play Duration:|Special Notes:/);
+  assert.match(messages[2].text, /Additional Extras: Team shirts/);
   assert.equal((await api.POST(request("/api/admin/invites/email", { ...base, type: "waiver", waiverUrl: "javascript:alert(1)" }))).status, 400);
-  assert.equal(messages.length, 3);
+  assert.equal(messages.length, 4);
 });

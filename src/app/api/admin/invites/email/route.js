@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { omitUnfilledConfirmationDetails } from "@/lib/groupInvites";
 
 export const runtime = "nodejs";
 
@@ -306,8 +307,8 @@ function renderConfirmationHtml({ emailText, partyId, isGroup = false }) {
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:720px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
-        <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
-          <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
+        <div style="background:#000000;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
+          <img src="${escapeHtml(LOGO_URL)}" alt="Pixel Pulse Play" width="190" style="display:block;width:190px;max-width:100%;height:auto;margin:0 0 20px;" />
           <h1 style="margin:0;font-size:24px;line-height:1.25;">${isGroup ? "Your Group Event is Confirmed" : "Your Birthday Party is Confirmed"}</h1>
           ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">${isGroup ? "Group ID" : "Party ID"}: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
         </div>
@@ -389,7 +390,7 @@ export async function POST(request) {
     const { body, attachments } = await parseEmailRequest(request);
     const to = cleanEmail(body?.email);
     const smsText = cleanText(body?.smsText);
-    const confirmationEmailText = cleanText(body?.confirmationEmailText);
+    const confirmationEmailText = omitUnfilledConfirmationDetails(cleanText(body?.confirmationEmailText));
     const feedbackUrl = cleanText(body?.feedbackUrl);
     const firstName = cleanText(body?.firstName);
     const feedbackName = cleanText(body?.name) || firstName;
