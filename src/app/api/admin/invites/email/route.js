@@ -57,7 +57,7 @@ function renderEmailButton({ href, label, variant = "dark" }) {
   `;
 }
 
-function renderBrandedEmailShell({ title, partyId = "", children = "", logoUrl = LOGO_URL }) {
+function renderBrandedEmailShell({ title, partyId = "", idLabel = "Party ID", children = "", logoUrl = LOGO_URL }) {
   const imageUrl = cleanText(logoUrl) || LOGO_URL;
 
   return `
@@ -66,7 +66,7 @@ function renderBrandedEmailShell({ title, partyId = "", children = "", logoUrl =
         <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:22px 24px;">
           <img src="${escapeHtml(imageUrl)}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
           <h1 style="margin:0;font-size:28px;line-height:1.15;color:#ffffff;">${escapeHtml(title)}</h1>
-          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
+          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">${escapeHtml(idLabel)}: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
         </div>
         <div style="background:#ffffff;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
           ${children}
@@ -279,10 +279,10 @@ function renderTextLines(lines = []) {
   return html;
 }
 
-function renderConfirmationHtml({ emailText, partyId }) {
+function renderConfirmationHtml({ emailText, partyId, isGroup = false }) {
   const lines = emailText.split("\n");
   const greetingLines = lines.slice(0, 3);
-  const detailStart = lines.findIndex((line) => line.trim() === "Your Party Details");
+  const detailStart = lines.findIndex((line) => line.trim() === (isGroup ? "Your Group Details" : "Your Party Details"));
   const packageStart = lines.findIndex((line) => line.trim() === "Package Inclusions");
   const importantStart = lines.findIndex((line) => line.trim() === "Important Information - Please Read Carefully");
   const detailEnd = packageStart > detailStart ? packageStart : importantStart;
@@ -308,8 +308,8 @@ function renderConfirmationHtml({ emailText, partyId }) {
       <div style="max-width:720px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
         <div style="background:#111827;color:#ffffff;border-radius:14px 14px 0 0;padding:24px;">
           <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a4cf5f;">Pixel Pulse Play</p>
-          <h1 style="margin:0;font-size:24px;line-height:1.25;">Your Birthday Party is Confirmed</h1>
-          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">Party ID: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
+          <h1 style="margin:0;font-size:24px;line-height:1.25;">${isGroup ? "Your Group Event is Confirmed" : "Your Birthday Party is Confirmed"}</h1>
+          ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">${isGroup ? "Group ID" : "Party ID"}: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
         </div>
         <div style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:24px;">
           <div style="font-size:15px;line-height:1.6;">
@@ -318,7 +318,7 @@ function renderConfirmationHtml({ emailText, partyId }) {
 
           ${detailRows.length ? `
             <div style="margin:22px 0;padding:18px;border:1px solid #d1d5db;border-radius:12px;background:#f9fafb;">
-              <h2 style="margin:0 0 14px;font-size:18px;color:#111827;">Party Details</h2>
+              <h2 style="margin:0 0 14px;font-size:18px;color:#111827;">${isGroup ? "Group Details" : "Party Details"}</h2>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
                 <tbody>
                   ${detailRows.map((row) => `
@@ -401,13 +401,21 @@ export async function POST(request) {
     const promotionalText = cleanText(body?.promotionalText);
     const sendThankYou = body?.type === "thank-you" || Boolean(body?.thankYouEmail);
     const sendPromotional = body?.type === "promotional";
+    const sendWaiver = body?.type === "waiver";
+    const isGroup = body?.inviteType === "group";
+    const idLabel = isGroup ? "Group ID" : "Party ID";
+    const waiverUrl = cleanText(body?.waiverUrl);
     const inviteUrl = cleanText(body?.inviteUrl);
     const qrCodeUrl = cleanText(body?.qrCodeUrl);
-    const partyId = cleanText(body?.partyId);
-    const emailText = confirmationEmailText ? withPackageInclusions(confirmationEmailText) : smsText;
+    const partyId = cleanText(body?.groupId || body?.partyId);
+    const emailText = confirmationEmailText ? isGroup ? confirmationEmailText : withPackageInclusions(confirmationEmailText) : smsText;
 
     if (!to) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+
+    if (sendWaiver && !/^https?:\/\//i.test(waiverUrl)) {
+      return NextResponse.json({ error: "A valid waiver URL is required." }, { status: 400 });
     }
 
     if (sendThankYou && !feedbackUrl) {
@@ -428,7 +436,7 @@ export async function POST(request) {
       ? appendFeedbackRecipient(feedbackUrl, { name: feedbackName, email: to })
       : feedbackUrl;
 
-    if (!sendThankYou && !sendPromotional && (!emailText || !inviteUrl)) {
+    if (!sendWaiver && !sendThankYou && !sendPromotional && (!emailText || !inviteUrl)) {
       return NextResponse.json(
         { error: "Email text and invite URL are required." },
         { status: 400 },
@@ -484,7 +492,9 @@ export async function POST(request) {
       websiteLink,
     ].filter(Boolean).join("\n");
 
-    const text = sendPromotional
+    const text = sendWaiver
+      ? [`${idLabel}: ${partyId}`, "Please complete your waiver before your group's visit to Pixel Pulse Play.", "Incomplete waivers may delay your group's start.", waiverUrl].join("\n\n")
+      : sendPromotional
       ? promotionalText
       : sendThankYou
       ? thankYouText
@@ -492,17 +502,24 @@ export async function POST(request) {
         : defaultThankYouText
       : confirmationEmailText
       ? [
-          partyId ? `Party ID: ${partyId}` : "",
+          partyId ? `${idLabel}: ${partyId}` : "",
           emailText,
         ].filter(Boolean).join("\n")
       : [
-          partyId ? `Party ID: ${partyId}` : "",
+          partyId ? `${idLabel}: ${partyId}` : "",
           emailText,
           "",
           qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
         ].filter(Boolean).join("\n");
 
-    const html = sendPromotional
+    const html = sendWaiver
+      ? renderBrandedEmailShell({
+          title: "Complete your group waiver",
+          partyId,
+          idLabel,
+          children: `<p>Every participant needs a signed waiver before arrival. Incomplete waivers may delay your group's start.</p>${renderEmailButton({ href: waiverUrl, label: "Complete waiver", variant: "lime" })}`,
+        })
+      : sendPromotional
       ? renderCustomThankYouHtml({
           text: promotionalText,
           feedbackUrl: "",
@@ -516,10 +533,10 @@ export async function POST(request) {
         ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
         : renderThankYouHtml({ firstName, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
       : confirmationEmailText
-      ? renderConfirmationHtml({ emailText, partyId })
+      ? renderConfirmationHtml({ emailText, partyId, isGroup })
       : `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
-          ${partyId ? `<p><strong>Party ID:</strong> ${escapeHtml(partyId)}</p>` : ""}
+          ${partyId ? `<p><strong>${idLabel}:</strong> ${escapeHtml(partyId)}</p>` : ""}
           <div style="white-space:normal;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;">
             ${textToHtml(emailText)}
           </div>
@@ -541,13 +558,15 @@ export async function POST(request) {
       },
       to,
       replyTo: CONTACT_EMAIL,
-      subject: sendPromotional
+      subject: sendWaiver
+        ? "Your Pixel Pulse Group Waiver"
+        : sendPromotional
         ? customSubject || "Your Next Pixel Pulse Adventure Is On Us"
         : sendThankYou
         ? "Your Next Pixel Pulse Adventure Is On Us ⚡⭐"
         : confirmationEmailText
-        ? "Your Pixel Pulse Birthday Party is Confirmed"
-        : "Your Party Invite at Pixel Pulse Playzone! 🎉",
+        ? isGroup ? "Your Pixel Pulse Group Event is Confirmed" : "Your Pixel Pulse Birthday Party is Confirmed"
+        : isGroup ? "You're Invited: Group Event at Pixel Pulse Play" : "Your Party Invite at Pixel Pulse Playzone! 🎉",
       text,
       html,
       attachments,

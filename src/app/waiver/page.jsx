@@ -63,7 +63,8 @@ async function getWaiverContent() {
 
 export default async function WaiverPage({ searchParams }) {
   const params = await searchParams;
-  const partyId = searchValue(params, "partyId");
+  const groupId = searchValue(params, "groupId");
+  const partyId = groupId || searchValue(params, "partyId");
   const queryVisitDate = searchValue(params, "visitDate") || searchValue(params, "date");
   const queryVisitTime = searchValue(params, "visitTime") || searchValue(params, "time");
   const [partyDetails, waiverContent] = await Promise.all([
@@ -73,8 +74,9 @@ export default async function WaiverPage({ searchParams }) {
   const primaryParticipant = partyDetails?.primaryParticipant || "";
   const initialVisit = {
     partyId,
+    ...(groupId ? { groupId } : {}),
     partyName: primaryParticipant || "",
-    passType: partyDetails?.passType || (partyId ? "Birthday Party Package" : ""),
+    passType: partyDetails?.passType || (groupId ? "Group Event" : partyId ? "Birthday Party Package" : ""),
     visitDate: partyDetails?.visitDate || queryVisitDate || "",
     visitTime: partyDetails?.visitTime || queryVisitTime || "",
   };
@@ -89,7 +91,15 @@ export default async function WaiverPage({ searchParams }) {
         <WaiverForm
           initialPrimary={initialPrimary}
           initialVisit={initialVisit}
-          waiverContent={waiverContent}
+          waiverContent={groupId ? {
+            ...waiverContent,
+            partyIdLabel: "Group ID",
+            partyIdPlaceholder: "Group ID",
+            partyNameLabel: "Group / event name",
+            partyNamePlaceholder: "Group name",
+            linkedPartyFallback: "your group",
+            linkedPartyIdText: "with Group ID",
+          } : waiverContent}
         />
       </section>
     </main>

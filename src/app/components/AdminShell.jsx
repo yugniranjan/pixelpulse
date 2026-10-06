@@ -8,6 +8,7 @@ const ADMIN_LINKS = [
   { href: "/admin/daily-checklist", label: "Daily Checklist" },
   { href: "/admin/waivers", label: "Player Info" },
   { href: "/admin/invites", label: "Create Party Links" },
+  { href: "/admin/group-invites", label: "Create Group Links" },
   { href: "/admin/gift-cards", label: "Gift Cards" },
   { href: "/admin/thank-you", label: "Promotional Email" },
   { href: "/admin/feedback", label: "Feedback Data" },

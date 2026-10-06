@@ -36,6 +36,13 @@ const MODULES = [
     accent: "#fb923c",
   },
   {
+    title: "Create Group Links",
+    desc: "Corporate and adult group invitations, waivers, and confirmations.",
+    href: "/admin/group-invites",
+    action: "Build group invites",
+    accent: "#10b981",
+  },
+  {
     title: "Gift Cards",
     desc: "Create digital 30, 60, and 90 minute gameplay gift cards.",
     href: "/admin/gift-cards",

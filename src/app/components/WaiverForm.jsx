@@ -442,7 +442,8 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
       const params = new URLSearchParams();
       if (primary.email) params.set("email", primary.email);
       if (primary.phone) params.set("phone", primary.phone);
-      if (visit.partyId) params.set("partyId", visit.partyId);
+      if (visit.groupId) params.set("groupId", visit.groupId);
+      else if (visit.partyId) params.set("partyId", visit.partyId);
 
       const response = await fetch(`/api/waivers?${params.toString()}`, {
         cache: "no-store",
@@ -569,6 +570,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           <h1>Sign your waiver</h1>
         </div>
         <p>One signature covers your whole group. Takes about two minutes.</p>
+        {visit.groupId ? <p><strong>{visit.partyName || "Group event"}</strong> · Group ID: {visit.groupId}</p> : null}
       </div>
 
       <section className="ppp-waiver-section">

@@ -5,6 +5,8 @@ import { fetchsheetdata } from "@/lib/sheets";
 import { getConfigValue, getRowValue } from "@/lib/ctaContent";
 import { LOCATION_NAME } from "@/lib/constant";
 import { getInviteBySlug } from "@/lib/invites";
+import GroupInvite from "@/components/GroupInvite";
+import { inviteKind } from "@/lib/groupInvites";
 
 export const dynamic = "force-dynamic";
 
@@ -102,11 +104,12 @@ function escapeRegExp(value = "") {
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
+  const inviteRow = await getInviteBySlug(slug);
+  if (inviteRow && inviteKind(inviteRow) === "group") {
+    return { title: `${inviteRow.childName} | Pixel Pulse Group Invite`, robots: { index: false, follow: false } };
+  }
   const locationSlug = LOCATION_NAME || "vaughan";
-  const [configData, inviteRow] = await Promise.all([
-    fetchsheetdata("config", locationSlug),
-    getInviteBySlug(slug),
-  ]);
+  const configData = await fetchsheetdata("config", locationSlug);
 
   return {
     title:
@@ -122,15 +125,15 @@ export async function generateMetadata({ params }) {
 
 export default async function InviteSlugPage({ params }) {
   const { slug } = await params;
-  const locationSlug = LOCATION_NAME || "vaughan";
-  const [configData, inviteRow] = await Promise.all([
-    fetchsheetdata("config", locationSlug),
-    getInviteBySlug(slug),
-  ]);
+  const inviteRow = await getInviteBySlug(slug);
 
   if (!inviteRow) {
     notFound();
   }
+
+  if (inviteKind(inviteRow) === "group") return <GroupInvite invite={inviteRow} />;
+  const locationSlug = LOCATION_NAME || "vaughan";
+  const configData = await fetchsheetdata("config", locationSlug);
 
   const invite = {
     eyebrow: inviteText(inviteRow, configData, ["eyebrow", "inviteEyebrow"]),

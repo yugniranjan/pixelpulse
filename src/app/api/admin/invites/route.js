@@ -7,6 +7,7 @@ import {
   deletePostgresInvite,
   getPostgresInviteByPartyId,
   getPostgresInviteBySlug,
+  getPostgresPartyWaiver,
   hasPostgres,
   listPostgresInvites,
   postgresInviteSlugExists,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/postgresData";
 import { fetchsheetdata } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
+import { GROUP_INVITE_DEFAULTS, inviteKind, buildGroupConfirmationText } from "@/lib/groupInvites";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -79,7 +81,8 @@ function serializeFirestoreInvite(snapshot) {
   };
 }
 
-async function getInviteDefaults() {
+async function getInviteDefaults(kind = "birthday") {
+  if (kind === "group") return GROUP_INVITE_DEFAULTS;
   const configData = await fetchsheetdata("config", LOCATION_NAME || "vaughan");
   const greeting = plainSheetText(
     getConfigValue(configData, ["partyFormGreeting", "inviteGreeting", "greeting"]),
@@ -153,6 +156,7 @@ async function listInvites() {
 
 function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
   return [
+    inviteKind(invite) === "group" ? `${invite.childName}\nGroup ID: ${invite.groupId || invite.partyId}` : "",
     invite.intro,
     `${invite.dateLabel || "Date"}: ${invite.date}`,
     `${invite.timeLabel || "Time"}: ${invite.time}`,
@@ -163,6 +167,7 @@ function buildSmsText(invite = {}, inviteUrl = "", waiverLink = "") {
 }
 
 function buildConfirmationEmailText(invite = {}) {
+  if (inviteKind(invite) === "group") return buildGroupConfirmationText(invite);
   const hostName = invite.rsvpName || "Party Host";
   const childName = invite.childName || "the birthday child";
   const partyPackage = invite.partyPackage || invite.titleSuffix || invite.title || "Birthday Party Package";
@@ -256,12 +261,13 @@ function buildConfirmationEmailText(invite = {}) {
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
+  const kind = searchParams.get("type") === "group" ? "group" : "birthday";
   if (searchParams.get("list") === "1") {
-    return NextResponse.json({ invites: await listInvites() });
+    return NextResponse.json({ invites: (await listInvites()).filter((invite) => inviteKind(invite) === kind) });
   }
 
   return NextResponse.json({
-    defaults: await getInviteDefaults(),
+    defaults: await getInviteDefaults(kind),
   });
 }
 
@@ -274,8 +280,12 @@ export async function POST(req) {
   }
 
   const body = await req.json();
+  const isGroup = body.inviteType === "group";
+  const kind = isGroup ? "group" : "birthday";
+  const defaultTitle = isGroup ? "Group Event" : "Birthday Party";
+  const defaultPassType = isGroup ? "Group Event" : "Birthday Party Package";
   const childName = cleanText(body.childName);
-  const partyId = cleanText(body.partyId);
+  const partyId = cleanText(isGroup ? body.groupId || body.partyId : body.partyId);
   const date = cleanText(body.date);
   const time = cleanText(body.time);
   const rsvpName = cleanText(body.rsvpName);
@@ -283,7 +293,7 @@ export async function POST(req) {
 
   if (!childName || !partyId || !date || !time || !rsvpName || !phone) {
     return NextResponse.json(
-      { error: "Child name, Party ID, date, time, RSVP name, and RSVP phone are required." },
+      { error: isGroup ? "Group name, Group ID, date, time, organizer name, and RSVP phone are required." : "Child name, Party ID, date, time, RSVP name, and RSVP phone are required." },
       { status: 400 },
     );
   }
@@ -291,6 +301,20 @@ export async function POST(req) {
   const requestedSlug = normalizeInviteSlug(body.slug);
   const baseSlug = requestedSlug || normalizeInviteSlug(childName);
   const existingPartySlug = await getInviteSlugByPartyId(partyId);
+  if (isGroup) {
+    const seed = hasPostgres()
+      ? await getPostgresPartyWaiver(partyId)
+      : serializeFirestoreInvite(await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get());
+    if (seed && inviteKind(seed) !== "group") return NextResponse.json({ error: "This ID is already used by a birthday party. Choose a different Group ID." }, { status: 409 });
+  }
+  if (existingPartySlug) {
+    const existing = hasPostgres()
+      ? await getPostgresInviteBySlug(existingPartySlug)
+      : serializeFirestoreInvite(await db.collection("invites").doc(existingPartySlug).get());
+    if (existing && inviteKind(existing) !== kind) {
+      return NextResponse.json({ error: "This ID is already used by another event. Choose a different ID." }, { status: 409 });
+    }
+  }
   const slug = requestedSlug
     ? requestedSlug === existingPartySlug
       ? existingPartySlug
@@ -299,16 +323,16 @@ export async function POST(req) {
   const origin = getOrigin(req);
   const inviteUrl = `${origin}/invite/${slug}`;
   const waiverLink = partyId
-    ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
+    ? `${origin}/waiver?${isGroup ? "groupId" : "partyId"}=${encodeURIComponent(partyId)}`
     : `${origin}/waiver`;
   const feedbackUrl = partyId
     ? `${origin}/feedback?partyId=${encodeURIComponent(partyId)}&date=${encodeURIComponent(date)}`
     : `${origin}/feedback`;
-  const title = titleWithoutChildName(cleanText(body.title) || "Birthday Party", childName) || "Birthday Party";
+  const title = isGroup ? cleanText(body.title) || defaultTitle : titleWithoutChildName(cleanText(body.title) || defaultTitle, childName) || defaultTitle;
   const partyPackage = cleanText(body.partyPackage);
   const websiteLink = cleanText(body.websiteLink);
   const websiteText = cleanText(body.websiteText) || websiteLink?.replace(/^https?:\/\//, "");
-  const inviteDefaults = await getInviteDefaults();
+  const inviteDefaults = await getInviteDefaults(kind);
   const greeting = cleanText(body.greeting) || inviteDefaults.greeting;
   const guestName = cleanText(body.guestName) || inviteDefaults.guestName;
   const intro = cleanText(body.intro) || inviteDefaults.intro;
@@ -318,7 +342,9 @@ export async function POST(req) {
     active: "1",
     slug,
     partyId,
-    eyebrow: cleanText(body.eyebrow) || "Birthday Invite",
+    inviteType: kind,
+    ...(isGroup ? { groupId: partyId, eventType: body.eventType === "adult" ? "adult" : "corporate" } : {}),
+    eyebrow: cleanText(body.eyebrow) || (isGroup ? "Group Invitation" : "Birthday Invite"),
     greeting,
     guestName,
     childName,
@@ -334,7 +360,7 @@ export async function POST(req) {
     intro,
     dateLabel: cleanText(body.dateLabel) || "Date",
     date,
-    timeLabel: cleanText(body.timeLabel) || "Party Time",
+    timeLabel: cleanText(body.timeLabel) || (isGroup ? "Event Time" : "Party Time"),
     time,
     venueLabel: cleanText(body.venueLabel) || "Place",
     venue: cleanText(body.venue),
@@ -382,7 +408,8 @@ export async function POST(req) {
         primaryParticipant: childName,
         visitDate: date,
         visitTime: time,
-        passType: partyPackage || "Birthday Party Package",
+        passType: partyPackage || defaultPassType,
+        ...(isGroup ? { groupId: partyId, inviteType: kind } : {}),
         createdAt: now,
         updatedAt: now,
       });
@@ -396,7 +423,8 @@ export async function POST(req) {
           primaryParticipant: childName,
           visitDate: date,
           visitTime: time,
-          passType: partyPackage || "Birthday Party Package",
+          passType: partyPackage || defaultPassType,
+          ...(isGroup ? { groupId: partyId, inviteType: kind } : {}),
           createdAt: now,
           updatedAt: now,
         },
@@ -409,6 +437,7 @@ export async function POST(req) {
     success: true,
     slug,
     partyId,
+    ...(isGroup ? { groupId: partyId } : {}),
     inviteUrl,
     waiverUrl: waiverLink,
     feedbackUrl,
@@ -435,14 +464,32 @@ export async function PUT(req) {
     ? await getPostgresInviteBySlug(slug)
     : serializeFirestoreInvite(await db.collection("invites").doc(slug).get());
   if (!existing) return NextResponse.json({ error: "Invite not found." }, { status: 404 });
+  const isGroup = inviteKind(existing) === "group";
+  const requestedKind = searchParams.get("type") === "group" ? "group" : "birthday";
+  if (inviteKind(existing) !== requestedKind) return NextResponse.json({ error: "Invite not found in this module." }, { status: 404 });
+  const defaultTitle = isGroup ? "Group Event" : "Birthday Party";
+  const defaultPassType = isGroup ? "Group Event" : "Birthday Party Package";
 
   const bodyText = (name, fallback = "") =>
     Object.prototype.hasOwnProperty.call(body, name)
       ? cleanText(body[name])
       : fallback;
   const origin = getOrigin(req);
-  const partyId = bodyText("partyId", existing.partyId || "");
+  const partyId = isGroup ? bodyText("groupId", bodyText("partyId", existing.partyId || "")) : bodyText("partyId", existing.partyId || "");
   const childName = bodyText("childName", existing.childName || "");
+  if (!partyId || !childName || !bodyText("date", existing.date) || !bodyText("time", existing.time) || !bodyText("rsvpName", existing.rsvpName) || !bodyText("phone", existing.phone)) {
+    return NextResponse.json({ error: "Name, ID, date, time, RSVP name, and RSVP phone are required." }, { status: 400 });
+  }
+  if (partyId !== existing.partyId) {
+    const conflictingSlug = await getInviteSlugByPartyId(partyId);
+    if (conflictingSlug && conflictingSlug !== slug) return NextResponse.json({ error: "This ID is already used by another event." }, { status: 409 });
+    if (isGroup) {
+      const seed = hasPostgres()
+        ? await getPostgresPartyWaiver(partyId)
+        : serializeFirestoreInvite(await db.collection("partyWaivers").doc(partyWaiverDocId(partyId)).get());
+      if (seed && inviteKind(seed) !== "group") return NextResponse.json({ error: "This ID is already used by a birthday party." }, { status: 409 });
+    }
+  }
   const childNameChanged = cleanText(existing.childName || "") !== childName;
   const desiredSlug = childNameChanged ? normalizeInviteSlug(childName) : slug;
   const updatedSlug =
@@ -451,21 +498,22 @@ export async function PUT(req) {
       : slug;
   const inviteUrl = `${origin}/invite/${updatedSlug}`;
   const waiverLink = partyId
-    ? `${origin}/waiver?partyId=${encodeURIComponent(partyId)}`
+    ? `${origin}/waiver?${isGroup ? "groupId" : "partyId"}=${encodeURIComponent(partyId)}`
     : existing.waiverLink || `${origin}/waiver`;
   const feedbackUrl = partyId
     ? `${origin}/feedback?partyId=${encodeURIComponent(partyId)}&date=${encodeURIComponent(bodyText("date", existing.date || ""))}`
     : existing.feedbackUrl || `${origin}/feedback`;
   const updatedAt = new Date();
-  const title = bodyText("title", existing.title || "Birthday Party");
+  const title = bodyText("title", existing.title || defaultTitle);
   const invite = {
     ...existing,
     slug: updatedSlug,
     partyId,
+    ...(isGroup ? { groupId: partyId, eventType: bodyText("eventType", existing.eventType) === "adult" ? "adult" : "corporate" } : {}),
     active: bodyText("active", existing.active || "1") || "1",
     childName,
-    title: titleWithoutChildName(title, childName) || "Birthday Party",
-    titleSuffix: bodyText("titleSuffix", existing.titleSuffix || title || "Birthday Party") || title || "Birthday Party",
+    title: isGroup ? title || defaultTitle : titleWithoutChildName(title, childName) || defaultTitle,
+    titleSuffix: bodyText("titleSuffix", existing.titleSuffix || title || defaultTitle) || title || defaultTitle,
     partyPackage: bodyText("partyPackage", existing.partyPackage || ""),
     playDuration: bodyText("playDuration", existing.playDuration || ""),
     childrenIncluded: bodyText("childrenIncluded", existing.childrenIncluded || ""),
@@ -475,10 +523,10 @@ export async function PUT(req) {
     specialNotes: bodyText("specialNotes", existing.specialNotes || ""),
     greeting: bodyText("greeting", existing.greeting || DEFAULT_GREETING) || DEFAULT_GREETING,
     guestName: bodyText("guestName", existing.guestName || DEFAULT_GUEST_LINE) || DEFAULT_GUEST_LINE,
-    intro: bodyText("intro", existing.intro || DEFAULT_PARTY_INTRO) || DEFAULT_PARTY_INTRO,
+    intro: bodyText("intro", existing.intro || (isGroup ? GROUP_INVITE_DEFAULTS.intro : DEFAULT_PARTY_INTRO)),
     dateLabel: existing.dateLabel || "Date",
     date: bodyText("date", existing.date || ""),
-    timeLabel: bodyText("timeLabel", "Party Time") || "Party Time",
+    timeLabel: bodyText("timeLabel", isGroup ? "Event Time" : "Party Time"),
     time: bodyText("time", existing.time || ""),
     venueLabel: existing.venueLabel || "Place",
     venue: bodyText("venue", existing.venue || ""),
@@ -502,7 +550,7 @@ export async function PUT(req) {
     websiteText: bodyText("websiteText", existing.websiteText || ""),
     websiteLink: bodyText("websiteLink", existing.websiteLink || ""),
     logoAlt: existing.logoAlt || "Pixel Pulse Play logo",
-    metaTitle: existing.metaTitle || `${title || "Birthday Party"} Invite`,
+    metaTitle: existing.metaTitle || `${title || defaultTitle} Invite`,
     inviteUrl,
     feedbackUrl,
     updatedAt,
@@ -521,7 +569,8 @@ export async function PUT(req) {
         primaryParticipant: childName,
         visitDate: invite.date,
         visitTime: invite.time,
-        passType: invite.partyPackage || "Birthday Party Package",
+        passType: invite.partyPackage || defaultPassType,
+        ...(isGroup ? { groupId: partyId, inviteType: "group" } : {}),
         createdAt: existing.createdAt || updatedAt,
         updatedAt,
       });
@@ -538,7 +587,8 @@ export async function PUT(req) {
           primaryParticipant: childName,
           visitDate: invite.date,
           visitTime: invite.time,
-          passType: invite.partyPackage || "Birthday Party Package",
+          passType: invite.partyPackage || defaultPassType,
+          ...(isGroup ? { groupId: partyId, inviteType: "group" } : {}),
           updatedAt,
         },
         { merge: true },
@@ -560,6 +610,12 @@ export async function DELETE(req) {
   const { searchParams } = new URL(req.url);
   const slug = normalizeInviteSlug(searchParams.get("slug"));
   if (!slug) return NextResponse.json({ error: "Invite slug is required." }, { status: 400 });
+
+  const existing = hasPostgres()
+    ? await getPostgresInviteBySlug(slug)
+    : serializeFirestoreInvite(await db.collection("invites").doc(slug).get());
+  const kind = searchParams.get("type") === "group" ? "group" : "birthday";
+  if (!existing || inviteKind(existing) !== kind) return NextResponse.json({ error: "Invite not found in this module." }, { status: 404 });
 
   if (hasPostgres()) {
     const deleted = await deletePostgresInvite(slug);

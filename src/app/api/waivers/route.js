@@ -93,7 +93,8 @@ function cleanFamilyMember(member = {}) {
 
 function cleanVisit(visit = {}) {
   return {
-    partyId: cleanText(visit.partyId),
+    partyId: cleanText(visit.groupId || visit.partyId),
+    ...(visit.groupId ? { groupId: cleanText(visit.groupId) } : {}),
     partyName: cleanText(visit.partyName),
     passType: cleanText(visit.passType),
     visitDate: cleanText(visit.visitDate),
@@ -151,6 +152,7 @@ function publicWaiverPayload(waiver = {}) {
     familyMembers: addClientIdsToFamilyMembers(waiver.familyMembers),
     visit: {
       partyId: cleanText(waiver.visit?.partyId),
+      ...(waiver.visit?.groupId ? { groupId: cleanText(waiver.visit.groupId) } : {}),
       partyName: cleanText(waiver.visit?.partyName),
       passType: cleanText(waiver.visit?.passType),
       visitDate: cleanText(waiver.visit?.visitDate),
@@ -311,7 +313,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const email = cleanEmail(searchParams.get("email"));
   const phone = cleanText(searchParams.get("phone"));
-  const partyId = normalizePartyId(searchParams.get("partyId"));
+  const partyId = normalizePartyId(searchParams.get("groupId") || searchParams.get("partyId"));
 
   if (!email && !phone) {
     return NextResponse.json(
