@@ -164,10 +164,14 @@
 .ppp-waiver-people { list-style: none; margin: 0 0 12px; padding: 0; }
 .ppp-waiver-people li {
   display: grid;
-  grid-template-columns: 1fr 150px auto;
+  grid-template-columns: minmax(0, 1fr) 210px 44px;
   gap: 8px;
   margin-bottom: 8px;
 }
+
+.ppp-waiver-people input,
+.ppp-waiver-people select { min-width: 0; }
+.ppp-waiver-people select { font-size: 16px; padding-right: 32px; }
 
 .ppp-waiver-people button {
   border: 0;
@@ -372,10 +376,13 @@
   }
 }
 
+@media (max-width: 640px) {
+  .ppp-waiver-people li { grid-template-columns: minmax(0, 1fr) 44px; }
+  .ppp-waiver-people li input { grid-column: 1 / -1; }
+}
+
 @media (max-width: 480px) {
   .ppp-waiver-heading h1 { font-size: 38px; }
   .ppp-waiver-heading__title img { width: 42px; height: 42px; }
   .ppp-waiver-field-grid { grid-template-columns: 1fr; }
-  .ppp-waiver-people li { grid-template-columns: 1fr 1fr auto; }
-  .ppp-waiver-people li input { grid-column: 1 / -1; }
 }
