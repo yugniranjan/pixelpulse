@@ -381,9 +381,12 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
   }
 
   function updateFamilyMemberName(id, value) {
-    const parts = value.trimStart().split(/\s+/);
-    updateFamilyMember(id, "firstName", parts.shift() || "");
-    updateFamilyMember(id, "lastName", parts.join(" "));
+    const parts = value.trim().split(/\s+/);
+    const firstName = parts.shift() || "";
+    const lastName = parts.join(" ");
+    setFamilyMembers((current) => current.map((member) =>
+      member.id === id ? { ...member, nameInput: value, firstName, lastName } : member,
+    ));
   }
 
   function addFamilyMember(type) {
@@ -616,7 +619,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
                 required
                 aria-label={`Person ${index + 1} full name`}
                 placeholder="Full name"
-                value={[member.firstName, member.lastName].filter(Boolean).join(" ")}
+                value={member.nameInput ?? [member.firstName, member.lastName].filter(Boolean).join(" ")}
                 onChange={(event) => updateFamilyMemberName(member.id, event.target.value)}
               />
               <select

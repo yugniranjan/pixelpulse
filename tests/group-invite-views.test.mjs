@@ -83,6 +83,52 @@ test("confirmation details omit blank values and retain zero or completed fields
   assert.equal(groupUtilities.confirmationDetail("Notes", " Bring team shirts "), "Notes: Bring team shirts");
 });
 
+test("additional participant name input preserves spaces during typing and parses saved names", async () => {
+  const states = [];
+  let cursor = 0;
+  const WaiverForm = await component("../src/app/components/WaiverForm.jsx", {
+    react: {
+      ...React,
+      useState: (initial) => {
+        const index = cursor++;
+        if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
+        return [states[index], (next) => { states[index] = typeof next === "function" ? next(states[index]) : next; }];
+      },
+      useRef: (current) => ({ current }),
+      useMemo: (calculate) => calculate(),
+      useEffect: () => {},
+    },
+  });
+  const render = () => { cursor = 0; return WaiverForm({}); };
+  const find = (node, predicate) => {
+    if (!React.isValidElement(node)) return null;
+    if (predicate(node)) return node;
+    for (const child of React.Children.toArray(node.props.children)) {
+      const result = find(child, predicate);
+      if (result) return result;
+    }
+    return null;
+  };
+  const add = () => find(render(), (node) => node.type === "button" && String(node.props.children).includes("Add a person")).props.onClick();
+  const input = () => find(render(), (node) => node.props["aria-label"] === "Person 1 full name");
+  add();
+  add();
+  for (const character of "Mary Jane Doe") {
+    const field = input();
+    const expected = field.props.value + character;
+    field.props.onChange({ target: { value: expected } });
+    assert.equal(input().props.value, expected);
+  }
+  input().props.onChange({ target: { value: "Mary  Jane Doe " } });
+  assert.equal(input().props.value, "Mary  Jane Doe ");
+  const members = states.find((state) => Array.isArray(state) && state.length === 2);
+  assert.equal(members[0].firstName, "Mary");
+  assert.equal(members[0].lastName, "Jane Doe");
+  assert.equal(members[1].firstName, "");
+  input().props.onChange({ target: { value: "" } });
+  assert.equal(input().props.value, "");
+});
+
 test("GTM uses the config sheet and renders once in head and first in body even when other tracking is excluded", async () => {
   const gtm = await component("../src/app/components/GoogleTagManager.jsx");
   for (const configuredId of ["GTM-53N567VP", "GTM-TEST123", "invalid<script>"]) {
