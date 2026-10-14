@@ -199,6 +199,9 @@ export async function POST(request) {
       selectedPackage,
       groupSize,
       privateParty,
+      totalDuration,
+      playDuration,
+      foodPizza,
       details,
       from,
       contactCompany,
@@ -284,6 +287,9 @@ export async function POST(request) {
           `Preferred Date: ${date || "Not provided"}`,
           `Estimated Group Size: ${groupSize || "Not provided"}`,
           `Looking for a Private Party: ${privateParty || "Not provided"}`,
+          `Total Duration: ${totalDuration || "Not provided"}`,
+          `Play Duration: ${playDuration || "Not provided"}`,
+          `Food / Pizza: ${foodPizza || "Not provided"}`,
           "",
           "Additional Details:",
           details || "Not provided",
@@ -369,6 +375,9 @@ export async function POST(request) {
           <p><strong>Preferred Date:</strong> ${escapeHtml(date || "Not provided")}</p>
           <p><strong>Estimated Group Size:</strong> ${escapeHtml(groupSize || "Not provided")}</p>
           <p><strong>Looking for a Private Party:</strong> ${escapeHtml(privateParty || "Not provided")}</p>
+          <p><strong>Total Duration:</strong> ${escapeHtml(totalDuration || "Not provided")}</p>
+          <p><strong>Play Duration:</strong> ${escapeHtml(playDuration || "Not provided")}</p>
+          <p><strong>Food / Pizza:</strong> ${escapeHtml(foodPizza || "Not provided")}</p>
           <p><strong>Additional Details:</strong></p>
           <p style="white-space:pre-wrap">${escapeHtml(details || "Not provided")}</p>
         </div>

@@ -47,6 +47,9 @@ const initialForm = {
   selectedEvent: slides[0].title,
   groupSize: "",
   privateParty: "",
+  totalDuration: "",
+  playDuration: "",
+  foodPizza: "",
   details: "",
 };
 
@@ -96,6 +99,9 @@ export default function EventHero() {
           message: [
             `Estimated group size: ${formData.groupSize || "Not provided"}`,
             `Looking for a private party: ${formData.privateParty || "Not provided"}`,
+            `Total duration: ${formData.totalDuration || "Not provided"}`,
+            `Play duration: ${formData.playDuration || "Not provided"}`,
+            `Food / Pizza: ${formData.foodPizza || "Not provided"}`,
             `Additional details: ${formData.details || "Not provided"}`,
           ].join("\n"),
           subject: `${formData.fullName} - ${formData.selectedEvent} inquiry`,
@@ -196,6 +202,39 @@ export default function EventHero() {
               <input type="number" min="4" max="150" inputMode="numeric" placeholder="Approx." value={formData.groupSize} onChange={(event) => setFormData({ ...formData, groupSize: event.target.value })} />
             </label>
           </div>
+          <div className="ppp-event-form__row">
+            <label>
+              Total Duration
+              <select name="totalDuration" value={formData.totalDuration} onChange={(event) => setFormData({ ...formData, totalDuration: event.target.value })}>
+                <option value="">Select duration</option>
+                {["2 hrs", "2.5 hrs", "3 hrs"].map((option) => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </label>
+            <label>
+              Play Duration
+              <select name="playDuration" value={formData.playDuration} onChange={(event) => setFormData({ ...formData, playDuration: event.target.value })}>
+                <option value="">Select play duration</option>
+                {["60 mins", "90 mins"].map((option) => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </label>
+          </div>
+          <fieldset className="ppp-event-form__choice">
+            <legend>Food / Pizza</legend>
+            <div>
+              {["Yes", "No"].map((option) => (
+                <label key={option} className={formData.foodPizza === option ? "is-selected" : ""}>
+                  <input
+                    type="radio"
+                    name="foodPizza"
+                    value={option}
+                    checked={formData.foodPizza === option}
+                    onChange={(event) => setFormData({ ...formData, foodPizza: event.target.value })}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <fieldset className="ppp-event-form__choice">
             <legend>Looking for a private party?</legend>
             <div>
