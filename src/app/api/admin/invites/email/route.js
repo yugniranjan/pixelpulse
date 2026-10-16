@@ -60,17 +60,25 @@ function renderEmailButton({ href, label, variant = "dark" }) {
   `;
 }
 
-function renderBrandedEmailShell({ title, partyId = "", idLabel = "Party ID", children = "", logoUrl = LOGO_URL }) {
+function renderBrandedEmailShell({ title, partyId = "", idLabel = "Party ID", children = "", logoUrl = LOGO_URL, compactHeader = false }) {
   const imageUrl = cleanText(logoUrl) || LOGO_URL;
 
   return `
     <div style="margin:0;padding:0;background:#f3f4f6;">
       <div style="max-width:680px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#111827;">
+        ${compactHeader ? `
+        <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:16px 24px 20px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+            <td style="vertical-align:middle;"><img src="${escapeHtml(imageUrl)}" alt="Pixel Pulse Play Zone" width="145" style="display:block;width:145px;max-width:100%;height:auto;" /></td>
+            ${partyId ? `<td style="vertical-align:middle;text-align:right;font-size:11px;color:#b7c0ce;">${escapeHtml(idLabel)}<br /><strong style="font-size:13px;color:#ffffff;">${escapeHtml(partyId)}</strong></td>` : ""}
+          </tr></table>
+          <h1 style="margin:12px 0 0;font-size:22px;line-height:1.3;font-weight:700;color:#ffffff;">${escapeHtml(title)}</h1>
+        </div>` : `
         <div style="background:#050505;color:#ffffff;border-radius:14px 14px 0 0;padding:22px 24px;">
           <img src="${escapeHtml(imageUrl)}" alt="Pixel Pulse Play Zone" width="190" style="display:block;width:190px;max-width:62%;height:auto;margin:0 0 18px;" />
           <h1 style="margin:0;font-size:28px;line-height:1.15;color:#ffffff;">${escapeHtml(title)}</h1>
           ${partyId ? `<p style="margin:10px 0 0;color:#e5e7eb;">${escapeHtml(idLabel)}: <strong>${escapeHtml(partyId)}</strong></p>` : ""}
-        </div>
+        </div>`}
         <div style="background:#ffffff;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:24px;font-size:15px;line-height:1.7;color:#374151;">
           ${children}
         </div>
@@ -115,16 +123,42 @@ function appendFeedbackRecipient(feedbackUrl, { name = "", email = "" } = {}) {
   }
 }
 
+function renderFreePlayPassOffer(paragraphs = []) {
+  return `
+    <div style="margin:28px 0;padding:28px 24px;border-radius:14px;background:#b9eb73;border:2px solid #a4cf5f;color:#111a28;">
+      <p style="margin:0 0 12px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#344a20;">🎁 A LITTLE THANK YOU, A LOT MORE PLAY</p>
+      <h2 style="margin:0 0 18px;font-size:28px;line-height:1.2;font-weight:800;color:#111a28;">Enjoy a <span style="display:block;font-size:34px;line-height:1.1;">FREE 60-Minute</span>Play Pass</h2>
+      ${paragraphs.map((paragraph) => `<p style="margin:12px 0 0;font-size:15px;line-height:1.7;color:#24351b;">${escapeHtml(paragraph).replaceAll("FREE 60-Minute Play Pass", "<strong>FREE 60-Minute Play Pass</strong>")}</p>`).join("")}
+    </div>`;
+}
+
 function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
   const feedback = cleanText(feedbackUrl);
   const website = cleanText(websiteLink);
   const lines = String(text || "").split("\n");
   let html = "";
   let skipNextFeedbackUrl = false;
+  let offerLines = null;
 
   lines.forEach((line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
+
+    if (offerLines) {
+      const isClosingLine = /^(Thank you for being|See you|The Pixel Pulse Team|Vaughan, Ontario|💬)/.test(trimmed)
+        || trimmed === ADDRESS || (website && trimmed.replace(/\/$/, "") === website.replace(/\/$/, ""));
+      if (!isClosingLine) {
+        offerLines.push(trimmed);
+        return;
+      }
+      html += renderFreePlayPassOffer(offerLines);
+      offerLines = null;
+    }
+
+    if (trimmed === "🎁 Enjoy a FREE 60-Minute Play Pass") {
+      offerLines = [];
+      return;
+    }
 
     if (feedback && trimmed === feedback && skipNextFeedbackUrl) {
       skipNextFeedbackUrl = false;
@@ -138,7 +172,7 @@ function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
       return;
     }
 
-    if (trimmed === "💬 Help Us Level Up" || trimmed === "🎁 Enjoy a FREE 60-Minute Play Pass") {
+    if (trimmed === "💬 Help Us Level Up") {
       html += `<h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">${escapeHtml(trimmed)}</h2>`;
       return;
     }
@@ -163,6 +197,7 @@ function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
     html += `<p style="margin:0 0 14px;color:#374151;">${escapeHtml(trimmed)}</p>`;
   });
 
+  if (offerLines) html += renderFreePlayPassOffer(offerLines);
   return html;
 }
 
@@ -356,21 +391,21 @@ function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId, reca
   return renderBrandedEmailShell({
     title: "Thanks for Playing at Pixel Pulse!",
     partyId,
+    compactHeader: true,
     children: `
+          ${renderVisitRecapEmail(recap, firstName)}
           <p style="margin:0 0 14px;">${greeting}</p>
           <p style="margin:0 0 18px;">We loved having you and hope you had an amazing time taking on our immersive challenges.</p>
-          ${renderVisitRecapEmail(recap, firstName)}
 
           <h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">💬 Help Us Level Up</h2>
           <p style="margin:0 0 14px;">Your feedback helps us create an even better experience for every player.</p>
           <p style="margin:0 0 8px;"><strong style="color:#111827;">Share your feedback:</strong></p>
           ${renderEmailButton({ href: feedbackUrl, label: "Share Feedback" })}
 
-          <div style="margin:24px 0;padding:18px;border-radius:12px;background:#f7fbea;border:1px solid #d8e6b8;">
-            <h2 style="margin:0 0 10px;font-size:20px;line-height:1.25;color:#111827;">🎁 Enjoy a FREE 60-Minute Play Pass</h2>
-            <p style="margin:0 0 12px;">As a thank you for sharing your feedback, we'll send you a <strong style="color:#111827;">FREE 60-Minute Play Pass</strong> for your next visit.*</p>
-            <p style="margin:0;">Complete the feedback form today and get ready for your next adventure!</p>
-          </div>
+          ${renderFreePlayPassOffer([
+            "As a thank you for sharing your feedback, we'll send you a FREE 60-Minute Play Pass for your next visit.*",
+            "Complete the feedback form today and get ready for your next adventure!",
+          ])}
 
           <p style="margin:22px 0 8px;">Thank you for being part of the Pixel Pulse community.</p>
           <p style="margin:0 0 18px;">See you again soon!</p>
@@ -385,6 +420,7 @@ function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, tit
     title,
     partyId,
     logoUrl,
+    compactHeader: Boolean(recap),
     children: renderVisitRecapEmail(recap, firstName) + renderThankYouTextHtml({ text, feedbackUrl, websiteLink }),
   });
 }
