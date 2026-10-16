@@ -1,0 +1,337 @@
+.visit-recap {
+  min-height:100vh;
+  background:#0b111b;
+  color:#f3f5f8;
+  font-family:Arial,sans-serif;
+  padding:0 24px;
+  background-image:radial-gradient(ellipse at 85% 10%,#253721 0,transparent 35%);
+}
+.visit-recap a {
+  color:inherit;
+  text-decoration:none;
+}
+.visit-recap__nav {
+  max-width:1120px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:30px 0;
+  border-bottom:1px solid #ffffff1c;
+  gap:20px;
+}
+.visit-recap__brand {
+  display:block;
+  flex-shrink:0;
+}
+.visit-recap__logo {
+  display:block;
+  width:260px;
+  height:74px;
+  object-fit:cover;
+}
+.visit-recap__shell {
+  max-width:1000px;
+  margin:auto;
+}
+.visit-recap .visit-recap__hero {
+  position:relative;
+  inset:auto;
+  width:auto;
+  z-index:auto;
+  backdrop-filter:none;
+  background:transparent;
+  border-bottom:0;
+  isolation:isolate;
+  padding:68px 20px 48px;
+  text-align:center;
+}
+.visit-recap__hero::before {
+  content:"";
+  position:absolute;
+  inset:0 -24px;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,#b9eb7312,transparent 65%);
+}
+.visit-recap__hero>.visit-recap__eyebrow {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:9px 16px;
+  border:1px solid #b9eb7326;
+  border-radius:30px;
+  background:#b9eb7308;
+  font-size:10px!important;
+  letter-spacing:1.8px;
+  margin-bottom:24px!important;
+}
+.visit-recap__hero>.visit-recap__eyebrow::before {
+  content:"";
+  width:6px;
+  height:6px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:#b9eb73;
+  box-shadow:0 0 12px #b9eb7350;
+}
+.visit-recap__hero>p:not(.visit-recap__eyebrow):not(.visit-recap__date) {
+  max-width:480px;
+  margin:0 auto;
+  line-height:1.65;
+}
+.visit-recap__eyebrow {
+  color:#b9eb73!important;
+  font-size:12px!important;
+  letter-spacing:2px;
+  font-weight:700;
+  margin:0 0 20px!important;
+}
+.visit-recap h1 {
+  font-size:clamp(40px,6.5vw,76px);
+  line-height:1.08;
+  letter-spacing:-2.5px;
+  font-weight:800;
+  margin:0 0 22px;
+}
+.visit-recap h1 span {
+  color:#b9eb73;
+}
+.visit-recap p {
+  font-size:16px;
+  line-height:1.7;
+  color:#aeb8c7;
+}
+.visit-recap__date {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  font-size:13px!important;
+  margin:24px 0 0;
+  color:#8996a8!important;
+}
+.visit-recap__date svg {
+  flex-shrink:0;
+  color:#b9eb73;
+}
+.visit-recap .visit-recap__stats {
+  padding-top:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:24px;
+}
+.visit-recap__stats>div {
+  background:#17202d;
+  border:1px solid #ffffff15;
+  border-radius:16px;
+  padding:28px;
+}
+.visit-recap__stats strong {
+  display:block;
+  font-size:clamp(28px,5vw,46px);
+  letter-spacing:-1px;
+  color:#b9eb73;
+  margin-bottom:8px;
+  overflow-wrap:anywhere;
+}
+.visit-recap__stats span {
+  font-size:14px;
+  color:#cad2dd;
+}
+.visit-recap__best {
+  padding:30px;
+  border:1px solid #b9eb734d;
+  border-radius:16px;
+  background:#b9eb730a;
+  margin-bottom:56px;
+}
+.visit-recap__best>span {
+  font-size:11px;
+  letter-spacing:2px;
+  color:#b9eb73;
+}
+.visit-recap h2 {
+  font-size:30px;
+  line-height:1.2;
+  margin:14px 0;
+  font-weight:700;
+  letter-spacing:-.5px;
+}
+.visit-recap__best p {
+  margin-bottom:0;
+}
+.visit-recap__best strong {
+  color:#f3f5f8;
+}
+.visit-recap__scores {
+  scroll-margin-top:24px;
+}
+.visit-recap__table {
+  overflow-x:auto;
+  margin:24px 0 50px;
+  border:1px solid #ffffff1c;
+  border-radius:14px;
+}
+.visit-recap table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:480px;
+  font-size:14px;
+}
+.visit-recap th,.visit-recap td {
+  padding:20px;
+  text-align:right;
+  border-bottom:1px solid #ffffff12;
+}
+.visit-recap tr:last-child>* {
+  border-bottom:0;
+}
+.visit-recap th:first-child {
+  text-align:left;
+}
+.visit-recap thead {
+  background:#17202d;
+  color:#aeb8c7;
+}
+.visit-recap tbody td:last-child {
+  color:#b9eb73;
+  font-weight:700;
+}
+.visit-recap__players {
+  margin:40px 0;
+}
+.visit-recap__players>div {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;
+}
+.visit-recap__players article {
+  padding:22px;
+  border:1px solid #ffffff1c;
+  border-radius:14px;
+  background:#17202d;
+}
+.visit-recap__players strong {
+  display:block;
+  font-size:28px;
+  margin-top:16px;
+}
+.visit-recap__players small {
+  font-size:13px;
+  color:#aeb8c7;
+}
+.visit-recap__players article p {
+  font-size:13px;
+  margin-bottom:0;
+}
+.visit-recap__player-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  min-height:30px;
+}
+.visit-recap__player-rank {
+  font-size:13px;
+  color:#aeb8c7;
+  font-weight:700;
+}
+.visit-recap__players h3 {
+  font-size:20px;
+  margin:18px 0 0;
+}
+.visit-recap__players .visit-recap__player--winner {
+  border-color:#f2ca61;
+  background:linear-gradient(135deg,#f2ca6117,#17202d);
+}
+.visit-recap__winner-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:5px 10px;
+  border-radius:20px;
+  background:#f2ca611f;
+  color:#f2ca61;
+  font-size:12px;
+  font-weight:700;
+}
+.visit-recap .visit-recap__empty {
+  padding:30px;
+  background:#17202d;
+  border-radius:16px;
+}
+.visit-recap__empty a {
+  color:#b9eb73;
+}
+.visit-recap__booking-cta {
+  margin:36px 0 48px;
+  text-align:center;
+}
+.visit-recap .visit-recap__booking {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:16px 28px;
+  border-radius:10px;
+  background:#b9eb73;
+  color:#111a28;
+  font-size:16px;
+  font-weight:700;
+}
+.visit-recap .visit-recap__booking:hover {
+  background:#ccf794;
+}
+.visit-recap__footer {
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:0 0 30px;
+  font-size:12px;
+  color:#aeb8c7;
+}
+.visit-recap a:focus-visible {
+  outline:3px solid #b9eb73;
+  outline-offset:5px;
+}
+@media(max-width:600px) {
+  .visit-recap {
+    padding:0 18px;
+  }
+  .visit-recap__nav {
+    padding:22px 0;
+  }
+  .visit-recap__logo {
+    width:180px;
+    height:56px;
+  }
+  .visit-recap .visit-recap__hero {
+    padding:42px 0 36px;
+  }
+  .visit-recap h1 {
+    letter-spacing:-1.5px;
+  }
+  .visit-recap .visit-recap__stats {
+    gap:8px;
+  }
+  .visit-recap__stats>div {
+    padding:20px 10px;
+  }
+  .visit-recap__stats span {
+    font-size:11px;
+  }
+  .visit-recap__best {
+    padding:24px;
+  }
+  .visit-recap__footer {
+    flex-direction:column;
+    gap:10px;
+  }
+  .visit-recap h2 {
+    font-size:26px;
+  }
+}

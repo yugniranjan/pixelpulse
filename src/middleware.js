@@ -177,6 +177,14 @@ export function middleware(request) {
     return NextResponse.next(requestOptions);
   }
 
+  if (pathname.startsWith("/visit/")) {
+    const response = NextResponse.next(requestOptions);
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return response;
+  }
+
   if (SUMMER_PLAY_PASS_HOSTS.has(requestHostname)) {
     if (requestHostname === "www.summer.pixelpulseplay.ca") {
       const url = request.nextUrl.clone();

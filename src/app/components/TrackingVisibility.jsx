@@ -21,6 +21,7 @@ export default function TrackingVisibility({ children }) {
     TRACKING_EXCLUDED_PATHS.has(pathname) ||
     pathname.startsWith("/waiver/") ||
     pathname.startsWith("/invite") ||
+    pathname.startsWith("/visit/") ||
     pathname.startsWith("/admin/")
   ) {
     return null;

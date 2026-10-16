@@ -40,6 +40,7 @@ export default function ChromeVisibility({ children }) {
     STANDALONE_HOSTS.has(hostname) ||
     STANDALONE_PATHS.has(pathname) ||
     pathname.startsWith("/invite") ||
+    pathname.startsWith("/visit/") ||
     pathname === "/admin" ||
     pathname.startsWith("/admin/")
   ) {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { omitUnfilledConfirmationDetails } from "@/lib/groupInvites";
+import { createVisitRecap } from "@/lib/visitRecaps";
+import { renderVisitRecapEmail, visitRecapEmailText } from "@/lib/visitRecapEmail";
 
 export const runtime = "nodejs";
 
@@ -149,7 +151,7 @@ function renderThankYouTextHtml({ text, feedbackUrl, websiteLink }) {
       return;
     }
 
-    if (trimmed === "Vaughan, Ontario" || trimmed === ADDRESS) {
+    if (trimmed === ADDRESS) {
       return;
     }
 
@@ -348,7 +350,7 @@ function renderConfirmationHtml({ emailText, partyId, isGroup = false }) {
   `;
 }
 
-function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
+function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId, recap }) {
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : "Hi,";
 
   return renderBrandedEmailShell({
@@ -357,6 +359,7 @@ function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
     children: `
           <p style="margin:0 0 14px;">${greeting}</p>
           <p style="margin:0 0 18px;">We loved having you and hope you had an amazing time taking on our immersive challenges.</p>
+          ${renderVisitRecapEmail(recap, firstName)}
 
           <h2 style="margin:24px 0 8px;font-size:20px;line-height:1.25;color:#111827;">💬 Help Us Level Up</h2>
           <p style="margin:0 0 14px;">Your feedback helps us create an even better experience for every player.</p>
@@ -372,16 +375,17 @@ function renderThankYouHtml({ firstName, feedbackUrl, websiteLink, partyId }) {
           <p style="margin:22px 0 8px;">Thank you for being part of the Pixel Pulse community.</p>
           <p style="margin:0 0 18px;">See you again soon!</p>
           <p style="margin:0 0 18px;"><strong style="color:#111827;">The Pixel Pulse Team</strong></p>
+          <p style="margin:0;">Vaughan, Ontario</p>
     `,
   });
 }
 
-function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, title = "Thanks for Playing at Pixel Pulse!", logoUrl = LOGO_URL }) {
+function renderCustomThankYouHtml({ text, feedbackUrl, websiteLink, partyId, title = "Thanks for Playing at Pixel Pulse!", logoUrl = LOGO_URL, recap, firstName }) {
   return renderBrandedEmailShell({
     title,
     partyId,
     logoUrl,
-    children: renderThankYouTextHtml({ text, feedbackUrl, websiteLink }),
+    children: renderVisitRecapEmail(recap, firstName) + renderThankYouTextHtml({ text, feedbackUrl, websiteLink }),
   });
 }
 
@@ -455,6 +459,7 @@ export async function POST(request) {
     }
 
     const authenticatedSender = getRequiredEnv("GMAIL_FROM_EMAIL") || gmailUser;
+    const recap = sendThankYou ? await createVisitRecap(to) : null;
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -493,7 +498,7 @@ export async function POST(request) {
       websiteLink,
     ].filter(Boolean).join("\n");
 
-    const text = sendWaiver
+    const emailBodyText = sendWaiver
       ? [`${idLabel}: ${partyId}`, "Please complete your waiver before your group's visit to Pixel Pulse Play.", "Incomplete waivers may delay your group's start.", waiverUrl].join("\n\n")
       : sendPromotional
       ? promotionalText
@@ -513,6 +518,8 @@ export async function POST(request) {
           qrCodeUrl ? `QR Code: ${qrCodeUrl}` : "",
         ].filter(Boolean).join("\n");
 
+    const text = [visitRecapEmailText(recap), emailBodyText].filter(Boolean).join("\n\n");
+
     const html = sendWaiver
       ? renderBrandedEmailShell({
           title: "Complete your group waiver",
@@ -531,8 +538,8 @@ export async function POST(request) {
         })
       : sendThankYou
       ? thankYouText
-        ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
-        : renderThankYouHtml({ firstName, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId })
+        ? renderCustomThankYouHtml({ text: thankYouText, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId, recap, firstName })
+        : renderThankYouHtml({ firstName, feedbackUrl: personalizedFeedbackUrl, websiteLink, partyId, recap })
       : confirmationEmailText
       ? renderConfirmationHtml({ emailText, partyId, isGroup })
       : `
@@ -564,7 +571,7 @@ export async function POST(request) {
         : sendPromotional
         ? customSubject || "Your Next Pixel Pulse Adventure Is On Us"
         : sendThankYou
-        ? "Your Next Pixel Pulse Adventure Is On Us ⚡⭐"
+        ? recap?.summary.challengesPlayed ? "Your Pixel Pulse Scores & Visit Recap Are Ready!" : "Thanks for Playing at Pixel Pulse!"
         : confirmationEmailText
         ? isGroup ? "Your Pixel Pulse Group Event is Confirmed" : "Your Pixel Pulse Birthday Party is Confirmed"
         : isGroup ? "You're Invited: Group Event at Pixel Pulse Play" : "Your Party Invite at Pixel Pulse Playzone! 🎉",

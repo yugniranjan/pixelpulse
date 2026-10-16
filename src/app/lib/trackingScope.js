@@ -8,6 +8,6 @@ export function isPublicTrackingPath(value) {
   } catch {
     return false;
   }
-  return !["/admin", "/api", "/waiver", "/waiver-data", "/invite", "/concessions-tv", "/consession-tv"]
+  return !["/admin", "/api", "/waiver", "/waiver-data", "/invite", "/visit", "/concessions-tv", "/consession-tv"]
     .some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }

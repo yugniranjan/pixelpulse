@@ -482,6 +482,7 @@ function ThankYouEmailModal({ draft, onChange, onClose, onSend, sending, error, 
 
         <section>
           <h3>Email Content</h3>
+          <p>A visit recap with scores, stats, and a personal results link is added automatically when sending. It uses the recipient’s latest completed visit and stays available for 90 days.</p>
           <label className="waiver-edit-wide waiver-email-content">
             <span>Review and edit before sending</span>
             <textarea required value={draft.emailText} onChange={(event) => update("emailText", event.target.value)} />
