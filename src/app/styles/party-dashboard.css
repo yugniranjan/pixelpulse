@@ -25,7 +25,7 @@
   background: linear-gradient(#090c12c9, #090c12c9), url("/assets/images/party-waiver-background.png") center / cover no-repeat;
 }
 .ppp-party-dashboard-page * { box-sizing: border-box; }
-.ppp-party-dashboard-shell { width: min(520px, 100%); margin: 0 auto; }
+.ppp-party-dashboard-shell { width: min(584px, 100%); margin: 0 auto; padding: 32px; border-radius: 20px; background: rgba(0, 0, 0, 0.6); }
 .ppp-party-dashboard-brand { display: inline-flex; align-items: center; min-height: 46px; margin-bottom: 44px; }
 .ppp-party-dashboard-brand img { width: 168px; height: auto; object-fit: contain; }
 .ppp-party-dashboard-heading { position: static; z-index: auto; margin-bottom: 28px; background: transparent; backdrop-filter: none; border: 0; box-shadow: none; }
@@ -112,6 +112,7 @@
 
 @media (max-width: 600px) {
   .ppp-party-dashboard-page { padding: 24px 20px 48px; }
+  .ppp-party-dashboard-shell { padding: 20px; border-radius: 16px; }
   .ppp-party-dashboard-brand { margin-bottom: 48px; }
   .ppp-party-dashboard-brand img { width: 156px; }
   .ppp-party-dashboard-heading { margin-bottom: 28px; }

@@ -179,7 +179,7 @@ export default function PartyDashboardClient() {
               <div className="ppp-party-dashboard-spotlight__meta">
                 <span>Party {featuredParty.partyId}</span>
                 <strong>{featuredParty.childName || featuredParty.hostName || "Your party"}</strong>
-                <small>{formatDate(featuredParty.visitDate)}{featuredParty.startTime ? ` at ${featuredParty.startTime}` : ""}</small>
+                <small>{formatDate(featuredParty.visitDate)}</small>
               </div>
 
               <div className="ppp-party-dashboard-coverage" aria-label={`${featuredParty.participantsCovered} minors covered by waivers`}>
@@ -247,7 +247,7 @@ export default function PartyDashboardClient() {
                       <div>
                         <span>Party {party.partyId}</span>
                         <h2>{party.childName || party.hostName || "Your party"}</h2>
-                        <p>{formatDate(party.visitDate)}{party.startTime ? ` at ${party.startTime}` : ""}</p>
+                        <p>{formatDate(party.visitDate)}</p>
                       </div>
                       {party.expectedGuests ? <strong>{pct}%</strong> : null}
                     </div>
