@@ -1,4 +1,5 @@
 export const previewRecap = {
+  recipientName: "Alex",
   visitDate: "2026-10-15",
   totalPoints: 12480,
   challengesPlayed: 18,

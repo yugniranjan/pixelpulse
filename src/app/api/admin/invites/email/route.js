@@ -495,7 +495,7 @@ export async function POST(request) {
     }
 
     const authenticatedSender = getRequiredEnv("GMAIL_FROM_EMAIL") || gmailUser;
-    const recap = sendThankYou ? await createVisitRecap(to) : null;
+    const recap = sendThankYou ? await createVisitRecap(to, firstName) : null;
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

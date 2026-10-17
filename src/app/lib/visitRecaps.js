@@ -20,7 +20,7 @@ function ensureTable() {
 const hash = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
 // Freeze the completed visit at send time: a later visit cannot change an old email's results.
-export async function createVisitRecap(email) {
+export async function createVisitRecap(email, recipientName = "") {
   if (!getPostgresPool()) return null;
   const { rows } = await query(`
     with completed_sessions as (
@@ -45,6 +45,7 @@ export async function createVisitRecap(email) {
     order by cs.player_id, ps."ScoreID"
   `, [String(email).trim().toLowerCase()]);
   const summary = summarizeVisit(rows);
+  if (String(recipientName || "").trim()) summary.recipientName = String(recipientName).trim();
   await ensureTable();
   const token = crypto.randomBytes(32).toString("hex");
   await query("insert into visit_recaps (token_hash, summary) values ($1, $2::jsonb)", [hash(token), JSON.stringify(summary)]);

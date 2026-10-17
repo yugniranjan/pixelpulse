@@ -77,7 +77,7 @@
   box-shadow:0 0 12px #b9eb7350;
 }
 .visit-recap__hero>p:not(.visit-recap__eyebrow):not(.visit-recap__date) {
-  max-width:480px;
+  max-width:760px;
   margin:0 auto;
   line-height:1.65;
 }
@@ -89,13 +89,15 @@
   margin:0 0 20px!important;
 }
 .visit-recap h1 {
-  font-size:clamp(40px,6.5vw,76px);
-  line-height:1.08;
-  letter-spacing:-2.5px;
+  font-size:clamp(32px,5vw,56px);
+  line-height:1.15;
+  letter-spacing:-1.5px;
   font-weight:800;
   margin:0 0 22px;
 }
 .visit-recap h1 span {
+  display:block;
+  margin-top:16px;
   color:#b9eb73;
 }
 .visit-recap p {

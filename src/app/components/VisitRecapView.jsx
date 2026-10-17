@@ -7,6 +7,7 @@ const number = (value) => Number(value).toLocaleString("en-CA");
 export default function VisitRecapView({ recap }) {
   const hasScores = recap?.challengesPlayed > 0;
   const standings = getPlayerStandings(recap?.players);
+  const greetingName = recap?.recipientName || (recap?.players?.length === 1 ? recap.players[0].name : "crew");
   const date = recap?.visitDate ? new Date(`${recap.visitDate}T12:00:00Z`).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric", timeZone: "America/Toronto" }) : "";
 
   return (
@@ -19,23 +20,23 @@ export default function VisitRecapView({ recap }) {
       <div className="visit-recap__shell">
         <header className="visit-recap__hero">
           <p className="visit-recap__eyebrow">GOOD TIMES. GREAT CHALLENGES.</p>
-          <h1>{recap ? <>Your visit.<br />Your <span>highlights.</span></> : <>Let’s find your<br /><span>visit recap.</span></>}</h1>
-          <p>{recap ? "You brought the energy. Here’s how your visit added up." : "This recap link is invalid or has expired. Contact our team for help with your results."}</p>
+          <h1>{recap ? <>What a game, {greetingName}!<span>Here’s how you scored.</span></> : <>Let’s find your<span>visit recap.</span></>}</h1>
+          <p>{recap ? "Every challenge. Every point. Every win. Here’s a look at your Pixel Pulse Play adventure!" : "This recap link is invalid or has expired. Contact our team for help with your results."}</p>
           {date && <p className="visit-recap__date">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M7 3v4m10-4v4M3 11h18" /></svg>
-            <span>{date} <span aria-hidden="true">·</span> Pixel Pulse Play Zone</span>
+            <span>{date} <span aria-hidden="true">·</span> Pixel Pulse Play</span>
           </p>}
         </header>
 
         {recap && <>
           {hasScores ? <>
             <section className="visit-recap__stats" aria-label="Visit statistics">
-              {[["Total points", recap.totalPoints], ["Challenges played", recap.challengesPlayed], ["Games explored", recap.gamesExplored]].map(([label, value]) => <div key={label}><strong>{number(value)}</strong><span>{label}</span></div>)}
+              {[["Points earned", recap.totalPoints], ["Challenges played", recap.challengesPlayed], ["Games explored", recap.gamesExplored]].map(([label, value]) => <div key={label}><strong>{number(value)}</strong><span>{label}</span></div>)}
             </section>
             <section className="visit-recap__players" aria-label="Player leaderboard">
               <p className="visit-recap__eyebrow">YOUR CREW’S LEADERBOARD</p>
-              <h2>Every player. Every point.</h2>
-              <p>Players linked to your email for this visit. The highest total score takes the crown.</p>
+              <h2>Who&apos;s leading the pack?</h2>
+              <p>See how everyone in your crew scored. Who claimed the top spot, and who&apos;s ready for a rematch?</p>
               <div>{standings.map((player, index) => (
                 <article key={index} className={player.isWinner ? "visit-recap__player--winner" : undefined}>
                   <div className="visit-recap__player-heading">
