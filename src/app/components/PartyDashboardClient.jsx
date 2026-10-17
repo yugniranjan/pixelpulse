@@ -29,17 +29,40 @@ function remainingCount(party) {
   return Math.max(0, party.expectedGuests - party.participantsCovered);
 }
 
-function SignedWaivers({ party }) {
+function SignedWaivers({ party, onPlayChange, sending }) {
   if (!party.signedWaivers?.length) return null;
 
   return (
     <div className="ppp-party-dashboard-signers">
       <h2>Signed waivers</h2>
+      <p className="ppp-party-dashboard-coverage-note">Covered includes the signer and all family members listed on each waiver.</p>
+      <p className="ppp-party-dashboard-coverage-note">Check “Will play” for each person joining the games. Then email your player list to our team.</p>
       <ul>
         {party.signedWaivers.map((waiver, index) => (
           <li key={index}>
-            <span><FaCheckCircle aria-hidden="true" /> {waiver.name}</span>
-            <small>{plural(waiver.participantsCovered, "person", "people")} covered</small>
+            <div className="ppp-party-dashboard-signer-heading">
+              <span><FaCheckCircle aria-hidden="true" /> {waiver.name}</span>
+              <small>{plural(waiver.participantsCovered, "person", "people")} covered</small>
+            </div>
+            {waiver.participants?.length ? (
+              <ul className="ppp-party-dashboard-participant-names" aria-label={`People on ${waiver.name}'s waiver`}>
+                {waiver.participants.map((person, personIndex) => (
+                  <li key={personIndex}>
+                    {person.name}
+                    <small className={`ppp-party-dashboard-person-type ppp-party-dashboard-person-type--${person.type}`}>
+                      {person.type === "minor" ? "Minor" : "Adult"}{person.isSigner ? " · Signer" : ""}
+                    </small>
+                    <label className="ppp-party-dashboard-will-play">
+                      <input type="checkbox" checked={person.willPlay === true}
+                        disabled={sending}
+                        onChange={(event) => onPlayChange(party.partyId, waiver.id, person.key, event.target.checked)}
+                        aria-label={`${person.name} will play`} />
+                      Will play
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </li>
         ))}
       </ul>
@@ -53,6 +76,9 @@ export default function PartyDashboardClient() {
   const [error, setError] = useState("");
   const [parties, setParties] = useState([]);
   const [copiedId, setCopiedId] = useState("");
+  const [sendingParty, setSendingParty] = useState("");
+  const [sentParty, setSentParty] = useState("");
+  const [playError, setPlayError] = useState("");
   const lookupRequest = useRef(null);
 
   const hasResults = parties.length > 0;
@@ -71,6 +97,46 @@ export default function PartyDashboardClient() {
   const featuredParty = parties[0] || null;
   const featuredPct = featuredParty ? progressPercent(featuredParty) : 0;
   const featuredRemaining = featuredParty ? remainingCount(featuredParty) : 0;
+
+  function setWillPlay(partyId, waiverId, participantKey, willPlay) {
+    setSentParty("");
+    setPlayError("");
+    setParties((current) => current.map((party) => party.partyId !== partyId ? party : {
+      ...party, signedWaivers: party.signedWaivers.map((waiver) => waiver.id !== waiverId ? waiver : {
+        ...waiver, participants: waiver.participants.map((person) => person.key !== participantKey ? person : { ...person, willPlay }),
+      }),
+    }));
+  }
+
+  async function emailPlayers(party) {
+    const players = party.signedWaivers.flatMap((waiver) => waiver.participants
+      .filter((person) => person.willPlay).map((person) => ({ waiverId: waiver.id, participantKey: person.key })));
+    setSendingParty(party.partyId);
+    setPlayError("");
+    setSentParty("");
+    try {
+      const response = await fetch("/api/party-dashboard", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partyId: party.partyId, players }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Unable to email player list.");
+      setSentParty(party.partyId);
+    } catch (error) {
+      setPlayError(error.message || "Unable to email player list. Please try again.");
+    } finally { setSendingParty(""); }
+  }
+
+  function playerEmailButton(party) {
+    const count = party.signedWaivers.reduce((total, waiver) => total + (waiver.participants || []).filter((person) => person.willPlay).length, 0);
+    return <div className="ppp-party-dashboard-player-email">
+      <p><b>{count}</b> selected to play.</p>
+      <button type="button" className="ppp-party-dashboard-submit" disabled={!count || Boolean(sendingParty)} onClick={() => emailPlayers(party)}>
+        {sendingParty === party.partyId ? "Sending…" : "Email player list"}
+      </button>
+      {sentParty === party.partyId ? <p role="status">Player list emailed to our team.</p> : null}
+    </div>;
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -92,6 +158,8 @@ export default function PartyDashboardClient() {
     setLoading(true);
     setError("");
     setParties([]);
+    setSentParty("");
+    setPlayError("");
 
     try {
       const params = new URLSearchParams({ partyId: value });
@@ -158,6 +226,7 @@ export default function PartyDashboardClient() {
 
       {hasResults ? (
         <section className="ppp-party-dashboard-results" aria-live="polite">
+          {playError ? <p className="ppp-party-dashboard-error" role="alert">{playError}</p> : null}
           {featuredParty ? (
             <div className="ppp-party-dashboard-spotlight">
               <div className="ppp-party-dashboard-spotlight__meta">
@@ -196,7 +265,8 @@ export default function PartyDashboardClient() {
                 </p>
               ) : null}
 
-              <SignedWaivers party={featuredParty} />
+              <SignedWaivers party={featuredParty} onPlayChange={setWillPlay} sending={Boolean(sendingParty)} />
+              {playerEmailButton(featuredParty)}
             </div>
           ) : null}
 
@@ -261,7 +331,8 @@ export default function PartyDashboardClient() {
                       </div>
                     </dl>
 
-                    <SignedWaivers party={party} />
+                    <SignedWaivers party={party} onPlayChange={setWillPlay} sending={Boolean(sendingParty)} />
+                    {playerEmailButton(party)}
 
                     <div className="ppp-party-dashboard-actions">
                       <a href={party.waiverLink}>
