@@ -41,15 +41,15 @@ function SignedWaivers({ party }) {
           <li key={index}>
             <div className="ppp-party-dashboard-signer-heading">
               <span><FaCheckCircle aria-hidden="true" /> {waiver.name}</span>
-              <small>{plural(waiver.participantsCovered, "minor")} covered</small>
+              <small className="ppp-party-dashboard-covered-badge">{plural(waiver.participantsCovered, "minor")} covered</small>
             </div>
             {waiver.participants?.length ? (
               <ul className="ppp-party-dashboard-participant-names" aria-label={`People on ${waiver.name}'s waiver`}>
                 {waiver.participants.map((person, personIndex) => (
-                  <li key={personIndex}>
+                  <li key={personIndex} className={person.type === "minor" ? "ppp-party-dashboard-person--covered" : undefined}>
                     {person.name}
                     <small className={`ppp-party-dashboard-person-type ppp-party-dashboard-person-type--${person.type}`}>
-                      {person.type === "minor" ? "Minor" : "Adult"}{person.isSigner ? " · Signer" : ""}
+                      {person.type === "minor" ? "Minor · Covered" : "Adult"}{person.isSigner ? " · Signer" : ""}
                     </small>
 
                   </li>
@@ -182,17 +182,21 @@ export default function PartyDashboardClient() {
                 <small>{formatDate(featuredParty.visitDate)}{featuredParty.startTime ? ` at ${featuredParty.startTime}` : ""}</small>
               </div>
 
+              <div className="ppp-party-dashboard-coverage" aria-label={`${featuredParty.participantsCovered} minors covered by waivers`}>
+                <FaCheckCircle aria-hidden="true" />
+                <div>
+                  <span>Minors covered</span>
+                  <strong>{featuredParty.participantsCovered.toLocaleString()}</strong>
+                  <small>{featuredParty.expectedGuests ? `of ${plural(featuredParty.expectedGuests, "expected guest")}` : "Listed on signed waivers"}</small>
+                </div>
+              </div>
+
               <div className="ppp-party-dashboard-count">
                 <strong>{featuredParty.waiverFormsCompleted.toLocaleString()}</strong>
                 <span>
                   {featuredParty.waiverFormsCompleted === 1 ? "waiver signed" : "waivers signed"}
                 </span>
               </div>
-
-              <p>
-                <b>{plural(featuredParty.participantsCovered, "minor")}</b> covered
-                {featuredParty.expectedGuests ? ` out of ${plural(featuredParty.expectedGuests, "expected guest")}` : ""}.
-              </p>
 
               {featuredParty.expectedGuests ? (
                 <div className="ppp-party-dashboard-meter ppp-party-dashboard-meter--large" aria-label={`${featuredPct}% of expected guests covered`}>
@@ -222,7 +226,7 @@ export default function PartyDashboardClient() {
                 <span>Waiver forms</span>
                 <strong>{totals.forms.toLocaleString()}</strong>
               </div>
-              <div>
+              <div className="ppp-party-dashboard-covered-stat">
                 <span>Minors covered</span>
                 <strong>{totals.participants.toLocaleString()}</strong>
               </div>
@@ -259,7 +263,7 @@ export default function PartyDashboardClient() {
                         <dt>Completed</dt>
                         <dd>{plural(party.waiverFormsCompleted, "form")}</dd>
                       </div>
-                      <div>
+                      <div className="ppp-party-dashboard-covered-stat">
                         <dt>Minors covered</dt>
                         <dd>{plural(party.participantsCovered, "minor")}</dd>
                       </div>
