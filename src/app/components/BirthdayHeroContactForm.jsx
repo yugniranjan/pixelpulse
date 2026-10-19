@@ -6,13 +6,6 @@ import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
-const PACKAGE_DETAIL_KEYS = [
-  "Number of Participants",
-  "Game Time Included",
-  "Total Party Duration",
-  "Party Room Access",
-  "Refreshments",
-];
 const PARTY_ROOM_ACCESS_BY_PACKAGE = {
   "pixel punch": "45 minutes",
   "pixel ultra": "45 minutes",
@@ -91,34 +84,18 @@ function getTimeSlotsForPackage(option) {
 function PackageDetails({ packageDetails }) {
   if (!packageDetails) return null;
 
+  const description = [
+    packageDetails["Number of Participants"] && `${packageDetails["Number of Participants"]} participants.`,
+    packageDetails["Game Time Included"] && `${packageDetails["Game Time Included"]} of game time.`,
+    packageDetails["Total Party Duration"] && `Total party duration: ${packageDetails["Total Party Duration"]}.`,
+    PARTY_ROOM_ACCESS_BY_PACKAGE[packageDetails.name.trim().toLowerCase()] && `Party room access: ${PARTY_ROOM_ACCESS_BY_PACKAGE[packageDetails.name.trim().toLowerCase()]}.`,
+    packageDetails.Refreshments && `Includes ${packageDetails.Refreshments}.`,
+  ].filter(Boolean).join(" ");
+
   return (
-    <>
-      <div className="ppp-birthday-hero-form__online-head">
-        <div>
-          <small>Selected package</small>
-          <h3>{packageDetails.name}</h3>
-        </div>
-        {packageDetails["Package Price"] ? (
-          <strong>{packageDetails["Package Price"]}</strong>
-        ) : null}
-      </div>
-
-      <dl className="ppp-birthday-hero-form__package-details">
-        {PACKAGE_DETAIL_KEYS.map((key) => {
-          const value = key === "Party Room Access"
-            ? PARTY_ROOM_ACCESS_BY_PACKAGE[packageDetails.name.trim().toLowerCase()]
-            : packageDetails[key];
-          if (!value) return null;
-
-          return (
-            <div key={key}>
-              <dt>{key}</dt>
-              <dd>{value}</dd>
-            </div>
-          );
-        })}
-      </dl>
-    </>
+    <div className="ppp-birthday-hero-form__package-summary ppp-birthday-hero-form__wide" id="birthday-package-description">
+      {description ? <p>{description}</p> : null}
+    </div>
   );
 }
 
@@ -228,189 +205,171 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       </div>
       <div className="ppp-birthday-hero-form__head">
         <p>Plan the party</p>
-        <h2>
-          {isInquiryPackageSelected
-            ? "Request a birthday callback"
-            : "Choose your package"}
-        </h2>
+        <h2>Request a birthday callback</h2>
       </div>
 
       <div className="ppp-birthday-hero-form__fields">
         {packageChoices.length > 0 ? (
-          <fieldset className="ppp-birthday-hero-form__packages ppp-birthday-hero-form__wide">
-            <legend>Party package</legend>
-            <div className="ppp-birthday-hero-form__package-grid">
-              {packageChoices.map((option) => {
-                return (
-                  <label className="ppp-birthday-hero-form__package-option" key={option.name}>
-                    <input
-                      type="radio"
-                      name="selectedPackage"
-                      value={option.name}
-                      checked={formData.selectedPackage === option.name}
-                      onChange={updateField}
-                      required
-                    />
-                    <span>
-                      <strong>{option.name}</strong>
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </fieldset>
-        ) : null}
-
-        {isInquiryPackageSelected ? (
-          <>
-            <div className="ppp-birthday-hero-form__online ppp-birthday-hero-form__wide">
-              <PackageDetails packageDetails={selectedPackageDetails} />
-              <small className="ppp-birthday-hero-form__additional-person">
-                * Additional person: $25 plus HST
-              </small>
-            </div>
-
-            <label>
-              <span>Name</span>
-              <input
-                name="fullName"
-                value={formData.fullName}
-                onChange={updateField}
-                autoComplete="name"
-                required
-              />
-            </label>
-
-            <label>
-              <span>Child&apos;s name</span>
-              <input
-                name="childName"
-                value={formData.childName}
-                onChange={updateField}
-                required
-              />
-            </label>
-
-            <label>
-              <span>Child&apos;s Age</span>
-              <input
-                type="number"
-                name="childYear"
-                value={formData.childYear}
-                onChange={updateField}
-                min="1"
-                max="18"
-                inputMode="numeric"
-                required
-              />
-            </label>
-
-            <label>
-              <span>Email</span>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={updateField}
-                autoComplete="email"
-                inputMode="email"
-                required
-              />
-            </label>
-
-            <label>
-              <span>Phone</span>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={updateField}
-                autoComplete="tel"
-                inputMode="tel"
-                required
-              />
-            </label>
-
-            <label>
-              <span>Preferred date</span>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={updateField}
-              />
-            </label>
-
-            <label>
-              <span>Preferred time</span>
-              <select
-                name="time"
-                value={formData.time}
-                onChange={updateField}
-                disabled={packageChoices.length > 0 && !selectedPackageDetails}
-              >
-                <option value="">
-                  {packageChoices.length > 0 && !selectedPackageDetails
-                    ? "Select a package first"
-                    : "Select a time slot"}
+          <label className="ppp-birthday-hero-form__wide">
+            <span>Party package</span>
+            <select
+              name="selectedPackage"
+              value={formData.selectedPackage}
+              onChange={updateField}
+              aria-describedby={isInquiryPackageSelected ? "birthday-package-description" : undefined}
+              required
+            >
+              <option value="">Select a package</option>
+              {packageChoices.map((option) => (
+                <option key={option.name} value={option.name}>
+                  {option.name}{option["Package Price"] ? ` — ${option["Package Price"]}` : ""}
                 </option>
-                {partyTimeSlots.map((slot) => (
-                  <option key={slot} value={slot}>
-                    {slot}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <fieldset className="ppp-birthday-hero-form__choice-field">
-              <span>Extra play time</span>
-              <div className="ppp-birthday-hero-form__pill-group">
-                {["Yes", "No"].map((option) => (
-                  <label
-                    className="ppp-birthday-hero-form__pill-option"
-                    key={option}
-                  >
-                    <input
-                      type="radio"
-                      name="extraPlayTime"
-                      value={option}
-                      checked={formData.extraPlayTime === option}
-                      onChange={updateField}
-                    />
-                    <span>{option}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            {isPrivatePartySelected ? (
-              <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
-                Looking for a private party?{" "}
-                <a href={CONTACT_FORM_URL}>Send a private-party request</a>
-              </p>
-            ) : null}
-
-            <label className="ppp-birthday-hero-form__wide ppp-birthday-hero-form__notes">
-              <span>Party notes</span>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={updateField}
-                placeholder="Any questions, special requests, or details you'd like us to know?"
-                required
-              />
-              {!isPrivatePartySelected ? (
-                <small className="ppp-birthday-hero-form__fee-note">
-                  Each additional participant beyond your package is charged{" "}
-                  <strong>$25</strong>, paid at the venue.
-                </small>
-              ) : null}
-            </label>
-          </>
+              ))}
+            </select>
+          </label>
         ) : null}
+
+        <PackageDetails packageDetails={selectedPackageDetails} />
+
+        <label>
+          <span>Name</span>
+          <input
+            name="fullName"
+            value={formData.fullName}
+            onChange={updateField}
+            autoComplete="name"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Child&apos;s name</span>
+          <input
+            name="childName"
+            value={formData.childName}
+            onChange={updateField}
+            required
+          />
+        </label>
+
+        <label>
+          <span>Child&apos;s Age</span>
+          <input
+            type="number"
+            name="childYear"
+            value={formData.childYear}
+            onChange={updateField}
+            min="1"
+            max="18"
+            inputMode="numeric"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={updateField}
+            autoComplete="email"
+            inputMode="email"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Phone</span>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={updateField}
+            autoComplete="tel"
+            inputMode="tel"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Preferred date</span>
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={updateField}
+          />
+        </label>
+
+        <label>
+          <span>Preferred time</span>
+          <select
+            name="time"
+            value={formData.time}
+            onChange={updateField}
+            disabled={packageChoices.length > 0 && !selectedPackageDetails}
+          >
+            <option value="">
+              {packageChoices.length > 0 && !selectedPackageDetails
+                ? "Select a package first"
+                : "Select a time slot"}
+            </option>
+            {partyTimeSlots.map((slot) => (
+              <option key={slot} value={slot}>
+                {slot}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <fieldset className="ppp-birthday-hero-form__choice-field">
+          <span>Extra play time</span>
+          <div className="ppp-birthday-hero-form__pill-group">
+            {["Yes", "No"].map((option) => (
+              <label
+                className="ppp-birthday-hero-form__pill-option"
+                key={option}
+              >
+                <input
+                  type="radio"
+                  name="extraPlayTime"
+                  value={option}
+                  checked={formData.extraPlayTime === option}
+                  onChange={updateField}
+                />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {isPrivatePartySelected ? (
+          <p className="ppp-birthday-hero-form__note ppp-birthday-hero-form__wide">
+            Looking for a private party?{" "}
+            <a href={CONTACT_FORM_URL}>Send a private-party request</a>
+          </p>
+        ) : null}
+
+        <label className="ppp-birthday-hero-form__wide ppp-birthday-hero-form__notes">
+          <span>Party notes</span>
+          <textarea
+            name="message"
+            value={formData.message}
+            onChange={updateField}
+            placeholder="Any questions, special requests, or details you'd like us to know?"
+            required
+          />
+          {!isPrivatePartySelected ? (
+            <small className="ppp-birthday-hero-form__fee-note">
+              Each additional participant beyond your package is charged{" "}
+              <strong>$25 plus HST</strong>, paid at the venue.
+            </small>
+          ) : null}
+        </label>
       </div>
 
-      {isInquiryPackageSelected && turnstileEnabled ? (
+      {turnstileEnabled ? (
         <TurnstileWidget
           siteKey={siteKey}
           onVerify={setTurnstileToken}
@@ -419,19 +378,17 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         />
       ) : null}
 
-      {isInquiryPackageSelected ? (
-        <button
-          type="submit"
-          disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}
-        >
-          {submitting ? "Sending..." : "Send Birthday Request"}
-        </button>
-      ) : null}
+      <button
+        type="submit"
+        disabled={submitting || turnstileLoading || (turnstileEnabled && !turnstileToken)}
+      >
+        {submitting ? "Sending..." : "Send Birthday Request"}
+      </button>
 
       <p aria-live="polite">
         {status || (isInquiryPackageSelected
           ? "We will follow up with birthday package availability."
-          : "Select a package to continue.")}
+          : "Choose a package and enter your party details.")}
       </p>
 
       {urgency && isInquiryPackageSelected ? (
