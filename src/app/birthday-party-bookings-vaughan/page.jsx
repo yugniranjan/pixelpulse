@@ -16,9 +16,6 @@ const LOCATION_SLUG = "vaughan";
 const attractionFallbackImage = "https://storage.googleapis.com/pixel-pulse-play/web/PrivateParty.webp";
 const phoneUrl = "tel:+19057602922";
 const pageUrl = "https://birthdays.pixelpulseplay.ca";
-const onlineBirthdayBookingUrl =
-  "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
-const onlineBirthdayPackages = new Set(["pixel punch", "pixel ultra"]);
 const partyRoomAccessByPackage = {
   "pixel punch": "45 minutes",
   "pixel ultra": "45 minutes",
@@ -26,10 +23,6 @@ const partyRoomAccessByPackage = {
   "pulse max": "3 hours",
 };
 const ogImage = `${pageUrl}/assets/images/birthday-party-room-hero.webp`;
-
-function isOnlineBirthdayPackage(packageName = "") {
-  return onlineBirthdayPackages.has(String(packageName).trim().toLowerCase());
-}
 
 function getPartyRoomAccess(packageName = "") {
   return partyRoomAccessByPackage[String(packageName).trim().toLowerCase()] || "-";
@@ -542,13 +535,11 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <p>Party packages</p>
             <h2>Pick the birthday <em>package</em> that fits your group.</h2>
             <span className="ppp-bday-package-note">
-              Pixel Punch and Pixel Ultra can be booked online. For Pixel Jumbo or Pulse Max, send us a party request so our team can confirm availability and details.
+              Send us a party request for your preferred package so our team can confirm availability and details.
             </span>
           </div>
           <div className="ppp-bday-package-grid">
             {packageList.map((pkg, index) => {
-              const canBookOnline = isOnlineBirthdayPackage(pkg.name);
-
               return (
                 <article
                   key={pkg.name}
@@ -569,13 +560,9 @@ export default async function BirthdayPartyBookingsVaughanPage() {
                   </ul>
                   <a
                     className="ppp-bday-package-link"
-                    href={canBookOnline
-                      ? onlineBirthdayBookingUrl
-                      : `?package=${encodeURIComponent(pkg.name)}#birthday-party-form`}
-                    target={canBookOnline ? "_blank" : undefined}
-                    rel={canBookOnline ? "noopener noreferrer" : undefined}
+                    href={`?package=${encodeURIComponent(pkg.name)}#birthday-party-form`}
                   >
-                    {canBookOnline ? "Book online" : "Request this package"}
+                    Request this package
                   </a>
                 </article>
               );

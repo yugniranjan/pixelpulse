@@ -6,9 +6,7 @@ import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
 
 const CONTACT_FORM_URL = "https://pixelpulseplay.ca/contactus";
-const ONLINE_BOOKING_URL = "https://pixelpulseplayzone.lilypadpos.app/public/onlinebooking/step1.php?ptid=21";
-const ONLINE_PACKAGE_NAMES = new Set(["pixel punch", "pixel ultra"]);
-const ONLINE_PACKAGE_DETAIL_KEYS = [
+const PACKAGE_DETAIL_KEYS = [
   "Number of Participants",
   "Game Time Included",
   "Total Party Duration",
@@ -106,7 +104,7 @@ function PackageDetails({ packageDetails }) {
       </div>
 
       <dl className="ppp-birthday-hero-form__package-details">
-        {ONLINE_PACKAGE_DETAIL_KEYS.map((key) => {
+        {PACKAGE_DETAIL_KEYS.map((key) => {
           const value = key === "Party Room Access"
             ? PARTY_ROOM_ACCESS_BY_PACKAGE[packageDetails.name.trim().toLowerCase()]
             : packageDetails[key];
@@ -139,8 +137,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
   const selectedPackageDetails = packageChoices.find(
     (option) => option.name === formData.selectedPackage,
   );
-  const isOnlinePackageSelected = Boolean(selectedPackageDetails) && ONLINE_PACKAGE_NAMES.has(formData.selectedPackage.trim().toLowerCase());
-  const isInquiryPackageSelected = Boolean(selectedPackageDetails && !isOnlinePackageSelected);
+  const isInquiryPackageSelected = Boolean(selectedPackageDetails);
   const partyTimeSlots = selectedPackageDetails
     ? getTimeSlotsForPackage(selectedPackageDetails)
     : [];
@@ -149,9 +146,9 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
     const requestedPackage = searchParams.get("package") || "";
     if (!DEFAULT_PACKAGE_DURATIONS[requestedPackage.trim().toLowerCase()]) return;
 
-    setFormData((current) => current.selectedPackage
+    setFormData((current) => current.selectedPackage === requestedPackage
       ? current
-      : { ...current, selectedPackage: requestedPackage });
+      : { ...current, selectedPackage: requestedPackage, time: "" });
   }, [searchParams]);
 
   function updateField(event) {
@@ -232,7 +229,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       <div className="ppp-birthday-hero-form__head">
         <p>Plan the party</p>
         <h2>
-          {isOnlinePackageSelected ? "Book your party online" : isInquiryPackageSelected
+          {isInquiryPackageSelected
             ? "Request a birthday callback"
             : "Choose your package"}
         </h2>
@@ -264,13 +261,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
           </fieldset>
         ) : null}
 
-        {isOnlinePackageSelected ? (
-          <div className="ppp-birthday-hero-form__online ppp-birthday-hero-form__wide">
-            <PackageDetails packageDetails={selectedPackageDetails} />
-            <a href={ONLINE_BOOKING_URL} target="_blank" rel="noopener noreferrer">Continue to online booking</a>
-            <small className="ppp-birthday-hero-form__additional-person">* Additional person: $25 plus HST</small>
-          </div>
-        ) : isInquiryPackageSelected ? (
+        {isInquiryPackageSelected ? (
           <>
             <div className="ppp-birthday-hero-form__online ppp-birthday-hero-form__wide">
               <PackageDetails packageDetails={selectedPackageDetails} />
@@ -437,11 +428,11 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
         </button>
       ) : null}
 
-      {!isOnlinePackageSelected ? <p aria-live="polite">
+      <p aria-live="polite">
         {status || (isInquiryPackageSelected
           ? "We will follow up with birthday package availability."
           : "Select a package to continue.")}
-      </p> : null}
+      </p>
 
       {urgency && isInquiryPackageSelected ? (
         <p className="ppp-birthday-urgency">{urgency}</p>
