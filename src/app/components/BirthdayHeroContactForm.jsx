@@ -21,7 +21,7 @@ const INITIAL_FORM = {
   phone: "",
   date: "",
   time: "",
-  selectedPackage: "",
+  selectedPackage: "Pixel Punch",
   extraPlayTime: "",
   message: "",
 };
@@ -120,13 +120,15 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
     : [];
 
   useEffect(() => {
-    const requestedPackage = searchParams.get("package") || "";
-    if (!DEFAULT_PACKAGE_DURATIONS[requestedPackage.trim().toLowerCase()]) return;
+    const requestedName = (searchParams.get("package") || "").trim().toLowerCase();
+    const requestedPackage = packageOptions.map(normalizePackageOption)
+      .find((option) => option.name?.trim().toLowerCase() === requestedName)?.name;
+    if (!requestedPackage) return;
 
     setFormData((current) => current.selectedPackage === requestedPackage
       ? current
       : { ...current, selectedPackage: requestedPackage, time: "" });
-  }, [searchParams]);
+  }, [searchParams, packageOptions]);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -165,7 +167,6 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
           selectedEvent: "BirthDay Party",
           selectedPackage: formData.selectedPackage,
           subject: `${formData.fullName} - Birthday Party Inquiry`,
-          time: formData.time,
           turnstileToken,
         }),
       });
@@ -210,7 +211,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
       <div className="ppp-birthday-hero-form__fields">
         {packageChoices.length > 0 ? (
-          <label className="ppp-birthday-hero-form__wide">
+          <label className="ppp-birthday-hero-form__wide ppp-birthday-hero-form__package-select">
             <span>Party package</span>
             <select
               name="selectedPackage"
@@ -219,7 +220,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
               aria-describedby={isInquiryPackageSelected ? "birthday-package-description" : undefined}
               required
             >
-              <option value="">Select a package</option>
+              <option value="" disabled>Select a package</option>
               {packageChoices.map((option) => (
                 <option key={option.name} value={option.name}>
                   {option.name}{option["Package Price"] ? ` — ${option["Package Price"]}` : ""}
@@ -301,6 +302,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
             onChange={updateField}
           />
         </label>
+
 
         <label>
           <span>Preferred time</span>
