@@ -212,7 +212,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       <div className="ppp-birthday-hero-form__fields">
         {packageChoices.length > 0 ? (
           <label className="ppp-birthday-hero-form__wide ppp-birthday-hero-form__package-select">
-            <span>Party package</span>
+            <span>Choose a party package</span>
             <select
               name="selectedPackage"
               value={formData.selectedPackage}
