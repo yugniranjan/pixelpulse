@@ -8,6 +8,9 @@ import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl } from "@/lib/seo";
 import { getConfiguredValue } from "@/lib/ctaContent";
 
+const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
+const partyRoomImage = "/assets/images/birthday-party-room-hero.webp";
+
 const heroImage = "/assets/images/birthday-party-room-hero.webp";
 const heroVideo = "/assets/videos/pixelgame.mp4";
 const localFloorImage = "/assets/images/floorchallenge.webp";
@@ -416,6 +419,20 @@ function DedicatedPartyRoomSection() {
             </p>
           </div>
 
+          <div className="ppp-bday-room__video-shell">
+            <video
+              className="ppp-bday-room__video"
+              src={partyRoomVideo}
+              poster={partyRoomImage}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Pixel Pulse birthday party room video"
+            />
+            <div className="ppp-bday-room__video-badge">Party room preview</div>
+          </div>
         </div>
 
         <div className="ppp-bday-room__features">

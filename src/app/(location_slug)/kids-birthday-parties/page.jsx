@@ -18,6 +18,9 @@ import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
 import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
+const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
+const partyRoomImage = "/assets/images/birthday-party-room-hero.webp";
+
 const birthdayInquiryPageUrl = "https://birthdays.pixelpulseplay.ca/";
 const partyRoomAccessByPackage = {
   "pixel punch": "45 minutes",
@@ -413,6 +416,20 @@ function PrivatePartyRoomSection() {
           </p>
         </div>
 
+        <div className="ppp-party-room__video-shell">
+          <video
+            className="ppp-party-room__video"
+            src={partyRoomVideo}
+            poster={partyRoomImage}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label="Pixel Pulse birthday party room video"
+          />
+          <div className="ppp-party-room__video-badge">Party room preview</div>
+        </div>
       </div>
 
       <div className="ppp-party-room__features">

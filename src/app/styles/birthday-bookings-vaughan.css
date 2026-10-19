@@ -981,7 +981,7 @@
 
 .ppp-bday-room__story {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(1rem, 2vw, 1.4rem);
   align-items: start;
   margin-bottom: 1rem;
