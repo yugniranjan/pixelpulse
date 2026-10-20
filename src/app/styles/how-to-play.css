@@ -28,7 +28,7 @@
 }
 
 .ppp-how-hero {
-  padding: clamp(4rem, 7vw, 7rem) 0 clamp(2.6rem, 5vw, 4.5rem);
+  padding: clamp(2rem, 4vw, 3rem) 0 clamp(2.6rem, 5vw, 4.5rem);
 }
 
 .ppp-how-hero .ppp-how-shell {
@@ -53,8 +53,8 @@
 .ppp-how-copy h1 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.2rem, 8vw, 6.4rem);
-  line-height: 0.92;
+  font-size: clamp(2.2rem, 4.6vw, 4rem);
+  line-height: 1.04;
   text-transform: uppercase;
 }
 
@@ -89,7 +89,10 @@
   height: 5px;
   z-index: 1;
   background: linear-gradient(90deg, var(--how-lime), var(--how-coral), var(--how-pink));
+  pointer-events: none;
 }
+
+.ppp-how-page a { color: var(--how-lime); text-underline-offset: 4px; }
 
 .ppp-how-video video {
   width: 100%;

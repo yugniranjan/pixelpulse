@@ -610,6 +610,9 @@
   box-shadow: 0 24px 68px rgba(0, 0, 0, 0.46), 0 0 34px rgba(251, 174, 123, 0.12);
 }
 
+.ppp-how__watch-link { margin: 16px 0 0; text-align: right; }
+.ppp-how__watch-link a { color: #b9eb73; text-decoration: underline; text-underline-offset: 4px; }
+
 .ppp-how__video::before {
   content: "";
   position: absolute;

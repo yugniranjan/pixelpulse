@@ -3,61 +3,11 @@ import { format } from 'date-fns';
 import { fetchsheetdataNoCache } from "@/lib/sheets";
 import { fetchBlogs } from "@/lib/blogs";
 import { LOCATION_NAME } from "@/lib/constant";
-import { DEFAULT_SEO_IMAGE, canonicalUrl } from "@/lib/seo";
+import { canonicalUrl } from "@/lib/seo";
+import { SITE_VIDEOS, videoSitemapTag } from "@/lib/videoSeo.mjs";
 import { slugify } from "@/utils/slugify";
 
-const videoEntries = new Map([
-  [
-    canonicalUrl(),
-    {
-      thumbnail: DEFAULT_SEO_IMAGE,
-      title: "Pixel Pulse Play Gameplay Experience",
-      description:
-        "See how Pixel Pulse Play challenge rooms work with wristband activation, interactive games, live scoring, and replayable family fun.",
-      contentUrl: canonicalUrl("/assets/videos/pixel-pulse-experience.mp4"),
-      playerUrl: canonicalUrl(),
-      publicationDate: "2026-08-01T09:00:00-04:00",
-    },
-  ],
-  [
-    canonicalUrl("/how-to-play"),
-    {
-      thumbnail: DEFAULT_SEO_IMAGE,
-      title: "How to Play at Pixel Pulse Play",
-      description:
-        "Watch how Pixel Pulse Play wristbands, challenge rooms, scoring, and gameplay work before your Vaughan visit.",
-      contentUrl: canonicalUrl("/assets/videos/pixel-pulse-experience.mp4"),
-      playerUrl: canonicalUrl("/how-to-play"),
-      publicationDate: "2026-08-01T09:00:00-04:00",
-    },
-  ],
-]);
-
-function xmlEscape(value = "") {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-function videoSitemapTag(video = {}) {
-  if (!video.contentUrl || !video.thumbnail || !video.title || !video.description) {
-    return "";
-  }
-
-  return `
-      <video:video>
-        <video:thumbnail_loc>${xmlEscape(video.thumbnail)}</video:thumbnail_loc>
-        <video:title>${xmlEscape(video.title)}</video:title>
-        <video:description>${xmlEscape(video.description)}</video:description>
-        <video:content_loc>${xmlEscape(video.contentUrl)}</video:content_loc>
-        <video:player_loc>${xmlEscape(video.playerUrl || video.contentUrl)}</video:player_loc>
-        <video:publication_date>${xmlEscape(video.publicationDate)}</video:publication_date>
-        <video:family_friendly>yes</video:family_friendly>
-      </video:video>`;
-}
+const videoEntries = new Map(Object.values(SITE_VIDEOS).map((video) => [canonicalUrl(video.watchPath), video]));
 
 export async function GET() {
   const dynamicPaths = new Set();
@@ -65,7 +15,7 @@ export async function GET() {
   dynamicPaths.add(canonicalUrl());
   dynamicPaths.add(canonicalUrl("/blogs"));
   dynamicPaths.add(canonicalUrl("/booking"));
-  dynamicPaths.add(canonicalUrl("/how-to-play"));
+  for (const watchUrl of videoEntries.keys()) dynamicPaths.add(watchUrl);
 
   const getLocationPath = (location = "") => {
     const normalizedLocation = location.trim().toLowerCase();
@@ -141,7 +91,7 @@ export async function GET() {
       <lastmod>${lastmod}</lastmod>
       <changefreq>daily</changefreq>
       <priority>0.7</priority>
-      ${videoSitemapTag(videoEntries.get(url))}
+      ${videoSitemapTag(videoEntries.get(url), canonicalUrl())}
     </url>`).join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

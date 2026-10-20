@@ -1071,6 +1071,7 @@
 }
 
 .ppp-bday-room__video-badge {
+  text-decoration: none;
   position: absolute;
   z-index: 1;
   left: 18px;

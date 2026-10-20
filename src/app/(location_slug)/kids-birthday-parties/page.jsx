@@ -18,8 +18,11 @@ import BookingButton from "@/components/smallComponents/BookingButton";
 import Loading from "@/loading";
 import { getConfigValue, getConfiguredValue, getCtaContent, getRowValue } from "@/lib/ctaContent";
 
-const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
-const partyRoomImage = "/assets/images/birthday-party-room-hero.webp";
+import { canonicalUrl } from "@/lib/seo";
+import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
+
+const partyRoomVideo = SITE_VIDEOS.partyRoom.contentPath;
+const partyRoomImage = SITE_VIDEOS.partyRoom.thumbnailPath;
 
 const birthdayInquiryPageUrl = "https://birthdays.pixelpulseplay.ca/";
 const partyRoomAccessByPackage = {
@@ -428,7 +431,7 @@ function PrivatePartyRoomSection() {
             preload="metadata"
             aria-label="Pixel Pulse birthday party room video"
           />
-          <div className="ppp-party-room__video-badge">Party room preview</div>
+          <a className="ppp-party-room__video-badge" href={canonicalUrl(SITE_VIDEOS.partyRoom.watchPath)}>Watch party room tour ↗</a>
         </div>
       </div>
 
@@ -542,6 +545,7 @@ const Page = async ({ params }) => {
 
   return (
     <main className="ppp-party-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoStructuredData(SITE_VIDEOS.partyRoom, canonicalUrl())) }} />
       <section className="ppp-party-hero">
         <div className="aero-max-container ppp-party-hero__inner">
           <div className="ppp-party-hero__panel">

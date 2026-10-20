@@ -66,6 +66,12 @@ const MotionImage = ({ pageData, heroData = {} }) => {
     return () => window.clearTimeout(timeoutId);
   }, [hasVideo, videoPoster]);
 
+  useEffect(() => {
+    if (!shouldLoadVideo || !videoRef.current) return;
+    videoRef.current.load();
+    videoRef.current.play().catch(() => {});
+  }, [shouldLoadVideo]);
+
   const heroCopy = (
     <div className="ppp-hero-copy">
       {heroTitle && <h1 className="ppp-hero-copy__title">{heroTitle}</h1>}
@@ -164,27 +170,25 @@ const MotionImage = ({ pageData, heroData = {} }) => {
               }}
             />
           ) : null}
-          {shouldLoadVideo ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              muted={isMuted}
-              loop
-              playsInline
-              preload="metadata"
-              poster={videoPoster || undefined}
-              width="100%"
-              onCanPlay={() => setVideoReady(true)}
-              style={{
-                position: videoPoster ? "absolute" : undefined,
-                inset: videoPoster ? 0 : undefined,
-                opacity: videoPoster && !videoReady ? 0 : undefined,
-                transition: videoPoster ? "opacity 400ms ease" : undefined,
-              }}
-            >
-              <source src={item.video} type="video/mp4" />
-            </video>
-          ) : null}
+          <video
+            ref={videoRef}
+            autoPlay={shouldLoadVideo}
+            muted={isMuted}
+            loop
+            playsInline
+            preload={shouldLoadVideo ? "metadata" : "none"}
+            poster={videoPoster || undefined}
+            width="100%"
+            onCanPlay={() => setVideoReady(true)}
+            style={{
+              position: videoPoster ? "absolute" : undefined,
+              inset: videoPoster ? 0 : undefined,
+              opacity: videoPoster && !videoReady ? 0 : undefined,
+              transition: videoPoster ? "opacity 400ms ease" : undefined,
+            }}
+          >
+            <source src={item.video} type="video/mp4" />
+          </video>
           {heroCopy}
           <button
             type="button"

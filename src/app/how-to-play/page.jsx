@@ -1,9 +1,11 @@
 import "../styles/how-to-play.css";
-import { DEFAULT_SEO_IMAGE, canonicalUrl } from "@/lib/seo";
+import { canonicalUrl } from "@/lib/seo";
 
-const videoUrl = "/assets/videos/pixel-pulse-experience.mp4";
-const pageUrl = canonicalUrl("/how-to-play");
-const videoContentUrl = canonicalUrl(videoUrl);
+import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
+
+const video = SITE_VIDEOS.gameplay;
+const videoUrl = video.contentPath;
+const pageUrl = canonicalUrl(video.watchPath);
 
 export const metadata = {
   title: "How to Play | Pixel Pulse Play Vaughan",
@@ -18,32 +20,16 @@ export const metadata = {
       "Watch the quick Pixel Pulse Play guide before your visit so every player knows how the challenge rooms work.",
     url: pageUrl,
     type: "website",
+    images: [canonicalUrl(video.thumbnailPath)],
   },
   robots: {
     index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large" },
   },
 };
 
-const videoJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "VideoObject",
-  name: "How to Play at Pixel Pulse Play",
-  description:
-    "Watch how Pixel Pulse Play wristbands, challenge rooms, scoring, and gameplay work before your Vaughan visit.",
-  thumbnailUrl: [DEFAULT_SEO_IMAGE],
-  uploadDate: "2026-08-01T09:00:00-04:00",
-  contentUrl: videoContentUrl,
-  embedUrl: pageUrl,
-  publisher: {
-    "@type": "Organization",
-    name: "Pixel Pulse Play",
-    url: canonicalUrl(),
-    logo: {
-      "@type": "ImageObject",
-      url: DEFAULT_SEO_IMAGE,
-    },
-  },
-};
+const videoJsonLd = videoStructuredData(video, canonicalUrl());
 
 const steps = [
   {
@@ -75,19 +61,12 @@ export default function HowToPlayPage() {
         <div className="ppp-how-shell">
           <div className="ppp-how-copy">
             <span className="ppp-how-kicker">Ready to Play?</span>
-            <h1>It&apos;s as easy as <strong>Tap. Play. Repeat.</strong></h1>
-            <p>
-              Whether you&apos;re visiting with family, friends, or teammates, every
-              challenge room offers multiple games, different difficulty levels,
-              and endless replayability.
-            </p>
-            <p>
-              Watch the video to see how your Pixel Pulse adventure begins.
-            </p>
+            <h1>How to Play at <strong>Pixel Pulse</strong></h1>
+            <p>Watch the video to see how wristbands, challenge rooms, and scoring work before your visit.</p>
           </div>
 
           <div className="ppp-how-video" aria-label="Pixel Pulse how to play video">
-            <video controls preload="metadata" playsInline>
+            <video controls preload="metadata" playsInline poster={video.thumbnailPath} width="1280" height="720" aria-label={video.name}>
               <source src={videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>

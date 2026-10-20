@@ -5,13 +5,15 @@ import { FaArrowRight, FaGamepad, FaLock, FaPeopleGroup, FaStar } from "react-ic
 import BirthdayHeroVideo from "@/components/BirthdayHeroVideo";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
-import { safeImageUrl } from "@/lib/seo";
+import { safeImageUrl, canonicalUrl } from "@/lib/seo";
 import { getConfiguredValue } from "@/lib/ctaContent";
 
-const partyRoomVideo = "/assets/videos/birthday-party-room.mp4";
-const partyRoomImage = "/assets/images/birthday-party-room-hero.webp";
+import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
 
-const heroImage = "/assets/images/birthday-party-room-hero.webp";
+const partyRoomVideo = SITE_VIDEOS.partyRoom.contentPath;
+const partyRoomImage = SITE_VIDEOS.partyRoom.thumbnailPath;
+
+const heroImage = "/assets/images/videos/pixelgame.jpg";
 const heroVideo = "/assets/videos/pixelgame.mp4";
 const localFloorImage = "/assets/images/floorchallenge.webp";
 const localShootingImage = "/assets/images/shootinggame.webp";
@@ -43,26 +45,7 @@ function addPartyRoomAccessFeature(features = []) {
     ...features.slice(durationIndex + 1),
   ];
 }
-const birthdayHeroVideoJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "VideoObject",
-  name: "Pixel Pulse Play Birthday Party Experience",
-  description:
-    "Preview a Pixel Pulse Play birthday party with interactive challenge rooms, hosted gameplay, and high-energy indoor fun for kids and teens.",
-  thumbnailUrl: [ogImage],
-  uploadDate: "2026-08-01T09:00:00-04:00",
-  contentUrl: `${pageUrl}${heroVideo}`,
-  embedUrl: pageUrl,
-  publisher: {
-    "@type": "Organization",
-    name: "Pixel Pulse Play",
-    url: "https://pixelpulseplay.ca",
-    logo: {
-      "@type": "ImageObject",
-      url: "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png",
-    },
-  },
-};
+const birthdayRoomVideoJsonLd = videoStructuredData(SITE_VIDEOS.partyRoom, canonicalUrl());
 
 export const revalidate = 900;
 
@@ -431,7 +414,7 @@ function DedicatedPartyRoomSection() {
               preload="metadata"
               aria-label="Pixel Pulse birthday party room video"
             />
-            <div className="ppp-bday-room__video-badge">Party room preview</div>
+            <a className="ppp-bday-room__video-badge" href={canonicalUrl(SITE_VIDEOS.partyRoom.watchPath)}>Watch party room tour ↗</a>
           </div>
         </div>
 
@@ -488,7 +471,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
     <main className="ppp-bday-booking-page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(birthdayHeroVideoJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(birthdayRoomVideoJsonLd) }}
       />
       <nav className="ppp-bday-booking-nav" aria-label="Birthday party page navigation">
         <a className="ppp-bday-booking-logo" href="https://pixelpulseplay.ca">

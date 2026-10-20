@@ -20,7 +20,9 @@ import BookingButton from "./components/smallComponents/BookingButton";
 import PromotionModal from "./components/model/PromotionModal";
 import VrTeaserModal from "./components/model/VrTeaserModal";
 import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaContent";
-import { DEFAULT_SEO_IMAGE, canonicalUrl, safeImageUrl } from "@/lib/seo";
+import { canonicalUrl, safeImageUrl } from "@/lib/seo";
+
+import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
 
 export const revalidate = 900;
 
@@ -42,29 +44,6 @@ const SITE_DATA_SHEET_NAMES = [
   "location",
   "cta",
 ];
-const HOMEPAGE_URL = canonicalUrl();
-const HOMEPAGE_GAMEPLAY_VIDEO_URL = canonicalUrl("/assets/videos/pixel-pulse-experience.mp4");
-const homepageGameplayVideoJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "VideoObject",
-  name: "Pixel Pulse Play Gameplay Experience",
-  description:
-    "See how Pixel Pulse Play challenge rooms work with wristband activation, interactive games, live scoring, and replayable family fun.",
-  thumbnailUrl: [DEFAULT_SEO_IMAGE],
-  uploadDate: "2026-08-01T09:00:00-04:00",
-  contentUrl: HOMEPAGE_GAMEPLAY_VIDEO_URL,
-  embedUrl: HOMEPAGE_URL,
-  publisher: {
-    "@type": "Organization",
-    name: "Pixel Pulse Play",
-    url: HOMEPAGE_URL,
-    logo: {
-      "@type": "ImageObject",
-      url: DEFAULT_SEO_IMAGE,
-    },
-  },
-};
-
 function looksLikeRenderableImage(url = "") {
   if (!url) return false;
   if (url.startsWith("/")) return true;
@@ -978,10 +957,10 @@ const Home = async () => {
 
   return (
     <main className="ppp-home">
-      <script
+      {siteData.howItWorks.steps.length > 0 && <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageGameplayVideoJsonLd) }}
-      />
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoStructuredData(SITE_VIDEOS.gameplay, canonicalUrl())) }}
+      />}
       <PromotionModal
         promotionPopup={promotionPopup}
         delayMs={5000}
@@ -1063,7 +1042,9 @@ const Home = async () => {
             </ol>
             <div className="ppp-how__video" aria-label="Pixel Pulse gameplay video">
               <video
-                src="/assets/videos/pixel-pulse-experience.mp4"
+                src={SITE_VIDEOS.gameplay.contentPath}
+                poster={SITE_VIDEOS.gameplay.thumbnailPath}
+                preload="metadata"
                 title="Pixel Pulse gameplay video"
                 autoPlay
                 loop
@@ -1073,6 +1054,7 @@ const Home = async () => {
               />
             </div>
           </div>
+          <p className="ppp-how__watch-link"><Link href={SITE_VIDEOS.gameplay.watchPath}>Watch the full how-to-play video ↗</Link></p>
         </div>
       </section>
       )}

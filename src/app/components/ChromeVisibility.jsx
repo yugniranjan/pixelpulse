@@ -8,6 +8,7 @@ const STANDALONE_PATHS = new Set([
   "/concessions-tv",
   "/feedback",
   "/how-to-play",
+  "/videos/birthday-party-room",
   "/level-up-rewards",
   "/levelingup",
   "/private-party",
