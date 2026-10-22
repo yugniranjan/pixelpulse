@@ -22,6 +22,7 @@
 .pixieplay__invite-cta:hover { background: #29402a; }
 .pixieplay__invite-note { display: block; margin-top: 9px; font-size: 9px; color: #677260; text-align: center; }
 .pixieplay__panel { position: absolute; right: 0; bottom: calc(100% + 12px); display: flex; flex-direction: column; width: min(390px, calc(100vw - 32px)); height: 640px; max-height: calc(100dvh - 124px); overflow: hidden; border: 1px solid #536c3d; border-radius: 20px; background: #0c131e; box-shadow: 0 20px 70px #0009; }
+.pixieplay__panel--welcome { height: 320px; }
 .pixieplay__header { display: flex; flex-shrink: 0; align-items: center; gap: 10px; padding: 17px; border-bottom: 1px solid #263344; background: linear-gradient(125deg, #21321e, #101b27); }
 .pixieplay__avatar { display: block; flex-shrink: 0; width: 38px; height: 38px; color: #b9eb73; }
 .pixieplay__header > div { flex: 1; min-width: 0; }
@@ -29,21 +30,6 @@
 .pixieplay__header p { margin: 1px 0 0; color: #aab8c9; font-size: 11px; }
 .pixieplay__icon-button { display: grid; place-items: center; width: 30px; height: 34px; padding: 0; border: 0; border-radius: 8px; background: #ffffff0a; color: #e7eef7; font-size: 24px !important; }
 .pixieplay__feed { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #425436 transparent; }
-.pixieplay__welcome { position: relative; padding: 2px 28px 0 0; margin-bottom: 12px; }
-.pixieplay__welcome > span { position: absolute; top: -5px; right: 0; color: #b9eb73; font-size: 30px; }
-.pixieplay__welcome > p { margin: 0 0 6px; color: #b9eb73; font-size: 8px; letter-spacing: 1.4px; font-weight: 700; }
-.pixieplay__welcome h3 { margin: 0; color: #f4f7fc; font-size: 24px; line-height: 1.2; letter-spacing: -.6px; font-weight: 800; }
-.pixieplay__welcome-actions { display: grid; gap: 8px; margin-top: 14px; }
-.pixieplay__welcome-actions :is(button, a) { display: grid; grid-template-columns: 32px minmax(0, 1fr) 12px; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px 12px; border: 1px solid #2f4050; border-radius: 11px; background: #131e2c; color: #f0f4f9; text-align: left; text-decoration: none; transition: background 150ms ease, border-color 150ms ease; }
-.pixieplay__welcome-actions :is(button, a):hover { background: #203020; border-color: #b9eb73; }
-.pixieplay__welcome-actions :is(button, a).is-featured { min-height: 67px; background: linear-gradient(115deg, #26391f, #182b25); border-color: #8bbb52; }
-.pixieplay__welcome-actions strong { display: block; font-size: 12px; line-height: 1.4; font-weight: 700; }
-.pixieplay__welcome-actions small { display: block; margin-top: 3px; color: #aebcd0; font-size: 10px; line-height: 1.4; }
-.pixieplay__welcome-actions .is-featured small { color: #c1d2b4; }
-.pixieplay__action-icon { display: grid; place-items: center; width: 32px; height: 34px; border-radius: 8px; background: #ffffff09; font-size: 20px; }
-.pixieplay__action-arrow { color: #b9eb73; font-size: 17px; }
-.pixieplay__play-link { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 0 2px; color: #c0d0df; font-size: 11px; text-decoration: none; }
-.pixieplay__play-link:hover { color: #b9eb73; }
 .pixieplay__planner { margin: 12px 0; padding: 14px; border: 1px solid #536c3d; border-radius: 12px; background: #13221c; }
 .pixieplay__planner-step { margin: 0 0 12px; color: #b9eb73; font-size: 10px; letter-spacing: 1px; font-weight: 700; }
 .pixieplay__progress { display: flex; gap: 5px; margin: -2px 0 15px; }
@@ -64,7 +50,7 @@
 .pixieplay__sender { color: #b9eb73; font-size: 10px; font-weight: 700; }
 .pixieplay__message--welcome { max-width: none; width: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
 .pixieplay__message--welcome .pixieplay__sender { display: none; }
-.pixieplay__message--welcome p { margin: 0; color: #afbdce; font-size: 12px; line-height: 1.6; }
+.pixieplay__message--welcome p { margin: 6px 0 0; color: #d5deea; font-size: 14px; line-height: 1.7; }
 .pixieplay__message--user { margin-left: auto; border-color: #b9eb73; border-radius: 15px 3px 15px 15px; background: #b9eb73; color: #0b111b; }
 .pixieplay__message--user .pixieplay__sender { color: #385628; }
 .pixieplay__links { display: grid; gap: 7px; margin-top: 12px; }

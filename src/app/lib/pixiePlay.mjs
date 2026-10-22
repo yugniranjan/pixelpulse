@@ -1,7 +1,9 @@
+import { getPixieKnowledgeReply } from './pixiePlayAnswers.mjs';
+
 export const PIXIE_PROMPTS = ["Plan a birthday", "Corporate or group event", "I already have a booking", "I have a question"];
 export const PIXIE_EVENTS_URL = 'https://events.pixelpulseplay.ca';
 export const PIXIE_QUESTIONS = {
-  birthday: ['Birthday packages', 'How do children play?', 'Party duration', 'Small birthday groups', 'Food & cake', 'Arcade games', 'Age requirements', 'Deposit & payment', 'Birthday promotions'],
+  birthday: ['Plan a birthday', 'Birthday packages', 'Party duration', 'How do children play?', 'Small birthday groups', 'Food & cake', 'Arcade games', 'Age requirements', 'Deposit & payment', 'Birthday promotions'],
   events: ['Private venue booking', 'Group sizes', 'Food & refreshments'],
   existing: ['Check waiver status', 'Complete a waiver', 'Birthday invitations', 'Arrival time', 'Change my booking', 'Food & cake', 'Contact the team'],
   waiver: ['Check waiver status', 'Complete a waiver', 'Contact the team'],
@@ -80,11 +82,17 @@ export function getPixiePlayReply(message, { faqs = [], address = "" } = {}, pre
     return reply("I’m PixiePlay, the automated Pixel Pulse FAQ guide. I can help you find visit information and booking links. If you need a person, contact our team.", teamLinks, "team");
   }
 
-  if (/\b(refund|cancel|reschedul|change my|human|person|staff|complaint|lost|payment|charged|double charge|guarantee)/.test(text)) {
-    return reply("Our team can help with booking changes, payments, refunds, or anything specific to your visit. Contact them directly so they can check your details.", teamLinks, "team");
-  }
   if (/\b(allerg|medical|pregnan|disabil|accessib|wheelchair|injur|epilep)/.test(text)) {
     return reply("Please check with our team before booking so they can discuss your needs and the activities or food involved in your visit.", teamLinks, "team");
+  }
+  if (/\b(refund|cancel|reschedul|change my|complaint|lost|double charge|guarantee)/.test(text)) {
+    return reply("Our team can help with booking changes, payments, refunds, or anything specific to your visit. Contact them directly so they can check your details.", teamLinks, "team");
+  }
+  const knowledgeAnswer = getPixieKnowledgeReply(text, { address: pixieText(address) });
+  if (knowledgeAnswer) return knowledgeAnswer;
+
+  if (/\b(refund|cancel|reschedul|change my|human|person|staff|complaint|lost|payment|charged|double charge|guarantee)/.test(text)) {
+    return reply("Our team can help with booking changes, payments, refunds, or anything specific to your visit. Contact them directly so they can check your details.", teamLinks, "team");
   }
   if (/party dashboard/.test(text) || (/\bwaivers?\b/.test(text) && /\b(check|status|count|signed|submitted|completed|filled|received|track|view|missing|remaining|pending)\b|how many/.test(text))) {
     return reply('You can check your party’s signed waivers and covered participants on the party dashboard. Enter your party ID there to view the status.', [waiverStatusLink], 'waiver');
@@ -98,16 +106,13 @@ export function getPixiePlayReply(message, { faqs = [], address = "" } = {}, pre
   if (/\b(invite|invites|invitation|invitations|rsvp)\b/.test(text)) {
     return reply('For a confirmed birthday party, contact your party coordinator about a digital invitation and the RSVP details you would like included. Share your party ID directly with the team.', teamLinks, 'existing');
   }
-  if (/\b(deposit|balance|payment methods?)\b/.test(text)) {
-    return reply('Our team will confirm the deposit, accepted payment methods, and remaining balance for your selected package. Please use the details in your booking confirmation or contact your party coordinator.', teamLinks, 'birthday');
-  }
   if (/\b(arriv|check.?in)/.test(text)) {
     return reply('For a birthday party, please arrive 15 minutes before your reserved time for check-in. Every participant needs a completed waiver before playing. Your party confirmation contains your reserved schedule.', [{ label: 'Complete a waiver', href: '/waiver' }, teamLinks[0]], 'existing');
   }
   if (/\b(arcade|arcades|tokens?|coins?|game cards?)\b/.test(text)) {
     return reply('Arcade games are separate from the challenge-room gameplay included in birthday packages. Arcade cards are available separately; check with our team for current card options and prices.', [...birthdayLinks.slice(0, 1), teamLinks[0]], 'birthday');
   }
-  if (/buy\s*(2|two).*get\s*(2|two)|\b(promotion|promotions|discounts?|offers?)\b/.test(text)) {
+  if (/buy\s*(2|two).*get\s*(2|two)|\b(promotion|promotions|discounts?)\b/.test(text)) {
     return reply('Promotions and birthday packages have their own terms. Check the current offer details and ask our team to confirm eligibility before combining a promotion with a party booking.', [{ label: 'Current pricing & promotions', href: '/pricing-promos' }, teamLinks[0]], previousTopic === 'birthday' || /birthday|party/.test(text) ? 'birthday' : 'pricing');
   }
   if (/\b(duration|party room time|game time|how long|schedule|resume|eat.*play)\b/.test(text)) {
@@ -145,7 +150,7 @@ export function getPixiePlayReply(message, { faqs = [], address = "" } = {}, pre
     return reply(`${location ? `You’ll find Pixel Pulse Play at ${location}.` : "Pixel Pulse Play is in Vaughan, Ontario."} Visit our contact page for location details and check with our team for hours on your planned visit date.`, [{ label: "Hours & location", href: "/contactus" }, teamLinks[1]], "visit");
   }
   if (/\b(children play|rotate|rotation|all 13|together|group sizes?|at once|fit in a room)\b/.test(text)) {
-    return reply('Birthday groups rotate between the 13 challenge rooms during their scheduled gameplay. Each room accommodates one group of up to five players at a time, and our team guides the rotation. Trying every room depends on your play time and how quickly your group progresses.', [{ label: 'See how to play', href: '/how-to-play' }, birthdayLinks[0]], 'play');
+    return reply('Birthday groups rotate between the 13 challenge rooms during their scheduled gameplay. Many rooms accommodate teams of up to five players; capacity varies by room. Our team guides the rotation. Trying every room depends on your play time, room traffic and how quickly your group progresses.', [{ label: 'See how to play', href: '/how-to-play' }, birthdayLinks[0]], 'play');
   }
   const asksPrice = /\b(prices?|pricing|costs?|much|rates?|deals?|discounts?|offers?|expensive|cheap)\b/.test(text);
   const asksBirthday = /\b(birthdays?|party|parties|punch|ultra|jumbo|pulse max|packages?)\b/.test(text);

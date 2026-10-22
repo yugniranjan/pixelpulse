@@ -85,7 +85,7 @@ test('shared-reference questions cover existing parties, gameplay and unconfirme
   assert.match(getPixiePlayReply('Arcade games').text, /available separately/);
   assert.match(getPixiePlayReply('Birthday invitations').text, /party coordinator/);
   assert.match(getPixiePlayReply('Arrival time').text, /15 minutes/);
-  for (const question of ['Deposit & payment', 'Small birthday groups', 'Birthday promotions']) {
+  for (const question of ['Small birthday groups', 'Birthday promotions']) {
     const answer = getPixiePlayReply(question);
     assert.doesNotMatch(answer.text, /\$\d|guaranteed|confirmed booking/i);
     assert.ok(answer.links.some((link) => link.href === '/contactus'));

@@ -2,22 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { getPixiePartyPlan, getPixiePlayReply, PIXIE_EVENTS_URL, PIXIE_PARTY_OPTIONS, PIXIE_PROMPTS, PIXIE_QUESTIONS } from "@/lib/pixiePlay.mjs";
+import { getPixiePartyPlan, getPixiePlayReply, PIXIE_PARTY_OPTIONS, PIXIE_QUESTIONS } from "@/lib/pixiePlay.mjs";
 import "../styles/pixieplay.css";
 
 function PixieFace() {
   return <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M18 3h4v5h-4zM8 10h24v4h4v18h-4v4H8v-4H4V14h4z" fill="currentColor" /><path d="M10 16h20v14H10z" fill="#0b111b" /><path d="M13 19h4v5h-4zm10 0h4v5h-4z" fill="#b9eb73" /><path d="M17 27h6v2h-6z" fill="#b9eb73" /><path d="M30 3h3V0h2v3h3v2h-3v3h-2V5h-3z" fill="#fbae7b" /></svg>;
 }
 
-const greeting = { role: "assistant", text: "Hi, I’m PixiePlay! 👋 Pick a starting point and I’ll guide you from there. You can ask me a question anytime.", links: [] };
+const greeting = { role: "assistant", text: "Hi, I’m PixiePlay! 👋 What would you like to know about Pixel Pulse?", links: [] };
 const INVITATION_KEY = "pppPixieInvitationShown";
 const EMPTY_PARTY_PLAN = { step: 0, guests: '', age: '', date: '', privacy: 'Standard birthday package' };
-const welcomeActions = [
-  { prompt: PIXIE_PROMPTS[0], icon: "🎂", detail: "Build your party plan in 3 quick steps" },
-  { prompt: PIXIE_PROMPTS[1], icon: "🎉", detail: "Explore group & private events", href: PIXIE_EVENTS_URL },
-  { prompt: PIXIE_PROMPTS[2], icon: "📋", detail: "Waivers, invites & getting ready" },
-  { prompt: PIXIE_PROMPTS[3], icon: "💬", detail: "Ages, games, food & more" },
-];
 
 function PixiePartyPlanner({ plan, setPlan, onComplete, onCancel }) {
   const { step, guests, age, date, privacy } = plan;
@@ -71,6 +65,9 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
   const input = useRef(null);
   const launcher = useRef(null);
   const feed = useRef(null);
+  const relatedQuestions = (PIXIE_QUESTIONS[topic] || [])
+    .filter((prompt) => !messages.some((message) => message.role === "user" && message.text.toLowerCase() === prompt.toLowerCase()))
+    .slice(0, 3);
 
   useEffect(() => setReady(true), []);
   useEffect(() => {
@@ -166,10 +163,10 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
         <p className="pixieplay__invite-eyebrow">A LITTLE HELP FROM PIXIEPLAY</p>
         <h3>{isBirthday ? 'Big birthday plans? 🎉' : 'Ready for some real-life fun? ✨'}</h3>
         <p>{isBirthday ? 'Let’s turn “where do I start?” into a party plan.' : 'Find your next adventure or plan a party your crew will love.'}</p>
-        <button className="pixieplay__invite-cta" type="button" onClick={() => openChat(isBirthday)}>{isBirthday ? 'Help me plan a birthday' : 'Show me where to start'}<span aria-hidden="true">→</span></button>
+        <button className="pixieplay__invite-cta" type="button" onClick={() => openChat(isBirthday)}>{isBirthday ? 'Help me plan a birthday' : 'Ask PixiePlay'}<span aria-hidden="true">→</span></button>
         <span className="pixieplay__invite-note">Quick answers. No sign-up needed.</span>
       </aside>}
-      {open && <section ref={panel} tabIndex={-1} className="pixieplay__panel" role="dialog" aria-labelledby="pixieplay-title" onKeyDown={(event) => { if (event.key === "Escape") close(); }}>
+      {open && <section ref={panel} tabIndex={-1} className={`pixieplay__panel${messages.length === 1 ? ' pixieplay__panel--welcome' : ''}`} role="dialog" aria-labelledby="pixieplay-title" onKeyDown={(event) => { if (event.key === "Escape") close(); }}>
         <div className="pixieplay__header">
           <span className="pixieplay__avatar"><PixieFace /></span>
           <div><h2 id="pixieplay-title">PixiePlay</h2><p>{isBirthday ? 'Your party planning sidekick' : 'A little help. A lot more play.'}</p></div>
@@ -177,23 +174,17 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
           <button type="button" className="pixieplay__icon-button" aria-label="Close PixiePlay" onClick={close}>×</button>
         </div>
         <div className="pixieplay__feed" ref={feed} tabIndex={-1} role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation with PixiePlay">
-          {messages.length === 1 && <div className="pixieplay__welcome"><span aria-hidden="true">✦</span><p>LET’S MAKE IT A GOOD ONE</p><h3>{isBirthday ? 'Big smiles start here.' : 'More fun. Less figuring it out.'}</h3></div>}
           {messages.map((message, index) => <div className={`pixieplay__message pixieplay__message--${message.role}${messages.length === 1 ? ' pixieplay__message--welcome' : ''}`} key={index}>
             <span className="pixieplay__sender">{message.role === "user" ? "You" : "PixiePlay"}</span>
             <p>{message.text}</p>
             {message.links?.length > 0 && <div className="pixieplay__links">{message.links.map((link) => <a key={link.href} href={link.href}>{link.label}<span aria-hidden="true">↗</span></a>)}</div>}
           </div>)}
           {planning && <PixiePartyPlanner plan={partyPlan} setPlan={setPartyPlan} onComplete={finishPlan} onCancel={() => setPlanning(false)} />}
-          {!planning && messages.length > 1 && <div className="pixieplay__prompts" aria-label="Related questions">{(PIXIE_QUESTIONS[topic] || PIXIE_QUESTIONS.faq).map((prompt) => <button type="button" key={prompt} onClick={() => ask(prompt)}>{prompt}<span aria-hidden="true">↗</span></button>)}</div>}
-          {messages.length === 1 && <div className="pixieplay__welcome-actions" aria-label="Suggested questions">{welcomeActions.map(({ prompt, icon, detail, href }, index) => {
-            const Action = href ? 'a' : 'button';
-            return <Action href={href} type={href ? undefined : 'button'} className={index === 0 ? 'is-featured' : ''} key={prompt} onClick={href ? undefined : () => ask(prompt)}><span className="pixieplay__action-icon" aria-hidden="true">{icon}</span><span><strong>{prompt}</strong><small>{detail}</small></span><span className="pixieplay__action-arrow" aria-hidden="true">{href ? '↗' : '→'}</span></Action>;
-          })}</div>}
-          {messages.length === 1 && <a className="pixieplay__play-link" href="/booking?type=ticket">Ready to play? Book a session <span aria-hidden="true">↗</span></a>}
+          {!planning && messages.length > 1 && relatedQuestions.length > 0 && <div className="pixieplay__prompts" aria-label="Related questions">{relatedQuestions.map((prompt) => <button type="button" key={prompt} onClick={() => ask(prompt)}>{prompt}<span aria-hidden="true">↗</span></button>)}</div>}
         </div>
         <form className="pixieplay__form" onSubmit={(event) => { event.preventDefault(); ask(draft, true); }}>
           <label htmlFor="pixieplay-question" className="pixieplay__sr-only">Ask PixiePlay a question</label>
-          <input ref={input} id="pixieplay-question" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={600} autoComplete="off" placeholder="Or type your question here…" />
+          <input ref={input} id="pixieplay-question" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={600} autoComplete="off" placeholder="Type your question…" />
           <button type="submit" disabled={!draft.trim()} aria-label="Send message"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v15" /></svg></button>
         </form>
         <p className="pixieplay__footer">FAQ guide from Pixel Pulse · <a href="/contactus">Talk to our team</a></p>
