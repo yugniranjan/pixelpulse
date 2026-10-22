@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
@@ -122,7 +123,7 @@ export default function SummerPlayPassInquiryForm({ passOptions = [] }) {
       </label>
       <label>
         <span>Phone</span>
-        <input
+        <PhoneInput
           type="tel"
           name="phone"
           value={formData.phone}

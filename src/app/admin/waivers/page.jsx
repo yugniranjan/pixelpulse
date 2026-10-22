@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPhoneNumber, matchesPhoneSearch } from "@/lib/phone.mjs";
+import PhoneInput from "@/components/PhoneInput";
 import { useEffect, useMemo, useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import AdminShell from "@/components/AdminShell";
@@ -68,14 +70,14 @@ function peopleSearchValues(waiver = {}) {
     waiver.primary?.firstName,
     waiver.primary?.lastName,
     waiver.primary?.email,
-    waiver.primary?.phone,
+    formatPhoneNumber(waiver.primary?.phone),
     waiver.primary?.city,
     ...familyMembers.flatMap((member) => [
       participantName(member),
       member.firstName,
       member.lastName,
       member.email,
-      member.phone,
+      formatPhoneNumber(member.phone),
     ]),
   ];
 }
@@ -278,7 +280,7 @@ function waiverExportRow(waiver = {}) {
     waiver.primary?.firstName || "",
     waiver.primary?.lastName || "",
     waiver.primary?.email || "",
-    waiver.primary?.phone || "",
+    formatPhoneNumber(waiver.primary?.phone) || "",
     waiver.primary?.city || "",
     waiverParticipantCount(waiver),
     children.map(participantName).join("; "),
@@ -286,7 +288,7 @@ function waiverExportRow(waiver = {}) {
     additionalAdults.map(participantName).join("; "),
     waiver.visit?.emergencyName || "",
     waiver.visit?.emergencyRelation || "",
-    waiver.visit?.emergencyPhone || "",
+    formatPhoneNumber(waiver.visit?.emergencyPhone) || "",
     waiver.source || "",
   ];
 }
@@ -413,7 +415,7 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
             <label><span>DOB</span><input type="date" value={form.primary.dob} onChange={(event) => update("primary", "dob", event.target.value)} /></label>
             <label><span>Gender</span><input value={form.primary.gender} onChange={(event) => update("primary", "gender", event.target.value)} /></label>
             <label><span>Email</span><input type="email" value={form.primary.email} onChange={(event) => update("primary", "email", event.target.value)} /></label>
-            <label><span>Phone</span><input value={form.primary.phone} onChange={(event) => update("primary", "phone", event.target.value)} /></label>
+            <label><span>Phone</span><PhoneInput value={form.primary.phone} onChange={(event) => update("primary", "phone", event.target.value)} /></label>
             <label><span>City</span><input value={form.primary.city} onChange={(event) => update("primary", "city", event.target.value)} /></label>
             <label><span>Health condition</span><input value={form.primary.healthCondition} onChange={(event) => update("primary", "healthCondition", event.target.value)} /></label>
             <label className="waiver-edit-wide"><span>Medical notes</span><textarea value={form.primary.medicalNotes} onChange={(event) => update("primary", "medicalNotes", event.target.value)} /></label>
@@ -430,7 +432,7 @@ function WaiverEditModal({ form, onChange, onClose, onSave, saving, error }) {
             <label><span>Party time</span><input type="time" value={form.visit.visitTime} onChange={(event) => update("visit", "visitTime", event.target.value)} /></label>
             <label><span>Emergency name</span><input value={form.visit.emergencyName} onChange={(event) => update("visit", "emergencyName", event.target.value)} /></label>
             <label><span>Relationship</span><input value={form.visit.emergencyRelation} onChange={(event) => update("visit", "emergencyRelation", event.target.value)} /></label>
-            <label><span>Emergency phone</span><input value={form.visit.emergencyPhone} onChange={(event) => update("visit", "emergencyPhone", event.target.value)} /></label>
+            <label><span>Emergency phone</span><PhoneInput value={form.visit.emergencyPhone} onChange={(event) => update("visit", "emergencyPhone", event.target.value)} /></label>
             <label><span>Printed name</span><input value={form.visit.printName} onChange={(event) => update("visit", "printName", event.target.value)} /></label>
             <label><span>Signed date</span><input type="date" value={form.visit.signDate} onChange={(event) => update("visit", "signDate", event.target.value)} /></label>
           </div>
@@ -543,7 +545,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
               <div><dt>DOB</dt><dd>{activeWaiver.primary?.dob || "Not provided"}</dd></div>
               <div><dt>Gender</dt><dd>{activeWaiver.primary?.gender || "Not provided"}</dd></div>
               <div><dt>Email</dt><dd>{activeWaiver.primary?.email || "Not provided"}</dd></div>
-              <div><dt>Phone</dt><dd>{activeWaiver.primary?.phone || "Not provided"}</dd></div>
+              <div><dt>Phone</dt><dd>{formatPhoneNumber(activeWaiver.primary?.phone) || "Not provided"}</dd></div>
               <div><dt>City</dt><dd>{activeWaiver.primary?.city || "Not provided"}</dd></div>
               <div><dt>Health condition</dt><dd>{activeWaiver.primary?.healthCondition || "Not Applicable"}</dd></div>
               <div><dt>Medical notes</dt><dd>{activeWaiver.primary?.medicalNotes || "None"}</dd></div>
@@ -561,7 +563,7 @@ function WaiverCard({ waiver, onDelete, onEdit }) {
               <div><dt>Party time</dt><dd>{activeWaiver.visit?.visitTime || "Not provided"}</dd></div>
               <div><dt>Emergency contact</dt><dd>{activeWaiver.visit?.emergencyName || "Not provided"}</dd></div>
               <div><dt>Relationship</dt><dd>{activeWaiver.visit?.emergencyRelation || "Not provided"}</dd></div>
-              <div><dt>Emergency phone</dt><dd>{activeWaiver.visit?.emergencyPhone || "Not provided"}</dd></div>
+              <div><dt>Emergency phone</dt><dd>{formatPhoneNumber(activeWaiver.visit?.emergencyPhone) || "Not provided"}</dd></div>
               <div><dt>Printed name</dt><dd>{activeWaiver.visit?.printName || "Not provided"}</dd></div>
               <div><dt>Signed date</dt><dd>{activeWaiver.visit?.signDate || "Not provided"}</dd></div>
             </dl>
@@ -883,7 +885,7 @@ export default function AdminWaiversPage() {
         effectiveWaiverDate(waiver),
         waiver.visit?.passType,
       ];
-      const matchesSearch = !needle || searchableValues
+      const matchesSearch = !needle || [waiver.primary?.phone, ...(waiver.familyMembers || []).map((member) => member.phone)].some((phone) => matchesPhoneSearch(phone, needle)) || searchableValues
         .filter(Boolean)
         .some((value) => normalizeSearchValue(value).includes(needle));
 

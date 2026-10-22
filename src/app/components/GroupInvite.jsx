@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import Image from "next/image";
 import { FaBriefcase, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import "../styles/group-invite.css";
@@ -49,7 +50,7 @@ export default function GroupInvite({ invite }) {
           <a href={invite.waiverLink}>{invite.waiverButton || "Complete waiver"}</a>
         </section>
         <section className="ppp-group-invite-organizer">
-          <div><h2>RSVP to your organizer</h2><p>{invite.rsvpName}</p><a href={phoneLink}>{invite.phone}</a></div>
+          <div><h2>RSVP to your organizer</h2><p>{invite.rsvpName}</p><a href={phoneLink}>{formatPhoneNumber(invite.phone)}</a></div>
           <a href={directions} target="_blank" rel="noopener noreferrer">Get directions</a>
         </section>
         <footer className="ppp-group-invite-footer">

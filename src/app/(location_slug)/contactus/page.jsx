@@ -28,7 +28,7 @@ const page = () => {
             <div className="ppp-contact-hero__details" aria-label="Contact details">
               <div className="ppp-contact-hero__detail">
                 <span>Phone</span>
-                <a href="tel:+19057602922">+1 (905) 760-2922</a>
+                <a href="tel:+19057602922">(905)-760-2922</a>
               </div>
               <div className="ppp-contact-hero__detail">
                 <span>Email</span>

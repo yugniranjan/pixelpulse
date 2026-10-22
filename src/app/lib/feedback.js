@@ -1,3 +1,4 @@
+import { phoneSearchDigits } from "./phone.mjs";
 import crypto from "node:crypto";
 import { getPostgresPool, query } from "@/lib/postgres";
 import { createGiftCard } from "@/lib/giftCards";
@@ -242,13 +243,21 @@ export async function listFeedbackSubmissions({ q = "", source = "", minRating =
 
   if (q) {
     values.push(`%${cleanText(q).toLowerCase()}%`);
+    const searchIndex = values.length;
+    const digits = phoneSearchDigits(q);
+    let phoneClause = "";
+    if (digits) {
+      values.push(`%${digits}%`);
+      phoneClause = ` or regexp_replace(coalesce(phone,''), '[^0-9]', '', 'g') like $${values.length}`;
+    }
     where.push(`(
-      lower(name) like $${values.length}
-      or lower(email) like $${values.length}
-      or lower(coalesce(phone, '')) like $${values.length}
-      or lower(coalesce(party_id, '')) like $${values.length}
-      or lower(coalesce(favorite_moment, '')) like $${values.length}
-      or lower(coalesce(upgrade_idea, '')) like $${values.length}
+      lower(name) like $${searchIndex}
+      or lower(email) like $${searchIndex}
+      or lower(coalesce(phone, '')) like $${searchIndex}
+      or lower(coalesce(party_id, '')) like $${searchIndex}
+      or lower(coalesce(favorite_moment, '')) like $${searchIndex}
+      or lower(coalesce(upgrade_idea, '')) like $${searchIndex}
+      ${phoneClause}
     )`);
   }
 

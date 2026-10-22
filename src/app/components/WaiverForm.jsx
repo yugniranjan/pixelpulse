@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
@@ -601,7 +602,7 @@ export default function WaiverForm({ initialPrimary = {}, initialVisit = {}, wai
           </label>
           <label>
             <span>{configuredText(waiverContent, "phoneLabel")}</span>
-            <input required type="tel" autoComplete="tel" inputMode="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
+            <PhoneInput required type="tel" autoComplete="tel" inputMode="tel" value={primary.phone} onChange={(event) => updatePrimary("phone", event.target.value)} />
           </label>
           <label>
             <span>{configuredText(waiverContent, "dobLabel")}</span>

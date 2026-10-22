@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPhoneNumber, matchesPhoneSearch } from "@/lib/phone.mjs";
+import PhoneInput from "@/components/PhoneInput";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "@/components/AdminShell";
 import EmailComposeModal from "@/components/admin/EmailComposeModal";
@@ -323,7 +325,7 @@ export default function AdminBookingsPage() {
   function downloadTemplate() {
     downloadCsv("party-bookings-template.csv", [
       ["Name", "Email", "Phone", "Address", "SaleID", "PartyDate", "Products"],
-      ["Jane Doe", "jane@example.com", "9051234567", "", "1001", "2026-12-20 14:00", "Pixel Ultra"],
+      ["Jane Doe", "jane@example.com", "(905)-123-4567", "", "1001", "2026-12-20 14:00", "Pixel Ultra"],
     ]);
   }
 
@@ -369,7 +371,7 @@ export default function AdminBookingsPage() {
       "— LOCATION & CONTACT —",
       "Pixel Pulse Play Zone",
       "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4",
-      "Phone: +1 (905) 760-2922",
+      "Phone: (905)-760-2922",
       "Email: connect@pixelpulseplay.ca",
       "",
       "— TERMS & CONDITIONS —",
@@ -618,7 +620,7 @@ export default function AdminBookingsPage() {
         !needle ||
         [b.customerName, b.childName, b.phone, b.email, b.package]
           .filter(Boolean)
-          .some((field) => field.toLowerCase().includes(needle));
+          .some((field) => String(field).toLowerCase().includes(needle)) || matchesPhoneSearch(b.phone, needle);
       const matchesStatus = statusFilter === "all" || b.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -709,7 +711,7 @@ export default function AdminBookingsPage() {
       b.endTime,
       b.status,
       b.customerName,
-      b.phone,
+      formatPhoneNumber(b.phone),
       b.email,
       b.childName,
       b.childAge,
@@ -760,7 +762,7 @@ export default function AdminBookingsPage() {
 
             <label>
               <span>Phone *</span>
-              <input name="phone" value={form.phone} onChange={updateField} inputMode="tel" required />
+              <PhoneInput name="phone" value={form.phone} onChange={updateField} inputMode="tel" required />
             </label>
 
             <label>
@@ -1052,7 +1054,7 @@ export default function AdminBookingsPage() {
                   .join(" · ")}
               </span>
               <span className="booking-admin-card__contact">
-                {[booking.phone, booking.email].filter(Boolean).join(" · ")}
+                {[formatPhoneNumber(booking.phone), booking.email].filter(Boolean).join(" · ")}
               </span>
               {booking.notes ? <span className="booking-admin-card__notes">{booking.notes}</span> : null}
             </div>

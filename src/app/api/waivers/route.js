@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizePhoneDigits, phoneTextVariants } from "@/lib/phone.mjs";
 import { db } from "@/lib/firestore";
 import {
   createPostgresWaiver,
@@ -38,7 +39,7 @@ function normalizePartyId(value = "") {
 }
 
 function normalizePhone(value = "") {
-  return cleanText(value).replace(/\D/g, "");
+  return normalizePhoneDigits(value);
 }
 
 function todayInToronto() {
@@ -250,7 +251,7 @@ async function getExistingWaiversByPhone(phone) {
 
   const exactSnapshot = await db
     .collection("waivers")
-    .where("primary.phone", "==", cleanText(phone))
+    .where("primary.phone", "in", phoneTextVariants(phone))
     .limit(50)
     .get();
   addSnapshot(exactSnapshot);

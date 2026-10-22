@@ -40,9 +40,15 @@ const PromotionModal = ({
       return undefined;
     }
 
-    const timeout = window.setTimeout(() => {
+    let timeout;
+    const openWhenClear = () => {
+      if (document.querySelector(".pixieplay__panel, .pixieplay__invite")) {
+        timeout = window.setTimeout(openWhenClear, 1000);
+        return;
+      }
       setIsModalOpen(true);
-    }, delayMs);
+    };
+    timeout = window.setTimeout(openWhenClear, delayMs);
 
     return () => window.clearTimeout(timeout);
   }, [delayMs, hasPopupContent, hasPromotionRows]);

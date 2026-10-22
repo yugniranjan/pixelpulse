@@ -489,7 +489,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             connect@pixelpulseplay.ca
           </a>
           <a className="ppp-bday-nav-phone" href={phoneUrl}>
-            Call +1 (905) 760-2922
+            Call (905)-760-2922
           </a>
         </span>
       </nav>
@@ -581,7 +581,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
               <p>Private-party access is handled by direct request so our team can confirm availability, timing, and group details with you.</p>
             </div>
             <div className="ppp-bday-private-band__actions">
-              <a href={phoneUrl}>Call: 905-760-2922</a>
+              <a href={phoneUrl}>Call: (905)-760-2922</a>
               <a href="https://pixelpulseplay.ca/contactus">Inquire Now</a>
             </div>
           </div>

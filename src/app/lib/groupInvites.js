@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "./phone.mjs";
 export const GROUP_INVITE_DEFAULTS = {
   greeting: "Hi,",
   guestName: "You're invited to join the group.",
@@ -65,7 +66,7 @@ export function buildGroupConfirmationText(invite = {}) {
     "How to Play",
     "https://www.pixelpulseplay.ca/how-to-play",
     `Website: ${invite.websiteLink || "https://www.pixelpulseplay.ca"}`,
-    `Phone: ${invite.businessPhone || "+1 (905) 760-2922"}`,
+    `Phone: ${formatPhoneNumber(invite.businessPhone || "(905)-760-2922")}`,
     "",
     "Warm regards,",
     "The Pixel Pulse Team",

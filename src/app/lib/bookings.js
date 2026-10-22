@@ -1,3 +1,4 @@
+import { phoneSearchDigits, matchesPhoneSearch } from "./phone.mjs";
 import crypto from "node:crypto";
 import { getPostgresPool, query } from "@/lib/postgres";
 import { db } from "@/lib/firestore";
@@ -167,7 +168,7 @@ async function firestoreBookingsSnapshot({ from, to, status, q, date } = {}) {
       if (status && status !== "all" && booking.status !== status) return false;
       if (!needle) return true;
       return [booking.customerName, booking.childName, booking.phone, booking.email, booking.partyId]
-        .some((value) => String(value || "").toLowerCase().includes(needle));
+        .some((value) => String(value || "").toLowerCase().includes(needle)) || matchesPhoneSearch(booking.phone, needle);
     })
     .sort((a, b) => (a.date === b.date ? (a.startMinutes ?? 0) - (b.startMinutes ?? 0) : a.date < b.date ? 1 : -1));
 }
@@ -361,8 +362,14 @@ export async function listBookings({ from, to, status, q, date } = {}) {
   if (q && q.trim()) {
     params.push(`%${q.trim().toLowerCase()}%`);
     const idx = `$${params.length}`;
+    const digits = phoneSearchDigits(q);
+    let phoneClause = "";
+    if (digits) {
+      params.push(`%${digits}%`);
+      phoneClause = ` or regexp_replace(coalesce(phone,''), '[^0-9]', '', 'g') like $${params.length}`;
+    }
     where.push(
-      `(lower(customer_name) like ${idx} or lower(coalesce(child_name,'')) like ${idx} or lower(coalesce(phone,'')) like ${idx} or lower(coalesce(email,'')) like ${idx} or lower(coalesce(party_id,'')) like ${idx})`,
+      `(lower(customer_name) like ${idx} or lower(coalesce(child_name,'')) like ${idx} or lower(coalesce(phone,'')) like ${idx} or lower(coalesce(email,'')) like ${idx} or lower(coalesce(party_id,'')) like ${idx}${phoneClause})`,
     );
   }
 

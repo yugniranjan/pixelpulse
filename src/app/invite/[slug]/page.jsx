@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import "../../styles/invite.css";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -252,7 +253,7 @@ export default async function InviteSlugPage({ params }) {
             <div className="ppp-invite-rsvp">
               {invite.rsvpLabel ? <span>{invite.rsvpLabel}</span> : null}
               <p>
-                {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{invite.phone}</a>
+                {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{formatPhoneNumber(invite.phone)}</a>
               </p>
             </div>
           ) : null}
@@ -262,7 +263,7 @@ export default async function InviteSlugPage({ params }) {
               {businessTelHref ? (
                 <a href={businessTelHref}>
                   <span>{invite.businessPhoneLabel}</span>
-                  {invite.businessPhone}
+                  {formatPhoneNumber(invite.businessPhone)}
                 </a>
               ) : null}
               {finalDirectionsLink ? (

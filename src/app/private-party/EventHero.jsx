@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -185,7 +186,7 @@ export default function EventHero() {
             </label>
             <label>
               Phone
-              <input type="tel" autoComplete="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} required />
+              <PhoneInput type="tel" autoComplete="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} required />
             </label>
           </div>
           <label>

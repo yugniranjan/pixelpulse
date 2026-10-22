@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
@@ -21,7 +22,7 @@ const INITIAL_FORM = {
   phone: "",
   date: "",
   time: "",
-  selectedPackage: "Pixel Punch",
+  selectedPackage: "Pixel Ultra",
   extraPlayTime: "",
   message: "",
 };
@@ -120,6 +121,16 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
     : [];
 
   useEffect(() => {
+    // Carry only non-identifying planning preferences from the homepage guide.
+    const partyDate = searchParams.get("partyDate") || "";
+    const partyDetails = searchParams.get("partyDetails") || "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(partyDate) || partyDetails.startsWith("PixiePlay party enquiry: ")) {
+      setFormData((current) => ({
+        ...current,
+        ...(/^\d{4}-\d{2}-\d{2}$/.test(partyDate) && !current.date ? { date: partyDate } : {}),
+        ...(partyDetails.startsWith("PixiePlay party enquiry: ") && !current.message ? { message: partyDetails.slice(0, 400) } : {}),
+      }));
+    }
     const requestedName = (searchParams.get("package") || "").trim().toLowerCase();
     const requestedPackage = packageOptions.map(normalizePackageOption)
       .find((option) => option.name?.trim().toLowerCase() === requestedName)?.name;
@@ -212,7 +223,12 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
       <div className="ppp-birthday-hero-form__fields">
         {packageChoices.length > 0 ? (
           <label className="ppp-birthday-hero-form__wide ppp-birthday-hero-form__package-select">
-            <span>Choose a party package</span>
+            <span className="ppp-birthday-hero-form__package-label">
+              <span>Choose a party package</span>
+              {formData.selectedPackage === "Pixel Ultra" ? (
+                <span className="ppp-birthday-hero-form__popular">★ Most popular</span>
+              ) : null}
+            </span>
             <select
               name="selectedPackage"
               value={formData.selectedPackage}
@@ -282,7 +298,7 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
 
         <label>
           <span>Phone</span>
-          <input
+          <PhoneInput
             type="tel"
             name="phone"
             value={formData.phone}

@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
@@ -417,7 +418,7 @@ export default function FeedbackForm({ initial = {} }) {
               </label>
               <label>
                 <span>Phone *</span>
-                <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Phone number" required />
+                <PhoneInput type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Phone number" required />
               </label>
               <label>
                 <span>How did you hear about us? *</span>

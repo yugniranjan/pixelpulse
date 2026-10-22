@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../../styles/contactus.css";
@@ -9,7 +10,7 @@ import { toast } from "sonner";
 import TurnstileWidget from "./TurnstileWidget";
 
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
-const CONTACT_PHONE = "+1 (905) 760-2922";
+const CONTACT_PHONE = "(905)-760-2922";
 const birthdayPackageNotice =
   "Birthday party packages include a hosted party experience and party room time, but they do not reserve the entire facility or play area for private use.";
 const PARTY_SLOT_STARTS = [
@@ -198,7 +199,7 @@ function ContactForm() {
 
           <div className="form-group">
             <label htmlFor="phone">Phone Number <span>*</span></label>
-            <input
+            <PhoneInput
               type="tel"
               id="phone"
               name="phone"

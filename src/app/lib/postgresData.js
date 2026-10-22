@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { phoneLookupVariants } from "./phone.mjs";
 import { getPostgresPool, query } from "@/lib/postgres";
 
 export function hasPostgres() {
@@ -291,19 +292,19 @@ export async function listPostgresWaiversByEmail(email, limit = 50) {
 }
 
 export async function listPostgresWaiversByPhone(phone, limit = 50) {
-  const normalizedPhone = String(phone || "").replace(/\D/g, "");
-  if (!normalizedPhone) return [];
+  const phoneVariants = phoneLookupVariants(phone);
+  if (!phoneVariants.length) return [];
 
   const phoneExpr = "regexp_replace(coalesce(primary_participant->>'phone', raw->'primary'->>'phone', ''), '\\D', '', 'g')";
   const result = await query(
     `
       select *
       from waivers
-      where ${phoneExpr} = $1
+      where ${phoneExpr} = any($1::text[])
       order by submitted_at desc nulls last
       limit $2
     `,
-    [normalizedPhone, limit],
+    [phoneVariants, limit],
   );
 
   return result.rows.map(normalizeWaiverRow);

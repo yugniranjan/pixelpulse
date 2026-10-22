@@ -411,6 +411,30 @@
   resize: vertical;
 }
 
+.ppp-birthday-hero-form__package-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.ppp-birthday-hero-form__popular {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid #ffe591;
+  border-radius: 999px;
+  background: #ffd66b;
+  color: #231900;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(255, 214, 107, 0.2);
+}
+
 .ppp-birthday-hero-form__package-summary {
   display: grid;
   gap: 6px;

@@ -11,7 +11,7 @@ const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const CONTACT_EMAIL = "connect@pixelpulseplay.ca";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const SITE_URL = "https://www.pixelpulseplay.ca";
-const PHONE_DISPLAY = "(905) 760-2922";
+const PHONE_DISPLAY = "(905)-760-2922";
 const PHONE_TEL = "+19057602922";
 const ADDRESS = "960 Edgeley Blvd, Vaughan, ON L4K 4V4";
 

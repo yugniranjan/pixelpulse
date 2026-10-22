@@ -4,14 +4,17 @@ import { createRequire } from "node:module";
 import { test } from "node:test";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as phoneFormatting from "../src/app/lib/phone.mjs";
 import * as groupUtilities from "../src/app/lib/groupInvites.js";
 import * as ctaUtilities from "../src/app/lib/ctaContent.js";
 import * as trackingScope from "../src/app/lib/trackingScope.js";
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
+let phoneInputComponent;
 
 async function component(path, overrides = {}) {
+  if (!phoneInputComponent && !path.endsWith('/PhoneInput.jsx')) phoneInputComponent = await component('../src/app/components/PhoneInput.jsx');
   const source = await readFile(new URL(path, import.meta.url), "utf8");
   const { code } = transformSync(source, {
     filename: path,
@@ -22,6 +25,8 @@ async function component(path, overrides = {}) {
   const resolve = (name) => {
     if (name.endsWith(".css")) return {};
     if (name === "@/lib/groupInvites") return groupUtilities;
+    if (name === "@/lib/phone.mjs") return phoneFormatting;
+    if (name === "@/components/PhoneInput") return phoneInputComponent;
     if (name === "next/image") return ({ fill, priority, ...props }) => React.createElement("img", props);
     return overrides[name] || require(name);
   };
@@ -65,6 +70,8 @@ test("guest group invite renders its name, Group ID, and waiver link without bir
     assert.match(html, /floorchallenge.webp/);
     assert.match(html, /ppp-group-invite-tiles/);
     assert.match(html, /<header class="ppp-group-invite-header">/);
+    assert.match(html, /\(905\)-555-0100/);
+    assert.match(html, /href="tel:9055550100"/);
     assert.doesNotMatch(html, /Birthday|Party ID|balloon|&#x27;s/);
   }
 });
@@ -200,7 +207,7 @@ test("middleware overwrites spoofed tracking paths and preserves public subdomai
   }
 });
 
-test("Punch and Ultra use online booking while Jumbo and Max retain inquiry", async () => {
+test("all birthday packages use the enquiry form", async () => {
   for (const selectedPackage of ["Pixel Punch", "Pixel Ultra", "Pixel Jumbo", "Pulse Max"]) {
     const BirthdayForm = await component("../src/app/components/BirthdayHeroContactForm.jsx", {
       react: {
@@ -213,14 +220,8 @@ test("Punch and Ultra use online booking while Jumbo and Max retain inquiry", as
       "./smallComponents/TurnstileWidget": { default: () => null },
     });
     const html = renderToStaticMarkup(React.createElement(BirthdayForm, { packageOptions: [selectedPackage] }));
-    if (["Pixel Punch", "Pixel Ultra"].includes(selectedPackage)) {
-      assert.match(html, /lilypadpos\.app\/public\/onlinebooking\/step1\.php\?ptid=21/);
-      assert.match(html, /Continue to online booking/);
-      assert.doesNotMatch(html, /Send Birthday Request|Select a package to continue/);
-    } else {
-      assert.match(html, /Send Birthday Request/);
-      assert.doesNotMatch(html, /lilypadpos\.app/);
-    }
+    assert.match(html, /Send Birthday Request/);
+    assert.doesNotMatch(html, /lilypadpos\.app/);
   }
 });
 

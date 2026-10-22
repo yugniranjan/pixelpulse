@@ -45,7 +45,7 @@ const VrTeaserModal = ({ config = {} }) => {
     const openWhenClear = () => {
       if (isCancelled) return;
 
-      if (document.querySelector(".modal-overlay")) {
+      if (document.querySelector(".modal-overlay, .pixieplay__panel, .pixieplay__invite")) {
         retryTimeout = window.setTimeout(openWhenClear, 2400);
         return;
       }

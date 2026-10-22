@@ -1,5 +1,6 @@
 // 'use client';
 
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import Image from "next/image";
 import "../styles/home.css";
 import Link from "next/link";
@@ -39,7 +40,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const footerPhone = getConfiguredValue(
     configdata,
     ["footerPhone", "contactPhone", "locationPhone"],
-    "+1 (905) 760-2922",
+    "+19057602922",
   );
   const footerPhoneHref = footerPhone?.replace(/[^\d+]/g, "");
   const footerEmail = getConfiguredValue(
@@ -280,7 +281,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               {footerPhone && (
                 <a href={`tel:${footerPhoneHref}`} className="aero_footer_phone_link">
                   <span>Call Now</span>
-                  <strong>{footerPhone}</strong>
+                  <strong>{formatPhoneNumber(footerPhone)}</strong>
                 </a>
               )}
               {footerEmail && (

@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
@@ -8,8 +9,8 @@ const BUSINESS_NAME = "Pixel Pulse Play Zone";
 const LOGO_URL = "https://storage.googleapis.com/pixel-pulse-play/web/h-Logo.png";
 const ATTRACTIONS_URL = "https://www.pixelpulseplay.ca/attractions";
 const PRIVATE_PARTY_EMAIL = CONTACT_EMAIL;
-const PRIVATE_PARTY_PHONE = "+1 (905) 760-2922";
-const PRIVATE_PARTY_PHONE_DISPLAY = "(905) 760-2922";
+const PRIVATE_PARTY_PHONE = "(905)-760-2922";
+const PRIVATE_PARTY_PHONE_DISPLAY = "(905)-760-2922";
 const HOW_TO_PLAY_URL = "https://www.pixelpulseplay.ca/how-to-play";
 const BIRTHDAY_PACKAGE_REPLY_LINES = [
   "Here’s a quick overview of how our birthday parties work:",
@@ -248,7 +249,7 @@ export async function POST(request) {
     const visitorName = cleanHeaderValue(fullName, "Website Inquiry");
     const visitorDisplayName = visitorName.toLowerCase();
     const visitorEmail = cleanEmailAddress(email, "");
-    const visitorPhone = cleanHeaderValue(phone, "");
+    const visitorPhone = formatPhoneNumber(cleanHeaderValue(phone, ""));
     const childDisplayName = cleanHeaderValue(childName, "");
     const childDisplayYear = cleanHeaderValue(childYear || age, "");
 

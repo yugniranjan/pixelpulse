@@ -1,0 +1,13 @@
+# PixiePlay
+
+PixiePlay is a local FAQ and guided planning widget on the homepage and `/birthday-party-landing`. It is intentionally absent from `/birthday-party-bookings-vaughan` and the root of `birthdays.pixelpulseplay.ca`. It uses no AI provider, API key, external chat endpoint, or paid inference service.
+
+The structure and topics follow the [shared birthday enquiry analysis](https://chatgpt.com/share/6ada028a-3a4c-83e9-88f1-8498a610817a): birthday planning, corporate/group events, existing bookings, and general questions. The reference is used as source material, not embedded or shown as the visitor's chat destination. Its suggestions for future automation do not create bookings or send messages.
+
+The birthday planner collects a guest-count range, age range, optional preferred date, and standard/private preference. Visitors can explore before choosing a date. It keeps these preferences only in component memory, including when the chat is closed and reopened; starting over clears them. Continuing to the birthday enquiry passes any selected date and a short summary in URL parameters to prefill the existing form. Visitors must complete and submit that form themselves. The “Corporate or group event” action opens https://events.pixelpulseplay.ca directly. Private-event replies and private birthday-plan requests use the same destination.
+
+The birthday pages use party-focused launcher copy and a three-step planning action. The opening menu presents the four paths with icons and short descriptions. After eight seconds, a small invitation may appear once per browser session; it waits while visitors are typing, the tab is hidden, or another dialog is open. It can be dismissed and never opens the chat automatically. Only its shown/dismissed flag uses session storage; chat messages and planning preferences are not persisted. Opening the chat focuses its panel instead of opening the mobile keyboard. Motion respects reduced-motion preferences.
+
+Answers use curated rules in `src/app/lib/pixiePlay.mjs` and the existing website FAQ data. Where the shared analysis flags uncertain pricing, deposit, payment, timing, or promotion details, the guide directs visitors to the team/current package page. Current published birthday-page policies take precedence over conflicting reference suggestions. No customer names, email excerpts, or private enquiry details from the analysis are included.
+
+Test with `node --test tests/pixieplay.test.mjs`, lint the changed files, and run the Next.js build. Browser checks should cover all four paths, birthday planner/back/reset, form prefilling, an unknown question, and mobile layout. Do not submit real enquiries during verification.

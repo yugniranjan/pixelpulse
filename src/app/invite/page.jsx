@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import "../styles/invite.css";
 import Image from "next/image";
 import { fetchsheetdata } from "@/lib/sheets";
@@ -221,14 +222,14 @@ export default async function InvitePage() {
           {invite.phone ? <div className="ppp-invite-rsvp">
             <span>{invite.rsvpLabel}</span>
             <p>
-              {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{invite.phone}</a>
+              {invite.rsvpText} {invite.rsvpName ? `${invite.rsvpName} at ` : null}<a href={telHref}>{formatPhoneNumber(invite.phone)}</a>
             </p>
           </div> : null}
 
           <div className="ppp-invite-actions" aria-label={invite.contactLinksLabel}>
             <a href={businessTelHref}>
               <span>{invite.businessPhoneLabel}</span>
-              {invite.businessPhone}
+              {formatPhoneNumber(invite.businessPhone)}
             </a>
             {finalDirectionsLink ? (
               <a href={finalDirectionsLink} target="_blank" rel="noopener noreferrer">

@@ -1,3 +1,4 @@
+import { phoneLookupVariants } from "./phone.mjs";
 import { getPostgresPool, query } from "@/lib/postgres";
 import { ensureRewardsTables, unlockRewardsForPlayers } from "@/lib/rewards";
 
@@ -118,9 +119,9 @@ export async function lookupRewardPlayers(identifierValue = "") {
         select w.*
         from waivers w
         where ($1 <> '' and lower(coalesce(w.primary_participant->>'email', '')) = $1)
-          or ($2 <> '' and regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') = $2)
+          or (cardinality($2::text[]) > 0 and regexp_replace(coalesce(w.primary_participant->>'phone', ''), '\\D', '', 'g') = any($2::text[]))
           or (
-            ($1 <> '' or $2 <> '')
+            ($1 <> '' or cardinality($2::text[]) > 0)
             and exists (
               select 1
               from jsonb_array_elements(
@@ -130,7 +131,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
                 end
               ) member
               where ($1 <> '' and lower(coalesce(member->>'email', '')) = $1)
-                or ($2 <> '' and regexp_replace(coalesce(member->>'phone', ''), '\\D', '', 'g') = $2)
+                or (cardinality($2::text[]) > 0 and regexp_replace(coalesce(member->>'phone', ''), '\\D', '', 'g') = any($2::text[]))
             )
           )
       ),
@@ -181,7 +182,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
         select distinct *
         from waiver_people
         where ($1 <> '' and email = $1)
-          or ($2 <> '' and phone = $2)
+          or (cardinality($2::text[]) > 0 and phone = any($2::text[]))
       ),
       candidate_players as (
         select distinct p."PlayerID" as player_id
@@ -270,7 +271,7 @@ export async function lookupRewardPlayers(identifierValue = "") {
       order by lifetime_points desc, p."PlayerID" desc
       limit 10
     `,
-    [email.includes("@") ? email : "", phone, playerId, nameSearch, `%${nameSearch}%`],
+    [email.includes("@") ? email : "", phoneLookupVariants(phone), playerId, nameSearch, `%${nameSearch}%`],
   );
 
   const playerIds = matchedPlayers.rows.map((player) => Number(player.player_id));

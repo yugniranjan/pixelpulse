@@ -23,6 +23,8 @@ import { getConfiguredValue, getConfigValue, getCtaContent } from "@/lib/ctaCont
 import { canonicalUrl, safeImageUrl } from "@/lib/seo";
 
 import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
+import PixiePlay from "@/components/PixiePlay";
+import { buildPixiePlayKnowledge } from "@/lib/pixiePlay.mjs";
 
 export const revalidate = 900;
 
@@ -717,14 +719,16 @@ const Home = async () => {
   let homePageData = null;
   let dataconfig = [];
   let siteData = emptySiteData;
+  let pixieFaqs = [];
 
   try {
-    [waiverLink, data, homePageData, dataconfig, siteData] = await Promise.all([
+    [waiverLink, data, homePageData, dataconfig, siteData, pixieFaqs] = await Promise.all([
       getWaiverLink(location_slug),
       fetchMenuData(location_slug),
       fetchPageData(location_slug, "home"),
       fetchsheetdata("config", location_slug),
       fetchGoogleSiteDataSheets().then(parseSiteDataSheets),
+      fetchsheetdata("faq", location_slug).catch(() => []),
     ]);
   } catch (error) {
     console.error("home page data failed:", error);
@@ -1493,6 +1497,7 @@ const Home = async () => {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(pixelPulseSchema) }}
         />
       )}
+      <PixiePlay knowledge={buildPixiePlayKnowledge(pixieFaqs, siteData.location.address)} />
     </main>
   );
 };

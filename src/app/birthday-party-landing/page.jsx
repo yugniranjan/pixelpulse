@@ -4,6 +4,8 @@ import "../styles/birthday-landing.css";
 import Image from "next/image";
 import Script from "next/script";
 import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
+import PixiePlay from "@/components/PixiePlay";
+import { buildPixiePlayKnowledge } from "@/lib/pixiePlay.mjs";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { getConfiguredValue } from "@/lib/ctaContent";
@@ -210,10 +212,11 @@ function getAttractions(menuData = []) {
 }
 
 export default async function BirthdayPartyLandingPage() {
-  const [configData, landingData, menuData] = await Promise.all([
+  const [configData, landingData, menuData, pixieFaqs] = await Promise.all([
     getBirthdayConfigData(),
     getBirthdayLandingData(),
     getBirthdayMenuData(),
+    fetchsheetdata("faq", LOCATION_SLUG).catch(() => []),
   ]);
 
   const packagesData = parseBirthdayPackages(configData);
@@ -496,6 +499,7 @@ export default async function BirthdayPartyLandingPage() {
           </div>
         </section>
       ) : null}
+        <PixiePlay variant="birthday" knowledge={buildPixiePlayKnowledge(pixieFaqs)} />
       </main>
     </>
   );

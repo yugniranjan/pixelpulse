@@ -1,5 +1,6 @@
 "use client";
 
+import PhoneInput from "@/components/PhoneInput";
 import { useState } from "react";
 import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
 import TurnstileWidget from "./smallComponents/TurnstileWidget";
@@ -156,7 +157,7 @@ export default function SquadSignupForm({ content = {} }) {
 
         <label>
           <span>{formContent.phoneLabel}</span>
-          <input
+          <PhoneInput
             name="phone"
             type="tel"
             value={formData.phone}

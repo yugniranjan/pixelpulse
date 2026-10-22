@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "@/components/AdminShell";
 import "../../styles/admin-feedback.css";
@@ -588,7 +589,7 @@ export default function AdminFeedbackPage() {
                   <h2>{item.name}</h2>
                   <div className="feedback-admin__meta">
                     <span>{item.email}</span>
-                    {item.phone ? <span>{item.phone}</span> : null}
+                    {item.phone ? <span>{formatPhoneNumber(item.phone)}</span> : null}
                     <span>Heard: {item.heardAboutUs || "Not provided"}</span>
                     <span>Submitted: {formatDate(item.createdAt)}</span>
                     <span>Visit: {item.visitDate || "Not provided"}</span>

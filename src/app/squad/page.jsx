@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import Image from "next/image";
 import "../styles/squad.css";
 import SquadSignupForm from "@/components/SquadSignupForm";
@@ -194,7 +195,7 @@ function getSquadContent(rows = []) {
       errorText: getConfiguredValue(rows, ["squadReferralErrorText", "referralErrorText"], "Could not send referral. Please try again."),
     },
     website: getConfiguredValue(rows, ["squadWebsite", "website"], "www.pixelpulseplay.ca"),
-    phone: getConfiguredValue(rows, ["squadPhone", "phone"], "905-760-2922"),
+    phone: getConfiguredValue(rows, ["squadPhone", "phone"], "(905)-760-2922"),
     email: getConfiguredValue(rows, ["squadEmail", "email"], "connect@pixelpulsplay.ca"),
     address: getConfiguredValue(rows, ["squadAddress", "address"], "960 Edgeley Blvd, Vaughan Mills"),
     termsTitle: getConfiguredValue(rows, ["squadTermsTitle", "termsTitle"], "Terms and Conditions"),
@@ -350,7 +351,7 @@ export default async function SquadLandingPage() {
         <div className="ppp-squad-shell ppp-squad-signup__grid">
           <div className="ppp-squad-contact-card">
             <span>{content.website}</span>
-            <strong>{content.phone}</strong>
+            <strong>{formatPhoneNumber(content.phone)}</strong>
             <span>{content.email}</span>
             <p>{content.address}</p>
           </div>

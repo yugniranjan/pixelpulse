@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
 import { getConfigValue } from "@/lib/ctaContent";
@@ -173,7 +174,7 @@ function buildConfirmationEmailText(invite = {}) {
   const venue = invite.venue || "Pixel Pulse PlayZone";
   const address = invite.address || DEFAULT_ADDRESS;
   const website = invite.websiteLink || "https://www.pixelpulseplay.ca";
-  const phone = invite.businessPhone || "+1 (905) 760-2922";
+  const phone = formatPhoneNumber(invite.businessPhone || "(905)-760-2922");
 
   return [
     `Dear ${hostName},`,

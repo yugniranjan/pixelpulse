@@ -544,7 +544,7 @@ export default async function PrivatePartyPage() {
               Request Event Details
             </a>
             <a className="ppp-private-btn ppp-private-btn--ghost" href={phoneUrl}>
-              Call +1 (905) 760-2922
+              Call (905)-760-2922
             </a>
           </div>
           <small>Pixel Pulse Play Vaughan | connect@pixelpulseplay.ca</small>

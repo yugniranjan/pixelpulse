@@ -9,8 +9,18 @@ async function loadRoute(path, dependencies, env = {}) {
   await route.link(async (specifier) => {
     if (specifier === "@/lib/groupInvites") {
       const module = new SourceTextModule(await readFile(new URL("../src/app/lib/groupInvites.js", import.meta.url), "utf8"), { context });
-      await module.link(() => { throw new Error("Unexpected group utility dependency"); });
+      await module.link(async (specifier) => {
+        assert.equal(specifier, "./phone.mjs");
+        const phone = new SourceTextModule(await readFile(new URL("../src/app/lib/phone.mjs", import.meta.url), "utf8"), { context });
+        await phone.link(() => { throw new Error("Unexpected phone dependency"); });
+        return phone;
+      });
       return module;
+    }
+    if (specifier === "@/lib/phone.mjs") {
+      const phone = new SourceTextModule(await readFile(new URL("../src/app/lib/phone.mjs", import.meta.url), "utf8"), { context });
+      await phone.link(() => { throw new Error("Unexpected phone dependency"); });
+      return phone;
     }
     const exports = dependencies[specifier];
     assert(exports, `Missing dependency: ${specifier}`);
@@ -112,6 +122,8 @@ test("group invite, waiver, and confirmation emails have Group ID wording withou
   const api = await loadRoute("../src/app/api/admin/invites/email/route.js", {
     "next/server": { NextResponse: Response },
     nodemailer: { default: { createTransport: () => ({ sendMail: async (mail) => messages.push(mail) }) } },
+    "@/lib/visitRecaps": { createVisitRecap: async () => null },
+    "@/lib/visitRecapEmail": { renderVisitRecapEmail: () => '', visitRecapEmailText: () => '' },
   }, { GMAIL_USER: "test@example.test", GMAIL_APP_PASSWORD: "test-only" });
   const base = { email: "guest@example.test", inviteType: "group", groupId: "GROUP-101", inviteUrl: "https://example.test/invite/acme", waiverUrl: "https://example.test/waiver?groupId=GROUP-101" };
   const { api: invites } = await inviteStore();

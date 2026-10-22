@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/AdminShell";
@@ -211,7 +212,7 @@ export default function WaiverReportsPage() {
       (r.children || []).map((c) => c.name).join("; "),
       (r.children || []).map((c) => c.age).join("; "),
       r.email,
-      r.phone,
+      formatPhoneNumber(r.phone),
       r.partyId,
       r.type === "Walk-in" ? "Yes" : "No",
       r.type === "Party" ? "Yes" : "No",

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/AdminShell";
@@ -262,7 +263,7 @@ export default function PartyHostsPage() {
                         <td>{p.visitDate || "—"}</td>
                         <td>{p.host.name || "—"}</td>
                         <td>{hasEmail(p.host) ? p.host.email : <span title="No usable email">{p.host.email || "—"}</span>}</td>
-                        <td>{p.host.phone || "—"}</td>
+                        <td>{formatPhoneNumber(p.host.phone) || "—"}</td>
                         <td><ChildCell name={p.host.childName} age={p.host.childAge} source={p.host.childSource} /></td>
                         <td><SignersPanel signers={p.signers} /></td>
                         <td>

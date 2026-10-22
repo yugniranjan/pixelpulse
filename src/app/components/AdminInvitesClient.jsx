@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPhoneNumber } from "@/lib/phone.mjs";
+import PhoneInput from "@/components/PhoneInput";
 import { useEffect, useMemo, useState } from "react";
 import "../styles/admin-invites.css";
 import "../styles/admin-waivers.css";
@@ -27,7 +29,7 @@ function Field({ label, required = false, children }) {
   );
 }
 
-const DEFAULT_BUSINESS_PHONE = "+1 (905) 760-2922";
+const DEFAULT_BUSINESS_PHONE = "+19057602922";
 const DEFAULT_ADDRESS = "960 Edgeley Blvd #2, Vaughan, ON L4K 4V4";
 const DEFAULT_DIRECTIONS_LINK =
   "https://www.google.com/maps/search/?api=1&query=960%20Edgeley%20Blvd%20%232%2C%20Vaughan%2C%20ON%20L4K%204V4";
@@ -517,10 +519,10 @@ export default function AdminInvitesClient({ inviteType = "birthday" }) {
               <input required value={form.rsvpName} onChange={(event) => updateField("rsvpName", event.target.value)} placeholder={isGroup ? "Group organizer name" : "Parent or guardian name"} />
             </Field>
             <Field label="RSVP phone" required>
-              <input required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder={isGroup ? "Organizer RSVP number" : "Parent or guardian RSVP number"} />
+              <PhoneInput required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder={isGroup ? "Organizer RSVP number" : "Parent or guardian RSVP number"} />
             </Field>
             <Field label="Pixel Pulse phone">
-              <input value={form.businessPhone} onChange={(event) => updateField("businessPhone", event.target.value)} />
+              <PhoneInput value={form.businessPhone} onChange={(event) => updateField("businessPhone", event.target.value)} />
             </Field>
             <Field label="Google Maps link">
               <input value={form.directionsLink} onChange={(event) => updateField("directionsLink", event.target.value)} />
@@ -700,7 +702,7 @@ export default function AdminInvitesClient({ inviteType = "birthday" }) {
                   <input required value={editingInvite.rsvpName} onChange={(event) => updateEditingInvite("rsvpName", event.target.value)} />
                 </Field>
                 <Field label="RSVP phone" required>
-                  <input required value={editingInvite.phone} onChange={(event) => updateEditingInvite("phone", event.target.value)} />
+                  <PhoneInput required value={editingInvite.phone} onChange={(event) => updateEditingInvite("phone", event.target.value)} />
                 </Field>
                 <Field label="Venue">
                   <input value={editingInvite.venue} onChange={(event) => updateEditingInvite("venue", event.target.value)} />
@@ -727,7 +729,7 @@ export default function AdminInvitesClient({ inviteType = "birthday" }) {
                   <input value={editingInvite.rsvpText} onChange={(event) => updateEditingInvite("rsvpText", event.target.value)} />
                 </Field>
                 <Field label="Pixel Pulse phone">
-                  <input value={editingInvite.businessPhone} onChange={(event) => updateEditingInvite("businessPhone", event.target.value)} />
+                  <PhoneInput value={editingInvite.businessPhone} onChange={(event) => updateEditingInvite("businessPhone", event.target.value)} />
                 </Field>
                 <Field label="Google Maps link">
                   <input value={editingInvite.directionsLink} onChange={(event) => updateEditingInvite("directionsLink", event.target.value)} />
@@ -783,7 +785,7 @@ export default function AdminInvitesClient({ inviteType = "birthday" }) {
                       <td>{invite.childName || "—"}</td>
                       <td>{invite.partyId || "—"}</td>
                       <td>{[invite.date, invite.time].filter(Boolean).join(" ") || "—"}</td>
-                      <td>{[invite.rsvpName, invite.phone].filter(Boolean).join(" · ") || "—"}</td>
+                      <td>{[invite.rsvpName, formatPhoneNumber(invite.phone)].filter(Boolean).join(" · ") || "—"}</td>
                       <td>
                         {invite.inviteUrl ? (
                           <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer">View</a>

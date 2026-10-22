@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPhoneNumber, matchesPhoneSearch } from "@/lib/phone.mjs";
 import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
@@ -59,7 +60,7 @@ function WaiverRecord({ waiver }) {
       <summary className="waiver-admin-card__summary">
         <span>
           <strong>Parent / Guardian: {waiver.primaryName || participantName(waiver.primary)}</strong>
-          <em>{waiver.primary?.phone || waiver.primary?.email || "No contact"}</em>
+          <em>{formatPhoneNumber(waiver.primary?.phone) || waiver.primary?.email || "No contact"}</em>
         </span>
         <span>
           <strong>{children.length || "No"} child{children.length === 1 ? "" : "ren"}</strong>
@@ -87,7 +88,7 @@ function WaiverRecord({ waiver }) {
             <div><dt>DOB</dt><dd>{waiver.primary?.dob || "Not provided"}</dd></div>
             <div><dt>Gender</dt><dd>{waiver.primary?.gender || "Not provided"}</dd></div>
             <div><dt>Email</dt><dd>{waiver.primary?.email || "Not provided"}</dd></div>
-            <div><dt>Phone</dt><dd>{waiver.primary?.phone || "Not provided"}</dd></div>
+            <div><dt>Phone</dt><dd>{formatPhoneNumber(waiver.primary?.phone) || "Not provided"}</dd></div>
             <div><dt>City</dt><dd>{waiver.primary?.city || "Not provided"}</dd></div>
             <div><dt>Health condition</dt><dd>{waiver.primary?.healthCondition || "Not Applicable"}</dd></div>
             <div><dt>Medical notes</dt><dd>{waiver.primary?.medicalNotes || "None"}</dd></div>
@@ -104,7 +105,7 @@ function WaiverRecord({ waiver }) {
             <div><dt>Party time</dt><dd>{waiver.visit?.visitTime || "Not provided"}</dd></div>
             <div><dt>Emergency contact</dt><dd>{waiver.visit?.emergencyName || "Not provided"}</dd></div>
             <div><dt>Relationship</dt><dd>{waiver.visit?.emergencyRelation || "Not provided"}</dd></div>
-            <div><dt>Emergency phone</dt><dd>{waiver.visit?.emergencyPhone || "Not provided"}</dd></div>
+            <div><dt>Emergency phone</dt><dd>{formatPhoneNumber(waiver.visit?.emergencyPhone) || "Not provided"}</dd></div>
             <div><dt>Printed name</dt><dd>{waiver.visit?.printName || "Not provided"}</dd></div>
             <div><dt>Signed date</dt><dd>{waiver.visit?.signDate || "Not provided"}</dd></div>
           </dl>
@@ -183,7 +184,7 @@ export default function LocalWaiverDashboard({ waivers }) {
       const searchableValues = [
         waiver.primaryName,
         waiver.primary?.email,
-        waiver.primary?.phone,
+        formatPhoneNumber(waiver.primary?.phone),
         waiver.visit?.partyId,
         waiver.visit?.partyName,
         waiver.visit?.passType,
@@ -194,7 +195,7 @@ export default function LocalWaiverDashboard({ waivers }) {
           ? partyId === needle
           : searchableValues
             .filter(Boolean)
-            .some((value) => normalizeSearchValue(value).includes(needle))
+            .some((value) => normalizeSearchValue(value).includes(needle)) || matchesPhoneSearch(waiver.primary?.phone, needle)
       );
 
       const waiverVisitDate = waiver.visit?.visitDate || "";
@@ -213,7 +214,7 @@ export default function LocalWaiverDashboard({ waivers }) {
         waiver.primaryName,
         participantName(waiver.primary),
         waiver.primary?.email,
-        waiver.primary?.phone,
+        formatPhoneNumber(waiver.primary?.phone),
         waiver.visit?.partyId,
         waiver.visit?.partyName,
         waiver.visit?.passType,

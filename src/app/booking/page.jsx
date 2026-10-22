@@ -349,7 +349,7 @@ export default async function BookingPage({ searchParams }) {
               <div className="ppp-booking-help__links">
                 <Link href="/contactus">Contact us</Link>
                 <a href="mailto:connect@pixelpulseplay.ca">Email us</a>
-                <a href="tel:+19057602922">Call 905-760-2922</a>
+                <a href="tel:+19057602922">Call (905)-760-2922</a>
               </div>
             </div>
           </div>
