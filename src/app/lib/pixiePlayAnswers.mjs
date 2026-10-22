@@ -1,3 +1,5 @@
+import { BIRTHDAY_DEPOSIT_ANSWER } from './birthdayPolicy.mjs';
+
 // Customer-facing content adapted from the two supplied chatbot CSVs.
 // Internal notes, historical prices and unverified policy promises are not bundled.
 const answers = [
@@ -352,7 +354,7 @@ const answers = [
   {
     "id": "PPP-039",
     "question": "Is a deposit required and how much?",
-    "answer": "The deposit is $100 for Pixel Punch and $200 for all other birthday packages. E-transfers can be sent to connect@pixelpulseplay.ca. Our team confirms your reservation after checking availability and verifying the payment.",
+    "answer": BIRTHDAY_DEPOSIT_ANSWER,
     "topic": "birthday"
   },
   {

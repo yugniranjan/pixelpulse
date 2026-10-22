@@ -107,13 +107,13 @@ test('birthday plan carries preferences to the enquiry without quoting prices or
   assert.doesNotMatch(plan.text, /\$\d|reservation confirmed/i);
 });
 
-test('private and younger/small-group plans route to the appropriate human confirmation', () => {
-  const base = { guests: '4–7', age: 'Under 7', date: '2026-11-15', privacy: 'Help me choose' };
+test('private and small-group plans route to the appropriate human confirmation', () => {
+  const base = { guests: '4–7', age: '7–10', date: '2026-11-15', privacy: 'Help me choose' };
   assert.match(getPixiePartyPlan(base).text, /confirm the right option/);
   const privatePlan = getPixiePartyPlan({ ...base, privacy: 'Private venue booking' });
   assert.equal(privatePlan.links[0].href, 'https://events.pixelpulseplay.ca');
   assert.match(privatePlan.text, /exclusive venue access/);
-  for (const invalid of [{ guests: 'bad' }, { age: 'unknown' }, { date: '2026-02-30' }, { date: '2026-2-3' }, { privacy: 'anything' }]) {
+  for (const invalid of [{ guests: 'bad' }, { age: 'unknown' }, { age: 'Under 7' }, { date: '2026-02-30' }, { date: '2026-2-3' }, { privacy: 'anything' }]) {
     assert.equal(getPixiePartyPlan({ ...base, ...invalid }), null);
   }
 });

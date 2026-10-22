@@ -1,4 +1,5 @@
 import { formatPhoneNumber } from "@/lib/phone.mjs";
+import { BIRTHDAY_DEPOSIT_NOTICE, BIRTHDAY_TRANSFER_NOTICE } from "@/lib/birthdayPolicy.mjs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
@@ -28,6 +29,7 @@ const BIRTHDAY_PACKAGE_REPLY_LINES = [
   `How to Play: ${HOW_TO_PLAY_URL}`,
   "",
   "Important to Know",
+  `- ${BIRTHDAY_DEPOSIT_NOTICE} ${BIRTHDAY_TRANSFER_NOTICE}`,
   "- Birthday packages take place during regular operating hours and are not private facility rentals. If you are looking for a private party, ask for a custom package as per your requirement.",
   "- Other parties and walk-in guests may be present, but unrelated groups are not mixed inside the challenge rooms.",
   "- Outside cake, dry snacks, and non-alcoholic beverages are welcome.",
@@ -352,6 +354,7 @@ export async function POST(request) {
 
                 <h2 style="margin:18px 0 8px;font-size:18px;line-height:1.3;color:#111827;">Important to Know</h2>
                 <ul style="margin:0 0 16px 20px;padding:0;color:#374151;font-size:15px;line-height:1.7;">
+                  <li>${BIRTHDAY_DEPOSIT_NOTICE} ${BIRTHDAY_TRANSFER_NOTICE}</li>
                   <li>Birthday packages take place during regular operating hours and are not private facility rentals. If you are looking for a private party, ask for a custom package as per your requirement.</li>
                   <li>Other parties and walk-in guests may be present, but unrelated groups are not mixed inside the challenge rooms.</li>
                   <li>Outside cake, dry snacks, and non-alcoholic beverages are welcome.</li>

@@ -7,6 +7,7 @@ import BirthdayHeroContactForm from "@/components/BirthdayHeroContactForm";
 import { fetchMenuData, fetchsheetdata } from "@/lib/sheets";
 import { safeImageUrl, canonicalUrl } from "@/lib/seo";
 import { getConfiguredValue } from "@/lib/ctaContent";
+import { BIRTHDAY_DEPOSIT_NOTICE } from "@/lib/birthdayPolicy.mjs";
 
 import { SITE_VIDEOS, videoStructuredData } from "@/lib/videoSeo.mjs";
 
@@ -535,7 +536,7 @@ export default async function BirthdayPartyBookingsVaughanPage() {
             <p>Party packages</p>
             <h2>Pick the birthday <em>package</em> that fits your group.</h2>
             <span className="ppp-bday-package-note">
-              Send us a party request for your preferred package so our team can confirm availability and details.
+              {BIRTHDAY_DEPOSIT_NOTICE} Send us a party request so our team can confirm availability and details.
             </span>
           </div>
           <div className="ppp-bday-package-grid">

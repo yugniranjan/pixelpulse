@@ -12,7 +12,7 @@ export const PIXIE_QUESTIONS = {
 
 export const PIXIE_PARTY_OPTIONS = {
   guests: ['4–7', '8–12', '13–20', '20+'],
-  ages: ['Under 7', '7–10', '11–14', '15+'],
+  ages: ['7–10', '11–14', '15+'],
   privacy: ['Standard birthday package', 'Private venue booking', 'Help me choose'],
 };
 
@@ -51,7 +51,7 @@ export function getPixiePartyPlan({ guests, age, date, privacy }) {
   }
   const summary = `${guests} children · Ages ${age} · ${date || 'Date to be decided'} · ${privacy}`;
   const privateBooking = privacy === 'Private venue booking';
-  const needsTeam = age === 'Under 7' || guests === '4–7' || guests === '20+';
+  const needsTeam = guests === '4–7' || guests === '20+';
   const next = privateBooking
     ? 'For exclusive venue access, request a private event quote from our team.'
     : needsTeam

@@ -1,3 +1,4 @@
+import { BIRTHDAY_DEPOSIT_NOTICE } from "@/lib/birthdayPolicy.mjs";
 export const dynamic = "force-dynamic";
 
 import React from "react";
@@ -200,7 +201,7 @@ const PricingComparison = ({ birthdaydata, ctaContent }) => {
 
   return (
     <section className="ppp-party-pricing" id="party-packages">
-      
+      <p className="ppp-party-deposit-notice">{BIRTHDAY_DEPOSIT_NOTICE}</p>
 
       <div className="ppp-party-table-wrap">
         <table className="ppp-party-table">

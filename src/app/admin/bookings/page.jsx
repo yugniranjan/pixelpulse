@@ -2,6 +2,7 @@
 
 import { formatPhoneNumber, matchesPhoneSearch } from "@/lib/phone.mjs";
 import PhoneInput from "@/components/PhoneInput";
+import { BIRTHDAY_DEPOSIT_LABEL, BIRTHDAY_TRANSFER_NOTICE } from "@/lib/birthdayPolicy.mjs";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "@/components/AdminShell";
 import EmailComposeModal from "@/components/admin/EmailComposeModal";
@@ -375,7 +376,8 @@ export default function AdminBookingsPage() {
       "Email: connect@pixelpulseplay.ca",
       "",
       "— TERMS & CONDITIONS —",
-      "• Deposit & payment: Your deposit secures the date and time and is non-refundable. The remaining balance is due on or before the party date.",
+      `• Deposit & payment: The deposit is ${BIRTHDAY_DEPOSIT_LABEL} for all birthday packages and is non-refundable. The remaining balance is due on or before the party date.`,
+      `• ${BIRTHDAY_TRANSFER_NOTICE}`,
       "• Rescheduling: Changes are subject to availability and must be requested at least 7 days in advance. Requests within 7 days cannot be guaranteed.",
       "• Cancellation: Cancellations made within 7 days of the party may forfeit the deposit.",
       "• Final guest count: Please confirm your final headcount at least 48 hours before the party. Charges are based on the confirmed package and guest count.",

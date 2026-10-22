@@ -99,7 +99,8 @@ test('owner-confirmed deposits and transfer email override the older draft polic
     'Deposit & payment',
   ]) {
     const answer = getPixiePlayReply(question);
-    assert.match(answer.text, /\$100 for Pixel Punch and \$200 for all other birthday packages/);
+    assert.match(answer.text, /\$200 for all birthday packages/);
+    assert.doesNotMatch(answer.text, /\$100/);
     assert.match(answer.text, /E-transfers can be sent to connect@pixelpulseplay.ca/);
     assert.ok(answer.links.some((link) => link.href === 'mailto:connect@pixelpulseplay.ca'));
   }

@@ -1,3 +1,4 @@
+import { BIRTHDAY_DEPOSIT_NOTICE, BIRTHDAY_TRANSFER_NOTICE } from "@/lib/birthdayPolicy.mjs";
 import { formatPhoneNumber } from "@/lib/phone.mjs";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firestore";
@@ -200,6 +201,9 @@ function buildConfirmationEmailText(invite = {}) {
     "- Water, juice, or soda is included as per your package.",
     "- Only dry snacks and non-alcoholic drinks are allowed from outside.",
     ...HOW_TO_PLAY_LINES,
+    "",
+    BIRTHDAY_DEPOSIT_NOTICE,
+    BIRTHDAY_TRANSFER_NOTICE,
     "",
     "Important Information - Please Read Carefully",
     "1. This is a Scheduled Party Package",

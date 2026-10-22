@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { normalizeBirthdayDepositText } from "./birthdayPolicy.mjs";
 import { getConfigValue } from "@/lib/ctaContent";
 import { DEFAULT_SEO_IMAGE, canonicalUrl, getCanonicalSiteUrl, safeImageUrl } from "@/lib/seo";
 import { isMenuItemActive } from "@/utils/customFunctions";
@@ -11,6 +12,12 @@ const reviewesData = new Map();
 let workbookLoadPromise = null;
 
 function normalizeSheetData(name, sheetData) {
+  const isBirthdaySheet = name.toLowerCase() === 'birthday packages';
+  sheetData = sheetData.map((row) => {
+    const birthdayContent = isBirthdaySheet || /birthday/i.test(String(row.path || "")) || row.key === 'birthday_packages';
+    if (!birthdayContent) return row;
+    return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, normalizeBirthdayDepositText(value)]));
+  });
   if (name !== 'config') {
     return sheetData;
   }

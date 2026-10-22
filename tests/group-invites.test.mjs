@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import * as birthdayPolicy from "../src/app/lib/birthdayPolicy.mjs";
 import { test } from "node:test";
 import { createContext, SourceTextModule, SyntheticModule } from "node:vm";
 
@@ -22,7 +23,7 @@ async function loadRoute(path, dependencies, env = {}) {
       await phone.link(() => { throw new Error("Unexpected phone dependency"); });
       return phone;
     }
-    const exports = dependencies[specifier];
+    const exports = specifier === "@/lib/birthdayPolicy.mjs" ? birthdayPolicy : dependencies[specifier];
     assert(exports, `Missing dependency: ${specifier}`);
     return new SyntheticModule(Object.keys(exports), function () {
       for (const [name, value] of Object.entries(exports)) this.setExport(name, value);
@@ -93,6 +94,8 @@ test("birthday and group lists stay separate; editing and deleting respect the m
   const birthdayResult = await (await api.POST(request("/api/admin/invites", birthday))).json();
   assert.match(birthdayResult.waiverUrl, /\?partyId=BIRTHDAY-1/);
   assert.match(birthdayResult.confirmationEmailText, /birthday/i);
+  assert.match(birthdayResult.confirmationEmailText, /\$200 deposit.*all birthday packages/);
+  assert.match(birthdayResult.confirmationEmailText, /E-transfers.*connect@pixelpulseplay.ca/);
   assert.doesNotMatch(birthdayResult.confirmationEmailText, /Play Duration:|Party Room Access:|Food & Add-ons:|Additional Extras:|Special Notes:/);
   const groupList = await (await api.GET(request("/api/admin/invites?list=1&type=group", null, "GET"))).json();
   const birthdayList = await (await api.GET(request("/api/admin/invites?list=1", null, "GET"))).json();

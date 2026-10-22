@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { test } from "node:test";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as birthdayPolicy from "../src/app/lib/birthdayPolicy.mjs";
 import * as phoneFormatting from "../src/app/lib/phone.mjs";
 import * as groupUtilities from "../src/app/lib/groupInvites.js";
 import * as ctaUtilities from "../src/app/lib/ctaContent.js";
@@ -25,6 +26,7 @@ async function component(path, overrides = {}) {
   const resolve = (name) => {
     if (name.endsWith(".css")) return {};
     if (name === "@/lib/groupInvites") return groupUtilities;
+    if (name === "@/lib/birthdayPolicy.mjs") return birthdayPolicy;
     if (name === "@/lib/phone.mjs") return phoneFormatting;
     if (name === "@/components/PhoneInput") return phoneInputComponent;
     if (name === "next/image") return ({ fill, priority, ...props }) => React.createElement("img", props);

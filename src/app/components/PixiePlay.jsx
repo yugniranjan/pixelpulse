@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { getPixiePartyPlan, getPixiePlayReply, PIXIE_PARTY_OPTIONS, PIXIE_QUESTIONS } from "@/lib/pixiePlay.mjs";
+import { getPixiePartyPlan, PIXIE_PARTY_OPTIONS } from "@/lib/pixiePlay.mjs";
+import { getPixieFlowReply } from "@/lib/pixiePlayFlow.mjs";
 import "../styles/pixieplay.css";
 
 function PixieFace() {
@@ -65,9 +66,10 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
   const input = useRef(null);
   const launcher = useRef(null);
   const feed = useRef(null);
-  const relatedQuestions = (PIXIE_QUESTIONS[topic] || [])
+  const latestAnswer = [...messages].reverse().find((message) => message.role === "assistant");
+  const relatedQuestions = (latestAnswer?.questions || [])
     .filter((prompt) => !messages.some((message) => message.role === "user" && message.text.toLowerCase() === prompt.toLowerCase()))
-    .slice(0, 3);
+    .slice(0, 2);
 
   useEffect(() => setReady(true), []);
   useEffect(() => {
@@ -135,10 +137,10 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
   function ask(value, keepTyping = false) {
     const text = value.trim();
     if (!text || text.length > 600) return;
-    const answer = getPixiePlayReply(text, knowledge, topic);
+    const answer = getPixieFlowReply(text, knowledge, topic);
     setMessages((current) => [...current, { role: "user", text }, { role: "assistant", ...answer }].slice(-41));
     setTopic(answer.topic);
-    const startPlanning = /plan.*birthday|birthday.*plan/i.test(text);
+    const startPlanning = answer.startPlanning;
     if (startPlanning) setPartyPlan(EMPTY_PARTY_PLAN);
     setPlanning(startPlanning);
     setDraft("");
@@ -149,7 +151,7 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
   function finishPlan(plan) {
     const answer = getPixiePartyPlan(plan);
     if (!answer) return;
-    setMessages((current) => [...current, { role: "assistant", ...answer }].slice(-41));
+    setMessages((current) => [...current, { role: "assistant", ...answer, links: answer.links.slice(0, 1), questions: [] }].slice(-41));
     setPlanning(false);
     setTopic("birthday");
     feed.current?.focus({ preventScroll: true });
@@ -177,10 +179,15 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
           {messages.map((message, index) => <div className={`pixieplay__message pixieplay__message--${message.role}${messages.length === 1 ? ' pixieplay__message--welcome' : ''}`} key={index}>
             <span className="pixieplay__sender">{message.role === "user" ? "You" : "PixiePlay"}</span>
             <p>{message.text}</p>
-            {message.links?.length > 0 && <div className="pixieplay__links">{message.links.map((link) => <a key={link.href} href={link.href}>{link.label}<span aria-hidden="true">↗</span></a>)}</div>}
+            {message.links?.length > 0 && <div className="pixieplay__links">
+              <a href={message.links[0].href}>{message.links[0].label}<span aria-hidden="true">↗</span></a>
+            </div>}
           </div>)}
           {planning && <PixiePartyPlanner plan={partyPlan} setPlan={setPartyPlan} onComplete={finishPlan} onCancel={() => setPlanning(false)} />}
-          {!planning && messages.length > 1 && relatedQuestions.length > 0 && <div className="pixieplay__prompts" aria-label="Related questions">{relatedQuestions.map((prompt) => <button type="button" key={prompt} onClick={() => ask(prompt)}>{prompt}<span aria-hidden="true">↗</span></button>)}</div>}
+          {!planning && messages.length > 1 && relatedQuestions.length > 0 && <details className="pixieplay__related" key={messages.length}>
+            <summary>More questions</summary>
+            <div className="pixieplay__prompts" aria-label="Related questions">{relatedQuestions.map((prompt) => <button type="button" key={prompt} onClick={() => ask(prompt)}>{prompt}<span aria-hidden="true">↗</span></button>)}</div>
+          </details>}
         </div>
         <form className="pixieplay__form" onSubmit={(event) => { event.preventDefault(); ask(draft, true); }}>
           <label htmlFor="pixieplay-question" className="pixieplay__sr-only">Ask PixiePlay a question</label>

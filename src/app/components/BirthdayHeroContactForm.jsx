@@ -1,6 +1,7 @@
 "use client";
 
 import PhoneInput from "@/components/PhoneInput";
+import { BIRTHDAY_DEPOSIT_NOTICE } from "@/lib/birthdayPolicy.mjs";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTurnstileSiteKey } from "@/lib/useTurnstileSiteKey";
@@ -378,6 +379,9 @@ export default function BirthdayHeroContactForm({ urgency = "", packageOptions =
             placeholder="Any questions, special requests, or details you'd like us to know?"
             required
           />
+          {!isPrivatePartySelected ? (
+            <small className="ppp-birthday-hero-form__deposit-note">{BIRTHDAY_DEPOSIT_NOTICE}</small>
+          ) : null}
           {!isPrivatePartySelected ? (
             <small className="ppp-birthday-hero-form__fee-note">
               Each additional participant beyond your package is charged{" "}
