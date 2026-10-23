@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import PhoneInput from '@/components/PhoneInput';
 import { useTurnstileSiteKey } from '@/lib/useTurnstileSiteKey';
 import TurnstileWidget from './smallComponents/TurnstileWidget';
 import { PIXIE_LEAD_CONSENT, validatePixieLead } from '@/lib/pixiePlayLeads.mjs';
 import { trackPixiePlay } from '@/lib/pixiePlayAnalytics.mjs';
 
 export default function PixieLeadForm({ variant, onSaved }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', consent: false, website: '' });
+  const [form, setForm] = useState({ name: '', email: '', consent: false, website: '' });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
@@ -63,7 +62,6 @@ export default function PixieLeadForm({ variant, onSaved }) {
     <p>Tell us a little about yourself, and let&apos;s get started.</p>
     <label htmlFor="pixie-lead-name">Full Name<input id="pixie-lead-name" name="name" autoComplete="name" maxLength={100} minLength={2} value={form.name} onChange={update} required disabled={locked} /></label>
     <label htmlFor="pixie-lead-email">Email<input id="pixie-lead-email" name="email" type="email" autoComplete="email" maxLength={254} value={form.email} onChange={update} required disabled={locked} /></label>
-    <label htmlFor="pixie-lead-phone">Phone<PhoneInput id="pixie-lead-phone" name="phone" maxLength={35} value={form.phone} onChange={update} required disabled={locked} /></label>
     <label className="pixieplay__lead-consent"><input type="checkbox" name="consent" checked={form.consent} onChange={update} required disabled={locked} /><span>{PIXIE_LEAD_CONSENT}</span></label>
     <label className="pixieplay__lead-honeypot" aria-hidden="true">Leave this empty<input name="website" value={form.website} onChange={update} tabIndex={-1} autoComplete="off" /></label>
     {siteKey && <TurnstileWidget key={widgetKey} siteKey={siteKey} onVerify={setToken} onExpire={() => setToken('')} onError={() => { setToken(''); setError('Security check could not load. Please retry or contact our team.'); }} />}

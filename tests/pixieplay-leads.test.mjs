@@ -6,7 +6,7 @@ import { SourceTextModule, SyntheticModule, createContext } from 'node:vm';
 import * as leads from '../src/app/lib/pixiePlayLeads.mjs';
 import { pixieAnalyticsPayload, trackPixiePlay, pixieLinkDestination } from '../src/app/lib/pixiePlayAnalytics.mjs';
 
-const valid = { submissionId: randomUUID(), name: 'Demo Parent', email: 'DEMO@example.com', phone: '+1 613 799 1972', consent: true, page: '/', variant: 'default' };
+const valid = { submissionId: randomUUID(), name: 'Demo Parent', email: 'DEMO@example.com', consent: true, page: '/', variant: 'default' };
 async function load(path, dependencies, extra = {}) {
   const context = createContext({ console, Response, URL, URLSearchParams, Buffer, Date, process: { env: {} }, AbortSignal, ...extra });
   const module = new SourceTextModule(await readFile(new URL(path, import.meta.url), 'utf8'), { context });
@@ -17,17 +17,18 @@ async function load(path, dependencies, extra = {}) {
   await module.evaluate(); return module.namespace;
 }
 
-test('leads require valid name, email, phone and explicit follow-up consent', () => {
+test('leads require name/email and consent without collecting a phone number', () => {
   const result = leads.validatePixieLead(valid);
-  assert.equal(result.email, 'demo@example.com'); assert.equal(result.phone, '(613)-799-1972');
-  for (const changes of [{ name: '' }, { name: 'x'.repeat(101) }, { email: 'not-an-email' }, { email: 'a@b.com\nBCC:other@example.com' }, { phone: '123' }, { phone: '613-799-1972 ext 123' }, { consent: false }, { consent: 'yes' }, { submissionId: 'guessed' }]) {
+  assert.equal(result.email, 'demo@example.com'); assert.equal(result.phone, undefined);
+  assert.equal(leads.validatePixieLead({ ...valid, phone: '+1 613 799 1972' }).phone, undefined);
+  for (const changes of [{ name: '' }, { name: 'x'.repeat(101) }, { email: 'not-an-email' }, { email: 'a@b.com\nBCC:other@example.com' }, { consent: false }, { consent: 'yes' }, { submissionId: 'guessed' }]) {
     assert.throws(() => leads.validatePixieLead({ ...valid, ...changes }), leads.PixieLeadError);
   }
   assert.throws(() => leads.validatePixieLead(null), leads.PixieLeadError);
   const safe = leads.validatePixieLead({ ...valid, page: '/?email=private@example.com', variant: 'private@email.com', extra: 'ignore' });
   assert.equal(safe.page, '/'); assert.equal(safe.variant, 'default'); assert.equal(safe.extra, undefined);
   const row = leads.pixieLeadRow(result, new Date('2026-10-23T16:00:00Z'));
-  assert.equal(row.length, 9); assert.match(row[1], /12:00:00.*EDT/); assert.equal(row[8], '2026-10-23T16:00:00.000Z');
+  assert.equal(row.length, 9); assert.equal(row[1], '2026-10-23, 11:00:00 EST'); assert.equal(row[4], ''); assert.equal(row[8], '2026-10-23T16:00:00.000Z');
 });
 
 test('analytics allowlists categories and discards all personal data and free text', () => {
@@ -130,4 +131,19 @@ test('public or domain-wide sheet access blocks lead writes; Google errors are s
   const failed = await sheetHarness({ failAppend: true });
   await assert.rejects(failed.module.savePixieLead(valid), (error) => error.status === 503 && !error.message.includes('credentials'));
   assert.equal(failed.queries.at(-1)[0], 'ROLLBACK'); assert.equal(failed.released(), 1);
+});
+
+
+test('EST timestamps remain UTC minus five in summer and winter, including date rollover', () => {
+  assert.equal(leads.formatPixieLeadEST(new Date('2026-07-23T16:00:00Z')), '2026-07-23, 11:00:00 EST');
+  assert.equal(leads.formatPixieLeadEST(new Date('2026-12-23T16:00:00Z')), '2026-12-23, 11:00:00 EST');
+  assert.equal(leads.formatPixieLeadEST(new Date('2026-10-23T03:30:00Z')), '2026-10-22, 22:30:00 EST');
+});
+
+test('sheet header migration supports both time labels without accepting unrelated changes', () => {
+  assert.equal(leads.matchesPixieLeadHeaders(leads.PIXIE_LEAD_HEADERS), true);
+  const legacy = [...leads.PIXIE_LEAD_HEADERS]; legacy[1] = 'Submitted (Toronto)';
+  assert.equal(leads.matchesPixieLeadHeaders(legacy), true);
+  legacy[3] = 'Wrong field'; assert.equal(leads.matchesPixieLeadHeaders(legacy), false);
+  assert.equal(leads.matchesPixieLeadHeaders([]), false);
 });
