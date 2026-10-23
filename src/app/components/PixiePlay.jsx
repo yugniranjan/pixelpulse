@@ -5,12 +5,15 @@ import { createPortal } from "react-dom";
 import { getPixiePartyPlan, PIXIE_PARTY_OPTIONS } from "@/lib/pixiePlay.mjs";
 import { getPixieFlowReply } from "@/lib/pixiePlayFlow.mjs";
 import "../styles/pixieplay.css";
+import PixieLeadForm from "./PixieLeadForm";
+import { trackPixiePlay, pixieLinkDestination } from "@/lib/pixiePlayAnalytics.mjs";
 
 function PixieFace() {
   return <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M18 3h4v5h-4zM8 10h24v4h4v18h-4v4H8v-4H4V14h4z" fill="currentColor" /><path d="M10 16h20v14H10z" fill="#0b111b" /><path d="M13 19h4v5h-4zm10 0h4v5h-4z" fill="#b9eb73" /><path d="M17 27h6v2h-6z" fill="#b9eb73" /><path d="M30 3h3V0h2v3h3v2h-3v3h-2V5h-3z" fill="#fbae7b" /></svg>;
 }
 
 const greeting = { role: "assistant", text: "Hi, I’m PixiePlay! 👋 What would you like to know about Pixel Pulse?", links: [] };
+const LEAD_SESSION_KEY = "pppPixieLeadAcceptedUntil";
 const INVITATION_KEY = "pppPixieInvitationShown";
 const EMPTY_PARTY_PLAN = { step: 0, guests: '', age: '', date: '', privacy: 'Standard birthday package' };
 
@@ -55,6 +58,9 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
   const isBirthday = variant === "birthday";
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activated, setActivated] = useState(false);
+  const [leadAccepted, setLeadAccepted] = useState(false);
+  const queuedPlan = useRef(false);
   const [messages, setMessages] = useState([greeting]);
   const [draft, setDraft] = useState("");
   const [topic, setTopic] = useState("");
@@ -71,7 +77,10 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
     .filter((prompt) => !messages.some((message) => message.role === "user" && message.text.toLowerCase() === prompt.toLowerCase()))
     .slice(0, 2);
 
-  useEffect(() => setReady(true), []);
+  useEffect(() => {
+    try { setLeadAccepted(Number(sessionStorage.getItem(LEAD_SESSION_KEY)) > Date.now()); } catch { /* In-memory lead acceptance still works. */ }
+    setReady(true);
+  }, []);
   useEffect(() => {
     if (!ready || open || invitationHandled.current) return;
     try { if (window.sessionStorage.getItem(INVITATION_KEY)) return; } catch { /* Invitation still works when storage is unavailable. */ }
@@ -105,9 +114,10 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
     if (planning) { element.scrollTop = element.scrollHeight; return; }
     const latest = [...element.querySelectorAll('.pixieplay__message')].at(-1);
     if (latest) element.scrollTop += latest.getBoundingClientRect().top - element.getBoundingClientRect().top - 16;
-  }, [messages, open, planning]);
+  }, [messages, open, planning, leadAccepted]);
 
   function close() {
+    trackPixiePlay("pixieplay_close", { variant });
     setOpen(false);
     launcher.current?.focus();
   }
@@ -121,11 +131,17 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
     invitationHandled.current = true;
     setInvitation(false);
     try { window.sessionStorage.setItem(INVITATION_KEY, 'true'); } catch { /* Keep the dismissal in memory. */ }
+    setActivated(true);
     setOpen(true);
-    if (startPlanning) ask('Plan a birthday');
+    trackPixiePlay('pixieplay_open', { variant });
+    if (startPlanning) {
+      if (leadAccepted) ask('Plan a birthday');
+      else queuedPlan.current = true;
+    }
   }
 
   function reset() {
+    trackPixiePlay("pixieplay_reset", { variant });
     setPlanning(false);
     setPartyPlan(EMPTY_PARTY_PLAN);
     setMessages([greeting]);
@@ -134,14 +150,28 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
     panel.current?.focus({ preventScroll: true });
   }
 
+  function acceptLead() {
+    setLeadAccepted(true);
+    try { sessionStorage.setItem(LEAD_SESSION_KEY, String(Date.now() + 8 * 60 * 60 * 1000)); } catch { /* Keep acceptance in memory. */ }
+    if (queuedPlan.current) {
+      queuedPlan.current = false;
+      setMessages([greeting, { role: 'assistant', text: 'Let’s plan your birthday. Start with the number of children who will play.', links: [] }]);
+      setPlanning(true);
+      trackPixiePlay('pixieplay_planner_start', { variant });
+    }
+    feed.current?.focus({ preventScroll: true });
+  }
+
   function ask(value, keepTyping = false) {
+    if (!leadAccepted) return;
     const text = value.trim();
     if (!text || text.length > 600) return;
     const answer = getPixieFlowReply(text, knowledge, topic);
     setMessages((current) => [...current, { role: "user", text }, { role: "assistant", ...answer }].slice(-41));
+    trackPixiePlay("pixieplay_question", { variant, topic: answer.topic, answered: Boolean(answer.topic) });
     setTopic(answer.topic);
     const startPlanning = answer.startPlanning;
-    if (startPlanning) setPartyPlan(EMPTY_PARTY_PLAN);
+    if (startPlanning) { setPartyPlan(EMPTY_PARTY_PLAN); trackPixiePlay("pixieplay_planner_start", { variant }); }
     setPlanning(startPlanning);
     setDraft("");
     if (keepTyping) input.current?.focus();
@@ -150,7 +180,8 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
 
   function finishPlan(plan) {
     const answer = getPixiePartyPlan(plan);
-    if (!answer) return;
+    if (!answer || !leadAccepted) return;
+    trackPixiePlay("pixieplay_planner_complete", { variant });
     setMessages((current) => [...current, { role: "assistant", ...answer, links: answer.links.slice(0, 1), questions: [] }].slice(-41));
     setPlanning(false);
     setTopic("birthday");
@@ -166,35 +197,36 @@ export default function PixiePlay({ knowledge = {}, variant = "default" }) {
         <h3>{isBirthday ? 'Big birthday plans? 🎉' : 'Ready for some real-life fun? ✨'}</h3>
         <p>{isBirthday ? 'Let’s turn “where do I start?” into a party plan.' : 'Find your next adventure or plan a party your crew will love.'}</p>
         <button className="pixieplay__invite-cta" type="button" onClick={() => openChat(isBirthday)}>{isBirthday ? 'Help me plan a birthday' : 'Ask PixiePlay'}<span aria-hidden="true">→</span></button>
-        <span className="pixieplay__invite-note">Quick answers. No sign-up needed.</span>
+        <span className="pixieplay__invite-note">A few details. Then let’s play.</span>
       </aside>}
-      {open && <section ref={panel} tabIndex={-1} className={`pixieplay__panel${messages.length === 1 ? ' pixieplay__panel--welcome' : ''}`} role="dialog" aria-labelledby="pixieplay-title" onKeyDown={(event) => { if (event.key === "Escape") close(); }}>
+      {activated && <section hidden={!open} ref={panel} tabIndex={-1} className={`pixieplay__panel${!leadAccepted ? ' pixieplay__panel--lead' : messages.length === 1 ? ' pixieplay__panel--welcome' : ''}`} role="dialog" aria-labelledby="pixieplay-title" onKeyDown={(event) => { if (event.key === "Escape") close(); }}>
         <div className="pixieplay__header">
           <span className="pixieplay__avatar"><PixieFace /></span>
           <div><h2 id="pixieplay-title">PixiePlay</h2><p>{isBirthday ? 'Your party planning sidekick' : 'A little help. A lot more play.'}</p></div>
-          <button type="button" className="pixieplay__icon-button" aria-label="Start a new conversation" title="Start over" onClick={reset}>↺</button>
+          <button type="button" className="pixieplay__icon-button" aria-label="Start a new conversation" title="Start over" onClick={reset} disabled={!leadAccepted}>↺</button>
           <button type="button" className="pixieplay__icon-button" aria-label="Close PixiePlay" onClick={close}>×</button>
         </div>
         <div className="pixieplay__feed" ref={feed} tabIndex={-1} role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation with PixiePlay">
-          {messages.map((message, index) => <div className={`pixieplay__message pixieplay__message--${message.role}${messages.length === 1 ? ' pixieplay__message--welcome' : ''}`} key={index}>
+          {!leadAccepted && <PixieLeadForm variant={variant} onSaved={acceptLead} />}
+          {leadAccepted && messages.map((message, index) => <div className={`pixieplay__message pixieplay__message--${message.role}${messages.length === 1 ? ' pixieplay__message--welcome' : ''}`} key={index}>
             <span className="pixieplay__sender">{message.role === "user" ? "You" : "PixiePlay"}</span>
             <p>{message.text}</p>
             {message.links?.length > 0 && <div className="pixieplay__links">
-              <a href={message.links[0].href}>{message.links[0].label}<span aria-hidden="true">↗</span></a>
+              <a href={message.links[0].href} onClick={() => trackPixiePlay("pixieplay_link_click", { variant, destination: pixieLinkDestination(message.links[0].href) })}>{message.links[0].label}<span aria-hidden="true">↗</span></a>
             </div>}
           </div>)}
-          {planning && <PixiePartyPlanner plan={partyPlan} setPlan={setPartyPlan} onComplete={finishPlan} onCancel={() => setPlanning(false)} />}
-          {!planning && messages.length > 1 && relatedQuestions.length > 0 && <details className="pixieplay__related" key={messages.length}>
+          {leadAccepted && planning && <PixiePartyPlanner plan={partyPlan} setPlan={setPartyPlan} onComplete={finishPlan} onCancel={() => setPlanning(false)} />}
+          {leadAccepted && !planning && messages.length > 1 && relatedQuestions.length > 0 && <details className="pixieplay__related" key={messages.length}>
             <summary>More questions</summary>
             <div className="pixieplay__prompts" aria-label="Related questions">{relatedQuestions.map((prompt) => <button type="button" key={prompt} onClick={() => ask(prompt)}>{prompt}<span aria-hidden="true">↗</span></button>)}</div>
           </details>}
         </div>
-        <form className="pixieplay__form" onSubmit={(event) => { event.preventDefault(); ask(draft, true); }}>
+        {leadAccepted && <form className="pixieplay__form" onSubmit={(event) => { event.preventDefault(); ask(draft, true); }}>
           <label htmlFor="pixieplay-question" className="pixieplay__sr-only">Ask PixiePlay a question</label>
           <input ref={input} id="pixieplay-question" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={600} autoComplete="off" placeholder="Type your question…" />
           <button type="submit" disabled={!draft.trim()} aria-label="Send message"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v15" /></svg></button>
-        </form>
-        <p className="pixieplay__footer">FAQ guide from Pixel Pulse · <a href="/contactus">Talk to our team</a></p>
+        </form>}
+        <p className="pixieplay__footer">FAQ guide from Pixel Pulse · <a href="/contactus" onClick={() => trackPixiePlay("pixieplay_link_click", { variant, destination: "contact" })}>Talk to our team</a></p>
       </section>}
       <button ref={launcher} type="button" className="pixieplay__launcher" aria-expanded={open} aria-haspopup="dialog" aria-label={open ? "Close PixiePlay chat" : "Open PixiePlay chat"} onClick={() => open ? close() : openChat()}>
         <span className="pixieplay__launcher-face"><PixieFace /></span><span>{open ? 'Back to the page' : messages.length > 1 ? 'Back to PixiePlay' : isBirthday ? 'Plan a birthday' : 'Let’s plan some fun'}<small>{open ? 'Your chat stays right here' : isBirthday ? '3 quick steps with PixiePlay' : 'Quick answers with PixiePlay'}</small></span><span className="pixieplay__launcher-arrow" aria-hidden="true">{open ? '⌄' : '↗'}</span>
