@@ -47,7 +47,7 @@ function loadTurnstileScript() {
   return scriptPromise;
 }
 
-export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }) {
+export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError, appearance = "interaction-only" }) {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
 
@@ -67,6 +67,7 @@ export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }
 
         widgetIdRef.current = turnstile.render(containerRef.current, {
           sitekey: siteKey,
+          appearance,
           callback: (token) => onVerify?.(token),
           "expired-callback": () => onExpire?.(),
           "error-callback": () => onError?.(),
@@ -88,7 +89,7 @@ export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteKey]);
+  }, [siteKey, appearance]);
 
   return <div ref={containerRef} className="ppp-turnstile" />;
 }
