@@ -695,7 +695,7 @@ const Home = async () => {
     ...item,
     videoThumbnail: [item.videoThumbnail, item.video_thumbnail, item.thumbnail, item.smallimage, item.headerimage]
       .map((url) => safeImageUrl(url, ""))
-      .find(Boolean) || SITE_VIDEOS.gameplay.thumbnailPath,
+      .find(Boolean) || "/assets/images/videos/pixelgame.jpg",
   }));
 
   const attractionsData = Array.isArray(data)

@@ -167,6 +167,8 @@ const MotionImage = ({ pageData, heroData = {} }) => {
               style={{
                 objectFit: "cover",
                 filter: "opacity(0.58) saturate(1.14) contrast(1.05)",
+                opacity: videoReady ? 0 : 1,
+                transition: "opacity 400ms ease",
               }}
             />
           ) : null}
@@ -178,7 +180,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
             playsInline
             preload={shouldLoadVideo ? "metadata" : "none"}
             width="100%"
-            onCanPlay={() => setVideoReady(true)}
+            onPlaying={() => setVideoReady(true)}
             style={{
               position: videoPoster ? "absolute" : undefined,
               inset: videoPoster ? 0 : undefined,
