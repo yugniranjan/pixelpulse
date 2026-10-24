@@ -1,3 +1,4 @@
+import { menuItemPath } from "@/lib/contentPaths.mjs";
 import { fetchPublicBlogCards } from "@/lib/publicBlogs";
 // 'use client';
 
@@ -23,16 +24,6 @@ const GROUP_EVENT_FOOTER_LINKS = [
   { path: "school-groups", label: "School / Groups" },
   { path: "fund-raising", label: "Fund Raising" },
 ];
-
-function footerHrefForItem(item = {}, locationSlug = "") {
-  const path = String(item?.path || "").trim().toLowerCase();
-  const parentid = String(item?.parentid || "").trim().toLowerCase();
-
-  if (!path) return "";
-  if (!parentid || parentid === path) return `/${path}`;
-
-  return `/${locationSlug}/${parentid}/${path}`;
-}
 
 const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   if (!configdata?.length || !menudata?.length) return null;
@@ -75,7 +66,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
     .filter((item) => {
       const path = String(item?.path || "").trim().toLowerCase();
       const parentid = String(item?.parentid || "").trim().toLowerCase();
-      const href = footerHrefForItem(item, location_slug);
+      const href = menuItemPath(item);
 
       return (
         isMenuItemActive(item) &&
@@ -87,7 +78,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
     })
     .map((item) => ({
       label: item?.desc || item?.title || item?.path,
-      href: footerHrefForItem(item, location_slug),
+      href: menuItemPath(item),
     }));
   const companyLinks = [...companyStaticLinks, ...sheetCompanyLinks];
   const groupSheetChildren = groupsData?.[0]?.children || [];
@@ -118,9 +109,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
         .map((item, index) => ({
           id: `menu-${item?.path || index}`,
           title: item?.desc || blogFallbacks[index]?.title || "Latest Update",
-          href: item?.parentid && item?.path
-            ? `/${location_slug}/${item.parentid}/${item.path}`
-            : "/blogs",
+          href: menuItemPath(item, "blogs"),
           image: blogFallbacks[index]?.featuredImage || blogFallbacks[0].featuredImage,
         }));
   const socialLinks = [
@@ -154,7 +143,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             <li>Attractions</li>
             {attractionsData?.[0]?.children?.map((item, i) => (
               <li key={i}>
-                <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                <Link href={menuItemPath(item)} prefetch>
                   {item?.desc}
                 </Link>
               </li>
@@ -165,7 +154,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
               <li>Programs</li>
               {programsData?.[0]?.children?.map((item, i) => (
                 <li key={i}>
-                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                  <Link href={menuItemPath(item)} prefetch>
                     {item?.desc}
                   </Link>
                 </li>
@@ -198,7 +187,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                   !hiddenCompanySlugs.has(itemPath) &&
                   !itemTitle.includes("safety information") && (
                     <li key={i}>
-                      <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                      <Link href={menuItemPath(item)} prefetch>
                         {item?.desc}
                       </Link>
                     </li>
@@ -231,7 +220,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
             {blogChildren.map((item, i) => (
               item?.isactive == 1 && (
                 <li key={i}>
-                  <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                  <Link href={menuItemPath(item, "blogs")} prefetch>
                     {item?.desc}
                   </Link>
                 </li>

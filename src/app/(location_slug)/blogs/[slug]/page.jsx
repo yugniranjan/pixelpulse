@@ -8,7 +8,7 @@ import {
 } from "@/lib/sheets";
 import { LOCATION_NAME } from "@/lib/constant";
 import { db } from "@/lib/firestore";
-import { fetchBlogs } from "@/lib/blogs";
+import { getBlogBySlug } from "@/lib/blogLookup";
 import { getPostgresBlogById, hasPostgres } from "@/lib/postgresData";
 import { notFound } from "next/navigation";
 import { canonicalUrl } from "@/lib/seo";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params, searchParams }) {
   const data = await getBlogBySlugOrId({ id, slug });
 
   if (!data) {
-    return {};
+    notFound();
   }
 
   const title = data?.title || "Blog";
@@ -114,8 +114,7 @@ async function getBlogBySlugOrId({ id, slug }) {
   if (!slug) return null;
 
   try {
-    const blogs = await fetchBlogs();
-    return blogs.find((blog) => slugify(blog?.title || "") === slug) || null;
+    return await getBlogBySlug(slug);
   } catch (error) {
     console.warn(`Blog detail unavailable: ${error?.message || error}`);
     return null;

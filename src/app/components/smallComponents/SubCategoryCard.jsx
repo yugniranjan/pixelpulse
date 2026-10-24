@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { safeImageUrl } from "@/lib/seo";
+import { menuItemPath } from "@/lib/contentPaths.mjs";
 const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, parentpath }) => {
 
   return (
@@ -24,7 +25,7 @@ const SubCategoryCard = ({ attractionsData, location_slug, theme, title, text, p
           {attractionsData?.map((item, i) => (
             <li key={i}>
               <Link
-                href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                href={menuItemPath(item, parentpath)}
                 prefetch
               >
                 <article className="d-flex-dir-col">

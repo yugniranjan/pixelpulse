@@ -1,4 +1,5 @@
 import { LOCATION_NAME } from "@/lib/constant";
+import { canonicalBlogPath } from "./contentPaths.mjs";
 
 const DEFAULT_SITE_URL = "https://pixelpulseplay.ca";
 export const DEFAULT_SEO_IMAGE =
@@ -47,7 +48,8 @@ export function canonicalPath(...segments) {
     parts[0] = "contactus";
   }
 
-  return parts.length ? `/${parts.join("/")}` : "";
+  const path = parts.length ? `/${parts.join("/")}` : "";
+  return canonicalBlogPath(path) || path;
 }
 
 export function canonicalUrl(...segments) {

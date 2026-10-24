@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { TRACKING_PATH_HEADER } from "./app/lib/trackingScope";
+import { canonicalBlogPath } from "./app/lib/contentPaths.mjs";
 
 const CANONICAL_HOST = "pixelpulseplay.ca";
 const DEFAULT_LOCATION_SLUG = "vaughan";
@@ -137,6 +138,22 @@ export function middleware(request) {
   ).toLowerCase();
   const token = request.cookies.get("admin_token")?.value;
   const isInternalAppPath = pathname.startsWith("/admin") || pathname.startsWith("/api");
+
+  // Normalize the host, protocol, legacy prefixes, casing and old article names
+  // together, so crawlers reach the canonical article in one permanent hop.
+  const blogPath = canonicalBlogPath(pathname);
+  if (blogPath && !isInternalAppPath && !isAssetPath(pathname) && (
+    blogPath !== pathname || requestHostname !== CANONICAL_HOST ||
+    forwardedProto === "http" || request.nextUrl.searchParams.has("uid")
+  )) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https";
+    url.hostname = CANONICAL_HOST;
+    url.port = "";
+    url.pathname = blogPath;
+    url.searchParams.delete("uid");
+    return NextResponse.redirect(url, 308);
+  }
 
   if (
     requestHostname === "www.pixelpulseplay.ca" ||

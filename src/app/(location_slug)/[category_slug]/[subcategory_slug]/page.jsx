@@ -1,3 +1,4 @@
+import { menuItemPath } from "@/lib/contentPaths.mjs";
 export const dynamic = "force-dynamic";
 import React from "react";
 import Image from "next/image";
@@ -190,7 +191,7 @@ const Subcategory = async ({ params }) => {
                     {categoryData.map((item, i) => (
                       <article className="ppp-subcategory-card" key={item.pageid || i}>
                         <Link
-                          href={`/${item?.parentid}/${item?.path}`}
+                          href={menuItemPath(item)}
                           prefetch
                           className="ppp-subcategory-card__media"
                         >
@@ -204,13 +205,13 @@ const Subcategory = async ({ params }) => {
                         </Link>
 
                         <div className="ppp-subcategory-card__body">
-                          <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
+                          <Link href={menuItemPath(item)} prefetch>
                             <h3>{item?.desc}</h3>
                             <p>{item?.metatitle}</p>
                           </Link>
                           {ctaContent.readMoreText && (
                             <Link
-                              href={`/${item?.parentid}/${item?.path}`}
+                              href={menuItemPath(item)}
                               prefetch
                               className="ppp-subcategory-card__link"
                             >
@@ -296,7 +297,7 @@ const Subcategory = async ({ params }) => {
                     {categoryData.map((item, i) => (
                       <article className="ppp-groupdetail-card" key={item.pageid || i}>
                         <Link
-                          href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                          href={menuItemPath(item)}
                           prefetch
                           className="ppp-groupdetail-card__media"
                         >
@@ -310,13 +311,13 @@ const Subcategory = async ({ params }) => {
                         </Link>
 
                         <div className="ppp-groupdetail-card__body">
-                          <Link href={`/${location_slug}/${item?.parentid}/${item?.path}`} prefetch>
+                          <Link href={menuItemPath(item)} prefetch>
                             <h3>{item?.desc}</h3>
                             <p>{item?.metatitle}</p>
                           </Link>
                           {ctaContent.readMoreText && (
                             <Link
-                              href={`/${location_slug}/${item?.parentid}/${item?.path}`}
+                              href={menuItemPath(item)}
                               prefetch
                               className="ppp-groupdetail-card__link"
                             >
@@ -403,7 +404,7 @@ const Subcategory = async ({ params }) => {
                     {categoryData.map((item, i) => (
                       <article className="ppp-detail-card" key={item.pageid || i}>
                         <Link
-                          href={`/${item?.parentid}/${item?.path}`}
+                          href={menuItemPath(item)}
                           prefetch
                           className="ppp-detail-card__media"
                         >
@@ -417,13 +418,13 @@ const Subcategory = async ({ params }) => {
                         </Link>
 
                         <div className="ppp-detail-card__body">
-                          <Link href={`/${item?.parentid}/${item?.path}`} prefetch>
+                          <Link href={menuItemPath(item)} prefetch>
                             <h3>{item?.desc}</h3>
                             <p>{item?.metatitle || item?.metadescription}</p>
                           </Link>
                           {ctaContent.readMoreText && (
                             <Link
-                              href={`/${item?.parentid}/${item?.path}`}
+                              href={menuItemPath(item)}
                               prefetch
                               className="ppp-detail-card__link"
                             >

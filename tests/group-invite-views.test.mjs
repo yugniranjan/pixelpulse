@@ -9,6 +9,7 @@ import * as phoneFormatting from "../src/app/lib/phone.mjs";
 import * as groupUtilities from "../src/app/lib/groupInvites.js";
 import * as ctaUtilities from "../src/app/lib/ctaContent.js";
 import * as trackingScope from "../src/app/lib/trackingScope.js";
+import * as contentPaths from "../src/app/lib/contentPaths.mjs";
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
@@ -28,6 +29,8 @@ async function component(path, overrides = {}) {
     if (name === "@/lib/groupInvites") return groupUtilities;
     if (name === "@/lib/birthdayPolicy.mjs") return birthdayPolicy;
     if (name === "@/lib/phone.mjs") return phoneFormatting;
+    if (name === "@/lib/contentPaths.mjs" || name === "./app/lib/contentPaths.mjs") return contentPaths;
+    if (name === "./lib/blogLookup") return { getBlogBySlug: async () => null };
     if (name === "@/components/PhoneInput") return phoneInputComponent;
     if (name === "next/image") return ({ fill, priority, ...props }) => React.createElement("img", props);
     return overrides[name] || require(name);

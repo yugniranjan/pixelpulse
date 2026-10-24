@@ -1,6 +1,8 @@
 import "./globals.css";
 import Script from "next/script";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import { getBlogBySlug } from "./lib/blogLookup";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Header from "./components/Header";
@@ -205,7 +207,16 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const requestHeaders = headers();
-  const trackingAllowed = isPublicTrackingPath(requestHeaders.get(TRACKING_PATH_HEADER));
+  const requestPath = requestHeaders.get(TRACKING_PATH_HEADER);
+  const trackingAllowed = isPublicTrackingPath(requestPath);
+  // Resolve article existence before returning the shell/Suspense boundary;
+  // otherwise a streamed not-found page has already committed HTTP 200.
+  const articlePath = /^\/blogs\/([^/]+)\/?$/.exec(requestPath || "");
+  if (articlePath) {
+    let slug;
+    try { slug = decodeURIComponent(articlePath[1]); } catch { notFound(); }
+    if (!await getBlogBySlug(slug)) notFound();
+  }
   const hostname = (requestHeaders.get("x-forwarded-host") || requestHeaders.get("host") || "").split(":")[0].toLowerCase();
   // These hosts never use the main navigation/footer. Omit them on the server
   // instead of rendering them and discarding them during browser hydration.
