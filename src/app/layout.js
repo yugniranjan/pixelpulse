@@ -204,7 +204,12 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
-  const trackingAllowed = isPublicTrackingPath(headers().get(TRACKING_PATH_HEADER));
+  const requestHeaders = headers();
+  const trackingAllowed = isPublicTrackingPath(requestHeaders.get(TRACKING_PATH_HEADER));
+  const hostname = (requestHeaders.get("x-forwarded-host") || requestHeaders.get("host") || "").split(":")[0].toLowerCase();
+  // These hosts never use the main navigation/footer. Omit them on the server
+  // instead of rendering them and discarding them during browser hydration.
+  const standaloneHost = /^(www\.)?(birthdays|events|rewards)\.pixelpulseplay\.ca$/.test(hostname);
   // const location_slug = params?.location_slug;
   const location_slug = LOCATION_NAME;
 
@@ -213,7 +218,7 @@ export default async function RootLayout({ children }) {
   let sheetdata = [];
   try {
     [menudata, configdata, sheetdata] = await Promise.all([
-      fetchMenuData(location_slug),
+      standaloneHost ? Promise.resolve([]) : fetchMenuData(location_slug),
       fetchsheetdata('config', location_slug),
       fetchsheetdata('locations', location_slug),
     ]);
@@ -253,21 +258,21 @@ export default async function RootLayout({ children }) {
         </TrackingVisibility>
         <Toaster position="top-right" />
         <div className="ppp-site-shell">
-          <ChromeVisibility>
+          {!standaloneHost && <ChromeVisibility>
             <Header location_slug={location_slug} menudata={menudata} configdata={configdata} />
             <Breadcrumbs />
             <FloatingWaiverButton />
-          </ChromeVisibility>
+          </ChromeVisibility>}
           <div className="ppp-site-content">
             <Suspense fallback={<Loading />}>{children}</Suspense>
           </div>
-          <ChromeVisibility>
+          {!standaloneHost && <ChromeVisibility>
             <Footer
               location_slug={location_slug}
               configdata={configdata}
               menudata={menudata}
             />
-          </ChromeVisibility>
+          </ChromeVisibility>}
         </div>
         <div id="modal-root"></div>
       </body>

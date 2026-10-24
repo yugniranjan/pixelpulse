@@ -1,4 +1,5 @@
 import Image from "next/image";
+import DeferredVideo from "@/components/DeferredVideo";
 import "../styles/birthday-landing.css";
 import "../styles/birthday-bookings-vaughan.css";
 import { FaArrowRight, FaGamepad, FaLock, FaPeopleGroup, FaStar } from "react-icons/fa6";
@@ -404,7 +405,7 @@ function DedicatedPartyRoomSection() {
           </div>
 
           <div className="ppp-bday-room__video-shell">
-            <video
+            <DeferredVideo
               className="ppp-bday-room__video"
               src={partyRoomVideo}
               poster={partyRoomImage}
@@ -412,7 +413,6 @@ function DedicatedPartyRoomSection() {
               muted
               loop
               playsInline
-              preload="metadata"
               aria-label="Pixel Pulse birthday party room video"
             />
             <a className="ppp-bday-room__video-badge" href={canonicalUrl(SITE_VIDEOS.partyRoom.watchPath)}>Watch party room tour ↗</a>

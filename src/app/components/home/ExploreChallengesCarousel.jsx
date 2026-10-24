@@ -71,7 +71,7 @@ export default function ExploreChallengesCarousel({ games = [] }) {
               href={href}
               target={href.startsWith("http") ? "_blank" : undefined}
               rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-              prefetch={!href.startsWith("http")}
+              prefetch={false}
             >
               <article className="ppp-attraction-card">
                 <figure className="ppp-attraction-card__fig">
@@ -81,7 +81,7 @@ export default function ExploreChallengesCarousel({ games = [] }) {
                       width={400}
                       height={260}
                       alt={imageAlt || title}
-                      unoptimized
+                      sizes="(max-width: 600px) 70vw, (max-width: 1000px) 45vw, 400px"
                       className="ppp-attraction-card__img"
                     />
                   )}

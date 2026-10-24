@@ -1051,25 +1051,25 @@
 .ppp-use-case-card--birthday::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/aerosports/celeberate-your-birthday-parties-at-aerosports.png");
+    url("/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Faerosports%2Fceleberate-your-birthday-parties-at-aerosports.png&w=828&q=75");
 }
 
 .ppp-use-case-card--corporate::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/CorporateParty.webp");
+    url("/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpixel-pulse-play%2Fweb%2FCorporateParty.webp&w=828&q=75");
 }
 
 .ppp-use-case-card--school-trips::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/SchoolTrips.webp");
+    url("/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpixel-pulse-play%2Fweb%2FSchoolTrips.webp&w=828&q=75");
 }
 
 .ppp-use-case-card--friends-date::before {
   background-image:
     linear-gradient(180deg, rgba(5, 8, 16, 0.08), rgba(5, 8, 16, 0.28)),
-    url("https://storage.googleapis.com/pixel-pulse-play/web/fund-raisers.webp");
+    url("/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fpixel-pulse-play%2Fweb%2Ffund-raisers.webp&w=828&q=75");
 }
 
 .ppp-use-case-card--birthday > *,

@@ -1,10 +1,11 @@
+import { fetchPublicBlogCards } from "@/lib/publicBlogs";
 // 'use client';
 
 import { formatPhoneNumber } from "@/lib/phone.mjs";
 import Image from "next/image";
 import "../styles/home.css";
 import Link from "next/link";
-import { fetchBlogs, getFallbackBlogs } from "@/lib/blogs";
+import { getFallbackBlogs } from "@/lib/blogs";
 import { getConfiguredValue } from "@/lib/ctaContent";
 import BookingButton from "@/components/smallComponents/BookingButton";
 import { getDataByParentId, isMenuItemActive } from "@/utils/customFunctions";
@@ -102,7 +103,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
   const companyChildren = companyData?.[0]?.children || [];
   const blogChildren = blogsData?.[0]?.children || [];
   const blogFallbacks = getFallbackBlogs();
-  const latestBlogData = await fetchBlogs();
+  const latestBlogData = await fetchPublicBlogCards();
   const latestNews =
     Array.isArray(latestBlogData) && latestBlogData.length > 0
       ? latestBlogData.slice(0, 2).map((item, index) => ({
@@ -247,7 +248,7 @@ const Footer = async ({ location_slug, configdata, menudata, reviewdata }) => {
                         alt=""
                         width={40}
                         height={40}
-                        unoptimized
+                        sizes="40px"
                       />
                       <div>
                         <h6>Latest News</h6>

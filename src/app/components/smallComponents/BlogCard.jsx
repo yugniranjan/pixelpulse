@@ -1,11 +1,12 @@
-import { fetchBlogs, getFallbackBlogs } from '@/lib/blogs';
+import { fetchPublicBlogCards } from "@/lib/publicBlogs";
+import { getFallbackBlogs } from '@/lib/blogs';
 import { slugify } from '@/utils/slugify';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
 const BlogCard = async ({ blogsData, location_slug }) => {
-  const extractBlogData = await fetchBlogs();
+  const extractBlogData = await fetchPublicBlogCards();
   const blogChildren = Array.isArray(blogsData?.children)
     ? blogsData.children.filter((item) => item?.isactive == 1)
     : [];
@@ -47,7 +48,7 @@ const BlogCard = async ({ blogsData, location_slug }) => {
               height={120}
               alt="article image"
               title={item.title}
-              unoptimized
+              sizes="120px"
             />
             <div className="aero_home_article_desc">
               <div>{item.order}</div>

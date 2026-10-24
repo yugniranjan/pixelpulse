@@ -88,6 +88,9 @@ async function populateSheetCache() {
       name,
       XLSX.utils.sheet_to_json(worksheet, { defval: '' }),
     );
+    // Shared, unfiltered tabs (including homepage content) come from the same
+    // workbook request as navigation/config rather than separate CSV requests.
+    sheetCache.set(`${name}:all`, { data: sheetData, timestamp: now });
 
     distinctLocations.forEach((loc) => {
       const filteredData = filterSheetDataByLocation(sheetData, loc);
@@ -114,7 +117,10 @@ async function ensureSheetCache(cacheKey) {
   }
 
   await workbookLoadPromise;
-  return sheetCache.get(cacheKey)?.data || [];
+  if (!sheetCache.has(cacheKey)) {
+    sheetCache.set(cacheKey, { data: [], timestamp: Date.now() });
+  }
+  return sheetCache.get(cacheKey).data;
 }
 
 export async function fetchsheetdata(sheetName, location) {
