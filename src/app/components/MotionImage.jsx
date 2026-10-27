@@ -179,6 +179,7 @@ const MotionImage = ({ pageData, heroData = {} }) => {
             loop
             playsInline
             preload={shouldLoadVideo ? "metadata" : "none"}
+            poster={videoPoster || undefined}
             width="100%"
             onPlaying={() => setVideoReady(true)}
             style={{

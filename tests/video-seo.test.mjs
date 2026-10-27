@@ -54,7 +54,7 @@ test('watch pages remain in the video sitemap if the content sheet is unavailabl
   assert.ok(!xml.includes('player_loc'));
 });
 
-test('homepage hero exposes its video source in initial HTML without eager playback', async () => {
+test('homepage hero exposes its video source and thumbnail in initial HTML without eager playback', async () => {
   const { transform } = await import('next/dist/build/swc/index.js');
   const source = fs.readFileSync(path.join(root, 'src/app/components/MotionImage.jsx'), 'utf8')
     .replace('import BookingButton from "./smallComponents/BookingButton";', 'const BookingButton = () => null;');
@@ -66,6 +66,7 @@ test('homepage hero exposes its video source in initial HTML without eager playb
   compiled._compile(result.code, filename);
   const html = renderToStaticMarkup(React.createElement(compiled.exports.default, { pageData: { video: '/hero.mp4', videoThumbnail: '/poster.jpg' }, heroData: { headline: 'Play together' } }));
   assert.ok(html.includes('<source src="/hero.mp4"'));
+  assert.match(html, /<video\b[^>]*poster="\/poster\.jpg"/);
   assert.ok(html.includes('preload="none"'));
   assert.ok(!html.includes('autoPlay') && !html.includes('autoplay'));
   assert.ok(html.includes('Play together'));
